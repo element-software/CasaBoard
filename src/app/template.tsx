@@ -4,6 +4,7 @@ import './globals.css'
 import { HassConnect } from '@hakit/core'
 import { ThemeProvider } from '@hakit/components'
 import React from 'react';
+import Sidebar from '@/components/Sidebar';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,8 +17,10 @@ export default function Template({
 }) {
   return (
       <HassConnect hassUrl={HASS_URL}>
-        <ThemeProvider />
-        {children}
+        <ThemeProvider includeThemeControls={true}/>
+          <Sidebar>
+            {children}
+          </Sidebar>
       </HassConnect>
   )
 }

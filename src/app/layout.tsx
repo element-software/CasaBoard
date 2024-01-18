@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import React from 'react';
-import Sidebar from './components/Sidebar';
 
 export const metadata: Metadata = {
   title: 'InnerSpace Dashboard',
@@ -15,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className='h-full bg-white'>
-      <body className='h-full'><Sidebar>{children}</Sidebar></body>
+      <body className='h-full'>{children}</body>
     </html>
   )
 }
