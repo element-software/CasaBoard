@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "npx ts-node --esm scripts/deploy.ts"
   },
   "dependencies": {
     "@hakit/components": "^3.1.1",
@@ -15,7 +16,9 @@
     "@heroicons/react": "^2.1.1",
     "@tailwindcss/forms": "^0.5.7",
     "classnames": "^2.5.1",
+    "dotenv": "^16.3.1",
     "next": "14.0.4",
+    "node-scp": "^0.0.23",
     "react": "^18",
     "react-dom": "^18"
   },
