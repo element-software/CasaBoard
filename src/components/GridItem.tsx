@@ -82,22 +82,18 @@ const GridItem = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "w-full divide-y divide-gray-200 shadow",
+        "w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-6 h-36",
         stateClassNameBg()
       )}
+      onClick={() => handleToggle(entity.entity_id as EntityName)}
     >
-      <div
-        className="flex w-full flex-col items-center text-center justify-between space-y-2 p-6"
-        onClick={() => handleToggle(entity.entity_id as EntityName)}
-      >
-        <h3 className="w-full text-sm font-medium uppercase text-white">
-          {entity.attributes.friendly_name}
-        </h3>
-        <LightBulbIcon
-          className={classNames("h-8 w-8", stateClassNameIcon())}
-          aria-hidden="true"
-        />
-      </div>
+      <h3 className="w-full text-sm font-medium uppercase text-white">
+        {entity.attributes.friendly_name}
+      </h3>
+      <LightBulbIcon
+        className={classNames("h-8 w-8", stateClassNameIcon())}
+        aria-hidden="true"
+      />
     </div>
   );
 };
