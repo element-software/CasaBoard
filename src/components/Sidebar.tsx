@@ -2,6 +2,7 @@ import { EntityName, useWeather } from "@hakit/core";
 import Clock from "./Clock";
 import { WeatherCard } from "@hakit/components";
 import Thermostat from "./Thermostat";
+import ThermostatCardSimple from "./ThermostatCardSimple";
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -37,7 +38,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               />
             </div>
             <div className="flex flex-1 flex-col w-full">
-              <Thermostat entityId={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
+              <ThermostatCardSimple entity={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
             </div>
             <div className="flex flex-1 flex-col w-full items-end">
               <img
