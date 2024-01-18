@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .bgimage {
-  background-image: url("/gold-bg.jpg");
+  background-image: url("http://192.168.1.222:8123/local/ha-nextjs-dashboard/gold-bg.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

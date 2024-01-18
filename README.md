@@ -33,4 +33,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 To deploy you can run `npm run deploy` but make sure to fill out your ENV file
 
-Also you need to do a 'find all' and replace `/_next` with `http://192.168.1.222:8123/local/ha-nextjs-dashboard/_next` so it can reference the correct path when deployed.
+Also you need to do a 'find all' for `*.html` and replace `/_next` with `http://192.168.1.222:8123/local/ha-nextjs-dashboard/_next` so it can reference the correct path when deployed.
+
+TODO: add script to auto replace these files or find a way around it
