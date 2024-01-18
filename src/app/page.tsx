@@ -1,6 +1,7 @@
 "use client";
+import GridItem from '@/components/GridItem';
 import { ButtonCard, Group } from '@hakit/components';
-import { DomainService, useHass } from '@hakit/core';
+import { DomainService, EntityName, useHass } from '@hakit/core';
 import { useCallback } from 'react';
 
 export default function Home() {
@@ -24,6 +25,7 @@ export default function Home() {
 
   return (
     <main className="flex h-full flex-col items-center p-8">
+        <GridItem entityId={"light.kitchen_downlights" as EntityName}/>
         <Group title="Main Lighting" gap="1rem">
           <ButtonCard 
             entity="light.kitchen_downlights"

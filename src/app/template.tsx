@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar';
 
 const inter = Inter({ subsets: ['latin'] })
 
-const HASS_URL = 'http://192.168.1.222:8123';
+const HASS_URL = 'https://ha.iqbalibrahim.co.uk';
 
 export default function Template({
   children,
