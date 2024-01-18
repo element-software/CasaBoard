@@ -82,7 +82,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-6 h-36",
+        "w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-6 h-36 cursor-pointer",
         stateClassNameBg()
       )}
       onClick={() => handleToggle(entity.entity_id as EntityName)}

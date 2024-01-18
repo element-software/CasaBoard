@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npx ts-node --esm scripts/deploy.ts"
+    "deploy": "npx tsx ./deploy.ts"
   },
   "dependencies": {
     "@hakit/components": "^3.1.1",

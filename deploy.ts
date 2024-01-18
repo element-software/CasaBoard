@@ -10,7 +10,7 @@ const PASSWORD = process.env.VITE_SSH_PASSWORD;
 const HOST_OR_IP_ADDRESS = process.env.VITE_SSH_HOSTNAME;
 const PORT = 22;
 const REMOTE_FOLDER_NAME = process.env.VITE_FOLDER_NAME;
-const LOCAL_DIRECTORY = './dist';
+const LOCAL_DIRECTORY = './build';
 const REMOTE_PATH = `/config/www/${REMOTE_FOLDER_NAME}`;
 
 async function checkDirectoryExists() {
