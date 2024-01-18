@@ -1,7 +1,6 @@
 "use client";
 import './globals.css'
 import { HassConnect } from '@hakit/core'
-import { ThemeProvider } from '@hakit/components'
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 

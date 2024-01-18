@@ -1,12 +1,7 @@
-import { useWeather } from "@hakit/core";
+import { EntityName, useWeather } from "@hakit/core";
 import Clock from "./Clock";
 import { WeatherCard } from "@hakit/components";
-
-const Weather = () => {
-  const weatherEntity = useWeather("weather.home");
-  // can now access all properties relating to the weather for this entity.
-  return <div>{JSON.stringify(weatherEntity.forecast, null, 2)}</div>;
-};
+import Thermostat from "./Thermostat";
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -40,6 +35,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 xxs={12}
                 apparentTemperatureAttribute="temperature"
               />
+            </div>
+            <div className="flex flex-1 flex-col w-full">
+              <Thermostat entityId={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
             </div>
             <div className="flex flex-1 flex-col w-full items-end">
               <img
