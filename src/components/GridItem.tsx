@@ -1,6 +1,5 @@
 "use client";
 import { EntityName, useEntity, useHass } from "@hakit/core";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/20/solid";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useCallback } from "react";
@@ -59,7 +58,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
   const stateClassNameBg = () => {
     switch (entity.state) {
       case "on":
-        return "bg-stone-500";
+        return "bg-stone-800";
       case "off":
         return "bg-stone-800";
       default:
@@ -78,22 +77,33 @@ const GridItem = ({ entityId }: GridItemProps) => {
     }
   };
 
+  const stateClassNameIconBg = () => {
+    switch (entity.state) {
+      case "on":
+        return "bg-yellow-800";
+      case "off":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
   return (
     <div
       key={entity.entity_id}
       className={classNames(
-        "w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-6 h-36 cursor-pointer",
+        "relative rounded-md overflow-hidden w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-4 h-40 cursor-pointer bg-stone-500",
         stateClassNameBg()
       )}
       onClick={() => handleToggle(entity.entity_id as EntityName)}
     >
-      <h3 className="w-full text-sm font-medium uppercase text-white">
+      <h3 className="w-full text-md font-bold uppercase text-white">
         {entity.attributes.friendly_name}
       </h3>
-      <LightBulbIcon
-        className={classNames("h-8 w-8", stateClassNameIcon())}
-        aria-hidden="true"
-      />
+
+      <div className={classNames("absolute -left-4 -bottom-4 rounded-full p-6", stateClassNameIconBg())}>
+        <LightBulbIcon className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />
+      </div>
     </div>
   );
 };

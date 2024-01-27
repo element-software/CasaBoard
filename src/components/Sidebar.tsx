@@ -38,7 +38,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               />
             </div>
             <div className="flex flex-1 flex-col w-full">
-              <ThermostatCardSimple entity={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
+              <Thermostat entityId={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
             </div>
             <div className="flex flex-1 flex-col w-full items-end">
               <img
