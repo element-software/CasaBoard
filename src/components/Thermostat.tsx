@@ -18,7 +18,7 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
   return (
     <div className="w-full p-4 text-center bg-stone-500/80 text-white rounded-lg">
       <div className="relative w-40 h-40">
-        <svg className="w-full h-full -rotate-[135deg]" viewBox="0 0 100 100">
+        <svg className="w-full h-full" viewBox="0 0 100 100">
           <circle
             className="text-gray-200 stroke-current"
             stroke-width="10"
@@ -28,7 +28,7 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
             fill="transparent"
           ></circle>
           <circle
-            className="text-indigo-500  progress-ring__circle stroke-current"
+            className="text-indigo-500 progress-ring__circle stroke-current"
             stroke-width="10"
             stroke-linecap="round"
             cx="50"
