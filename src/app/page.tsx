@@ -41,7 +41,7 @@ export default function Home() {
         <div className="relative rounded-md overflow-hidden w-full shadow flex flex-col items-center text-center justify-between space-y-2 p-4 h-40 cursor-pointer bg-gradient-to-tl from-zinc-900 via-neutral-900 to-neutral-600">
           <div className="flex-row w-full flex items-center justify-start">
             <LightBulbIcon className="h-10 w-10 text-yellow-600" aria-hidden="true" />
-            <div className="w-full justify-end">
+            <div className="w-full justify-end items-end self-end">
               <Toggle />
             </div>
           </div>
