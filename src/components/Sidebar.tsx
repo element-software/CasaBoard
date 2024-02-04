@@ -41,7 +41,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
               />
             </div>
             <div className="flex flex-1 flex-col w-full">
-              <Thermostat entityId={"climate.central_heating_and_hot_water_tank_heat" as EntityName}/>
+              <Thermostat entityId={"climate.underfloor_heating" as EntityName}/>
             </div>
             <div className="flex flex-1 flex-col w-full items-center bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800">
               <div className="text-sm text-white p-4">
