@@ -1,9 +1,10 @@
 "use client";
 import { EntityName, useEntity, useHass } from "@hakit/core";
-import { LightBulbIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useCallback } from "react";
 import Toggle from "./Toggle";
+import Icon from '@mdi/react';
+import { mdiDiamondStone, mdiLightRecessed, mdiLightbulb } from "@mdi/js";
 
 interface GridItemProps {
   entityId: EntityName;
@@ -78,14 +79,16 @@ const GridItem = ({ entityId }: GridItemProps) => {
     }
   };
 
-  const stateClassNameIconBg = () => {
-    switch (entity.state) {
-      case "on":
-        return "bg-yellow-800";
-      case "off":
-        return "bg-gray-500";
+  const renderIcon = () => {
+    switch (entity.attributes.icon) {
+      case "mdi:light-recessed":
+        return <Icon path={mdiLightRecessed} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+      case "mdi:lightbulb":
+        return <Icon path={mdiLightbulb} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+      case "mdi:diamond-stone":
+        return <Icon path={mdiDiamondStone} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
       default:
-        return "bg-gray-500";
+        return <Icon path={mdiLightbulb} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
     }
   };
 
@@ -99,7 +102,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
       onClick={() => handleToggle(entity.entity_id as EntityName)}
     >
       <div className="flex flex-row w-full items-center justify-between">
-        <LightBulbIcon className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />
+        {renderIcon()}
         <Toggle
           enabled={entity.state === "on" ? true : false}
           onToggle={() =>

@@ -31,16 +31,20 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col items-center p-8">
-      <div className="grid grid-cols-3 gap-2 w-full">
+      <div className="grid grid-cols-3 gap-8 w-full">
         <GridItem entityId={"light.kitchen_downlights" as EntityName} />
-            <GridItem
-              entityId={"light.office_downlights_dimmer" as EntityName}
-            />
-            <GridItem entityId={"light.focus_light" as EntityName} />
-            <GridItem entityId={"light.utility_room" as EntityName} />
-            <GridItem entityId={"light.kitchen_downlights" as EntityName} />
-        <Popup open={open} setOpen={setOpen} className="w-screen h-full bg-stone-900">
-          <div className="w-full text-center text-2xl font-bold text-white mb-4 uppercase">Main Lighting</div>
+        <GridItem entityId={"light.office_downlights_dimmer" as EntityName} />
+        <GridItem entityId={"light.focus_light" as EntityName} />
+        <GridItem entityId={"light.utility_room" as EntityName} />
+        <GridItem entityId={"light.island_stone" as EntityName} />
+        <Popup
+          open={open}
+          setOpen={setOpen}
+          className="w-screen h-full bg-stone-900"
+        >
+          <div className="w-full text-center text-2xl font-bold text-white mb-4 uppercase">
+            Main Lighting
+          </div>
           <div className="grid grid-cols-3 gap-2">
             <GridItem entityId={"light.kitchen_downlights" as EntityName} />
             <GridItem
