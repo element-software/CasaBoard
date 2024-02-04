@@ -23,7 +23,7 @@ const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
       <span className="absolute left-1 inset-y-0 flex items-center pl-1 text-black">
         On
       </span>
-      <span className="absolute right-1 inset-y-0 flex items-center text-black">
+      <span className="absolute right-2 inset-y-0 flex items-center text-black">
         Off
       </span>
       <span className="sr-only">Use setting</span>

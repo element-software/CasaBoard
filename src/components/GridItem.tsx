@@ -82,13 +82,13 @@ const GridItem = ({ entityId }: GridItemProps) => {
   const renderIcon = () => {
     switch (entity.attributes.icon) {
       case "mdi:light-recessed":
-        return <Icon path={mdiLightRecessed} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightRecessed} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
       case "mdi:lightbulb":
-        return <Icon path={mdiLightbulb} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightbulb} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
       case "mdi:diamond-stone":
-        return <Icon path={mdiDiamondStone} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiDiamondStone} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
       default:
-        return <Icon path={mdiLightbulb} className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightbulb} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
     }
   };
 

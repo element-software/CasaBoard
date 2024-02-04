@@ -9,7 +9,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
     <>
       <div>
         {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-96 lg:flex-col">
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto p-8 pb-4">
             <div className="flex flex-col">
@@ -58,7 +58,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
         <div className="relative">
           <div className="absolute bg-neutral-900 left-0 top-0 w-screen h-screen opacity-35" style={{ zIndex: "-1" }} />
-            <div className="lg:pl-96">
+            <div className="lg:pl-72">
               {children}
           </div>
         </div>

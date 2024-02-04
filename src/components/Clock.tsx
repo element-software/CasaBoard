@@ -13,7 +13,7 @@ const Clock = () => {
   }, []);
 
   return (
-    <div className="w-full p-6 text-center bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800">
+    <div className="w-full p-6 text-center text-white">
         <div className="text-4xl tracking-widest">{time.toLocaleTimeString().slice(0,5)}</div>
         <div className="text-xs opacity-50 tracking-wider">{time.toDateString()}</div>
     </div>
