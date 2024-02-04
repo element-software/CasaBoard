@@ -43,16 +43,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             <div className="flex flex-1 flex-col w-full">
               <Thermostat entityId={"climate.underfloor_heating" as EntityName}/>
             </div>
-            <div className="flex flex-1 flex-col w-full items-center bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800">
-              <div className="text-sm text-white p-4">
-                <p>Powered by</p>
-              </div>
-              <img
-                className="w-auto max-w-20 mx-auto"
-                src="https://element-connect.co.uk/wp-content/uploads/2023/03/EC-Logo-V2-Trimmed.png"
-                alt="Your Company"
-              />
-            </div>
           </div>
         </div>
 

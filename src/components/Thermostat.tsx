@@ -23,39 +23,39 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
   const stateClassname = entity.attributes.running_state === "heat" ? "text-black from-yellow-600 to-amber-500" : "text-white from-neutral-800 to-neutral-700 rounded-full";
 
   return (
-    <div className="w-full p-4 text-center flex flex-col gap-2 text-white bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl shadow-card shadow-neutral-800">
+    <div className="w-full p-4 text-center flex flex-col gap-1 text-white bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl shadow-card shadow-neutral-800">
       <div className="flex flex-row items-center justify-between">
         <div className="text-xs">{entity.attributes.friendly_name}</div>
         <Icon path={mdiPower} className={classNames("h-10 w-10 p-2 rounded-full bg-gradient-to-l", stateClassname)} aria-hidden="true" />
       </div>
       <div className="p-2 bg-gradient-to-l from-neutral-800 to-neutral-900 rounded-full ">
-        <svg className="w-full h-full" viewBox="0 0 100 100">
+        <svg className="w-full h-full" viewBox="0 0 80 80">
           <circle
             className="text-neutral-800 stroke-current"
-            stroke-width="5"
-            cx="50"
-            cy="50"
-            r="40"
+            stroke-width="3"
+            cx="40"
+            cy="40"
+            r="30"
             fill="transparent"
           ></circle>
           <circle
             className="text-amber-500 progress-ring__circle stroke-current"
-            stroke-width="5"
+            stroke-width="3"
             stroke-linecap="round"
-            cx="50"
-            cy="50"
-            r="40"
+            cx="40"
+            cy="40"
+            r="30"
             fill="transparent"
             stroke-dashoffset={`calc(400 - (400 * ${(60 * percent) / 100}) / 100)`}
           ></circle>
 
           <text
-            x="50"
-            y="50"
-            font-size="12"
+            x="40"
+            y="40"
+            font-size="10"
             text-anchor="middle"
             alignment-baseline="middle"
-            className="text-lg fill-white"
+            className="text-base fill-white"
           >
               {entity.attributes.temperature}°C
           </text>

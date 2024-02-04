@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import classNames from 'classnames';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface PopupProps {
   open: boolean;
@@ -10,11 +11,11 @@ interface PopupProps {
 }
 
 const Popup = ({ open, setOpen, children, className }: PopupProps) => {
-  const classes = classNames("relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 z-50", className);
+  const classes = classNames("relative transform overflow-hidden rounded-lg bg-gradient-to-tl from-neutral-900 to-neutral-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 z-50", className);
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => setOpen(!open)}>
+      <Dialog as="div" className="relative z-10" onClose={() => setOpen(false)}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -24,11 +25,11 @@ const Popup = ({ open, setOpen, children, className }: PopupProps) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center !pl-96 p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-end justify-center !pl-72 p-4 text-center sm:items-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -40,6 +41,7 @@ const Popup = ({ open, setOpen, children, className }: PopupProps) => {
             >
               <Dialog.Panel className={classes}>
                 <div>
+                  <XMarkIcon className="h-6 w-6 absolute top-4 right-4 text-white cursor-pointer" onClick={() => setOpen(!open)} />
                   {children}
                 </div>
               </Dialog.Panel>
