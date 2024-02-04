@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import React from 'react';
-import { Montserrat } from 'next/font/google';
+import { Kanit } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'InnerSpace Dashboard',
+  title: 'Smart Home Dashboard',
   description: 'Created by Element Connect',
 }
-const montserrat = Montserrat({
+const kanit = Kanit({
   weight: ['300', '400', '500', '700'],
   subsets: ['latin'],
   display:'swap',
@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className='h-full bg-black'>
-      <body className={`h-full ${montserrat.className}`}>{children}</body>
+    <html lang="en" className='h-full bg-neutral-900'>
+      <body className={`h-full ${kanit.className}`}>{children}</body>
     </html>
   )
 }

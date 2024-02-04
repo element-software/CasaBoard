@@ -47,6 +47,13 @@ export default function Home() {
           </div>
           <div className="w-full text-left text-lg font-normal text-white border-b border-gray-600 pb-1">Kitchen Lights</div>
         </div>
+        <GridItem entityId={"light.kitchen_downlights" as EntityName} />
+            <GridItem
+              entityId={"light.office_downlights_dimmer" as EntityName}
+            />
+            <GridItem entityId={"light.focus_light" as EntityName} />
+            <GridItem entityId={"light.utility_room" as EntityName} />
+            <GridItem entityId={"light.kitchen_downlights" as EntityName} />
         <Popup open={open} setOpen={setOpen} className="w-screen h-full bg-stone-900">
           <div className="w-full text-center text-2xl font-bold text-white mb-4 uppercase">Main Lighting</div>
           <div className="grid grid-cols-3 gap-2">
