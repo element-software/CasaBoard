@@ -70,11 +70,11 @@ const GridItem = ({ entityId }: GridItemProps) => {
   const stateClassNameIcon = () => {
     switch (entity.state) {
       case "on":
-        return "text-yellow-400";
+        return "text-amber-500";
       case "off":
         return "text-gray-400";
       default:
-        return "text-yellow-400";
+        return "text-amber-500";
     }
   };
 
@@ -93,13 +93,13 @@ const GridItem = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col items-center text-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-lg shadow-neutral-800",
+        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-lg shadow-neutral-800",
         stateClassNameBg()
       )}
       onClick={() => handleToggle(entity.entity_id as EntityName)}
     >
       <div className="flex flex-row w-full items-center justify-between">
-        <LightBulbIcon className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />
+        <LightBulbIcon className={classNames("h-6 w-6", stateClassNameIcon())} aria-hidden="true" />
         <Toggle
           enabled={entity.state === "on" ? true : false}
           onToggle={() =>
@@ -110,13 +110,9 @@ const GridItem = ({ entityId }: GridItemProps) => {
          />
       </div>
 
-      <h3 className="w-full text-md font-bold uppercase text-white">
-          {entity.attributes.friendly_name}
-        </h3>
-
-      <div className={classNames("absolute -left-4 -bottom-4 rounded-full p-6", stateClassNameIconBg())}>
-        <LightBulbIcon className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />
-      </div>
+      <h3 className="w-full text-base capitalize text-white">
+        {entity.attributes.friendly_name}
+      </h3>
     </div>
   );
 };
