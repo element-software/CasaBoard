@@ -96,7 +96,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-lg shadow-neutral-800",
+        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
         stateClassNameBg()
       )}
       onClick={() => handleToggle(entity.entity_id as EntityName)}

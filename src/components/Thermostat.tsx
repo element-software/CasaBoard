@@ -16,7 +16,7 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
     console.log("percent", percent);
 
   return (
-    <div className="w-full p-4 text-center text-white bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-lg shadow-neutral-800">
+    <div className="w-full p-4 text-center text-white bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800">
       <div className="relative w-40 h-40">
         <svg className="w-full h-full" viewBox="0 0 100 100">
           <circle

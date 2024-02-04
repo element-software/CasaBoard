@@ -34,7 +34,7 @@ const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
           'pointer-events-none translate-y-0.5 inline-block h-7 w-10 rounded-2xl transform bg-neutral-900 shadow ring-0 transition duration-200 ease-in-out'
         )}
       >
-        <PauseIcon className="h-5 w-5 mx-auto mt-1 font-bold text-neutral-600 shadow-2xl" aria-hidden="true" />
+        <PauseIcon className="h-5 w-5 mx-auto mt-1 font-bold text-neutral-600 shadow-card" aria-hidden="true" />
       </span>
     </Switch>
   )
