@@ -1,5 +1,6 @@
 "use client";
 import EntityCard from "@/components/EntityCard";
+import GraphCard from "@/components/GraphCard";
 import GridItem from "@/components/GridItem";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
@@ -45,6 +46,7 @@ export default function Home() {
           Ambient Lighting (Popup)
         </div>
         <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2}/>
+        <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
         <Popup
           open={open}
           setOpen={setOpen}
