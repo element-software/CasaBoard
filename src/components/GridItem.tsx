@@ -100,7 +100,14 @@ const GridItem = ({ entityId }: GridItemProps) => {
     >
       <div className="flex flex-row w-full items-center justify-between">
         <LightBulbIcon className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />
-        <Toggle />
+        <Toggle
+          enabled={entity.state === "on" ? true : false}
+          onToggle={() =>
+            entity.state === "on"
+              ? handleTurnOff(entity.entity_id as EntityName)
+              : handleTurnOn(entity.entity_id as EntityName)
+          }
+         />
       </div>
 
       <h3 className="w-full text-md font-bold uppercase text-white">
