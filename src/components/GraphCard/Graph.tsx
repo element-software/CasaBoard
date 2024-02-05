@@ -1,4 +1,5 @@
 import { ApexOptions } from "apexcharts";
+import { useMemo } from "react";
 import ReactApexChart from "react-apexcharts";
 
 interface GraphCardProps {
@@ -10,6 +11,14 @@ const Graph = ({ data, className }: GraphCardProps) => {
   console.log("Graph Data", data);
 
   const d = data.entityHistory.slice(0,20).map((item: any) => ({ "y": item.s, "x": new Date(item.lu) }));
+  const series = [
+    {
+      name: "Energy Use",
+      data: d,
+      zIndex: 1,
+      color: "#f59e0b",
+    },
+  ];
 
   var options: ApexOptions = {
     chart: {
@@ -72,14 +81,6 @@ const Graph = ({ data, className }: GraphCardProps) => {
     },
     // colors: ["#f59e0b"],
     stroke: { width: 3, curve: 'smooth' },
-    series: [
-      {
-        name: "Energy Use",
-        data: d,
-        zIndex: 1,
-        color: "#f59e0b",
-      },
-    ],
     // annotations: {
     //   points: [{
     //     x: d[0].x,
@@ -105,9 +106,13 @@ const Graph = ({ data, className }: GraphCardProps) => {
     // },
   };
 
+  const chart = useMemo(() => {
+    return <ReactApexChart type="area" options={options} series={series} height={150} width={400} />
+  }, [options, series]);
+
   return (
     <div className={className}>
-      <ReactApexChart type="area" options={options} series={options.series} height={150} width={400} />
+      {chart}
     </div>
   );
 };
