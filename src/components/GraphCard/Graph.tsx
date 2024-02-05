@@ -1,7 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+"use client"
 import { ApexOptions } from "apexcharts";
+import dynamic from 'next/dynamic';
 import { useMemo } from "react";
-import ReactApexChart from "react-apexcharts";
 
+const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 interface GraphCardProps {
   data: any;
   className?: string;
@@ -38,8 +41,6 @@ const Graph = ({ data, className }: GraphCardProps) => {
       tooltip: {
         enabled: false,
       },
-      min: 400,
-      max: 1400,
     },
     xaxis: {
       labels: {
@@ -107,7 +108,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
   };
 
   const chart = useMemo(() => {
-    return <ReactApexChart type="area" options={options} series={series} height={150} width={400} />
+    return <ApexCharts type="area" options={options} series={series} height={150} width={400} />
   }, [options, series]);
 
   return (

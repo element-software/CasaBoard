@@ -2,7 +2,6 @@ import { EntityName, useWeather } from "@hakit/core";
 import Clock from "./Clock";
 import { WeatherCard } from "@hakit/components";
 import Thermostat from "./Thermostat";
-import ThermostatCardSimple from "./ThermostatCardSimple";
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   return (
