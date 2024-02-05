@@ -15,3 +15,11 @@
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
 }
+
+#apexchartsenergy-graph .apexcharts-tooltip {
+  color: #ffffff;
+}
+
+#apexchartsenergy-graph .apexcharts-tooltip .apexcharts-tooltip-series-group.active {
+  background: #ffffff !important;
+}

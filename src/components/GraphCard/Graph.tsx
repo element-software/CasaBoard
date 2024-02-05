@@ -12,12 +12,13 @@ interface GraphCardProps {
 
 const Graph = ({ data, className }: GraphCardProps) => {
   const d = data.entityHistory.slice(0,20).map((item: any) => ({ "y": item.s, "x": new Date(item.lu) }));
-  const series = [
+  const series: ApexAxisChartSeries = [
     {
       name: "Energy Use",
       data: d,
       zIndex: 1,
       color: "#f59e0b",
+      type: "area",
     },
   ];
 
@@ -79,7 +80,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
       },
     },
     // colors: ["#f59e0b"],
-    stroke: { width: 3, curve: 'smooth' },
+    stroke: { width: 2, curve: 'smooth' },
     // annotations: {
     //   points: [{
     //     x: d[0].x,
@@ -103,6 +104,42 @@ const Graph = ({ data, className }: GraphCardProps) => {
     //     }
     //   }],
     // },
+    markers: {
+      size: 3,
+      colors: ["#f59e0b"],
+      strokeColors: "#fff",
+      strokeWidth: 1,
+      fillOpacity: 1,
+      shape: "circle",
+      radius: 2,
+      discrete: [],
+    },
+    tooltip: {
+      shared: false,
+      intersect: false,
+      followCursor: false,
+      fixed: {
+        enabled: true,
+        position: "topRight",
+        offsetY: 0,
+        offsetX: 0,
+      },
+      theme: "dark",
+      style: {
+        fontSize: "12px",
+      },
+      items: {
+        display: "flex",
+      },
+      y: {
+        formatter: function (val: any) {
+          return val + "W";
+        },
+      },
+      x: {
+        show: false,
+      }
+    }
   };
 
   const chart = useMemo(() => {
