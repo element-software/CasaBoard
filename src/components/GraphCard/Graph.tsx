@@ -11,8 +11,6 @@ interface GraphCardProps {
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
-  console.log("Graph Data", data);
-
   const d = data.entityHistory.slice(0,20).map((item: any) => ({ "y": item.s, "x": new Date(item.lu) }));
   const series = [
     {

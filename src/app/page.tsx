@@ -38,9 +38,9 @@ export default function Home() {
         <GridItem entityId={"light.office_downlights_dimmer" as EntityName} />
         <GridItem entityId={"light.focus_light" as EntityName} />
         <GridItem entityId={"light.utility_room" as EntityName} />
-        <GridItem entityId={"light.island_stone" as EntityName} />
+        <GridItem entityId={"light.living_room_downlights" as EntityName} />
         <div
-          className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+          className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
           onClick={() => setOpen(!open)}
         >
           Ambient Lighting (Popup)

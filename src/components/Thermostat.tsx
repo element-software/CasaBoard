@@ -11,14 +11,11 @@ interface ThermostatProps {
 const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
 
-  console.log("Thermostat entity", entity);
 
   // 10 is lowest, 32 is highest
   // map this to 0 - 60
   const percent = Math.round(
     (Math.round(entity.attributes.temperature - 10) / 22) * 100  );
-    console.log(Math.round(entity.attributes.temperature))
-    console.log("percent", percent);
 
   const stateClassname = entity.attributes.running_state === "heat" ? "text-black from-yellow-600 to-amber-500" : "text-white from-neutral-800 to-neutral-700 rounded-full";
 

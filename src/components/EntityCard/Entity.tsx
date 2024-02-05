@@ -15,7 +15,6 @@ const Entity = ({ entityId, icon }: EntityProps ) => {
 
   const toggleLighting = useCallback(
     (action: DomainService<"light">, entities: EntityName) => {
-      console.log("toggleLighting", action, entities);
       callService({
         domain: "light",
         service: action,

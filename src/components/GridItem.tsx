@@ -11,13 +11,10 @@ interface GridItemProps {
 }
 const GridItem = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
-  console.log("entity", entity);
-
   const { callService } = useHass();
 
   const handleTurnOn = useCallback(
     (entityId: EntityName) => {
-      console.log(entityId);
       callService({
         domain: "light",
         service: "turn_on",
@@ -31,7 +28,6 @@ const GridItem = ({ entityId }: GridItemProps) => {
 
   const handleTurnOff = useCallback(
     (entityId: EntityName) => {
-      console.log(entityId);
       callService({
         domain: "light",
         service: "turn_off",
@@ -45,7 +41,6 @@ const GridItem = ({ entityId }: GridItemProps) => {
 
   const handleToggle = useCallback(
     (entityId: EntityName) => {
-      console.log(entityId);
       callService({
         domain: "light",
         service: "toggle",
@@ -64,7 +59,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
       case "off":
         return "bg-stone-800";
       default:
-        return "bg-stone-500";
+        return "";
     }
   };
 
@@ -96,7 +91,7 @@ const GridItem = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-stone-500 bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
         stateClassNameBg()
       )}
       onClick={() => handleToggle(entity.entity_id as EntityName)}
