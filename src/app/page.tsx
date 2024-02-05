@@ -4,6 +4,8 @@ import GraphCard from "@/components/GraphCard";
 import GridItem from "@/components/GridItem";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
+import { mdiOpenInNew } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useState } from "react";
 
 export default function Home() {
@@ -43,7 +45,8 @@ export default function Home() {
           className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
           onClick={() => setOpen(!open)}
         >
-          Ambient Lighting (Popup)
+          Ambient Lighting
+          <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
         </div>
         <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2}/>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />

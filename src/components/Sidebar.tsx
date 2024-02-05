@@ -2,6 +2,7 @@ import { EntityName, useWeather } from "@hakit/core";
 import Clock from "./Clock";
 import { WeatherCard } from "@hakit/components";
 import Thermostat from "./Thermostat";
+import Image from "next/image";
 
 export default function Sidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +11,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         {/* Static sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto p-8 pb-4">
+          <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4">
             <div className="flex flex-col">
               <Clock />
             </div>
@@ -41,6 +42,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex flex-1 flex-col w-full">
               <Thermostat entityId={"climate.underfloor_heating" as EntityName}/>
+            </div>
+            <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
+              Powered by 
+              <Image src="https://element-connect.co.uk/wp-content/uploads/2024/02/EC-Logo-V2-Trimmed-White.png" alt="ec" width={100} height={100} />
             </div>
           </div>
         </div>

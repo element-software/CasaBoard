@@ -106,7 +106,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
   };
 
   const chart = useMemo(() => {
-    return <ApexCharts type="area" options={options} series={series} height={125} width={400} />
+    return <ApexCharts type="area" options={options} series={series} height={150} width={400} />
   }, [options, series]);
 
   return (
