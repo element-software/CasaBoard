@@ -23,6 +23,7 @@
     "next": "14.0.4",
     "node-scp": "^0.0.23",
     "react": "^18",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "^18"
   },
   "devDependencies": {
