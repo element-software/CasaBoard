@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { useCallback } from "react";
 import Toggle from "./Toggle";
 import Icon from '@mdi/react';
-import { mdiDiamondStone, mdiLightRecessed, mdiLightbulb } from "@mdi/js";
+import { mdiDiamondStone, mdiLightRecessed, mdiLightbulb, mdiTrackLight } from "@mdi/js";
 
 interface GridItemProps {
   entityId: EntityName;
@@ -76,14 +76,16 @@ const GridItem = ({ entityId }: GridItemProps) => {
 
   const renderIcon = () => {
     switch (entity.attributes.icon) {
+      case "mdi:track-light":
+        return <Icon path={mdiTrackLight} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
       case "mdi:light-recessed":
-        return <Icon path={mdiLightRecessed} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightRecessed} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
       case "mdi:lightbulb":
-        return <Icon path={mdiLightbulb} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightbulb} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
       case "mdi:diamond-stone":
-        return <Icon path={mdiDiamondStone} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiDiamondStone} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
       default:
-        return <Icon path={mdiLightbulb} className={classNames("h-8 w-8", stateClassNameIcon())} aria-hidden="true" />;
+        return <Icon path={mdiLightbulb} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
     }
   };
 

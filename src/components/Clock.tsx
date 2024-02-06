@@ -13,9 +13,9 @@ const Clock = () => {
   }, []);
 
   return (
-    <div className="w-full p-6 text-center text-white">
-        <div className="text-4xl tracking-widest">{time.toLocaleTimeString().slice(0,5)}</div>
-        <div className="text-xs opacity-50 tracking-wider">{time.toDateString()}</div>
+    <div className="w-full p-4 pt-0 text-center text-white">
+        <div className="text-6xl tracking-widest">{time.toLocaleTimeString().slice(0,5)}</div>
+        <div className="text-md opacity-50 tracking-wider">{time.toDateString()}</div>
     </div>
   );
 };

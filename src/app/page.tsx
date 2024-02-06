@@ -33,6 +33,25 @@ export default function Home() {
     },
   ];
 
+  const sensorEntities = [
+    {
+      id: "binary_sensor.front_door_sensor_contact" as EntityName,
+      icon: "mdiDoor",
+    },
+    {
+      id: "binary_sensor.bathroom_window_sensor_contact" as EntityName,
+      icon: "mdiDoor",
+    },
+    {
+      id: "binary_sensor.patio_door_sensor_contact" as EntityName,
+      icon: "mdiDoor",
+    },
+    {
+      id: "binary_sensor.gate_door_contact" as EntityName,
+      icon: "mdiDoor",
+    }
+  ];
+
   return (
     <main className="flex h-screen flex-col items-center p-8">
       <div className="grid grid-cols-3 gap-8 w-full">
@@ -48,8 +67,9 @@ export default function Home() {
           Ambient Lighting
           <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
         </div>
-        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2}/>
+        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2} showAllOn={true}/>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
+        <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
         <Popup
           open={open}
           setOpen={setOpen}

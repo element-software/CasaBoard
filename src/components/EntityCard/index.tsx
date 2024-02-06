@@ -10,6 +10,9 @@ interface EntityCardProps {
   title: string;
   entities: Entity[];
   colspan?: number;
+  showAllOn?: boolean;
+  showTitles?: boolean;
+  disableClick?: boolean;
 }
 
 interface Entity {
@@ -17,7 +20,7 @@ interface Entity {
   icon: string;
 }
 
-const EntityCard = ({ title, entities, colspan }: EntityCardProps) => {
+const EntityCard = ({ title, entities, colspan, showAllOn = false, showTitles = false, disableClick = false }: EntityCardProps) => {
   const getColspan = () => {
     return colspan ? `col-span-${colspan}` : "col-span-2";
   };
@@ -54,6 +57,7 @@ const EntityCard = ({ title, entities, colspan }: EntityCardProps) => {
         <div className="text-base">{title}</div>
         <div
           onClick={() => toggleLighting(entities.map((entity) => entity.id))}
+          className={showAllOn ? "block" : "hidden"}
         >
           <Icon
             path={mdiPower}
@@ -64,7 +68,7 @@ const EntityCard = ({ title, entities, colspan }: EntityCardProps) => {
       </div>
       <div className="flex flex-row w-full items-center justify-between">
         {entities.map((entity) => (
-          <Entity key={entity.id} entityId={entity.id} icon={entity.icon} />
+          <Entity key={entity.id} entityId={entity.id} icon={entity.icon} showTitle={showTitles} />
         ))}
       </div>
     </div>

@@ -52,7 +52,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
         <div className="relative">
           <div className="absolute bg-neutral-900 left-0 top-0 w-screen h-screen opacity-35" style={{ zIndex: "-1" }} />
-            <div className="lg:pl-72">
+            <div className="lg:pl-64">
               {children}
           </div>
         </div>
