@@ -28,6 +28,9 @@ const Graph = ({ data, className }: GraphCardProps) => {
       toolbar: {
         show: false
       },
+      animations: {
+        enabled: false,
+      },
     },
     grid: {
       show: false,
@@ -139,7 +142,10 @@ const Graph = ({ data, className }: GraphCardProps) => {
       x: {
         show: false,
       }
-    }
+    },
+    noData: {
+      text: "Loading...",
+    },
   };
 
   const chart = useMemo(() => {

@@ -56,7 +56,7 @@ const EntityCard = ({ title, entities, colspan, showAllOn = false, showTitles = 
       <div className="flex flex-row w-full justify-between items-center">
         <div className="text-base">{title}</div>
         <div
-          onClick={() => toggleLighting(entities.map((entity) => entity.id))}
+          onClick={disableClick ? undefined : () => toggleLighting(entities.map((entity) => entity.id))}
           className={showAllOn ? "block" : "hidden"}
         >
           <Icon

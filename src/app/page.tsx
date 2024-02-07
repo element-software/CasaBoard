@@ -67,7 +67,7 @@ export default function Home() {
           Ambient Lighting
           <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
         </div>
-        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2} showAllOn={true}/>
+        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2} showTitles={true} showAllOn={true}/>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
         <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
         <Popup

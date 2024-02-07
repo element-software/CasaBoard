@@ -29,7 +29,7 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
         <svg className="w-full h-full" viewBox="0 0 80 80">
           <circle
             className="text-neutral-800 stroke-current"
-            stroke-width="3"
+            strokeWidth="3"
             cx="40"
             cy="40"
             r="30"
@@ -37,21 +37,21 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
           ></circle>
           <circle
             className="text-amber-500 progress-ring__circle stroke-current"
-            stroke-width="3"
-            stroke-linecap="round"
+            strokeWidth="3"
+            strokeLinecap="round"
             cx="40"
             cy="40"
             r="30"
             fill="transparent"
-            stroke-dashoffset={`calc(400 - (400 * ${(60 * percent) / 100}) / 100)`}
+            strokeDashoffset={`calc(400 - (400 * ${(60 * percent) / 100}) / 100)`}
           ></circle>
 
           <text
             x="40"
             y="40"
-            font-size="10"
-            text-anchor="middle"
-            alignment-baseline="middle"
+            fontSize="10"
+            textAnchor="middle"
+            alignmentBaseline="middle"
             className="text-base fill-white"
           >
               {entity.attributes.temperature}°C
