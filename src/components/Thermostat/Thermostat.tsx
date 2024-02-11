@@ -8,7 +8,7 @@ interface ThermostatProps {
   entityId: EntityName;
 }
 
-const Thermostat = ({ entityId }: ThermostatProps) => {
+export const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
 
 
@@ -71,5 +71,3 @@ const Thermostat = ({ entityId }: ThermostatProps) => {
     </div>
   );
 };
-
-export default Thermostat;

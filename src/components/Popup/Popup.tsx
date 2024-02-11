@@ -10,7 +10,7 @@ interface PopupProps {
   className?: string;
 }
 
-const Popup = ({ open, setOpen, children, className }: PopupProps) => {
+export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
   const classes = classNames("relative transform overflow-hidden rounded-lg bg-gradient-to-tl from-neutral-900 to-neutral-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 z-50", className);
 
   return (
@@ -52,5 +52,3 @@ const Popup = ({ open, setOpen, children, className }: PopupProps) => {
     </Transition.Root>
   )
 }
-
-export default Popup;
