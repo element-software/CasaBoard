@@ -4,7 +4,7 @@ import { WeatherCard } from "@hakit/components";
 import Thermostat from "@/components/Thermostat";
 import Image from "next/image";
 
-export const Sidebar = ({ children }: { children: React.ReactNode }) => {
+export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, thermostat: EntityName }) => {
   return (
     <>
       <div>
@@ -41,7 +41,7 @@ export const Sidebar = ({ children }: { children: React.ReactNode }) => {
               />
             </div>
             <div className="flex flex-1 flex-col w-full">
-              <Thermostat entityId={"climate.underfloor_heating" as EntityName}/>
+              <Thermostat entityId={thermostat as EntityName}/>
             </div>
             <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
               Powered by 
