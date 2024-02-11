@@ -2,14 +2,15 @@
 import { EntityName, useEntity, useHass } from "@hakit/core";
 import classNames from "classnames";
 import { useCallback } from "react";
-import Toggle from "./Toggle";
+import Toggle from "../Toggle";
 import Icon from '@mdi/react';
 import { mdiDiamondStone, mdiLightRecessed, mdiLightbulb, mdiTrackLight } from "@mdi/js";
 
 interface GridItemProps {
   entityId: EntityName;
 }
-const GridItem = ({ entityId }: GridItemProps) => {
+
+export const GridItem = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
   const { callService } = useHass();
 
@@ -116,5 +117,3 @@ const GridItem = ({ entityId }: GridItemProps) => {
     </div>
   );
 };
-
-export default GridItem;

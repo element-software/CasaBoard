@@ -1,7 +1,7 @@
 "use client";
 import EntityCard from "@/components/EntityCard";
 import GraphCard from "@/components/GraphCard";
-import GridItem from "@/components/GridItem";
+import { GridItem } from "@/components/Grid";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
 import { mdiOpenInNew } from "@mdi/js";

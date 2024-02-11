@@ -8,7 +8,7 @@ interface ToggleProps {
   onToggle: (enabled: boolean) => void
 }
 
-const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
+export const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
 
   return (
     <Switch
@@ -39,5 +39,3 @@ const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
     </Switch>
   )
 }
-
-export default Toggle
