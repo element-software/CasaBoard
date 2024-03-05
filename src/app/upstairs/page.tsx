@@ -2,6 +2,7 @@
 import EntityCard from "@/components/EntityCard";
 import GraphCard from "@/components/GraphCard";
 import { GridItem } from "@/components/Grid";
+import { Alarm } from "@/components/Grid/Alarm";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
 import { mdiOpenInNew } from "@mdi/js";
@@ -60,8 +61,8 @@ export default function Home() {
         <GridItem entityId={"light.master_bedroom_dimmer" as EntityName} />
         <GridItem entityId={"light.upstairs_hallway_light" as EntityName} />
         <GridItem entityId={"light.living_room_downlights" as EntityName} />
-
-        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2} showTitles={true} showAllOn={true}/>
+        <GridItem entityId={"light.kitchen_downlights" as EntityName} />
+        <Alarm entityId={"alarm_control_panel.94_headland_rd_leicester" as EntityName} />
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
         <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
       </div>
