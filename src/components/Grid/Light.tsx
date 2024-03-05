@@ -3,16 +3,23 @@ import { EntityName, useEntity, useHass } from "@hakit/core";
 import classNames from "classnames";
 import { useCallback } from "react";
 import Toggle from "../Toggle";
-import Icon from '@mdi/react';
-import { mdiDiamondStone, mdiLightRecessed, mdiLightbulb, mdiTrackLight } from "@mdi/js";
+import Icon from "@mdi/react";
+import {
+  mdiDiamondStone,
+  mdiLightRecessed,
+  mdiLightbulb,
+  mdiTrackLight,
+} from "@mdi/js";
 
-interface GridItemProps {
+interface LightProps {
   entityId: EntityName;
+  dimmer?: boolean;
 }
 
-export const GridItem = ({ entityId }: GridItemProps) => {
+export const Light = ({ entityId, dimmer = false }: LightProps) => {
   const entity = useEntity(entityId);
   const { callService } = useHass();
+  console.log("Light:: entity", entity);
 
   const handleTurnOn = useCallback(
     (entityId: EntityName) => {
@@ -75,18 +82,65 @@ export const GridItem = ({ entityId }: GridItemProps) => {
     }
   };
 
+  const sliderClassnames = () => {
+    if (entity.attributes.brightness < 10) {
+      return "accent-gray-400";
+    } else {
+      // return accent colour relative to brightness
+      if (entity.attributes.brightness >= 10 && entity.attributes.brightness < 100) {
+        return "accent-amber-600";
+      } else if (entity.attributes.brightness >= 150 && entity.attributes.brightness < 200) {
+        return "accent-amber-500";
+      } else if (entity.attributes.brightness >= 200 && entity.attributes.brightness < 250) {
+        return "accent-amber-400";
+      } else {
+        return "accent-amber-500";
+      }
+    }
+  };
+
   const renderIcon = () => {
     switch (entity.attributes.icon) {
       case "mdi:track-light":
-        return <Icon path={mdiTrackLight} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
+        return (
+          <Icon
+            path={mdiTrackLight}
+            className={classNames("h-10 w-10", stateClassNameIcon())}
+            aria-hidden="true"
+          />
+        );
       case "mdi:light-recessed":
-        return <Icon path={mdiLightRecessed} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
+        return (
+          <Icon
+            path={mdiLightRecessed}
+            className={classNames("h-10 w-10", stateClassNameIcon())}
+            aria-hidden="true"
+          />
+        );
       case "mdi:lightbulb":
-        return <Icon path={mdiLightbulb} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
+        return (
+          <Icon
+            path={mdiLightbulb}
+            className={classNames("h-10 w-10", stateClassNameIcon())}
+            aria-hidden="true"
+          />
+        );
       case "mdi:diamond-stone":
-        return <Icon path={mdiDiamondStone} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
+        return (
+          <Icon
+            path={mdiDiamondStone}
+            className={classNames("h-10 w-10", stateClassNameIcon())}
+            aria-hidden="true"
+          />
+        );
       default:
-        return <Icon path={mdiLightbulb} className={classNames("h-10 w-10", stateClassNameIcon())} aria-hidden="true" />;
+        return (
+          <Icon
+            path={mdiLightbulb}
+            className={classNames("h-10 w-10", stateClassNameIcon())}
+            aria-hidden="true"
+          />
+        );
     }
   };
 
@@ -108,8 +162,31 @@ export const GridItem = ({ entityId }: GridItemProps) => {
               ? handleTurnOff(entity.entity_id as EntityName)
               : handleTurnOn(entity.entity_id as EntityName)
           }
-         />
+        />
       </div>
+      {dimmer && (
+        <input
+          type="range"
+          min="0"
+          max="250"
+          step="25"
+          defaultValue={entity.attributes.brightness}
+          className={classNames("w-full", sliderClassnames())}
+          onChange={(e: any) => {
+            console.log("Light:: input: brightness", e.target.value);
+            callService({
+              domain: "light",
+              service: "turn_on",
+              target: {
+                entity_id: entityId,
+              },
+              serviceData: {
+                brightness: Number(e.target.value),
+              },
+            });
+          }}
+        />
+      )}
 
       <h3 className="w-full text-base capitalize text-white">
         {entity.attributes.friendly_name}

@@ -1,3 +1,4 @@
-import { GridItem } from "./GridItem";
+import { Alarm } from "./Alarm";
+import { Light } from "./Light";
 
-export { GridItem };
+export { Light, Alarm };

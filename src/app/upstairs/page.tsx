@@ -1,39 +1,11 @@
 "use client";
 import EntityCard from "@/components/EntityCard";
 import GraphCard from "@/components/GraphCard";
-import { GridItem } from "@/components/Grid";
-import { Alarm } from "@/components/Grid/Alarm";
-import Popup from "@/components/Popup";
+import { Light } from "@/components/Grid";
+import { Alarm } from "@/components/Grid";
 import { EntityName } from "@hakit/core";
-import { mdiOpenInNew } from "@mdi/js";
-import Icon from "@mdi/react";
-import { useState } from "react";
 
 export default function Home() {
-  const [open, setOpen] = useState(false);
-  const entityCardEntities = [
-    {
-      id: "light.wall_cabinet_lighting" as EntityName,
-      icon: "mdiLedStripVariant",
-    },
-    {
-      id: "light.under_worktop_lighting" as EntityName,
-      icon: "mdiCountertop",
-    },
-    {
-      id: "light.oven_tower_lighting" as EntityName,
-      icon: "mdiToasterOven",
-    },
-    {
-      id: "light.island_stone" as EntityName,
-      icon: "mdiDiamondStone",
-    },
-    {
-      id: "light.island_drawers" as EntityName,
-      icon: "mdiFileCabinet",
-    },
-  ];
-
   const sensorEntities = [
     {
       id: "binary_sensor.front_door_sensor_contact" as EntityName,
@@ -50,21 +22,31 @@ export default function Home() {
     {
       id: "binary_sensor.gate_door_contact" as EntityName,
       icon: "mdiDoor",
-    }
+    },
   ];
 
   return (
     <main className="flex h-screen flex-col items-center p-8">
       <div className="grid grid-cols-3 gap-8 w-full">
-        <GridItem entityId={"light.baby_room_light" as EntityName} />
-        <GridItem entityId={"light.guest_bedroom" as EntityName} />
-        <GridItem entityId={"light.master_bedroom_dimmer" as EntityName} />
-        <GridItem entityId={"light.upstairs_hallway_light" as EntityName} />
-        <GridItem entityId={"light.living_room_downlights" as EntityName} />
-        <GridItem entityId={"light.kitchen_downlights" as EntityName} />
-        <Alarm entityId={"alarm_control_panel.94_headland_rd_leicester" as EntityName} />
+        <Light entityId={"light.baby_room_light" as EntityName} />
+        <Light entityId={"light.guest_bedroom" as EntityName} />
+        <Light entityId={"light.master_bedroom_dimmer" as EntityName} dimmer={true}/>
+        <Light entityId={"light.upstairs_hallway_light" as EntityName} />
+        <Light entityId={"light.living_room_downlights" as EntityName} dimmer={true}/>
+        <Light entityId={"light.kitchen_downlights" as EntityName}/>
+        <Alarm
+          entityId={
+            "alarm_control_panel.94_headland_rd_leicester" as EntityName
+          }
+        />
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
-        <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
+        <EntityCard
+          title="Sensors"
+          entities={sensorEntities}
+          colspan={2}
+          showTitles={true}
+          disableClick={true}
+        />
       </div>
     </main>
   );

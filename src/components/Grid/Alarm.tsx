@@ -1,8 +1,6 @@
 "use client";
-import { EntityName, useEntity, useHass } from "@hakit/core";
+import { EntityName, useEntity } from "@hakit/core";
 import classNames from "classnames";
-import { useCallback } from "react";
-import Toggle from "../Toggle";
 import Icon from "@mdi/react";
 import { mdiAlarmPanel } from "@mdi/js";
 
@@ -13,7 +11,7 @@ interface GridItemProps {
 export const Alarm = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
 
-  console.log("Alarm entity", entity);
+  //console.log("Alarm entity", entity);
 
   const stateClassNameBg = () => {
     switch (entity.state) {
@@ -55,7 +53,6 @@ export const Alarm = ({ entityId }: GridItemProps) => {
           entity.state.split("_")[0].slice(1) +
           (entity.state.split("_")[1] || "")}
       </div>
-
       <h3 className="w-full text-base capitalize text-white">Alarm</h3>
     </div>
   );

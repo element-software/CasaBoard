@@ -1,7 +1,7 @@
 "use client";
 import EntityCard from "@/components/EntityCard";
 import GraphCard from "@/components/GraphCard";
-import { GridItem } from "@/components/Grid";
+import { Light } from "@/components/Grid";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
 import { mdiOpenInNew } from "@mdi/js";
@@ -55,11 +55,11 @@ export default function Home() {
   return (
     <main className="flex h-screen flex-col items-center p-8">
       <div className="grid grid-cols-3 gap-8 w-full">
-        <GridItem entityId={"light.kitchen_downlights" as EntityName} />
-        <GridItem entityId={"light.office_downlights_dimmer" as EntityName} />
-        <GridItem entityId={"light.focus_light" as EntityName} />
-        <GridItem entityId={"light.utility_room" as EntityName} />
-        <GridItem entityId={"light.living_room_downlights" as EntityName} />
+        <Light entityId={"light.kitchen_downlights" as EntityName} />
+        <Light entityId={"light.office_downlights_dimmer" as EntityName} dimmer={true}/>
+        <Light entityId={"light.focus_light" as EntityName} dimmer={true}/>
+        <Light entityId={"light.utility_room" as EntityName} />
+        <Light entityId={"light.living_room_downlights" as EntityName} dimmer={true}/>
         <div
           className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
           onClick={() => setOpen(!open)}
@@ -79,11 +79,11 @@ export default function Home() {
             Ambient Lighting
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <GridItem entityId={"light.wall_cabinet_lighting" as EntityName} />
-            <GridItem entityId={"light.under_worktop_lighting" as EntityName} />
-            <GridItem entityId={"light.oven_tower_lighting" as EntityName} />
-            <GridItem entityId={"light.island_stone" as EntityName} />
-            <GridItem entityId={"light.island_drawers" as EntityName} />
+            <Light entityId={"light.wall_cabinet_lighting" as EntityName} />
+            <Light entityId={"light.under_worktop_lighting" as EntityName} />
+            <Light entityId={"light.oven_tower_lighting" as EntityName} />
+            <Light entityId={"light.island_stone" as EntityName} />
+            <Light entityId={"light.island_drawers" as EntityName} />
           </div>
         </Popup>
       </div>
