@@ -3,6 +3,8 @@ import { EntityName, useEntity } from "@hakit/core";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import {
+  mdiDoorClosed,
+  mdiDoorOpen,
   mdiShieldAlert,
   mdiShieldLock,
   mdiShieldLockOpen,
@@ -12,10 +14,10 @@ interface GridItemProps {
   entityId: EntityName;
 }
 
-export const Alarm = ({ entityId }: GridItemProps) => {
+export const Entity = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
 
-  console.log("Alarm entity", entity);
+  console.log("Entity entity", entity);
 
   const stateClassNameBg = () => {
     switch (entity.state) {
@@ -28,20 +30,31 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     }
   };
 
+  const stateClassNameIcon = () => {
+    switch (entity.state) {
+      case "on":
+        return "text-amber-500";
+      case "off":
+        return "text-gray-400";
+      default:
+        return "text-amber-500";
+    }
+  };
+
   const renderIcon = () => {
     switch (entity.state) {
-      case "armed_night":
+      case "on":
         return (
           <Icon
-            path={mdiShieldLock}
+            path={mdiDoorOpen}
             className={classNames("h-12 w-12", "text-amber-500")}
             aria-hidden="true"
           />
         );
-      case "disarmed":
+      case "off":
         return (
           <Icon
-            path={mdiShieldLockOpen}
+            path={mdiDoorClosed}
             className={classNames("h-12 w-12", "text-gray-400")}
             aria-hidden="true"
           />
@@ -49,7 +62,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
       default:
         return (
           <Icon
-            path={mdiShieldAlert}
+            path={mdiDoorOpen}
             className={classNames("h-12 w-12", "text-red-500")}
             aria-hidden="true"
           />
@@ -61,16 +74,15 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-4 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
         stateClassNameBg()
       )}
     >
+      <h3 className="w-full text-base capitalize text-white">{entity.attributes.friendly_name}</h3>
       {renderIcon()}
-      {entity.state.split("_")[0][0].toUpperCase() +
-        entity.state.split("_")[0].slice(1) +
-        " " +
-        (entity.state.split("_")[1] || "")}
-        <p className="text-xs text-gray-400">Last Changed {new Date(entity.last_changed).toLocaleTimeString()}</p>
+        <p className={classNames("text-base", stateClassNameIcon())}>
+          {entity.state === "off" ? "Closed" : "Open"}
+        </p>
     </div>
   );
 };
