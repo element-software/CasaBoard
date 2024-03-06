@@ -14,9 +14,6 @@ interface GridItemProps {
 
 export const Alarm = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
-
-  console.log("Alarm entity", entity);
-
   const stateClassNameBg = () => {
     switch (entity.state) {
       case "disarmed":

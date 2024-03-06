@@ -5,9 +5,6 @@ import Icon from "@mdi/react";
 import {
   mdiDoorClosed,
   mdiDoorOpen,
-  mdiShieldAlert,
-  mdiShieldLock,
-  mdiShieldLockOpen,
 } from "@mdi/js";
 
 interface GridItemProps {
@@ -17,7 +14,6 @@ interface GridItemProps {
 export const Entity = ({ entityId }: GridItemProps) => {
   const entity = useEntity(entityId);
 
-  console.log("Entity entity", entity);
 
   const stateClassNameBg = () => {
     switch (entity.state) {
