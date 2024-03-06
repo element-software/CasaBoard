@@ -25,7 +25,9 @@ export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" />
+          <Dialog.Overlay onClick={() => setOpen(false)}>
+            <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" onClick={() => setOpen(false)}/>
+          </Dialog.Overlay>
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">

@@ -55,11 +55,11 @@ export default function Home() {
   return (
     <main className="flex h-screen flex-col items-center p-8">
       <div className="grid grid-cols-3 gap-8 w-full">
-        <Light entityId={"light.kitchen_downlights" as EntityName} />
         <Light entityId={"light.office_downlights_dimmer" as EntityName} dimmer={true}/>
         <Light entityId={"light.focus_light" as EntityName} dimmer={true}/>
-        <Light entityId={"light.utility_room" as EntityName} />
         <Light entityId={"light.living_room_downlights" as EntityName} dimmer={true}/>
+        <Light entityId={"light.kitchen_downlights" as EntityName} />
+        <Light entityId={"light.utility_room" as EntityName} />
         <div
           className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
           onClick={() => setOpen(!open)}
@@ -67,7 +67,12 @@ export default function Home() {
           Ambient Lighting
           <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
         </div>
-        <EntityCard title="Ambient Lighting" entities={entityCardEntities} colspan={2} showTitles={true} showAllOn={true}/>
+        <EntityCard title="Ambient Lighting" openTab={true} entities={entityCardEntities} colspan={2} showTitles={true} showAllOn={true}>
+          <div className="grid grid-cols-2 gap-2">
+            <Light entityId={"light.focus_light" as EntityName} dimmer={true} temperature={true}/>
+            <Light entityId={"light.wall_cabinet_lighting" as EntityName} dimmer={true} temperature={true} color={true}/>
+          </div>
+          </EntityCard>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
         <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
         <Popup

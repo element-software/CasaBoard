@@ -3,8 +3,9 @@ import { EntityName, useHass } from "@hakit/core";
 import Entity from "./Entity";
 import classNames from "classnames";
 import Icon from "@mdi/react";
-import { mdiPower } from "@mdi/js";
+import { mdiOpenInNew, mdiPower } from "@mdi/js";
 import { useCallback, useState } from "react";
+import Popup from "../Popup";
 
 interface EntityCardProps {
   title: string;
@@ -13,6 +14,8 @@ interface EntityCardProps {
   showAllOn?: boolean;
   showTitles?: boolean;
   disableClick?: boolean;
+  openTab?: boolean;
+  children?: React.ReactNode;
 }
 
 interface Entity {
@@ -20,15 +23,25 @@ interface Entity {
   icon: string;
 }
 
-const EntityCard = ({ title, entities, colspan, showAllOn = false, showTitles = false, disableClick = false }: EntityCardProps) => {
+const EntityCard = ({
+  title,
+  entities,
+  colspan,
+  openTab = false,
+  showAllOn = false,
+  showTitles = false,
+  disableClick = false,
+  children,
+}: EntityCardProps) => {
   const getColspan = () => {
     return colspan ? `col-span-${colspan}` : "col-span-2";
   };
-  
+
   const [allOn, setAllOn] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { callService } = useHass();
-  
+
   const toggleLighting = useCallback(
     (entities: EntityName[]) => {
       callService({
@@ -43,8 +56,9 @@ const EntityCard = ({ title, entities, colspan, showAllOn = false, showTitles = 
     [allOn, callService]
   );
 
-
-  const stateClassname = allOn ? "text-black from-yellow-600 to-amber-500" : "text-white from-neutral-800 to-neutral-700 rounded-full";
+  const stateClassname = allOn
+    ? "text-black from-yellow-600 to-amber-500"
+    : "text-white from-neutral-800 to-neutral-700 rounded-full";
 
   return (
     <div
@@ -54,25 +68,54 @@ const EntityCard = ({ title, entities, colspan, showAllOn = false, showTitles = 
       )}
     >
       <div className="flex flex-row w-full justify-between items-center">
-        <div className="text-base">{title}</div>
+        <div className="text-base inline-flex">
+          {title}
+          {openTab && (
+            <div className="inline-flex" onClick={() => setOpen(true)}>
+              <Icon
+                path={mdiOpenInNew}
+                className="ml-3 h-6 w-6 text-amber-500"
+                aria-hidden="true"
+              />
+              <Popup open={open} setOpen={setOpen} className="w-screen h-full bg-stone-900">
+                <div className="w-full text-center text-2xl font-medium text-white mb-4">
+                  {title}
+                </div>
+                {children}
+              </Popup>
+            </div>
+          )}
+        </div>
         <div
-          onClick={disableClick ? undefined : () => toggleLighting(entities.map((entity) => entity.id))}
+          onClick={
+            disableClick
+              ? undefined
+              : () => toggleLighting(entities.map((entity) => entity.id))
+          }
           className={showAllOn ? "block" : "hidden"}
         >
           <Icon
             path={mdiPower}
-            className={classNames("h-10 w-10 p-2 rounded-full bg-gradient-to-l", stateClassname)}
+            className={classNames(
+              "h-10 w-10 p-2 rounded-full bg-gradient-to-l",
+              stateClassname
+            )}
             aria-hidden="true"
           />
         </div>
       </div>
       <div className="flex flex-row w-full items-center justify-between">
         {entities.map((entity) => (
-          <Entity key={entity.id} entityId={entity.id} icon={entity.icon} showTitle={showTitles} />
+          <Entity
+            key={entity.id}
+            entityId={entity.id}
+            icon={entity.icon}
+            showTitle={showTitles}
+          />
         ))}
       </div>
     </div>
   );
-}
+};
 
 export default EntityCard;
