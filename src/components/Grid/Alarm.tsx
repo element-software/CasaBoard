@@ -4,6 +4,7 @@ import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiShieldAlert, mdiShieldLock, mdiShieldLockOpen } from "@mdi/js";
 import { useState } from "react";
+import { AlarmUtils } from "@/utils";
 
 interface GridItemProps {
   entityId: EntityName;
@@ -14,63 +15,37 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     useState<HassEntityWithService<"alarmControlPanel">>();
 
   try {
-    const entity = useEntity(entityId);
-    if (!entity) setEntity(entity);
+    const alarmEntity = useEntity(entityId);
+    if (!entity) setEntity(alarmEntity);
   } catch (error) {
     console.error("Error fetching entity", error);
   }
 
-  if (!entity) return null;
-
-  const stateClassNameBg = () => {
-    switch (entity.state) {
-      case "disarmed":
-        return "bg-gray-800";
-      case "armed_night":
-        return "bg-stone-800";
-      default:
-        return "";
-    }
-  };
-
-  const renderIcon = () => {
-    switch (entity.state) {
-      case "armed_night":
-        return (
-          <Icon
-            path={mdiShieldLock}
-            className={classNames("h-12 w-12", "text-amber-500")}
-            aria-hidden="true"
-          />
-        );
-      case "disarmed":
-        return (
-          <Icon
-            path={mdiShieldLockOpen}
-            className={classNames("h-12 w-12", "text-gray-400")}
-            aria-hidden="true"
-          />
-        );
-      default:
-        return (
-          <Icon
-            path={mdiShieldAlert}
-            className={classNames("h-12 w-12", "text-red-500")}
-            aria-hidden="true"
-          />
-        );
-    }
-  };
+  if (!entity)
+    return (
+      <div
+        key={entityId}
+        className="relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+      >
+        <Icon
+          path={mdiShieldAlert}
+          className={classNames("h-12 w-12", "text-red-500")}
+          aria-hidden="true"
+        />
+        <p className="text-xs text-gray-400">{entityId}</p>
+        <p className="text-xs text-gray-400">Unavailable</p>
+      </div>
+    );
 
   return (
     <div
       key={entity.entity_id}
       className={classNames(
         "relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
-        stateClassNameBg()
+        AlarmUtils.stateClassNameBg(entity)
       )}
     >
-      {renderIcon()}
+      {AlarmUtils.renderIcon(entity)}
       {entity.state.split("_")[0][0].toUpperCase() +
         entity.state.split("_")[0].slice(1) +
         " " +

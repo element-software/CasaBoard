@@ -1,23 +1,12 @@
 "use client";
-import {
-  EntityName,
-  useEntity,
-  useHass,
-} from "@hakit/core";
+import { EntityName, useEntity, useHass } from "@hakit/core";
 import classNames from "classnames";
 import { useCallback } from "react";
 import Toggle from "../Toggle";
 import Icon from "@mdi/react";
-import {
-  mdiDiamondStone,
-  mdiLightRecessed,
-  mdiLightbulb,
-  mdiPalette,
-  mdiThermometer,
-  mdiTrackLight,
-  mdiWeatherSunny,
-} from "@mdi/js";
+import { mdiPalette, mdiThermometer, mdiWeatherSunny } from "@mdi/js";
 import { HuePicker } from "react-color";
+import { LightUtils } from "@/utils";
 
 interface LightProps {
   entityId: EntityName;
@@ -32,9 +21,15 @@ export const Light = ({
   temperature = false,
   color = false,
 }: LightProps) => {
- const entity = useEntity(entityId);
+  const entity = useEntity(entityId);
 
-  console.log("Light:: entity", entity?.attributes.friendly_name, " supports", entity?.attributes.supported_features, entity?.attributes.supported_color_modes)
+  console.log(
+    "Light:: entity",
+    entity?.attributes.friendly_name,
+    " supports",
+    entity?.attributes.supported_features,
+    entity?.attributes.supported_color_modes
+  );
 
   const { callService } = useHass();
 
@@ -131,119 +126,6 @@ export const Light = ({
     [callService]
   );
 
-  const stateClassNameBg = () => {
-    switch (entity.state) {
-      case "on":
-        return "bg-stone-800";
-      case "off":
-        return "bg-stone-800";
-      default:
-        return "";
-    }
-  };
-
-  const stateClassNameIcon = () => {
-    switch (entity.state) {
-      case "on":
-        return "text-amber-500";
-      case "off":
-        return "text-gray-400";
-      default:
-        return "text-amber-500";
-    }
-  };
-
-  const sliderBrightnessClassnames = () => {
-    if (entity.attributes.brightness < 10 || entity.state === "off") {
-      return "accent-gray-400 text-gray-400";
-    } else {
-      // return accent colour relative to brightness
-      if (
-        entity.attributes.brightness >= 10 &&
-        entity.attributes.brightness < 100
-      ) {
-        return "accent-amber-600 text-amber-600";
-      } else if (
-        entity.attributes.brightness >= 150 &&
-        entity.attributes.brightness < 200
-      ) {
-        return "accent-amber-500 text-amber-500";
-      } else if (
-        entity.attributes.brightness >= 200 &&
-        entity.attributes.brightness < 250
-      ) {
-        return "accent-amber-400 text-amber-400";
-      } else {
-        return "accent-amber-500 text-amber-500";
-      }
-    }
-  };
-
-  const sliderTemperatureClassnames = (
-    min: number,
-    max: number,
-    value: number
-  ) => {
-    if (entity.state === "off") return "accent-gray-400 text-gray-400";
-    const fifth = (max - min) / 5;
-    if (value < min + fifth) {
-      return "accent-amber-500 text-amber-500";
-    } else if (value >= min + fifth && value < min + fifth * 2) {
-      return "accent-amber-400 text-amber-400";
-    } else if (value >= min + fifth * 2 && value < min + fifth * 3) {
-      return "accent-amber-300 text-amber-300";
-    } else if (value >= min + fifth * 3 && value < min + fifth * 4) {
-      return "accent-amber-200 text-amber-200";
-    } else {
-      return "accent-amber-100 text-amber-100";
-    }
-  };
-
-  const renderIcon = () => {
-    switch (entity.attributes.icon) {
-      case "mdi:track-light":
-        return (
-          <Icon
-            path={mdiTrackLight}
-            className={classNames("h-10 w-10", stateClassNameIcon())}
-            aria-hidden="true"
-          />
-        );
-      case "mdi:light-recessed":
-        return (
-          <Icon
-            path={mdiLightRecessed}
-            className={classNames("h-10 w-10", stateClassNameIcon())}
-            aria-hidden="true"
-          />
-        );
-      case "mdi:lightbulb":
-        return (
-          <Icon
-            path={mdiLightbulb}
-            className={classNames("h-10 w-10", stateClassNameIcon())}
-            aria-hidden="true"
-          />
-        );
-      case "mdi:diamond-stone":
-        return (
-          <Icon
-            path={mdiDiamondStone}
-            className={classNames("h-10 w-10", stateClassNameIcon())}
-            aria-hidden="true"
-          />
-        );
-      default:
-        return (
-          <Icon
-            path={mdiLightbulb}
-            className={classNames("h-10 w-10", stateClassNameIcon())}
-            aria-hidden="true"
-          />
-        );
-    }
-  };
-
   if (!entity) return null;
 
   return (
@@ -260,14 +142,16 @@ export const Light = ({
             (temperature && color),
           "h-64": dimmer && temperature && color,
         },
-        stateClassNameBg()
+        LightUtils.stateClassNameBg(entity)
       )}
     >
       <div
         className="flex flex-row w-full items-center justify-between"
         onClick={() => handleToggle(entity.entity_id as EntityName)}
       >
-        {renderIcon()}
+        {LightUtils.renderIcon(entity, () =>
+          LightUtils.stateClassNameIcon(entity)
+        )}
         <Toggle
           enabled={entity.state === "on" ? true : false}
           onToggle={() =>
@@ -277,61 +161,71 @@ export const Light = ({
           }
         />
       </div>
-      {dimmer && entity?.attributes.supported_color_modes?.includes("brightness") && (
-        <div className="flex flex-row gap-2 w-full items-center">
-          <Icon
-            path={mdiWeatherSunny}
-            className={classNames("h-8 w-8", sliderBrightnessClassnames())}
-            aria-hidden="true"
-          />
-          <input
-            type="range"
-            min="0"
-            max="250"
-            step="25"
-            defaultValue={entity.attributes.brightness || 0}
-            className={classNames("w-full mt-0", sliderBrightnessClassnames())}
-            onChange={(e: any) =>
-              setBrightness(e.target.value, entity.entity_id as EntityName)
-            }
-          />
-        </div>
-      )}
+      {dimmer &&
+        entity?.attributes.supported_color_modes?.includes("brightness") && (
+          <div className="flex flex-row gap-2 w-full items-center">
+            <Icon
+              path={mdiWeatherSunny}
+              className={classNames(
+                "h-8 w-8",
+                LightUtils.sliderBrightnessClassnames(entity)
+              )}
+              aria-hidden="true"
+            />
+            <input
+              type="range"
+              min="0"
+              max="250"
+              step="25"
+              defaultValue={entity.attributes.brightness || 0}
+              className={classNames(
+                "w-full mt-0",
+                LightUtils.sliderBrightnessClassnames(entity)
+              )}
+              onChange={(e: any) =>
+                setBrightness(e.target.value, entity.entity_id as EntityName)
+              }
+            />
+          </div>
+        )}
 
-      {temperature && entity?.attributes.supported_color_modes?.includes("color_temp") && (
-        <div className="flex flex-row gap-2 w-full items-center">
-          <Icon
-            path={mdiThermometer}
-            className={classNames(
-              "h-8 w-8",
-              sliderTemperatureClassnames(
-                entity.attributes.min_color_temp_kelvin,
-                entity.attributes.max_color_temp_kelvin,
-                entity.attributes.color_temp_kelvin
-              )
-            )}
-            aria-hidden="true"
-          />
-          <input
-            type="range"
-            min={entity.attributes.min_color_temp_kelvin || 0}
-            max={entity.attributes.max_color_temp_kelvin || 100}
-            step="250"
-            defaultValue={entity.attributes.color_temp_kelvin || 0}
-            className={classNames(
-              "w-full",
-              sliderTemperatureClassnames(
-                entity.attributes.min_color_temp_kelvin,
-                entity.attributes.max_color_temp_kelvin,
-                entity.attributes.color_temp_kelvin
-              )
-            )}
-            onTouchEnd={(e: any) =>
-              setTemperature(e.target.value, entity.entity_id as EntityName)
-            }
-          />
-        </div>
-      )}
+      {temperature &&
+        entity?.attributes.supported_color_modes?.includes("color_temp") && (
+          <div className="flex flex-row gap-2 w-full items-center">
+            <Icon
+              path={mdiThermometer}
+              className={classNames(
+                "h-8 w-8",
+                LightUtils.sliderTemperatureClassnames(
+                  entity,
+                  entity.attributes.min_color_temp_kelvin,
+                  entity.attributes.max_color_temp_kelvin,
+                  entity.attributes.color_temp_kelvin
+                )
+              )}
+              aria-hidden="true"
+            />
+            <input
+              type="range"
+              min={entity.attributes.min_color_temp_kelvin || 0}
+              max={entity.attributes.max_color_temp_kelvin || 100}
+              step="250"
+              defaultValue={entity.attributes.color_temp_kelvin || 0}
+              className={classNames(
+                "w-full",
+                LightUtils.sliderTemperatureClassnames(
+                  entity,
+                  entity.attributes.min_color_temp_kelvin,
+                  entity.attributes.max_color_temp_kelvin,
+                  entity.attributes.color_temp_kelvin
+                )
+              )}
+              onTouchEnd={(e: any) =>
+                setTemperature(e.target.value, entity.entity_id as EntityName)
+              }
+            />
+          </div>
+        )}
 
       {color && entity?.attributes.supported_color_modes?.includes("xy") && (
         <div className="flex flex-row gap-2 w-full items-center">
@@ -339,7 +233,8 @@ export const Light = ({
             path={mdiPalette}
             className={classNames(
               "h-8 w-8",
-              sliderTemperatureClassnames(
+              LightUtils.sliderTemperatureClassnames(
+                entity,
                 entity.attributes.min_color_temp_kelvin,
                 entity.attributes.max_color_temp_kelvin,
                 entity.attributes.color_temp_kelvin

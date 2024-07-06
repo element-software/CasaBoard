@@ -3,7 +3,7 @@ import EntityCard from "@/components/EntityCard";
 import GraphCard from "@/components/GraphCard";
 import { Light } from "@/components/Grid";
 import { Alarm } from "@/components/Grid";
-import { Entity } from "@/components/Grid/Entity";
+import { BinarySensor } from "@/components/Grid/BinarySensor";
 import { EntityName } from "@hakit/core";
 
 export default function Home() {
@@ -35,19 +35,21 @@ export default function Home() {
               "alarm_control_panel.94_headland_rd_leicester" as EntityName
             }
           />
-          <Entity
+          <BinarySensor
+            entityId={"binary_sensor.front_door_sensor_contact" as EntityName}
+          />
+          <BinarySensor
             entityId={
-              "binary_sensor.front_door_sensor_contact" as EntityName
+              "binary_sensor.living_room_motion_sensor_occupancy" as EntityName
             }
+            friendlyName="Living Room"
           />
         </div>
-        {/* <Light
+        <Light
           entityId={"light.living_room_downlights" as EntityName}
           dimmer={true}
-        /> */}
-        {/* <Light
-          entityId={"light.bedroom_ceiling_fan_lights" as EntityName}
-        /> */}
+        />
+        <Light entityId={"light.bedroom_ceiling_fan_lights" as EntityName} />
         <Light entityId={"light.baby_room_light" as EntityName} />
         <Light entityId={"light.guest_bedroom" as EntityName} />
         <Light entityId={"light.upstairs_hallway_light" as EntityName} />
