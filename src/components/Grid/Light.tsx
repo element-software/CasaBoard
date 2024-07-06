@@ -1,5 +1,9 @@
 "use client";
-import { EntityName, useEntity, useHass } from "@hakit/core";
+import {
+  EntityName,
+  useEntity,
+  useHass,
+} from "@hakit/core";
 import classNames from "classnames";
 import { useCallback } from "react";
 import Toggle from "../Toggle";
@@ -13,7 +17,7 @@ import {
   mdiTrackLight,
   mdiWeatherSunny,
 } from "@mdi/js";
-import { HuePicker, SliderPicker } from "react-color";
+import { HuePicker } from "react-color";
 
 interface LightProps {
   entityId: EntityName;
@@ -28,7 +32,10 @@ export const Light = ({
   temperature = false,
   color = false,
 }: LightProps) => {
-  const entity = useEntity(entityId);
+ const entity = useEntity(entityId);
+
+  console.log("Light:: entity", entity?.attributes.friendly_name, " supports", entity?.attributes.supported_features, entity?.attributes.supported_color_modes)
+
   const { callService } = useHass();
 
   const handleTurnOn = useCallback(
@@ -237,6 +244,8 @@ export const Light = ({
     }
   };
 
+  if (!entity) return null;
+
   return (
     <div
       key={entity.entity_id}
@@ -268,7 +277,7 @@ export const Light = ({
           }
         />
       </div>
-      {dimmer && (
+      {dimmer && entity?.attributes.supported_color_modes?.includes("brightness") && (
         <div className="flex flex-row gap-2 w-full items-center">
           <Icon
             path={mdiWeatherSunny}
@@ -289,7 +298,7 @@ export const Light = ({
         </div>
       )}
 
-      {temperature && (
+      {temperature && entity?.attributes.supported_color_modes?.includes("color_temp") && (
         <div className="flex flex-row gap-2 w-full items-center">
           <Icon
             path={mdiThermometer}
@@ -324,7 +333,7 @@ export const Light = ({
         </div>
       )}
 
-      {color && (
+      {color && entity?.attributes.supported_color_modes?.includes("xy") && (
         <div className="flex flex-row gap-2 w-full items-center">
           <Icon
             path={mdiPalette}

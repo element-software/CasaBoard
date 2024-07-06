@@ -41,14 +41,13 @@ export default function Home() {
             }
           />
         </div>
-        <Light
-          entityId={"light.master_bedroom_dimmer" as EntityName}
-          dimmer={true}
-        />
-        <Light
+        {/* <Light
           entityId={"light.living_room_downlights" as EntityName}
           dimmer={true}
-        />
+        /> */}
+        {/* <Light
+          entityId={"light.bedroom_ceiling_fan_lights" as EntityName}
+        /> */}
         <Light entityId={"light.baby_room_light" as EntityName} />
         <Light entityId={"light.guest_bedroom" as EntityName} />
         <Light entityId={"light.upstairs_hallway_light" as EntityName} />

@@ -1,19 +1,27 @@
 "use client";
-import { EntityName, useEntity } from "@hakit/core";
+import { EntityName, HassEntityWithService, useEntity } from "@hakit/core";
 import classNames from "classnames";
 import Icon from "@mdi/react";
-import {
-  mdiShieldAlert,
-  mdiShieldLock,
-  mdiShieldLockOpen,
-} from "@mdi/js";
+import { mdiShieldAlert, mdiShieldLock, mdiShieldLockOpen } from "@mdi/js";
+import { useState } from "react";
 
 interface GridItemProps {
   entityId: EntityName;
 }
 
 export const Alarm = ({ entityId }: GridItemProps) => {
-  const entity = useEntity(entityId);
+  const [entity, setEntity] =
+    useState<HassEntityWithService<"alarmControlPanel">>();
+
+  try {
+    const entity = useEntity(entityId);
+    if (!entity) setEntity(entity);
+  } catch (error) {
+    console.error("Error fetching entity", error);
+  }
+
+  if (!entity) return null;
+
   const stateClassNameBg = () => {
     switch (entity.state) {
       case "disarmed":
@@ -67,7 +75,9 @@ export const Alarm = ({ entityId }: GridItemProps) => {
         entity.state.split("_")[0].slice(1) +
         " " +
         (entity.state.split("_")[1] || "")}
-        <p className="text-xs text-gray-400">Last Changed {new Date(entity.last_changed).toLocaleTimeString()}</p>
+      <p className="text-xs text-gray-400">
+        Last Changed {new Date(entity.last_changed).toLocaleTimeString()}
+      </p>
     </div>
   );
 };
