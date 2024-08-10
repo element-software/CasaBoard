@@ -28,7 +28,8 @@ export const Light = ({
     entity?.attributes.friendly_name,
     " supports",
     entity?.attributes.supported_features,
-    entity?.attributes.supported_color_modes
+    entity?.attributes.supported_color_modes,
+    entity.attributes.brightness,
   );
 
   const { callService } = useHass();
@@ -168,7 +169,7 @@ export const Light = ({
               path={mdiWeatherSunny}
               className={classNames(
                 "h-8 w-8",
-                LightUtils.sliderBrightnessClassnames(entity)
+                LightUtils.sliderBrightnessClassnames(entity) 
               )}
               aria-hidden="true"
             />

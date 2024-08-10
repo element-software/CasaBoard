@@ -116,4 +116,15 @@ export const renderState = (entity: HassEntityWithService<"binarySensor">) => {
         return "Unknown";
     }
   }
+
+  if (entity.attributes.device_class === "running") {
+    switch (entity.state) {
+      case "on":
+        return "Running";
+      case "off":
+        return "Not Running";
+      default:
+        return "Unknown";
+    }
+  }
 };

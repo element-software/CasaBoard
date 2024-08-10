@@ -25,7 +25,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     return (
       <div
         key={entityId}
-        className="relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+        className="relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
       >
         <Icon
           path={mdiShieldAlert}
@@ -41,7 +41,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
         AlarmUtils.stateClassNameBg(entity)
       )}
     >

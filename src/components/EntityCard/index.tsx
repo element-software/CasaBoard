@@ -16,6 +16,7 @@ interface EntityCardProps {
   disableClick?: boolean;
   openTab?: boolean;
   children?: React.ReactNode;
+  showLastChanged?: boolean;
 }
 
 interface Entity {
@@ -31,6 +32,7 @@ const EntityCard = ({
   showAllOn = false,
   showTitles = false,
   disableClick = false,
+  showLastChanged = false,
   children,
 }: EntityCardProps) => {
   const getColspan = () => {
@@ -111,6 +113,7 @@ const EntityCard = ({
             entityId={entity.id}
             icon={entity.icon}
             showTitle={showTitles}
+            showLastChanged={showLastChanged}
           />
         ))}
       </div>

@@ -6,6 +6,12 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    { pattern: /accent-amber-/ },
+    { pattern: /accent-gray-/ },
+    { pattern: /text-amber-/ },
+    { pattern: /text-gray-/ },
+  ],
   theme: {
     extend: {
       boxShadow: {

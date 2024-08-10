@@ -6,16 +6,20 @@ import { BinarySensorUtils } from "@/utils";
 interface GridItemProps {
   entityId: EntityName;
   friendlyName?: string;
+  asCard?: boolean;
 }
 
-export const BinarySensor = ({ entityId, friendlyName }: GridItemProps) => {
+export const BinarySensor = ({ entityId, friendlyName, asCard = true }: GridItemProps) => {
   const entity = useEntity(entityId);
 
   return (
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-36 text-center flex flex-col items-center justify-between gap-4 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-4 p-6 h-44 cursor-pointer text-white",
+        {
+          "bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl shadow-card shadow-neutral-800": asCard,
+        },
         BinarySensorUtils.stateClassNameBg(entity)
       )}
     >

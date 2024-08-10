@@ -117,32 +117,15 @@ export const stateClassNameIcon = (entity: HassEntityWithService<"light">) => {
 export const sliderBrightnessClassnames = (
   entity: HassEntityWithService<"light">
 ) => {
-  if (entity.attributes.brightness) {
-    if (entity.attributes.brightness < 10 || entity.state === "off") {
-      return "accent-gray-400 text-gray-400";
-    } else {
-      // return accent colour relative to brightness
-      if (
-        entity.attributes.brightness >= 10 &&
-        entity.attributes.brightness < 100
-      ) {
-        return "accent-amber-600 text-amber-600";
-      } else if (
-        entity.attributes.brightness >= 150 &&
-        entity.attributes.brightness < 200
-      ) {
-        return "accent-amber-500 text-amber-500";
-      } else if (
-        entity.attributes.brightness >= 200 &&
-        entity.attributes.brightness < 250
-      ) {
-        return "accent-amber-400 text-amber-400";
-      } else {
-        return "accent-amber-500 text-amber-500";
-      }
-    }
+  if (entity.attributes.supported_color_modes?.includes("brightness") && entity.attributes.brightness) {
+    return classNames({
+      "accent-gray-400 text-gray-400": entity.attributes.brightness === 0 || entity.state === "off",
+      "accent-amber-200 text-amber-200": entity.attributes.brightness > 0 && entity.attributes.brightness < 100,
+      "accent-amber-300 text-amber-300": entity.attributes.brightness >= 100 && entity.attributes.brightness < 200,
+      "accent-amber-400 text-amber-400": entity.attributes.brightness >= 200
+    })
   }
-  return "accent-amber-500 text-amber-500";
+  return "accent-gray-400 text-gray-400";
 };
 
 export const sliderTemperatureClassnames = (
@@ -153,15 +136,12 @@ export const sliderTemperatureClassnames = (
 ) => {
   if (entity.state === "off") return "accent-gray-400 text-gray-400";
   const fifth = (max - min) / 5;
-  if (value < min + fifth) {
-    return "accent-amber-500 text-amber-500";
-  } else if (value >= min + fifth && value < min + fifth * 2) {
-    return "accent-amber-400 text-amber-400";
-  } else if (value >= min + fifth * 2 && value < min + fifth * 3) {
-    return "accent-amber-300 text-amber-300";
-  } else if (value >= min + fifth * 3 && value < min + fifth * 4) {
-    return "accent-amber-200 text-amber-200";
-  } else {
-    return "accent-amber-100 text-amber-100";
-  }
+
+  return classNames({
+    "accent-amber-100 text-amber-100": value < min + fifth,
+    "accent-amber-200 text-amber-200": value >= min + fifth && value < min + fifth * 2,
+    "accent-amber-300 text-amber-300": value >= min + fifth * 2 && value < min + fifth * 3,
+    "accent-amber-400 text-amber-400": value >= min + fifth * 3 && value < min + fifth * 4,
+    "accent-amber-500 text-amber-500": value >= min + fifth * 4
+  });
 };
