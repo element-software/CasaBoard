@@ -15,6 +15,8 @@ export const stateClassNameIcon = (entity: HassEntityWithService<any>) => {
 };
 
 export const renderIcon = (entity: HassEntityWithService<any>, icon: string) => {
+
+  // check the type and return the appropriate icon from the utils folder
   switch (icon) {
     case "mdiTrackLight":
       return <Icon path={mdiTrackLight} className={classNames("h-10 w-10", stateClassNameIcon(entity))}/>;

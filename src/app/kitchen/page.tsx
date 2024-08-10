@@ -1,5 +1,5 @@
 "use client";
-import EntityCard from "@/components/EntityCard";
+import EntitiesCard from "@/components/EntitiesCard";
 import GraphCard from "@/components/GraphCard";
 import { Light } from "@/components/Grid";
 import Popup from "@/components/Popup";
@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
-  const entityCardEntities = [
+  const EntitiesCardEntities = [
     {
       id: "light.wall_cabinet_lighting" as EntityName,
       icon: "mdiLedStripVariant",
@@ -67,14 +67,14 @@ export default function Home() {
           Ambient Lighting
           <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
         </div>
-        <EntityCard title="Ambient Lighting" openTab={true} entities={entityCardEntities} colspan={2} showTitles={true} showAllOn={true}>
+        <EntitiesCard title="Ambient Lighting" openTab={true} entities={EntitiesCardEntities} colspan={2} showTitles={true} showAllOn={true}>
           <div className="grid grid-cols-2 gap-2">
             <Light entityId={"light.focus_light" as EntityName} dimmer={true} temperature={true}/>
             <Light entityId={"light.wall_cabinet_lighting" as EntityName} dimmer={true} temperature={true} color={true}/>
           </div>
-          </EntityCard>
+          </EntitiesCard>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
-        <EntityCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
+        <EntitiesCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
         <Popup
           open={open}
           setOpen={setOpen}

@@ -1,13 +1,14 @@
 "use client";
 import { EntityName, useHass } from "@hakit/core";
-import Entity from "./Entity";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiOpenInNew, mdiPower } from "@mdi/js";
 import { useCallback, useState } from "react";
 import Popup from "../Popup";
+import { Entity } from "@/types/shared";
+import EntityCard from "./EntityCard";
 
-interface EntityCardProps {
+interface EntitiesCardProps {
   title: string;
   entities: Entity[];
   colspan?: number;
@@ -19,12 +20,7 @@ interface EntityCardProps {
   showLastChanged?: boolean;
 }
 
-interface Entity {
-  id: EntityName;
-  icon: string;
-}
-
-const EntityCard = ({
+const EntitiesCard = ({
   title,
   entities,
   colspan,
@@ -34,7 +30,7 @@ const EntityCard = ({
   disableClick = false,
   showLastChanged = false,
   children,
-}: EntityCardProps) => {
+}: EntitiesCardProps) => {
   const getColspan = () => {
     return colspan ? `col-span-${colspan}` : "col-span-2";
   };
@@ -108,7 +104,7 @@ const EntityCard = ({
       </div>
       <div className="flex flex-row w-full items-center justify-between">
         {entities.map((entity) => (
-          <Entity
+          <EntityCard
             key={entity.id}
             entityId={entity.id}
             icon={entity.icon}
@@ -121,4 +117,4 @@ const EntityCard = ({
   );
 };
 
-export default EntityCard;
+export default EntitiesCard;
