@@ -11,6 +11,7 @@ const config: Config = {
     { pattern: /accent-gray-/ },
     { pattern: /text-amber-/ },
     { pattern: /text-gray-/ },
+    { pattern: /col-span-/ },
   ],
   theme: {
     extend: {
