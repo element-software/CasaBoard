@@ -14,8 +14,11 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
 
   // 10 is lowest, 32 is highest
   // map this to 0 - 60
-  const percent = Math.round(
-    (Math.round(entity.attributes.temperature - 10) / 22) * 100  );
+  const currentPercent = Math.round(
+    (Math.round(entity.attributes.current_temperature - 10) / 22) * 100  );
+
+  const targetPercent = Math.round(
+      (Math.round(entity.attributes.temperature - 10) / 22) * 100  );
 
   const stateClassname = entity.attributes.running_state === "heat" ? "text-black from-yellow-600 to-amber-500" : "text-white from-neutral-800 to-neutral-700 rounded-full";
 
@@ -36,16 +39,25 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
             fill="transparent"
           ></circle>
           <circle
-            className="text-amber-500 progress-ring__circle stroke-current"
+            className="text-amber-600 progress-ring__circle stroke-current !rotate-[180deg]"
             strokeWidth="3"
             strokeLinecap="round"
             cx="40"
             cy="40"
             r="30"
             fill="transparent"
-            strokeDashoffset={`calc(400 - (400 * ${(60 * percent) / 100}) / 100)`}
+            strokeDashoffset={`calc(450 - (350 * ${(60 * targetPercent) / 100}) / 100)`}
           ></circle>
-
+          <circle
+            className="text-amber-400 progress-ring__circle stroke-current !rotate-[180deg]"
+            strokeWidth="3"
+            strokeLinecap="round"
+            cx="40"
+            cy="40"
+            r="30"
+            fill="transparent"
+            strokeDashoffset={`calc(450 - (350 * ${(60 * currentPercent) / 100}) / 100)`}
+          ></circle>
           <text
             x="40"
             y="40"
@@ -55,6 +67,16 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
             className="text-base fill-white"
           >
               {entity.attributes.temperature}°C
+          </text>
+          <text
+            x="40"
+            y="53"
+            fontSize="2"
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            className="text-[6px] fill-white opacity-25"
+          >
+              TARGET
           </text>
         </svg>
       </div>

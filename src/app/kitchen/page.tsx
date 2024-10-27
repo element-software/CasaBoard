@@ -49,6 +49,10 @@ export default function Home() {
     {
       id: "binary_sensor.gate_door_contact" as EntityName,
       icon: "mdiDoor",
+    },
+    {
+      id: "binary_sensor.downstairs_toilet_door_sensor_contact" as EntityName,
+      icon: "mdiDoor",
     }
   ];
 

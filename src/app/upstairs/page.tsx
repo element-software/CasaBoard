@@ -27,7 +27,7 @@ export default function Home() {
       icon: "mdiMotionSensor",
     },
     {
-      id: "binary_sensor.living_room_motion_sensor_occupancy" as EntityName,
+      id: "binary_sensor.konnected_d0e418_zone_3" as EntityName,
       icon: "mdiMotionSensor",
     },
     {

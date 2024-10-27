@@ -23,15 +23,6 @@ export const Light = ({
 }: LightProps) => {
   const entity = useEntity(entityId);
 
-  console.log(
-    "Light:: entity",
-    entity?.attributes.friendly_name,
-    " supports",
-    entity?.attributes.supported_features,
-    entity?.attributes.supported_color_modes,
-    entity.attributes.brightness,
-  );
-
   const { callService } = useHass();
 
   const handleTurnOn = useCallback(

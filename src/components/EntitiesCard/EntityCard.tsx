@@ -22,7 +22,6 @@ const EntityCard = ({
 }: EntityCardProps) => {
   const { callService } = useHass();
   const entity = useEntity(entityId);
-  console.log("Entity:: entity", entity);
 
   const toggleLighting = useCallback(
     (action: DomainService<"light">, entities: EntityName) => {
