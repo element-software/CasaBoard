@@ -2,7 +2,7 @@
 import { EntityName, HassEntityWithService, useEntity } from "@hakit/core";
 import classNames from "classnames";
 import Icon from "@mdi/react";
-import { mdiShieldAlert, mdiShieldLock, mdiShieldLockOpen } from "@mdi/js";
+import { mdiShieldAlert } from "@mdi/js";
 import { useState } from "react";
 import { AlarmUtils } from "@/utils";
 

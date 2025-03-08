@@ -8,6 +8,7 @@ import {
   mdiBaby,
   mdiStairsUp,
   mdiBed,
+  mdiLedStrip,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import classNames from "classnames";
@@ -21,6 +22,14 @@ export const renderIcon = (
       return (
         <Icon
           path={mdiTrackLight}
+          className={classNames("h-10 w-10", stateClassNameIcon())}
+          aria-hidden="true"
+        />
+      );
+    case "mdi:led-strip":
+      return (
+        <Icon
+          path={mdiLedStrip}
           className={classNames("h-10 w-10", stateClassNameIcon())}
           aria-hidden="true"
         />

@@ -43,7 +43,7 @@ export default function Home() {
       icon: "mdiDoor",
     },
     {
-      id: "binary_sensor.patio_door_sensor_contact" as EntityName,
+      id: "binary_sensor.loft_access_door_contact" as EntityName,
       icon: "mdiDoor",
     },
     {
@@ -79,6 +79,7 @@ export default function Home() {
           </EntitiesCard>
         <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
         <EntitiesCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
+        <Light entityId={"light.kitchen_wall_panel_led_strips" as EntityName} />
         <Popup
           open={open}
           setOpen={setOpen}

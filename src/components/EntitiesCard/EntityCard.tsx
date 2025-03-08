@@ -1,7 +1,10 @@
-import { DomainService, EntityName, useEntity, useHass } from "@hakit/core";
-import { useCallback } from "react";
+import { DomainService, EntityName, HassEntityWithService, useEntity, useHass } from "@hakit/core";
+import { useCallback, useState } from "react";
 import { renderIcon } from "./utils";
 import { renderState } from "@/utils/binarySensor";
+import Icon from "@mdi/react";
+import { mdiShieldAlert } from "@mdi/js";
+import classNames from "classnames";
 
 interface EntityCardProps {
   entityId: EntityName;
@@ -20,22 +23,46 @@ const EntityCard = ({
   showState = false,
   showLastChanged = false,
 }: EntityCardProps) => {
-  const { callService } = useHass();
-  const entity = useEntity(entityId);
 
-  const toggleLighting = useCallback(
-    (action: DomainService<"light">, entities: EntityName) => {
-      if (disableClick) return;
-      callService({
-        domain: "light",
-        service: action,
-        target: {
-          entity_id: entities,
-        },
-      });
-    },
-    [callService, disableClick]
-  );
+    const [entity, setEntity] = useState<any>();
+  
+    try {
+      const alarmEntity = useEntity(entityId);
+      if (!entity) setEntity(alarmEntity);
+    } catch (error) {
+      console.error("Error fetching entity", error);
+    }
+
+    const { callService } = useHass();
+
+    const toggleLighting = useCallback(
+      (action: DomainService<"light">, entities: EntityName) => {
+        if (disableClick) return;
+        callService({
+          domain: "light",
+          service: action,
+          target: {
+            entity_id: entities,
+          },
+        });
+      },
+      [callService, disableClick]
+    );
+  
+    if (!entity)
+      return (
+        <div
+          key={entityId}
+          className="flex flex-col items-center gap-2 text-center"
+        >
+          <Icon
+            path={mdiShieldAlert}
+            className={classNames("h-8 w-8", "text-red-500")}
+            aria-hidden="true"
+          />
+          <p className="text-xs text-gray-400">Unavailable</p>
+        </div>
+      );
 
   return (
     <div

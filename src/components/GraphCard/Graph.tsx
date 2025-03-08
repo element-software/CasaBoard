@@ -59,12 +59,13 @@ const Graph = ({ data, className }: GraphCardProps) => {
       },
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
       background: {
         enabled: false,
       },
       style: {
         colors: ["#fff"],
+        fontSize: "9px"
       },
       formatter: function (val: any) {
         return Math.round(val) + "W";
@@ -149,7 +150,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
   };
 
   const chart = useMemo(() => {
-    return <ApexCharts type="area" options={options} series={series} height={150} width={400} />
+    return <ApexCharts type="area" options={options} series={series} height={150} width={800} />
   }, [options, series]);
 
   return (
