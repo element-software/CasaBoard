@@ -4,8 +4,6 @@ import GraphCard from "@/components/GraphCard";
 import { Light } from "@/components/Grid";
 import Popup from "@/components/Popup";
 import { EntityName } from "@hakit/core";
-import { mdiOpenInNew } from "@mdi/js";
-import Icon from "@mdi/react";
 import { useState } from "react";
 
 export default function Home() {
@@ -33,6 +31,21 @@ export default function Home() {
     },
   ];
 
+  const MediaWallEntities = [
+    {
+      id: "light.kitchen_projector_wall_middle_left" as EntityName,
+      icon: "mdiLedStripVariant",
+    },
+    {
+      id: "light.kitchen_projector_wall_middle_right" as EntityName,
+      icon: "mdiLedStripVariant",
+    },
+    {
+      id: "light.kitchen_projector_wall_sides" as EntityName,
+      icon: "mdiLedStripVariant",
+    },
+  ];
+
   const sensorEntities = [
     {
       id: "binary_sensor.front_door_sensor_contact" as EntityName,
@@ -53,32 +66,85 @@ export default function Home() {
     {
       id: "binary_sensor.downstairs_toilet_door_sensor_contact" as EntityName,
       icon: "mdiDoor",
-    }
+    },
   ];
 
   return (
     <main className="flex h-screen flex-col items-center p-8">
       <div className="grid grid-cols-3 gap-8 w-full">
-        <Light entityId={"light.office_downlights_dimmer" as EntityName} dimmer={true}/>
-        <Light entityId={"light.focus_light" as EntityName} dimmer={true}/>
-        <Light entityId={"light.living_room_downlights" as EntityName} dimmer={true}/>
+        <Light
+          entityId={"light.office_downlights_dimmer" as EntityName}
+          dimmer={true}
+        />
+        <Light entityId={"light.focus_light" as EntityName} dimmer={true} />
+        <Light
+          entityId={"light.living_room_downlights" as EntityName}
+          dimmer={true}
+        />
         <Light entityId={"light.kitchen_downlights" as EntityName} />
         <Light entityId={"light.utility_room" as EntityName} />
-        <div
+        <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
+
+        <EntitiesCard
+          title="Media Wall"
+          openTab={true}
+          entities={MediaWallEntities}
+          colspan={1}
+          showTitles={true}
+          showAllOn={true}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <Light
+              entityId={
+                "light.kitchen_projector_wall_middle_left" as EntityName
+              }
+            />
+            <Light
+              entityId={
+                "light.kitchen_projector_wall_middle_right" as EntityName
+              }
+            />
+            <Light
+              entityId={"light.kitchen_projector_wall_sides" as EntityName}
+            />
+          </div>
+        </EntitiesCard>
+        {/* <div
           className="relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
           onClick={() => setOpen(!open)}
         >
-          Ambient Lighting
+          Media Wall
           <Icon path={mdiOpenInNew} className="h-12 w-12 text-amber-500" aria-hidden="true" />
-        </div>
-        <EntitiesCard title="Ambient Lighting" openTab={true} entities={EntitiesCardEntities} colspan={2} showTitles={true} showAllOn={true}>
+        </div> */}
+        <EntitiesCard
+          title="Ambient Lighting"
+          openTab={true}
+          entities={EntitiesCardEntities}
+          colspan={2}
+          showTitles={true}
+          showAllOn={true}
+        >
           <div className="grid grid-cols-2 gap-2">
-            <Light entityId={"light.focus_light" as EntityName} dimmer={true} temperature={true}/>
-            <Light entityId={"light.wall_cabinet_lighting" as EntityName} dimmer={true} temperature={true} color={true}/>
+            <Light
+              entityId={"light.focus_light" as EntityName}
+              dimmer={true}
+              temperature={true}
+            />
+            <Light
+              entityId={"light.wall_cabinet_lighting" as EntityName}
+              dimmer={true}
+              temperature={true}
+              color={true}
+            />
           </div>
-          </EntitiesCard>
-        <GraphCard entityId={"sensor.whole_home_energy_usage" as EntityName} />
-        <EntitiesCard title="Sensors" entities={sensorEntities} colspan={2} showTitles={true} disableClick={true}/>
+        </EntitiesCard>
+        <EntitiesCard
+          title="Sensors"
+          entities={sensorEntities}
+          colspan={2}
+          showTitles={true}
+          disableClick={true}
+        />
         <Light entityId={"light.kitchen_wall_panel_led_strips" as EntityName} />
         <Popup
           open={open}
@@ -86,14 +152,22 @@ export default function Home() {
           className="w-screen h-full bg-stone-900"
         >
           <div className="w-full text-center text-2xl font-medium text-white mb-4">
-            Ambient Lighting
+            Media Wall
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <Light entityId={"light.wall_cabinet_lighting" as EntityName} />
-            <Light entityId={"light.under_worktop_lighting" as EntityName} />
-            <Light entityId={"light.oven_tower_lighting" as EntityName} />
-            <Light entityId={"light.island_stone" as EntityName} />
-            <Light entityId={"light.island_drawers" as EntityName} />
+            <Light
+              entityId={
+                "light.kitchen_projector_wall_middle_left" as EntityName
+              }
+            />
+            <Light
+              entityId={
+                "light.kitchen_projector_wall_middle_right" as EntityName
+              }
+            />
+            <Light
+              entityId={"light.kitchen_projector_wall_sides" as EntityName}
+            />
           </div>
         </Popup>
       </div>
