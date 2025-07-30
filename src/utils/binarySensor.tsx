@@ -70,7 +70,7 @@ export const renderIcon = (entity: HassEntityWithService<"binarySensor">) => {
         return (
           <Icon
             path={mdiDoorOpen}
-            className={classNames("h-12 w-12", "text-amber-500")}
+            className={classNames("min-h-12 min-w-12 h-12 w-12", "text-amber-500")}
             aria-hidden="true"
           />
         );
@@ -78,7 +78,7 @@ export const renderIcon = (entity: HassEntityWithService<"binarySensor">) => {
         return (
           <Icon
             path={mdiDoorClosed}
-            className={classNames("h-12 w-12", "text-gray-400")}
+            className={classNames("min-h-12 min-w-12 h-12 w-12", "text-gray-400")}
             aria-hidden="true"
           />
         );

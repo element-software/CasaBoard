@@ -120,6 +120,7 @@ export const Light = ({
 
   if (!entity) return null;
 
+  console.log("Light:: brightness for entity", entity.entity_id, entity.attributes.brightness);
   return (
     <div
       key={entity.entity_id}
@@ -153,8 +154,7 @@ export const Light = ({
           }
         />
       </div>
-      {dimmer &&
-        entity?.attributes.supported_color_modes?.includes("brightness") && (
+      {dimmer && (
           <div className="flex flex-row gap-2 w-full items-center">
             <Icon
               path={mdiWeatherSunny}
@@ -165,11 +165,12 @@ export const Light = ({
               aria-hidden="true"
             />
             <input
+              key={`${entity.entity_id}-brightness-${entity.state}`}
               type="range"
               min="0"
               max="250"
               step="25"
-              defaultValue={entity.attributes.brightness || 0}
+              value={entity.attributes.brightness || 0}
               className={classNames(
                 "w-full mt-0",
                 LightUtils.sliderBrightnessClassnames(entity)
@@ -198,11 +199,12 @@ export const Light = ({
               aria-hidden="true"
             />
             <input
+              key={`${entity.entity_id}-temperature-${entity.state}`}
               type="range"
               min={entity.attributes.min_color_temp_kelvin || 0}
               max={entity.attributes.max_color_temp_kelvin || 100}
               step="250"
-              defaultValue={entity.attributes.color_temp_kelvin || 0}
+              value={entity.attributes.color_temp_kelvin || 0}
               className={classNames(
                 "w-full",
                 LightUtils.sliderTemperatureClassnames(
@@ -212,7 +214,7 @@ export const Light = ({
                   entity.attributes.color_temp_kelvin
                 )
               )}
-              onTouchEnd={(e: any) =>
+              onChange={(e: any) =>
                 setTemperature(e.target.value, entity.entity_id as EntityName)
               }
             />

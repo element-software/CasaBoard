@@ -24,16 +24,10 @@ const EntityCard = ({
   showLastChanged = false,
 }: EntityCardProps) => {
 
-    const [entity, setEntity] = useState<any>();
-  
-    try {
-      const alarmEntity = useEntity(entityId);
-      if (!entity) setEntity(alarmEntity);
-    } catch (error) {
-      console.error("Error fetching entity", error);
-    }
-
     const { callService } = useHass();
+    
+    // Always call the hook, but handle errors in the component logic
+    const entity = useEntity(entityId);
 
     const toggleLighting = useCallback(
       (action: DomainService<"light">, entities: EntityName) => {
@@ -75,7 +69,7 @@ const EntityCard = ({
       )}
       {showState && (
         <div className="text-xs text-gray-400 m-0 -mt-2">
-          {renderState(entity)}
+          {renderState(entity as any)}
         </div>
       )}
       {showLastChanged && (

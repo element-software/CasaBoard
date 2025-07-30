@@ -3,7 +3,6 @@ import { EntityName, HassEntityWithService, useEntity } from "@hakit/core";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
-import { useState } from "react";
 import { AlarmUtils } from "@/utils";
 
 interface GridItemProps {
@@ -11,15 +10,10 @@ interface GridItemProps {
 }
 
 export const Alarm = ({ entityId }: GridItemProps) => {
-  const [entity, setEntity] =
-    useState<HassEntityWithService<"alarmControlPanel">>();
-
-  try {
-    const alarmEntity = useEntity(entityId);
-    if (!entity) setEntity(alarmEntity);
-  } catch (error) {
-    console.error("Error fetching entity", error);
-  }
+  // Always call the hook, but handle errors in the component logic
+  const entity = useEntity(entityId, {
+    returnNullIfNotFound: true,
+  });
 
   if (!entity)
     return (

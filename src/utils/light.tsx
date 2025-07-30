@@ -126,7 +126,7 @@ export const stateClassNameIcon = (entity: HassEntityWithService<"light">) => {
 export const sliderBrightnessClassnames = (
   entity: HassEntityWithService<"light">
 ) => {
-  if (entity.attributes.supported_color_modes?.includes("brightness") && entity.attributes.brightness) {
+  if (entity.attributes.brightness) {
     return classNames({
       "accent-gray-400 text-gray-400": entity.attributes.brightness === 0 || entity.state === "off",
       "accent-amber-200 text-amber-200": entity.attributes.brightness > 0 && entity.attributes.brightness < 100,
