@@ -4,6 +4,7 @@ import { HassConnect } from "@hakit/core";
 import React from "react";
 import { ConfigurableSidebar } from "@/components/Sidebar/ConfigurableSidebar";
 import { dashboardConfig } from "@/config/dashboard.config";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const HASS_URL = "https://ha.iqbalibrahim.co.uk";
 
@@ -23,10 +24,14 @@ export default function Template({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <HassConnect hassUrl={HASS_URL}>
-      <ConfigurableSidebar config={sidebarConfig || defaultSidebarConfig}>
-        {children}
-      </ConfigurableSidebar>
-    </HassConnect>
+    <ErrorBoundary>
+      <HassConnect hassUrl={HASS_URL}>
+        <ConfigurableSidebar config={sidebarConfig || defaultSidebarConfig}>
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+        </ConfigurableSidebar>
+      </HassConnect>
+    </ErrorBoundary>
   );
 }

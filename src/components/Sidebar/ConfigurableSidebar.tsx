@@ -5,6 +5,8 @@ import { WeatherCard } from "@hakit/components";
 import Thermostat from "@/components/Thermostat";
 import Image from "next/image";
 import { SidebarConfig } from "@/config/dashboard.types";
+import { MobileHeader } from "@/components/Header/MobileHeader";
+import { useState, useEffect } from "react";
 
 interface ConfigurableSidebarProps {
   children: React.ReactNode;
@@ -12,73 +14,147 @@ interface ConfigurableSidebarProps {
 }
 
 export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarProps) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  const SidebarContent = () => (
+    <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4 h-full">
+      {config.showClock && (
+        <div className="flex flex-col">
+          <Clock />
+        </div>
+      )}
+      
+      {config.showWeather && (
+        <div className="flex flex-1 flex-col w-full">
+          <WeatherCard
+            entity={config.weather as `weather.${string}`}
+            className="w-full bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+            onlyFunctionality
+            disableRipples
+            disableScale
+            disableActiveState
+            cssStyles={`
+              .button-group, h4.title {
+                display: none;
+              },
+              .icon {
+                color: #FA9703 !important;
+              }
+            `}
+            xlg={12}
+            lg={12}
+            md={12}
+            sm={12}
+            xs={12}
+            xxs={12}
+            apparentTemperatureAttribute="temperature"
+          />
+        </div>
+      )}
+      
+      {config.showThermostat && (
+        <div className="flex flex-1 flex-col w-full">
+          <Thermostat entityId={config.thermostat as EntityName}/>
+        </div>
+      )}
+      
+      {config.showBranding && (
+        <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
+          {config.brandingText}
+          {config.brandingImage && (
+            <Image 
+              src={config.brandingImage} 
+              alt="branding" 
+              width={100} 
+              height={100} 
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
-      <div>
-        {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-          {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4">
-            {config.showClock && (
-              <div className="flex flex-col">
-                <Clock />
-              </div>
-            )}
+      <div className="min-h-screen bg-neutral-900">
+        {/* Mobile header */}
+        <MobileHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
+
+        {/* Mobile sidebar overlay */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            {/* Overlay backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
             
-            {config.showWeather && (
-              <div className="flex flex-1 flex-col w-full">
-                <WeatherCard
-                  entity={config.weather as `weather.${string}`}
-                  className="w-full bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
-                  onlyFunctionality
-                  disableRipples
-                  disableScale
-                  disableActiveState
-                  cssStyles={`
-                    .button-group, h4.title {
-                      display: none;
-                    },
-                    .icon {
-                      color: #FA9703 !important;
-                    }
-                  `}
-                  xlg={12}
-                  lg={12}
-                  md={12}
-                  sm={12}
-                  xs={12}
-                  xxs={12}
-                  apparentTemperatureAttribute="temperature"
-                />
+            {/* Sidebar panel */}
+            <div className="relative flex flex-col w-80 max-w-sm bg-neutral-900 border-r border-neutral-700">
+              {/* Close button */}
+              <div className="absolute top-1 right-1">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-white hover:bg-neutral-800 rounded-lg transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
-            )}
-            
-            {config.showThermostat && (
-              <div className="flex flex-1 flex-col w-full">
-                <Thermostat entityId={config.thermostat as EntityName}/>
-              </div>
-            )}
-            
-            {config.showBranding && (
-              <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
-                {config.brandingText}
-                {config.brandingImage && (
-                  <Image 
-                    src={config.brandingImage} 
-                    alt="branding" 
-                    width={100} 
-                    height={100} 
-                  />
-                )}
-              </div>
-            )}
+              <SidebarContent />
+            </div>
           </div>
+        )}
+
+        {/* Desktop sidebar */}
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-neutral-900 border-r border-neutral-700">
+          <SidebarContent />
         </div>
 
-        <div className="relative">
-          <div className="absolute bg-neutral-900 left-0 top-0 w-screen h-screen opacity-35" style={{ zIndex: "-1" }} />
-            <div className="lg:pl-64">
+        {/* Main content */}
+        <div className="lg:pl-72">
+          <div className="relative min-h-screen pt-24 lg:pt-0">
+            <div className="absolute bg-neutral-900 left-0 top-0 w-full h-full opacity-35 pointer-events-none" style={{ zIndex: "-1" }} />
+            <div className="relative z-10">
               {children}
+            </div>
           </div>
         </div>
       </div>

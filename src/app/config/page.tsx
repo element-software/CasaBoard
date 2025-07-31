@@ -85,7 +85,7 @@ export default function ConfigEditor() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -175,13 +175,13 @@ export default function ConfigEditor() {
   };
 
   return (
-    <main className="flex h-screen p-8 bg-gray-900 text-white">
-      <div className="flex w-full gap-8">
+    <main className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-900 text-white">
+      <div className="flex flex-col xl:flex-row w-full gap-4 lg:gap-8 h-full">
         {/* Configuration Editor */}
-        <div className="w-1/2 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">Dashboard Configuration</h1>
-            <div className="flex gap-2">
+        <div className="flex flex-col xl:w-1/2">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+            <h1 className="text-xl sm:text-2xl font-bold">Dashboard Configuration</h1>
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="file"
                 accept=".json"
@@ -191,7 +191,7 @@ export default function ConfigEditor() {
               />
               <label
                 htmlFor="import-config"
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors cursor-pointer"
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors cursor-pointer text-center"
               >
                 Import Config
               </label>
@@ -205,10 +205,10 @@ export default function ConfigEditor() {
           </div>
 
           {/* Tabs */}
-          <div className="flex mb-4 border-b border-gray-700">
+          <div className="flex mb-4 border-b border-gray-700 overflow-x-auto">
             <button
               onClick={() => setActiveTab("pages")}
-              className={`px-4 py-2 transition-colors ${
+              className={`px-4 py-2 transition-colors whitespace-nowrap ${
                 activeTab === "pages"
                   ? "text-blue-400 border-b-2 border-blue-400"
                   : "text-gray-400 hover:text-white"
@@ -218,7 +218,7 @@ export default function ConfigEditor() {
             </button>
             <button
               onClick={() => setActiveTab("sidebar")}
-              className={`px-4 py-2 transition-colors ${
+              className={`px-4 py-2 transition-colors whitespace-nowrap ${
                 activeTab === "sidebar"
                   ? "text-blue-400 border-b-2 border-blue-400"
                   : "text-gray-400 hover:text-white"
@@ -228,7 +228,7 @@ export default function ConfigEditor() {
             </button>
             <button
               onClick={() => setActiveTab("global")}
-              className={`px-4 py-2 transition-colors ${
+              className={`px-4 py-2 transition-colors whitespace-nowrap ${
                 activeTab === "global"
                   ? "text-blue-400 border-b-2 border-blue-400"
                   : "text-gray-400 hover:text-white"
@@ -239,7 +239,7 @@ export default function ConfigEditor() {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-h-[300px] lg:min-h-[500px]">
             {activeTab === "pages" && (
               <textarea
                 value={JSON.stringify(config.pages, null, 2)}
@@ -251,7 +251,7 @@ export default function ConfigEditor() {
                     // Invalid JSON, ignore
                   }
                 }}
-                className="w-full h-full p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-full p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-xs sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 spellCheck={false}
                 placeholder="Pages configuration..."
               />
@@ -274,7 +274,7 @@ export default function ConfigEditor() {
                     // Invalid JSON, ignore
                   }
                 }}
-                className="w-full h-full p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-full p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-xs sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 spellCheck={false}
                 placeholder="Global configuration..."
               />
@@ -283,9 +283,9 @@ export default function ConfigEditor() {
         </div>
 
         {/* Preview */}
-        <div className="w-1/2 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Preview</h2>
+        <div className="flex flex-col xl:w-1/2 min-h-[400px] lg:min-h-[600px]">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+            <h2 className="text-lg sm:text-xl font-bold">Preview</h2>
             <select
               value={selectedPage}
               onChange={(e) => setSelectedPage(e.target.value)}
@@ -301,7 +301,7 @@ export default function ConfigEditor() {
           
           <div className="flex-1 border border-gray-700 rounded-lg overflow-hidden">
             <iframe
-              src={`/local/nextjs-dashboard/${selectedPage}`}
+              src={`${selectedPage}`}
               className="w-full h-full border-none"
               title="Dashboard Preview"
             />

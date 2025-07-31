@@ -31,9 +31,6 @@ const EntitiesCard = ({
   showLastChanged = false,
   children,
 }: EntitiesCardProps) => {
-  const getColspan = () => {
-    return colspan ? `col-span-${colspan}` : "col-span-2";
-  };
 
   const [allOn, setAllOn] = useState(false);
   const [open, setOpen] = useState(false);
@@ -54,15 +51,16 @@ const EntitiesCard = ({
     [allOn, callService]
   );
 
-  const stateClassname = allOn
-    ? "text-black from-yellow-600 to-amber-500"
-    : "text-white from-neutral-800 to-neutral-700 rounded-full";
 
   return (
     <div
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
-        getColspan()
+        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800 col-span-1",
+        {
+          "sm:col-span-2": colspan === 2,
+          "sm:col-span-3": colspan === 3,
+          "sm:col-span-4": colspan === 4,
+        }
       )}
     >
       <div className="flex flex-row w-full justify-between items-center">
@@ -96,13 +94,16 @@ const EntitiesCard = ({
             path={mdiPower}
             className={classNames(
               "h-10 w-10 p-2 rounded-full bg-gradient-to-l",
-              stateClassname
+              {
+                "text-black from-yellow-600 to-amber-500": allOn,
+                "text-white from-neutral-800 to-neutral-700 rounded-full": !allOn,
+              }
             )}
             aria-hidden="true"
           />
         </div>
       </div>
-      <div className="flex flex-row w-full items-center justify-between">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 w-full items-start justify-between gap-4">
         {entities.map((entity) => (
           <EntityCard
             key={entity.id}

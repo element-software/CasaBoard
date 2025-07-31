@@ -208,4 +208,30 @@ To migrate existing hardcoded pages:
 ✅ **Version control** friendly JSON configuration  
 ✅ **Real-time editing** with preview  
 ✅ **Type safety** with TypeScript  
-✅ **Modular design** - easy to extend
+✅ **Modular design** - easy to extend  
+✅ **Robust error handling** - graceful fallbacks and error pages  
+✅ **Auto-redirect** - unknown pages redirect to available pages  
+
+## Error Handling
+
+The dashboard includes comprehensive error handling:
+
+### Page Not Found
+- **Auto-redirect**: Unknown URLs automatically redirect to the first configured page
+- **Fallback page**: If no redirect is possible, shows available pages with links
+- **Configure button**: Direct link to config editor for easy setup
+
+### Application Errors
+- **Error boundaries**: Catch and handle React component errors gracefully
+- **Global error page**: Handles critical application errors
+- **Recovery options**: Try again, reload, or go to config editor
+
+### Middleware Protection
+- **Route validation**: Validates all routes against configuration
+- **Smart redirects**: Automatic redirection to valid pages
+- **Static file bypass**: Doesn't interfere with static assets or API routes
+
+### Configuration Errors
+- **Type safety**: TypeScript prevents many configuration errors
+- **JSON validation**: Real-time validation in the config editor
+- **Fallback configs**: Default configurations when user config is missing

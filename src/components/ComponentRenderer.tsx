@@ -65,8 +65,13 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
       const customGridConfig = config as CustomGridConfig;
       return (
         <div className={classNames(
-          "relative overflow-hidden w-full items-center justify-between p-2 h-40 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
-          `grid grid-cols-${customGridConfig.gridCols || 3} gap-4`,
+          "relative overflow-hidden w-full items-center justify-between cursor-pointer text-white rounded-2xl grid gap-4",
+          {
+            "grid-cols-1": !customGridConfig.gridCols || customGridConfig.gridCols === 1,
+            "grid-cols-2": customGridConfig.gridCols === 2,
+            "grid-cols-3": customGridConfig.gridCols === 3,
+            "grid-cols-4": customGridConfig.gridCols === 4,
+          },
           customGridConfig.className
         )}>
           {customGridConfig.entities.map((entity, index) => (
