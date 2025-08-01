@@ -121,11 +121,6 @@ export const Light = ({
 
   if (!entity) return null;
 
-  console.log(
-    "Light:: brightness for entity",
-    entity.entity_id,
-    entity.attributes.brightness
-  );
   return (
     <div
       key={entity.entity_id}

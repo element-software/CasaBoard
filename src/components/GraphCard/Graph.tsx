@@ -2,7 +2,7 @@
 "use client"
 import { ApexOptions } from "apexcharts";
 import dynamic from 'next/dynamic';
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 interface GraphCardProps {
@@ -11,18 +11,31 @@ interface GraphCardProps {
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
-  const d = data.entityHistory.slice(0,20).map((item: any) => ({ "y": item.s, "x": new Date(item.lu) }));
-  const series: ApexAxisChartSeries = [
+  
+  const processedData = useMemo(() => {
+    if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
+      return [];
+    }
+    return data.entityHistory.slice(data.entityHistory.length - 20).map((item: any) => ({
+      "y": item.s,
+      "x": new Date(item.lu)
+    }));
+  }, [data?.entityHistory]);
+
+  const series = useMemo((): ApexAxisChartSeries => [
     {
       name: "Energy Use",
-      data: d,
+      data: processedData,
       zIndex: 1,
-      color: "#f59e0b",
+      color: "var(--color-primary)",
       type: "area",
     },
-  ];
+  ], [processedData]);
 
-  var options: ApexOptions = {
+  const dataLabelFormatter = useCallback((val: any) => Math.round(val) + "W", []);
+  const tooltipFormatter = useCallback((val: any) => val + "W", []);
+
+  var options: ApexOptions = useMemo(() => ({
     chart: {
       id: "energy-graph",
       toolbar: {
@@ -64,12 +77,10 @@ const Graph = ({ data, className }: GraphCardProps) => {
         enabled: false,
       },
       style: {
-        colors: ["#fff"],
+        colors: ["var(--color-text)"],
         fontSize: "9px"
       },
-      formatter: function (val: any) {
-        return Math.round(val) + "W";
-      },
+      formatter: dataLabelFormatter,
       textAnchor: "middle",
       offsetY: -6,
     },
@@ -80,38 +91,14 @@ const Graph = ({ data, className }: GraphCardProps) => {
         opacityFrom: 0.6,
         opacityTo: 0.3,
         stops: [0, 100],
-        gradientToColors: ["#f59e0b"],
+        gradientToColors: ["var(--color-primary)"],
       },
     },
-    // colors: ["#f59e0b"],
     stroke: { width: 2, curve: 'smooth' },
-    // annotations: {
-    //   points: [{
-    //     x: d[0].x,
-    //     y: d[0].y,
-    //     marker: {
-    //       size: 8,
-    //       fillColor: '#fff',
-    //       strokeColor: 'red',
-    //       radius: 2,
-    //       cssClass: 'apexcharts-custom-class'
-    //     },
-    //     label: {
-    //       borderColor: '#FF4560',
-    //       offsetY: 0,
-    //       style: {
-    //         color: '#fff',
-    //         background: '#FF4560',
-    //       },
-    
-    //       text: 'Point Annotation',
-    //     }
-    //   }],
-    // },
     markers: {
       size: 3,
-      colors: ["#f59e0b"],
-      strokeColors: "#fff",
+      colors: ["var(--color-primary)"],
+      strokeColors: "var(--color-text)",
       strokeWidth: 1,
       fillOpacity: 1,
       shape: "circle",
@@ -136,9 +123,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
         display: "flex",
       },
       y: {
-        formatter: function (val: any) {
-          return val + "W";
-        },
+        formatter: tooltipFormatter,
       },
       x: {
         show: false,
@@ -147,7 +132,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
     noData: {
       text: "Loading...",
     },
-  };
+  }), [dataLabelFormatter, tooltipFormatter]);
 
   const chart = useMemo(() => {
     return <ApexCharts type="area" options={options} series={series} height={150} width={800} />

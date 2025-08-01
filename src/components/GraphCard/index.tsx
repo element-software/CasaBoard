@@ -7,8 +7,10 @@ interface GraphCardProps {
 
 const GraphCard = ({ entityId }: GraphCardProps) => {
   const entity = useEntity(entityId);
-  const history = useHistory(entityId);
-  const data = history.entityHistory.slice(0,20).map((item) => ({ "y": item.s, "x": new Date(item.lu) }));
+  const history = useHistory(entityId, { 
+    minimalResponse: true,
+    hoursToShow: 24,
+  });
   return (
     <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center h-40 justify-between space-y-2 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface">
       <div className="flex flex-row w-full items-center justify-between">
