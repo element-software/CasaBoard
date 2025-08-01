@@ -21,7 +21,7 @@ export default function HomePage() {
     <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 bg-theme-background">
       <div className="text-theme-text text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme-primary mx-auto mb-4"></div>
-        <p className="text-theme-text-secondary">Loading dashboard...</p>
+        <p className="text-theme-secondary">Loading dashboard...</p>
       </div>
     </main>
   );

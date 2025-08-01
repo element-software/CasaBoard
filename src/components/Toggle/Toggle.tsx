@@ -17,14 +17,11 @@ export const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
       className={classNames(
         'relative inline-flex h-8 w-20 flex-shrink-0 rounded-2xl cursor-pointer transition-colors duration-200 ease-in-out focus:outline-none focus:ring-none',
         {
-          'bg-theme-primary': enabled,
+          'bg-theme-primary linear-gradient(to left, var(--color-primary), var(--color-accent))': enabled,
           'bg-theme-surface': !enabled
         },
         className
       )}
-      style={enabled ? {
-        background: `linear-gradient(to left, var(--color-primary), var(--color-accent))`
-      } : undefined}
     > 
       <span 
         className="absolute left-1 inset-y-0 flex items-center pl-1 font-medium text-xs"
@@ -53,7 +50,7 @@ export const Toggle = ({ className, enabled, onToggle }: ToggleProps) => {
           }
         )}
       >
-        <PauseIcon className="h-5 w-5 mx-auto mt-1 font-bold text-theme-text-secondary shadow-card" aria-hidden="true" />
+        <PauseIcon className="h-5 w-5 mx-auto mt-1 font-bold text-theme-secondary shadow-card" aria-hidden="true" />
       </span>
     </Switch>
   )

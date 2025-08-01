@@ -7,6 +7,7 @@ import Icon from "@mdi/react";
 import { mdiPalette, mdiThermometer, mdiWeatherSunny } from "@mdi/js";
 import { HuePicker } from "react-color";
 import { LightUtils } from "@/utils";
+import { Slider } from "../RangeSlider/RangeSlider";
 
 interface LightProps {
   entityId: EntityName;
@@ -120,7 +121,11 @@ export const Light = ({
 
   if (!entity) return null;
 
-  console.log("Light:: brightness for entity", entity.entity_id, entity.attributes.brightness);
+  console.log(
+    "Light:: brightness for entity",
+    entity.entity_id,
+    entity.attributes.brightness
+  );
   return (
     <div
       key={entity.entity_id}
@@ -155,32 +160,27 @@ export const Light = ({
         />
       </div>
       {dimmer && (
-          <div className="flex flex-row gap-2 w-full items-center">
-            <Icon
-              path={mdiWeatherSunny}
-              className={classNames(
-                "h-8 w-8",
-                LightUtils.sliderBrightnessClassnames(entity) 
-              )}
-              aria-hidden="true"
-            />
-            <input
-              key={`${entity.entity_id}-brightness-${entity.state}`}
-              type="range"
-              min="0"
-              max="250"
-              step="25"
-              value={entity.attributes.brightness || 0}
-              className={classNames(
-                "w-full mt-0",
-                LightUtils.sliderBrightnessClassnames(entity)
-              )}
-              onChange={(e: any) =>
-                setBrightness(e.target.value, entity.entity_id as EntityName)
-              }
-            />
-          </div>
-        )}
+        <div className="flex flex-row gap-2 w-full items-center">
+          <Icon
+            path={mdiWeatherSunny}
+            className={classNames(
+              "h-8 w-8",
+              LightUtils.sliderBrightnessClassnames(entity)
+            )}
+            aria-hidden="true"
+          />
+          <Slider
+            value={entity.attributes.brightness || 0}
+            className={classNames(
+              "w-full mt-0",
+              LightUtils.sliderBrightnessClassnames(entity)
+            )}
+            onChange={(value) =>
+              setBrightness(value.toString(), entity.entity_id as EntityName)
+            }
+          />
+        </div>
+      )}
 
       {temperature &&
         entity?.attributes.supported_color_modes?.includes("color_temp") && (

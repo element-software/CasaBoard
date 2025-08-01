@@ -34,7 +34,7 @@
   .text-theme-secondary { color: var(--color-secondary); }
   .text-theme-accent { color: var(--color-accent); }
   .text-theme-text { color: var(--color-text); }
-  .text-theme-text-secondary { color: var(--color-text-secondary); }
+  .text-theme-secondary { color: var(--color-text-secondary); }
   .text-theme-success { color: var(--color-success); }
   .text-theme-warning { color: var(--color-warning); }
   .text-theme-error { color: var(--color-error); }
@@ -100,6 +100,18 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
   }
+  
+  /* Accent color theme classes */
+  .accent-theme-primary {
+    accent-color: var(--color-primary);
+  }
+  .accent-theme-secondary {
+    accent-color: var(--color-secondary);
+  }
+  .accent-theme-accent {
+    accent-color: var(--color-accent);
+  }
+
 }
 
 /* Hide scrollbar for mobile header tabs */

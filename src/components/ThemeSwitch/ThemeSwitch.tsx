@@ -38,7 +38,7 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({
     <div className={classNames("relative", className)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 p-2 text-theme-text-secondary hover:text-theme-text hover:bg-theme-surface rounded-lg transition-colors"
+        className="flex items-center space-x-2 p-2 text-theme-secondary hover:text-theme-text hover:bg-theme-surface rounded-lg transition-colors"
         aria-label="Change theme"
       >
         <div 

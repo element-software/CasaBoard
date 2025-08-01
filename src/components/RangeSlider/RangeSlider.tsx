@@ -1,130 +1,78 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { clamp, motion } from "framer-motion";
+import { useCallback, useRef, useState, useEffect } from "react";
 import classNames from "classnames";
 
 type Props = {
-  stops: ReactNode[];
   value: number;
   onChange: (value: number) => void;
   className?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+  id?: string;
 };
 
-export function Slider({ className, stops, value, onChange }: Props) {
-  const container = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+export function Slider({
+  className,
+  value,
+  onChange,
+  min = 0,
+  max = 240,
+  step = 20,
+  disabled = false,
+  id,
+}: Props) {
+  const [localValue, setLocalValue] = useState(value);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Handle input change with debounce
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = parseInt(e.target.value, 10);
+      setLocalValue(newValue); // Update local state immediately for smooth UI
+      
+      // Clear existing timeout
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+      
+      // Set new timeout for debounced onChange call
+      debounceRef.current = setTimeout(() => {
+        onChange(newValue);
+      }, 500);
+    },
+    [onChange]
+  );
 
+  // Update local value when prop value changes
   useEffect(() => {
-    if (!container.current) return;
-    const { width: containerWidth } = container.current.getBoundingClientRect();
-    const segmentWidth = containerWidth / (stops.length - 1);
-    setPosition(value * segmentWidth);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("resize", listener);
-
-    return () => window.removeEventListener("resize", listener);
-
-    function listener() {
-      if (!container.current) return;
-
-      const { width: containerWidth } =
-        container.current.getBoundingClientRect();
-      const segmentWidth = containerWidth / (stops.length - 1);
-      setPosition(value * segmentWidth);
-    }
+    setLocalValue(value);
   }, [value]);
 
-
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   return (
-    <div
+    <input
+      type="range"
+      id={id}
+      min={min}
+      max={max}
+      step={step}
+      value={localValue}
+      disabled={disabled}
       className={classNames(
-        "relative z-0 w-full flex justify-center items-center touch-none",
-        isDragging ? "cursor-ew-resize" : "cursor-pointer",
+        "w-full accent-theme-primary bg-theme-primary rounded-lg cursor-pointer",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
         className
       )}
-      ref={container}
-    >
-      <div
-        className={classNames("w-full py-3 flex gap-1")}
-        onClick={(e) => {
-          if (!container.current) return;
-
-          const { left: containerLeft, width: containerWidth } =
-            container.current.getBoundingClientRect();
-
-          const segmentWidth = containerWidth / (stops.length - 1);
-          const offsetLeft = e.clientX - containerLeft;
-          const nextIndex = Math.round(offsetLeft / segmentWidth);
-          setPosition(nextIndex * segmentWidth);
-          onChange(nextIndex);
-        }}
-      >
-        {Array.from({ length: stops.length - 1 }).map((stop, i) => (
-          <div
-            key={i}
-            className={classNames("flex-1 h-2 sm:h-3 bg-[#efefef] w-2", {
-              "rounded-l-md": i === 0,
-              "rounded-r-md": i === stops.length - 2,
-            })}
-          />
-        ))}
-      </div>
-      {position != null && (
-        <motion.div
-          tabIndex={0}
-          className={classNames(
-            "z-10 absolute left-0 top-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full border-medium hover:border-[#CFCFCF] border-2 shadow-[0px 4px 12px 0px #AB87FF1A] bg-white select-none cursor-ew-resize outline-offset-8 transition-colors",
-            { ["border-[#AB87FF] hover:border-[#AB87FF]"]: isDragging }
-          )}
-          initial={false}
-          animate={{
-            x: position - 14,
-            y: "-50%",
-          }}
-          transition={{
-            type: "tween",
-            ease: [0.165, 0.84, 0.44, 1],
-            duration: 0.4,
-          }}
-          onFocus={() => setIsDragging(true)}
-          onBlur={() => setIsDragging(false)}
-          onPointerDown={(e) => {
-            const { ownerDocument } = e.currentTarget;
-
-            setIsDragging(true);
-
-            function onPointerMove(e: PointerEvent) {
-              if (!container.current) return;
-
-              const { width: containerWidth, left: containerLeft } =
-                container.current.getBoundingClientRect();
-
-              const segmentWidth = containerWidth / (stops.length - 1);
-              const index = Math.round(
-                (e.clientX - containerLeft) / segmentWidth
-              );
-              const clampedIndex = clamp(index, 0, stops.length - 1);
-              setPosition(clampedIndex * segmentWidth);
-              onChange(clampedIndex);
-            }
-
-            function onPointerUp(e: PointerEvent) {
-              setIsDragging(false);
-              ownerDocument.removeEventListener("pointermove", onPointerMove);
-            }
-
-            ownerDocument.addEventListener("pointermove", onPointerMove);
-            ownerDocument.addEventListener("pointerup", onPointerUp);
-          }}
-        >
-          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 select-none">
-            {stops[value]}
-          </div>
-        </motion.div>
-      )}
-    </div>
+      onChange={handleChange}
+    />
   );
 }

@@ -8,14 +8,14 @@ export default function NotFound() {
       <div className="text-theme-text text-center max-w-md w-full">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4">404</h1>
         <h2 className="text-xl sm:text-2xl font-semibold mb-4">Page Not Found</h2>
-        <p className="text-theme-text-secondary mb-6 text-sm sm:text-base">
+        <p className="text-theme-secondary mb-6 text-sm sm:text-base">
           The page you&apos;re looking for doesn&apos;t exist in the dashboard configuration.
         </p>
         
         {availablePages.length > 0 ? (
           <>
             <div className="mb-6">
-              <p className="text-theme-text-secondary mb-4 text-sm sm:text-base">Choose a page:</p>
+              <p className="text-theme-secondary mb-4 text-sm sm:text-base">Choose a page:</p>
               <div className="flex flex-wrap gap-2 justify-center">
                 {availablePages.map((page) => (
                   <a
@@ -30,7 +30,7 @@ export default function NotFound() {
             </div>
           </>
         ) : (
-          <p className="text-theme-text-secondary mb-6 text-sm sm:text-base">No pages are configured.</p>
+          <p className="text-theme-secondary mb-6 text-sm sm:text-base">No pages are configured.</p>
         )}
         
         <a

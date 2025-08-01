@@ -39,12 +39,12 @@ export const dashboardConfig: DashboardConfig = {
             id: "light.utility_room",
             icon: "mdiLightbulb",
           },
-          {
-            type: "sensor",
-            id: "sensor.whole_home_energy_usage",
-            icon: "mdiFlash",
-            graphType: "line",
-          },
+          // {
+          //   type: "sensor",
+          //   id: "sensor.whole_home_energy_usage",
+          //   icon: "mdiFlash",
+          //   graphType: "line",
+          // },
           {
             type: "entities_card",
             title: "Media Wall",
@@ -226,12 +226,12 @@ export const dashboardConfig: DashboardConfig = {
             id: "light.kitchen_downlights",
             icon: "mdiLightbulb",
           },
-          {
-            type: "sensor",
-            id: "sensor.whole_home_energy_usage",
-            icon: "mdiFlash",
-            graphType: "line",
-          },
+          // {
+          //   type: "sensor",
+          //   id: "sensor.whole_home_energy_usage",
+          //   icon: "mdiFlash",
+          //   graphType: "line",
+          // },
           {
             type: "custom_grid",
             gridCols: 3,

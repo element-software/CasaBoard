@@ -1,5 +1,4 @@
 "use client";
-import "./globals.css";
 import { HassConnect } from "@hakit/core";
 import React from "react";
 import { ConfigurableSidebar } from "@/components/Sidebar/ConfigurableSidebar";

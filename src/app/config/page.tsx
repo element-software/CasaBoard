@@ -318,7 +318,7 @@ export default function ConfigEditor() {
                 "px-4 py-2 transition-colors whitespace-nowrap",
                 {
                   "text-blue-400 border-b-2 border-blue-400": activeTab === "pages",
-                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "pages"
+                  "text-theme-secondary hover:text-theme-text": activeTab !== "pages"
                 }
               )}
             >
@@ -330,7 +330,7 @@ export default function ConfigEditor() {
                 "px-4 py-2 transition-colors whitespace-nowrap",
                 {
                   "text-blue-400 border-b-2 border-blue-400": activeTab === "sidebar",
-                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "sidebar"
+                  "text-theme-secondary hover:text-theme-text": activeTab !== "sidebar"
                 }
               )}
             >
@@ -342,7 +342,7 @@ export default function ConfigEditor() {
                 "px-4 py-2 transition-colors whitespace-nowrap",
                 {
                   "text-blue-400 border-b-2 border-blue-400": activeTab === "global",
-                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "global"
+                  "text-theme-secondary hover:text-theme-text": activeTab !== "global"
                 }
               )}
             >

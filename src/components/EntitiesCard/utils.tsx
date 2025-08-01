@@ -8,7 +8,7 @@ export const stateClassNameIcon = (entity: HassEntityWithService<any>) => {
     case "on":
       return "text-theme-primary";
     case "off":
-      return "text-theme-text-secondary";
+      return "text-theme-secondary";
     default:
       return "text-theme-primary";
   }

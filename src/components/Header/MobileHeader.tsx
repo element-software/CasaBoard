@@ -64,7 +64,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuClick }) => {
                         "px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                         {
                           "bg-theme-primary text-theme-background": isActive,
-                          "text-theme-text-secondary hover:text-theme-text hover:bg-theme-surface":
+                          "text-theme-secondary hover:text-theme-text hover:bg-theme-surface":
                             !isActive,
                         }
                       )}
@@ -84,7 +84,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuClick }) => {
           
           <Link
             href="/config"
-            className="p-2 text-theme-text-secondary hover:text-theme-text hover:bg-theme-surface rounded-lg transition-colors"
+            className="p-2 text-theme-secondary hover:text-theme-text hover:bg-theme-surface rounded-lg transition-colors"
             aria-label="Configure dashboard"
           >
             <svg

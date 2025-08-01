@@ -35,7 +35,7 @@ export const BinarySensor = ({ entityId, friendlyName, asCard = true }: GridItem
       >
         {BinarySensorUtils.renderState(entity)}
       </p>
-      <p className="text-xs text-theme-text-secondary m-0 -mt-4">{new Date(entity.last_changed).toLocaleTimeString()}</p>
+      <p className="text-xs text-theme-secondary m-0 -mt-4">{new Date(entity.last_changed).toLocaleTimeString()}</p>
     </div>
   );
 };
