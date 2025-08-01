@@ -2,6 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme CSS Variables */
+:root {
+  --color-primary: #f59e0b;
+  --color-secondary: #6b7280;
+  --color-accent: #f97316;
+  --color-background: #171717;
+  --color-surface: #262626;
+  --color-text: #ffffff;
+  --color-text-secondary: #9ca3af;
+  --color-border: #404040;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-gradient-from: #262626;
+  --color-gradient-to: #171717;
+}
+
+/* Theme utility classes */
+@layer utilities {
+  .bg-theme-primary { background-color: var(--color-primary); }
+  .bg-theme-secondary { background-color: var(--color-secondary); }
+  .bg-theme-accent { background-color: var(--color-accent); }
+  .bg-theme-background { background-color: var(--color-background); }
+  .bg-theme-surface { background-color: var(--color-surface); }
+  .bg-theme-success { background-color: var(--color-success); }
+  .bg-theme-warning { background-color: var(--color-warning); }
+  .bg-theme-error { background-color: var(--color-error); }
+  
+  .text-theme-primary { color: var(--color-primary); }
+  .text-theme-secondary { color: var(--color-secondary); }
+  .text-theme-accent { color: var(--color-accent); }
+  .text-theme-text { color: var(--color-text); }
+  .text-theme-text-secondary { color: var(--color-text-secondary); }
+  .text-theme-success { color: var(--color-success); }
+  .text-theme-warning { color: var(--color-warning); }
+  .text-theme-error { color: var(--color-error); }
+  
+  .border-theme-border { border-color: var(--color-border); }
+  .border-theme-primary { border-color: var(--color-primary); }
+  .border-theme-secondary { border-color: var(--color-secondary); }
+  .border-theme-surface { border-color: var(--color-surface); }
+  
+  .hover\:bg-theme-surface:hover { background-color: var(--color-surface); }
+  .hover\:bg-theme-primary:hover { background-color: var(--color-primary); }
+  .hover\:text-theme-text:hover { color: var(--color-text); }
+  .hover\:text-theme-primary:hover { color: var(--color-primary); }
+  
+  .bg-gradient-theme {
+    background: linear-gradient(to bottom right, var(--color-gradient-from), var(--color-gradient-to));
+  }
+  
+  .bg-gradient-to-br-theme {
+    background: linear-gradient(to bottom right, var(--color-gradient-from), var(--color-gradient-to));
+  }
+  
+  .bg-gradient-to-tl-theme {
+    background: linear-gradient(to top left, var(--color-gradient-from), var(--color-gradient-to));
+  }
+  
+  .bg-gradient-to-l-theme {
+    background: linear-gradient(to left, var(--color-gradient-from), var(--color-gradient-to));
+  }
+  
+  .stroke-theme-primary { stroke: var(--color-primary); }
+  .stroke-theme-secondary { stroke: var(--color-secondary); }
+  .stroke-theme-surface { stroke: var(--color-surface); }
+  
+  /* Fill utilities for SVG */
+  .fill-theme-text { fill: var(--color-text); }
+  .fill-theme-text-secondary { fill: var(--color-text-secondary); }
+  .fill-theme-primary { fill: var(--color-primary); }
+  
+  /* Theme shadow utilities */
+  .shadow-theme {
+    box-shadow: 0 10px 15px -3px var(--color-surface), 0 4px 6px -2px var(--color-surface);
+  }
+  .shadow-theme-surface {
+    box-shadow: 0 10px 15px -3px var(--color-surface), 0 4px 6px -2px var(--color-surface);
+  }
+  
+  /* Form input theme styles */
+  .input-theme {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  .input-theme:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  
+  /* Focus ring for accessibility */
+  .focus\:ring-theme:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
 /* Hide scrollbar for mobile header tabs */
 @layer utilities {
   .scrollbar-hide {

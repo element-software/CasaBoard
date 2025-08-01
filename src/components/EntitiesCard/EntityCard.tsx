@@ -51,10 +51,10 @@ const EntityCard = ({
         >
           <Icon
             path={mdiShieldAlert}
-            className={classNames("h-8 w-8", "text-red-500")}
+            className={classNames("h-8 w-8", "text-theme-error")}
             aria-hidden="true"
           />
-          <p className="text-xs text-gray-400">Unavailable</p>
+          <p className="text-xs text-theme-text-secondary">Unavailable</p>
         </div>
       );
 
@@ -68,12 +68,12 @@ const EntityCard = ({
         <div className="text-xs">{entity.attributes.friendly_name}</div>
       )}
       {showState && (
-        <div className="text-xs text-gray-400 m-0 -mt-2">
+        <div className="text-xs text-theme-text-secondary m-0 -mt-2">
           {renderState(entity as any)}
         </div>
       )}
       {showLastChanged && (
-        <p className="text-[10px] text-gray-400">
+        <p className="text-[10px] text-theme-text-secondary">
           Last Changed {new Date(entity.last_changed).toLocaleTimeString()}
         </p>
       )}

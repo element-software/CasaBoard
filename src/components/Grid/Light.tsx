@@ -125,7 +125,7 @@ export const Light = ({
     <div
       key={entity.entity_id}
       className={classNames(
-        "z-0 relative overflow-hidden w-full flex space-y-2 flex-col items-center justify-between p-6 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "z-0 relative overflow-hidden w-full flex space-y-2 flex-col items-center justify-between p-6 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface",
         {
           "h-40": !dimmer && !temperature && !color,
           "h-44": dimmer || temperature || color,
@@ -248,7 +248,7 @@ export const Light = ({
         </div>
       )}
 
-      <h3 className="w-full text-base capitalize text-white">
+      <h3 className="w-full text-base capitalize text-theme-text">
         {entity.attributes.friendly_name}
       </h3>
     </div>

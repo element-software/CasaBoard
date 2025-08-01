@@ -7,10 +7,6 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
-    { pattern: /accent-amber-/ },
-    { pattern: /accent-gray-/ },
-    { pattern: /text-amber-/ },
-    { pattern: /text-gray-/ },
     { pattern: /col-span-/ },
   ],
   theme: {

@@ -26,11 +26,11 @@ export const stateClassNameIcon = (
 ) => {
   switch (entity.state) {
     case "on":
-      return "text-amber-500";
+      return "text-theme-primary";
     case "off":
-      return "text-gray-400";
+      return "text-theme-text-secondary";
     default:
-      return "text-amber-500";
+      return "text-theme-primary";
   }
 };
 
@@ -41,7 +41,7 @@ export const renderIcon = (entity: HassEntityWithService<"binarySensor">) => {
         return (
           <Icon
             path={mdiMotionSensor}
-            className={classNames("h-10 w-10", "text-amber-500")}
+            className={classNames("h-10 w-10", "text-theme-primary")}
             aria-hidden="true"
           />
         );
@@ -70,7 +70,7 @@ export const renderIcon = (entity: HassEntityWithService<"binarySensor">) => {
         return (
           <Icon
             path={mdiDoorOpen}
-            className={classNames("min-h-12 min-w-12 h-12 w-12", "text-amber-500")}
+            className={classNames("min-h-12 min-w-12 h-12 w-12", "text-theme-primary")}
             aria-hidden="true"
           />
         );

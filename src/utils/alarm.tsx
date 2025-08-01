@@ -24,7 +24,7 @@ export const renderIcon = (
       return (
         <Icon
           path={mdiShieldLock}
-          className={classNames("h-12 w-12", "text-amber-500")}
+          className={classNames("h-12 w-12", "text-theme-primary")}
           aria-hidden="true"
         />
       );

@@ -38,7 +38,7 @@ export default function ConfigurablePage({ params }: PageProps) {
     <main className="flex flex-col min-h-screen">
       <div className="flex-1 p-4 sm:p-6 lg:p-8">
         {pageConfig.title?.showTitle && (
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-4 lg:mb-6 text-center lg:text-left">
+          <h1 className="text-xl sm:text-2xl font-bold text-theme-text mb-4 lg:mb-6 text-center lg:text-left">
             {pageConfig.title.value}
           </h1>
         )}

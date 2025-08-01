@@ -18,7 +18,7 @@ export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, t
             <div className="flex flex-1 flex-col w-full">
               <WeatherCard
                 entity="weather.home"
-                className="w-full bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+                className="w-full bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface"
                 onlyFunctionality
                 disableRipples
                 disableScale
@@ -43,7 +43,7 @@ export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, t
             <div className="flex flex-1 flex-col w-full">
               <Thermostat entityId={thermostat as EntityName}/>
             </div>
-            <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
+            <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-theme-text text-xs">
               Powered by 
               <Image src="https://element-connect.co.uk/wp-content/uploads/2024/02/EC-Logo-V2-Trimmed-White.png" alt="ec" width={100} height={100} />
             </div>
@@ -51,7 +51,7 @@ export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, t
         </div>
 
         <div className="relative">
-          <div className="absolute bg-neutral-900 left-0 top-0 w-screen h-screen opacity-35" style={{ zIndex: "-1" }} />
+          <div className="absolute bg-theme-background left-0 top-0 w-screen h-screen opacity-35" style={{ zIndex: "-1" }} />
             <div className="lg:pl-64">
               {children}
           </div>

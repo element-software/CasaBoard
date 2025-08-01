@@ -19,15 +19,15 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     return (
       <div
         key={entityId}
-        className="relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+        className="relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface"
       >
         <Icon
           path={mdiShieldAlert}
-          className={classNames("h-12 w-12", "text-red-500")}
+          className={classNames("h-12 w-12", "text-theme-error")}
           aria-hidden="true"
         />
-        <p className="text-xs text-gray-400">{entityId}</p>
-        <p className="text-xs text-gray-400">Unavailable</p>
+        <p className="text-xs text-theme-text-secondary">{entityId}</p>
+        <p className="text-xs text-theme-text-secondary">Unavailable</p>
       </div>
     );
 
@@ -35,7 +35,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer  bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800",
+        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface",
         AlarmUtils.stateClassNameBg(entity)
       )}
     >
@@ -44,7 +44,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
         entity.state.split("_")[0].slice(1) +
         " " +
         (entity.state.split("_")[1] || "")}
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-theme-text-secondary">
         Last Changed {new Date(entity.last_changed).toLocaleTimeString()}
       </p>
     </div>

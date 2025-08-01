@@ -6,11 +6,11 @@ import classNames from "classnames";
 export const stateClassNameIcon = (entity: HassEntityWithService<any>) => {
   switch (entity.state) {
     case "on":
-      return "text-amber-500";
+      return "text-theme-primary";
     case "off":
-      return "text-gray-400";
+      return "text-theme-text-secondary";
     default:
-      return "text-amber-500";
+      return "text-theme-primary";
   }
 };
 

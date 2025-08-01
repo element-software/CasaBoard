@@ -309,6 +309,7 @@ export const dashboardConfig: DashboardConfig = {
   },
   global: {
     theme: "dark",
+    enableThemeSwitch: true,
     defaultIcons: {
       light: "mdiLightbulb",
       alarm: "mdiShieldHome",

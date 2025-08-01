@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
-import { DashboardConfig, SidebarConfig } from "@/config/dashboard.types";
+import classNames from "classnames";
+import { DashboardConfig, SidebarConfig, GlobalConfig } from "@/config/dashboard.types";
 import { dashboardConfig } from "@/config/dashboard.config";
+import { predefinedThemes } from "@/config/themes";
 
 export default function ConfigEditor() {
   const [config, setConfig] = useState<DashboardConfig>(dashboardConfig);
@@ -12,6 +14,13 @@ export default function ConfigEditor() {
     setConfig(prev => ({
       ...prev,
       sidebar: newSidebarConfig
+    }));
+  };
+
+  const handleGlobalConfigChange = (newGlobalConfig: GlobalConfig) => {
+    setConfig(prev => ({
+      ...prev,
+      global: newGlobalConfig
     }));
   };
 
@@ -66,7 +75,7 @@ export default function ConfigEditor() {
               ...sidebarConfig,
               thermostat: e.target.value as any
             })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary"
             placeholder="climate.your_thermostat"
           />
         </div>
@@ -80,7 +89,7 @@ export default function ConfigEditor() {
               ...sidebarConfig,
               weather: e.target.value as any
             })}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary"
             placeholder="weather.home"
           />
         </div>
@@ -150,7 +159,7 @@ export default function ConfigEditor() {
                   ...sidebarConfig,
                   brandingText: e.target.value
                 })}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary"
                 placeholder="Powered by"
               />
             </div>
@@ -164,7 +173,7 @@ export default function ConfigEditor() {
                   ...sidebarConfig,
                   brandingImage: e.target.value
                 })}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary"
                 placeholder="https://example.com/logo.png"
               />
             </div>
@@ -174,8 +183,105 @@ export default function ConfigEditor() {
     );
   };
 
+  const renderGlobalForm = () => {
+    const globalConfig = config.global || {
+      theme: "dark",
+      enableThemeSwitch: true,
+      defaultIcons: {
+        light: "mdiLightbulb",
+        alarm: "mdiShieldHome",
+        binary_sensor: "mdiSensorOn",
+        sensor: "mdiGauge",
+      },
+    };
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium mb-2">Theme</label>
+          <select
+            value={globalConfig.theme || "dark"}
+            onChange={(e) => handleGlobalConfigChange({
+              ...globalConfig,
+              theme: e.target.value
+            })}
+            className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary"
+          >
+            {Object.entries(predefinedThemes).map(([themeKey, themeConfig]) => (
+              <option key={themeKey} value={themeKey}>
+                {themeConfig.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={globalConfig.enableThemeSwitch ?? true}
+              onChange={(e) => handleGlobalConfigChange({
+                ...globalConfig,
+                enableThemeSwitch: e.target.checked
+              })}
+              className="rounded bg-gray-800 border-gray-700"
+            />
+            <span>Enable Theme Switch</span>
+          </label>
+          <p className="text-sm text-gray-400 mt-1">
+            Allow users to change themes via the theme switcher in the UI
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Default Icons</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Object.entries(globalConfig.defaultIcons || {}).map(([entityType, iconName]) => (
+              <div key={entityType}>
+                <label className="block text-xs text-gray-400 mb-1 capitalize">
+                  {entityType.replace('_', ' ')}
+                </label>
+                <input
+                  type="text"
+                  value={iconName}
+                  onChange={(e) => handleGlobalConfigChange({
+                    ...globalConfig,
+                    defaultIcons: {
+                      ...globalConfig.defaultIcons,
+                      [entityType]: e.target.value
+                    }
+                  })}
+                  className="w-full p-2 bg-theme-surface border border-theme-border rounded-lg text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-primary text-sm"
+                  placeholder="mdiIcon"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Raw JSON Configuration</label>
+          <textarea
+            value={JSON.stringify(globalConfig, null, 2)}
+            onChange={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value);
+                handleGlobalConfigChange(parsed);
+              } catch (error) {
+                // Invalid JSON, ignore
+              }
+            }}
+            className="w-full h-40 p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-xs sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            spellCheck={false}
+            placeholder="Advanced configuration..."
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <main className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-gray-900 text-white">
+    <main className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-theme-background text-theme-text">
       <div className="flex flex-col xl:flex-row w-full gap-4 lg:gap-8 h-full">
         {/* Configuration Editor */}
         <div className="flex flex-col xl:w-1/2">
@@ -208,31 +314,37 @@ export default function ConfigEditor() {
           <div className="flex mb-4 border-b border-gray-700 overflow-x-auto">
             <button
               onClick={() => setActiveTab("pages")}
-              className={`px-4 py-2 transition-colors whitespace-nowrap ${
-                activeTab === "pages"
-                  ? "text-blue-400 border-b-2 border-blue-400"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              className={classNames(
+                "px-4 py-2 transition-colors whitespace-nowrap",
+                {
+                  "text-blue-400 border-b-2 border-blue-400": activeTab === "pages",
+                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "pages"
+                }
+              )}
             >
               Pages
             </button>
             <button
               onClick={() => setActiveTab("sidebar")}
-              className={`px-4 py-2 transition-colors whitespace-nowrap ${
-                activeTab === "sidebar"
-                  ? "text-blue-400 border-b-2 border-blue-400"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              className={classNames(
+                "px-4 py-2 transition-colors whitespace-nowrap",
+                {
+                  "text-blue-400 border-b-2 border-blue-400": activeTab === "sidebar",
+                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "sidebar"
+                }
+              )}
             >
               Sidebar
             </button>
             <button
               onClick={() => setActiveTab("global")}
-              className={`px-4 py-2 transition-colors whitespace-nowrap ${
-                activeTab === "global"
-                  ? "text-blue-400 border-b-2 border-blue-400"
-                  : "text-gray-400 hover:text-white"
-              }`}
+              className={classNames(
+                "px-4 py-2 transition-colors whitespace-nowrap",
+                {
+                  "text-blue-400 border-b-2 border-blue-400": activeTab === "global",
+                  "text-theme-text-secondary hover:text-theme-text": activeTab !== "global"
+                }
+              )}
             >
               Global
             </button>
@@ -264,20 +376,9 @@ export default function ConfigEditor() {
             )}
 
             {activeTab === "global" && (
-              <textarea
-                value={JSON.stringify(config.global || {}, null, 2)}
-                onChange={(e) => {
-                  try {
-                    const global = JSON.parse(e.target.value);
-                    setConfig(prev => ({ ...prev, global }));
-                  } catch (error) {
-                    // Invalid JSON, ignore
-                  }
-                }}
-                className="w-full h-full p-4 bg-gray-800 border border-gray-700 rounded-lg font-mono text-xs sm:text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                spellCheck={false}
-                placeholder="Global configuration..."
-              />
+              <div className="h-full overflow-y-auto p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                {renderGlobalForm()}
+              </div>
             )}
           </div>
         </div>

@@ -43,7 +43,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
 function DefaultErrorFallback({ error, reset }: { error?: Error; reset: () => void }) {
   return (
     <main className="flex h-screen flex-col items-center justify-center p-8 bg-gray-900">
-      <div className="text-white text-center max-w-md">
+      <div className="text-theme-text text-center max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-red-500">Dashboard Error</h1>
         <p className="text-gray-400 mb-4">
           Something went wrong while loading the dashboard.

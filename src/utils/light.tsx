@@ -115,11 +115,11 @@ export const stateClassNameBg = (entity: HassEntityWithService<"light">) => {
 export const stateClassNameIcon = (entity: HassEntityWithService<"light">) => {
   switch (entity.state) {
     case "on":
-      return "text-amber-500";
+      return "text-theme-text-primary";
     case "off":
-      return "text-gray-400";
+      return "text-theme-text-text-theme-text-secondary";
     default:
-      return "text-amber-500";
+      return "text-theme-text-primary";
   }
 };
 
@@ -127,14 +127,18 @@ export const sliderBrightnessClassnames = (
   entity: HassEntityWithService<"light">
 ) => {
   if (entity.attributes.brightness) {
-    return classNames({
-      "accent-gray-400 text-gray-400": entity.attributes.brightness === 0 || entity.state === "off",
-      "accent-amber-200 text-amber-200": entity.attributes.brightness > 0 && entity.attributes.brightness < 100,
-      "accent-amber-300 text-amber-300": entity.attributes.brightness >= 100 && entity.attributes.brightness < 200,
-      "accent-amber-400 text-amber-400": entity.attributes.brightness >= 200
-    })
+    // Use different opacity levels to distinguish brightness levels
+    if (entity.attributes.brightness === 0 || entity.state === "off") {
+      return "accent-theme-accent-secondary text-theme-text-secondary";
+    } else if (entity.attributes.brightness > 0 && entity.attributes.brightness < 100) {
+      return "accent-theme-accent-primary text-theme-text-primary opacity-50";
+    } else if (entity.attributes.brightness >= 100 && entity.attributes.brightness < 200) {
+      return "accent-theme-accent-primary text-theme-text-primary opacity-75";
+    } else {
+      return "accent-theme-accent-primary text-theme-text-primary";
+    }
   }
-  return "accent-gray-400 text-gray-400";
+  return "accent-theme-accent-secondary text-theme-text-secondary";
 };
 
 export const sliderTemperatureClassnames = (
@@ -143,14 +147,19 @@ export const sliderTemperatureClassnames = (
   max: number,
   value: number
 ) => {
-  if (entity.state === "off") return "accent-gray-400 text-gray-400";
+  if (entity.state === "off") return "text-theme-text-theme-text-secondary";
   const fifth = (max - min) / 5;
 
-  return classNames({
-    "accent-amber-100 text-amber-100": value < min + fifth,
-    "accent-amber-200 text-amber-200": value >= min + fifth && value < min + fifth * 2,
-    "accent-amber-300 text-amber-300": value >= min + fifth * 2 && value < min + fifth * 3,
-    "accent-amber-400 text-amber-400": value >= min + fifth * 3 && value < min + fifth * 4,
-    "accent-amber-500 text-amber-500": value >= min + fifth * 4
-  });
+  // Use different opacity levels to distinguish temperature levels
+  if (value < min + fifth) {
+    return "accent-theme-accent-primary text-theme-text-primary opacity-25";
+  } else if (value >= min + fifth && value < min + fifth * 2) {
+    return "accent-theme-accent-primary text-theme-text-primary opacity-50";
+  } else if (value >= min + fifth * 2 && value < min + fifth * 3) {
+    return "accent-theme-accent-primary text-theme-text-primary opacity-75";
+  } else if (value >= min + fifth * 3 && value < min + fifth * 4) {
+    return "accent-theme-accent-primary text-theme-text-primary opacity-90";
+  } else {
+    return "accent-theme-accent-primary text-theme-text-primary";
+  }
 };

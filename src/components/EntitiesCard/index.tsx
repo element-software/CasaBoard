@@ -55,7 +55,7 @@ const EntitiesCard = ({
   return (
     <div
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 cursor-pointer bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800 col-span-1",
+        "relative overflow-hidden w-full flex flex-col items-center justify-between space-y-2 p-6 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface col-span-1",
         {
           "sm:col-span-2": colspan === 2,
           "sm:col-span-3": colspan === 3,
@@ -70,11 +70,11 @@ const EntitiesCard = ({
             <div className="inline-flex" onClick={() => setOpen(true)}>
               <Icon
                 path={mdiOpenInNew}
-                className="ml-3 h-6 w-6 text-amber-500"
+                className="ml-3 h-6 w-6 text-theme-primary"
                 aria-hidden="true"
               />
-              <Popup open={open} setOpen={setOpen} className="w-screen h-full bg-stone-900">
-                <div className="w-full text-center text-2xl font-medium text-white mb-4">
+              <Popup open={open} setOpen={setOpen} className="w-screen h-full bg-theme-background">
+                <div className="w-full text-center text-2xl font-medium text-theme-text mb-4">
                   {title}
                 </div>
                 {children}
@@ -88,17 +88,23 @@ const EntitiesCard = ({
               ? undefined
               : () => toggleLighting(entities.map((entity) => entity.id))
           }
-          className={showAllOn ? "block" : "hidden"}
+          className={classNames({
+            "block": showAllOn,
+            "hidden": !showAllOn
+          })}
         >
           <Icon
             path={mdiPower}
             className={classNames(
-              "h-10 w-10 p-2 rounded-full bg-gradient-to-l",
+              "h-10 w-10 p-2 rounded-full",
               {
-                "text-black from-yellow-600 to-amber-500": allOn,
-                "text-white from-neutral-800 to-neutral-700 rounded-full": !allOn,
+                "text-black": allOn,
+                "text-theme-text bg-theme-surface": !allOn,
               }
             )}
+            style={allOn ? {
+              background: `linear-gradient(to left, var(--color-warning), var(--color-primary))`
+            } : undefined}
             aria-hidden="true"
           />
         </div>

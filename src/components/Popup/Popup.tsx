@@ -11,7 +11,7 @@ interface PopupProps {
 }
 
 export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
-  const classes = classNames("relative transform overflow-hidden rounded-lg bg-gradient-to-tl from-neutral-900 to-neutral-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 z-50", className);
+  const classes = classNames("relative transform overflow-hidden rounded-lg bg-gradient-to-tl-theme px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl sm:p-6 z-50", className);
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -26,7 +26,7 @@ export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
           leaveTo="opacity-0"
         >
           <Dialog.Overlay onClick={() => setOpen(false)}>
-            <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 transition-opacity" onClick={() => setOpen(false)}/>
+            <div className="fixed inset-0 bg-theme-background bg-opacity-75 transition-opacity" onClick={() => setOpen(false)}/>
           </Dialog.Overlay>
         </Transition.Child>
 
@@ -43,7 +43,7 @@ export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
             >
               <Dialog.Panel className={classes}>
                 <div>
-                  <XMarkIcon className="h-6 w-6 absolute top-4 right-4 text-white cursor-pointer" onClick={() => setOpen(!open)} />
+                  <XMarkIcon className="h-6 w-6 absolute top-4 right-4 text-theme-text cursor-pointer" onClick={() => setOpen(!open)} />
                   {children}
                 </div>
               </Dialog.Panel>

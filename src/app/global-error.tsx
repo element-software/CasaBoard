@@ -15,7 +15,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
     <html lang="en">
       <body className="h-full bg-gray-900">
         <main className="flex h-screen flex-col items-center justify-center p-8">
-          <div className="text-white text-center max-w-md">
+          <div className="text-theme-text text-center max-w-md">
             <h1 className="text-3xl font-bold mb-4 text-red-500">Application Error</h1>
             <p className="text-gray-400 mb-6">
               A critical error occurred while loading the dashboard application.

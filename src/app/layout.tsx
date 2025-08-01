@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import React from 'react';
 import { Kanit } from 'next/font/google';
+import classNames from 'classnames';
+import { ThemeProvider } from '@/components/ThemeSwitch';
 
 export const metadata: Metadata = {
   title: 'Smart Home Dashboard',
@@ -20,8 +22,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className='h-full bg-neutral-900'>
-      <body className={`h-full ${kanit.className}`}>{children}</body>
+    <html lang="en" className='h-full bg-theme-background'>
+      <body className={classNames("h-full bg-theme-background text-theme-text", kanit.className)}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }

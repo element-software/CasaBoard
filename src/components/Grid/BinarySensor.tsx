@@ -16,14 +16,14 @@ export const BinarySensor = ({ entityId, friendlyName, asCard = true }: GridItem
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-4 p-6 h-44 cursor-pointer text-white",
+        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-4 p-6 h-44 cursor-pointer text-theme-text",
         {
-          "bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl shadow-card shadow-neutral-800": asCard,
+          "bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface": asCard,
         },
         BinarySensorUtils.stateClassNameBg(entity)
       )}
     >
-      <h3 className="w-full text-base capitalize text-white">
+      <h3 className="w-full text-base capitalize text-theme-text">
         {friendlyName || entity.attributes.friendly_name}
       </h3>
       {BinarySensorUtils.renderIcon(entity)}
@@ -35,7 +35,7 @@ export const BinarySensor = ({ entityId, friendlyName, asCard = true }: GridItem
       >
         {BinarySensorUtils.renderState(entity)}
       </p>
-      <p className="text-xs text-gray-400 m-0 -mt-4">{new Date(entity.last_changed).toLocaleTimeString()}</p>
+      <p className="text-xs text-theme-text-secondary m-0 -mt-4">{new Date(entity.last_changed).toLocaleTimeString()}</p>
     </div>
   );
 };

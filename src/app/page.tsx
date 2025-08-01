@@ -18,10 +18,10 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 bg-neutral-900">
-      <div className="text-white text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-        <p className="text-gray-400">Loading dashboard...</p>
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 bg-theme-background">
+      <div className="text-theme-text text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme-primary mx-auto mb-4"></div>
+        <p className="text-theme-text-secondary">Loading dashboard...</p>
       </div>
     </main>
   );

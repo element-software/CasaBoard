@@ -6,6 +6,7 @@ import Thermostat from "@/components/Thermostat";
 import Image from "next/image";
 import { SidebarConfig } from "@/config/dashboard.types";
 import { MobileHeader } from "@/components/Header/MobileHeader";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useState, useEffect } from "react";
 
 interface ConfigurableSidebarProps {
@@ -53,7 +54,7 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
         <div className="flex flex-1 flex-col w-full">
           <WeatherCard
             entity={config.weather as `weather.${string}`}
-            className="w-full bg-gradient-to-br from-neutral-800 to-neutral-900 text-white rounded-2xl shadow-card shadow-neutral-800"
+            className="w-full bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface"
             onlyFunctionality
             disableRipples
             disableScale
@@ -84,7 +85,7 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
       )}
       
       {config.showBranding && (
-        <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-white text-xs">
+        <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-theme-text text-xs">
           {config.brandingText}
           {config.brandingImage && (
             <Image 
@@ -96,12 +97,17 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
           )}
         </div>
       )}
+      
+      {/* Theme switch for desktop */}
+      <div className="mt-auto pt-4 border-t border-theme-border">
+        <ThemeSwitch />
+      </div>
     </div>
   );
 
   return (
     <>
-      <div className="min-h-screen bg-neutral-900">
+      <div className="min-h-screen bg-theme-background">
         {/* Mobile header */}
         <MobileHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
 
@@ -115,12 +121,12 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
             />
             
             {/* Sidebar panel */}
-            <div className="relative flex flex-col w-80 max-w-sm bg-neutral-900 border-r border-neutral-700">
+            <div className="relative flex flex-col w-80 max-w-sm bg-theme-background border-r border-theme-border">
               {/* Close button */}
               <div className="absolute top-1 right-1">
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-white hover:bg-neutral-800 rounded-lg transition-colors"
+                  className="p-2 text-theme-text hover:bg-theme-surface rounded-lg transition-colors"
                   aria-label="Close menu"
                 >
                   <svg
@@ -144,14 +150,14 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
         )}
 
         {/* Desktop sidebar */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-neutral-900 border-r border-neutral-700">
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-theme-background border-r border-theme-border">
           <SidebarContent />
         </div>
 
         {/* Main content */}
         <div className="lg:pl-72">
           <div className="relative min-h-screen pt-24 lg:pt-0">
-            <div className="absolute bg-neutral-900 left-0 top-0 w-full h-full opacity-35 pointer-events-none" style={{ zIndex: "-1" }} />
+            <div className="absolute bg-theme-background left-0 top-0 w-full h-full opacity-35 pointer-events-none" style={{ zIndex: "-1" }} />
             <div className="relative z-10">
               {children}
             </div>
