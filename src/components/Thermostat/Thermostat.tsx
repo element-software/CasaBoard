@@ -1,8 +1,9 @@
 "use client";
-import { EntityName, useEntity } from "@hakit/core";
-import { mdiPower } from "@mdi/js";
+import { EntityName, useEntity, useService } from "@hakit/core";
+import { mdiPlus, mdiMinus, mdiPower } from "@mdi/js";
 import Icon from "@mdi/react";
 import classNames from "classnames";
+import { useCallback, useMemo, useState } from "react";
 
 interface ThermostatProps {
   entityId: EntityName;
@@ -10,95 +11,135 @@ interface ThermostatProps {
 
 export const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
-
-  // 10 is lowest, 32 is highest
-  // map this to 0 - 60
-  const currentPercent = Math.round(
-    (Math.round(entity.attributes.current_temperature - 10) / 22) * 100
+  const controls = useService("climate");
+  const [targetTemp, setTargetTemp] = useState<number>(
+    entity.attributes.temperature
   );
+  // Get temperature color based on current temperature
+  const getTemperatureColor = useCallback((temp: number) => {
+    if (temp >= 25) return "text-red-500";
+    if (temp >= 20) return "text-orange-500";
+    if (temp >= 15) return "text-yellow-500";
+    if (temp >= 10) return "text-blue-400";
+    return "text-blue-600";
+  }, []);
 
-  const targetPercent = Math.round(
-    (Math.round(entity.attributes.temperature - 10) / 22) * 100
-  );
+  // Get status color and text
+  const statusInfo = useMemo(() => {
+    const isHeating = entity.attributes.hvac_action === "heating";
+    return {
+      text: isHeating ? "HEATING" : "IDLE",
+      color: isHeating
+        ? "text-red-500 bg-red-500/20"
+        : "text-theme-text-secondary bg-theme-surface/50",
+    };
+  }, [entity.attributes.hvac_action]);
+
+  const currentTemp = entity.attributes.current_temperature;
+
+  const tempColorClasses = getTemperatureColor(currentTemp);
+
+  // Handlers for temperature adjustment (you'll need to implement these based on your HA setup)
+  const increaseTemp = useCallback(() => {
+    setTargetTemp((prev) => {
+      const newTemp = prev + 0.5;
+      controls.setTemperature(entityId, {
+        temperature: newTemp,
+        hvac_mode: "heat",
+      });
+      return newTemp;
+    });
+  }, []);
+
+  const decreaseTemp = useCallback(() => {
+    setTargetTemp((prev) => {
+      const newTemp = prev - 0.5;
+      controls.setTemperature(entityId, {
+        temperature: newTemp,
+        hvac_mode: "heat",
+      });
+      return newTemp;
+    });
+  }, []);
 
   return (
-    <div className="w-full p-4 text-center flex flex-col gap-1 text-theme-text bg-gradient-theme rounded-2xl shadow-card shadow-theme-surface">
+    <div className="w-full p-6 text-center flex flex-col gap-4 text-theme-text bg-gradient-theme rounded-2xl shadow-card shadow-theme-surface">
+      {/* Header */}
       <div className="flex flex-row items-center justify-between">
-        <div className="text-xs">{entity.attributes.friendly_name}</div>
-        <Icon
-          path={mdiPower}
-          className={classNames("h-10 w-10 p-2 rounded-full", {
-            "linear-gradient(to left, var(--color-warning), var(--color-primary)) text-black":
-              entity.attributes.running_state === "heat",
-              "text-theme-text bg-theme-surface rounded-full": entity.attributes.running_state !== "heat",
-          })}
-          aria-hidden="true"
-        />
+        <div className="text-sm font-medium">
+          {entity.attributes.friendly_name}
+        </div>
       </div>
-      <div className="p-2 bg-gradient-theme rounded-full ">
-        <svg className="w-full h-full" viewBox="0 0 80 80">
-          <circle
-            className="stroke-theme-surface stroke-current"
-            strokeWidth="3"
-            cx="40"
-            cy="40"
-            r="30"
-            fill="transparent"
-          ></circle>
-          <circle
-            className="stroke-theme-primary progress-ring__circle stroke-current !rotate-[180deg]"
-            strokeWidth="3"
-            strokeLinecap="round"
-            cx="40"
-            cy="40"
-            r="30"
-            fill="transparent"
-            strokeDashoffset={`calc(450 - (350 * ${(60 * targetPercent) / 100}) / 100)`}
-          ></circle>
-          <circle
-            className="stroke-theme-accent progress-ring__circle stroke-current !rotate-[180deg]"
-            strokeWidth="3"
-            strokeLinecap="round"
-            cx="40"
-            cy="40"
-            r="30"
-            fill="transparent"
-            strokeDashoffset={`calc(450 - (350 * ${(60 * currentPercent) / 100}) / 100)`}
-          ></circle>
-          <text
-            x="40"
-            y="40"
-            fontSize="10"
-            textAnchor="middle"
-            alignmentBaseline="middle"
-            className="text-base fill-theme-text"
+
+      {/* Digital Display */}
+      <div className="relative p-6">
+        {/* Current Temperature - Large Display */}
+        <div className="text-center mb-4">
+          <div
+            className={classNames(
+              "text-4xl font-mono font-bold tracking-tight",
+              tempColorClasses
+            )}
           >
-            {entity.attributes.temperature}°C
-          </text>
-          <text
-            x="40"
-            y="53"
-            fontSize="2"
-            textAnchor="middle"
-            alignmentBaseline="middle"
-            className="text-[6px] fill-theme-text-secondary opacity-25"
+            {currentTemp}°C
+          </div>
+          <div className="text-xs opacity-60 uppercase tracking-wider mt-1">
+            Current
+          </div>
+        </div>
+
+        {/* Target Temperature Controls */}
+        <div className="flex items-center justify-center gap-4">
+          <button
+            onClick={decreaseTemp}
+            className="h-10 w-10 min-w-10 min-h-10 rounded-full bg-theme-surface hover:bg-theme-primary transition-colors duration-200 flex items-center justify-center hover:scale-105 active:scale-95"
+            aria-label="Decrease target temperature"
           >
-            TARGET
-          </text>
-        </svg>
+            <Icon path={mdiMinus} className="h-5 w-5 text-theme-text" />
+          </button>
+
+          <div className="text-center min-w-[80px]">
+            <div className="text-xl font-mono font-semibold">
+              {targetTemp.toFixed(1)}°C
+            </div>
+            <div className="text-xs opacity-60 uppercase tracking-wider">
+              Target
+            </div>
+          </div>
+
+          <button
+            onClick={increaseTemp}
+            className="h-10 w-10 min-w-10 min-h-10 rounded-full bg-theme-surface hover:bg-theme-primary transition-colors duration-200 flex items-center justify-center hover:scale-105 active:scale-95"
+            aria-label="Increase target temperature"
+          >
+            <Icon path={mdiPlus} className="h-5 w-5 text-theme-text" />
+          </button>
+        </div>
       </div>
+
+      {/* Status Display */}
       <div className="flex flex-row items-center justify-around">
         <div className="flex flex-col">
-          <div className="text-lg">
-            {entity.attributes.current_temperature}°C
+          <div
+            className={classNames(
+              "text-sm font-medium px-3 py-1 rounded-full",
+              statusInfo.color
+            )}
+          >
+            {statusInfo.text}
           </div>
-          <div className="text-xs opacity-25">CURRENTLY</div>
+          <div className="text-xs opacity-50 uppercase tracking-wider mt-1">
+            Status
+          </div>
         </div>
+
         <div className="flex flex-col">
-          <div className="text-lg">
-            {entity.state === "heat" ? "On" : "Off"}
+          <div className="text-lg font-semibold">
+            {Math.abs(targetTemp - currentTemp).toFixed(1)}°
           </div>
-          <div className="text-xs opacity-25">HEATING</div>
+          <div className="text-xs opacity-50 uppercase tracking-wider">
+            {targetTemp > currentTemp ? "To Heat" : "Difference"}
+          </div>
         </div>
       </div>
     </div>
