@@ -8,14 +8,24 @@ import { SidebarConfig } from "@/config/dashboard.types";
 import { MobileHeader } from "@/components/Header/MobileHeader";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useState, useEffect } from "react";
+import { useConfiguration } from "@/components/ConfigurationProvider";
 
 interface ConfigurableSidebarProps {
   children: React.ReactNode;
-  config: SidebarConfig;
+  fallbackConfig: SidebarConfig;
 }
 
-export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarProps) => {
+export const ConfigurableSidebar = ({ children, fallbackConfig }: ConfigurableSidebarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const { config } = useConfiguration();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Use live config when available, fallback during SSR
+  const sidebarConfig = isClient ? config.sidebar : fallbackConfig;
 
   // Close mobile menu when screen size changes to desktop
   useEffect(() => {
@@ -44,16 +54,16 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
 
   const SidebarContent = () => (
     <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4 h-full">
-      {config.showClock && (
+      {sidebarConfig?.showClock && (
         <div className="flex flex-col">
           <Clock />
         </div>
       )}
       
-      {config.showWeather && (
+      {sidebarConfig?.showWeather && (
         <div className="flex flex-1 flex-col w-full">
           <WeatherCard
-            entity={config.weather as `weather.${string}`}
+            entity={sidebarConfig.weather as `weather.${string}`}
             className="w-full bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface"
             onlyFunctionality
             disableRipples
@@ -78,18 +88,18 @@ export const ConfigurableSidebar = ({ children, config }: ConfigurableSidebarPro
         </div>
       )}
       
-      {config.showThermostat && (
+      {sidebarConfig?.showThermostat && (
         <div className="flex flex-1 flex-col w-full">
-          <Thermostat entityId={config.thermostat as EntityName}/>
+          <Thermostat entityId={sidebarConfig.thermostat as EntityName}/>
         </div>
       )}
       
-      {config.showBranding && (
+      {sidebarConfig?.showBranding && (
         <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-theme-text text-xs">
-          {config.brandingText}
-          {config.brandingImage && (
+          {sidebarConfig.brandingText}
+          {sidebarConfig.brandingImage && (
             <Image 
-              src={config.brandingImage} 
+              src={sidebarConfig.brandingImage} 
               alt="branding" 
               width={100} 
               height={100} 

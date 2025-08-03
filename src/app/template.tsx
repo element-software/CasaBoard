@@ -4,11 +4,16 @@ import React from "react";
 import { ConfigurableSidebar } from "@/components/Sidebar/ConfigurableSidebar";
 import { dashboardConfig } from "@/config/dashboard.config";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { usePathname } from "next/navigation";
 
 const HASS_URL = "https://ha.iqbalibrahim.co.uk";
 
 export default function Template({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const sidebarConfig = dashboardConfig.sidebar;
+
+  // Don't show sidebar on setup page
+  const isSetupPage = pathname?.startsWith('/setup');
 
   // Fallback config if sidebar is not configured
   const defaultSidebarConfig = {
@@ -25,11 +30,17 @@ export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <HassConnect hassUrl={HASS_URL}>
-        <ConfigurableSidebar config={sidebarConfig || defaultSidebarConfig}>
+        {isSetupPage ? (
           <ErrorBoundary>
             {children}
           </ErrorBoundary>
-        </ConfigurableSidebar>
+        ) : (
+          <ConfigurableSidebar fallbackConfig={sidebarConfig || defaultSidebarConfig}>
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </ConfigurableSidebar>
+        )}
       </HassConnect>
     </ErrorBoundary>
   );

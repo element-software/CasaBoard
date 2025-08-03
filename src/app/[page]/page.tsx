@@ -1,6 +1,6 @@
-import { DashboardGrid } from "@/components/DashboardGrid";
 import { dashboardConfig } from "@/config/dashboard.config";
 import { notFound } from "next/navigation";
+import { ClientPageWrapper } from "./ClientPageWrapper";
 
 // This function is required for static export
 export async function generateStaticParams() {
@@ -26,7 +26,7 @@ interface PageProps {
 export default function ConfigurablePage({ params }: PageProps) {
   const pageName = params.page;
   
-  // Check if the page exists in configuration
+  // Check if the page exists in static configuration
   if (!dashboardConfig.pages || !dashboardConfig.pages[pageName]) {
     // Trigger the not-found page
     notFound();
@@ -35,17 +35,9 @@ export default function ConfigurablePage({ params }: PageProps) {
   const pageConfig = dashboardConfig.pages[pageName];
 
   return (
-    <main className="flex flex-col min-h-screen">
-      <div className="flex-1 p-4 sm:p-6 lg:p-8">
-        {pageConfig.title?.showTitle && (
-          <h1 className="text-xl sm:text-2xl font-bold text-theme-text mb-4 lg:mb-6 text-center lg:text-left">
-            {pageConfig.title.value}
-          </h1>
-        )}
-        <div className="flex justify-center lg:justify-start">
-          <DashboardGrid config={pageConfig.layout} className="max-w-7xl w-full" />
-        </div>
-      </div>
-    </main>
+    <ClientPageWrapper 
+      pageName={pageName}
+      fallbackConfig={pageConfig}
+    />
   );
 }

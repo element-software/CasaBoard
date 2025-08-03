@@ -4,6 +4,7 @@ import React from 'react';
 import { Kanit } from 'next/font/google';
 import classNames from 'classnames';
 import { ThemeProvider } from '@/components/ThemeSwitch';
+import { ConfigurationProvider } from '@/components/ConfigurationProvider';
 
 export const metadata: Metadata = {
   title: 'Smart Home Dashboard',
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="en" className='h-full bg-theme-background'>
       <body className={classNames("h-full bg-theme-background text-theme-text", kanit.className)}>
         <ThemeProvider>
-          {children}
+          <ConfigurationProvider>
+            {children}
+          </ConfigurationProvider>
         </ThemeProvider>
       </body>
     </html>
