@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import classNames from 'classnames';
 import Icon from '@mdi/react';
-import { mdiPlus, mdiClose, mdiLightbulb, mdiGauge, mdiMotionSensor, mdiShieldHome, mdiThermostat } from '@mdi/js';
+import { mdiPlus, mdiClose, mdiLightbulb, mdiGauge, mdiMotionSensor, mdiShieldHome, mdiThermostat, mdiGrid, mdiCards } from '@mdi/js';
 import { useDragDrop } from './DragDropProvider';
 
 interface DroppableGridCellProps {
@@ -20,6 +20,8 @@ const getIconPath = (iconName?: string) => {
     case 'mdiMotionSensor': return mdiMotionSensor;
     case 'mdiShieldHome': return mdiShieldHome;
     case 'mdiThermostat': return mdiThermostat;
+    case 'mdiGrid': return mdiGrid;
+    case 'mdiCards': return mdiCards;
     default: return mdiGauge;
   }
 };
@@ -35,7 +37,15 @@ export const DroppableGridCell = ({ id, row, col }: DroppableGridCellProps) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({ 
+    id,
+    data: {
+      type: 'grid-cell',
+      row,
+      col,
+      hasComponent: !!component,
+    },
+  });
 
   const { isOver, setNodeRef: setDroppableNodeRef } = useDroppable({
     id,
@@ -73,7 +83,6 @@ export const DroppableGridCell = ({ id, row, col }: DroppableGridCellProps) => {
         }
       )}
       {...attributes}
-      {...listeners}
     >
       {component ? (
         <>
@@ -85,8 +94,11 @@ export const DroppableGridCell = ({ id, row, col }: DroppableGridCellProps) => {
             <Icon path={mdiClose} className="h-3 w-3" />
           </button>
           
-          {/* Component preview */}
-          <div className="w-full h-full p-3 flex flex-col items-center justify-center text-center">
+          {/* Component preview - draggable area */}
+          <div 
+            className="w-full h-full p-3 flex flex-col items-center justify-center text-center cursor-move"
+            {...listeners}
+          >
             <Icon 
               path={getIconPath(component.icon)} 
               className="h-8 w-8 text-theme-primary mb-2" 

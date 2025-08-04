@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { useHass } from '@hakit/core';
 import { DraggableEntityCard } from './DraggableEntityCard';
 import Icon from '@mdi/react';
-import { mdiMagnify, mdiLightbulb, mdiShieldHome, mdiMotionSensor, mdiGauge, mdiThermostat } from '@mdi/js';
+import { mdiMagnify, mdiLightbulb, mdiShieldHome, mdiMotionSensor, mdiGauge, mdiThermostat, mdiGrid, mdiCards } from '@mdi/js';
 
 const ENTITY_TYPES = {
   light: { icon: mdiLightbulb, label: 'Lights' },
@@ -11,6 +11,11 @@ const ENTITY_TYPES = {
   binary_sensor: { icon: mdiMotionSensor, label: 'Binary Sensors' },
   alarm_control_panel: { icon: mdiShieldHome, label: 'Alarms' },
   climate: { icon: mdiThermostat, label: 'Climate' },
+} as const;
+
+const SPECIAL_COMPONENTS = {
+  custom_grid: { icon: mdiGrid, label: 'Custom Grid', description: 'Grid container for multiple entities' },
+  entities_card: { icon: mdiCards, label: 'Entities Card', description: 'Card container for grouped entities' },
 } as const;
 
 export const EntityPalette = () => {
@@ -61,6 +66,7 @@ export const EntityPalette = () => {
           className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
         >
           <option value="all">All Types</option>
+          <option value="special">Special Components</option>
           {Object.entries(ENTITY_TYPES).map(([type, config]) => (
             <option key={type} value={type}>
               {config.label}
@@ -69,9 +75,38 @@ export const EntityPalette = () => {
         </select>
       </div>
 
+      {/* Special Components Section */}
+      {(selectedType === 'all' || selectedType === 'special') && (
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-theme-text mb-2">Special Components</h3>
+          <div className="space-y-2">
+            {Object.entries(SPECIAL_COMPONENTS).map(([type, config]) => (
+              <DraggableEntityCard
+                key={`special-${type}`}
+                id={`special-${type}`}
+                entity={{
+                  id: `special.${type}`,
+                  entity_id: `special.${type}`,
+                  state: 'available',
+                  attributes: {
+                    friendly_name: config.label,
+                    description: config.description,
+                  },
+                  last_changed: new Date().toISOString(),
+                  last_updated: new Date().toISOString(),
+                  context: { id: '', parent_id: null, user_id: null },
+                }}
+                isSpecialComponent={true}
+                specialType={type}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Entity List */}
       <div className="flex-1 overflow-y-auto space-y-2">
-        {filteredEntities.map(entity => (
+        {selectedType !== 'special' && filteredEntities.map(entity => (
           <DraggableEntityCard
             key={entity.id}
             id={entity.id}
@@ -79,7 +114,7 @@ export const EntityPalette = () => {
           />
         ))}
         
-        {filteredEntities.length === 0 && (
+        {selectedType !== 'special' && filteredEntities.length === 0 && (
           <div className="text-center text-theme-text-secondary py-8">
             No entities found
           </div>
@@ -88,7 +123,12 @@ export const EntityPalette = () => {
 
       {/* Entity Count */}
       <div className="mt-4 text-sm text-theme-text-secondary">
-        {filteredEntities.length} entities found
+        {selectedType === 'special' 
+          ? `${Object.keys(SPECIAL_COMPONENTS).length} special components`
+          : selectedType === 'all'
+          ? `${filteredEntities.length} entities + ${Object.keys(SPECIAL_COMPONENTS).length} special components`
+          : `${filteredEntities.length} entities found`
+        }
       </div>
     </div>
   );

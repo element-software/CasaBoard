@@ -1,9 +1,12 @@
 "use client";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useHass } from '@hakit/core';
 import Icon from '@mdi/react';
-import { mdiCog, mdiPalette, mdiGrid, mdiDownload, mdiUpload, mdiEye, mdiRocket, mdiUndo, mdiRedo } from '@mdi/js';
+import { mdiCog, mdiPalette, mdiGrid, mdiDownload, mdiUpload, mdiEye, mdiRocket, mdiUndo, mdiRedo, mdiPlus, mdiDelete, mdiLightbulb, mdiGauge, mdiMotionSensor, mdiShieldHome, mdiThermostat, mdiCogOutline } from '@mdi/js';
 import { useDragDrop } from './DragDropProvider';
 import { LiveStatusIndicator } from './LiveStatusIndicator';
+import { EntitySelectorPopup } from './EntitySelectorPopup';
+import { getEntityIconName } from '../../utils/entityIcons';
 
 export const ConfigPanel = () => {
   const [activeTab, setActiveTab] = useState<'component' | 'page' | 'global'>('component');
@@ -184,6 +187,7 @@ const ComponentConfig = ({
   updateComponent: (cellId: string, updates: any) => void;
 }) => {
   const component = selectedComponent ? gridComponents[selectedComponent] : null;
+  const [isEntityPopupOpen, setIsEntityPopupOpen] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -228,7 +232,9 @@ const ComponentConfig = ({
               type="text"
               value={component.id || ''}
               onChange={(e) => updateComponent(selectedComponent!, { id: e.target.value })}
+              placeholder={component.type === 'custom_grid' || component.type === 'entities_card' ? 'Optional - leave empty for special components' : 'entity.id'}
               className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+              disabled={component.type === 'custom_grid' || component.type === 'entities_card'}
             />
           </div>
           
@@ -244,38 +250,196 @@ const ComponentConfig = ({
               className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
             />
           </div>
+
+          {/* Special properties for custom_grid */}
+          {component.type === 'custom_grid' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Grid Columns
+                </label>
+                <select
+                  value={component.gridCols || 2}
+                  onChange={(e) => updateComponent(selectedComponent!, { gridCols: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+                >
+                  <option value={1}>1 Column</option>
+                  <option value={2}>2 Columns</option>
+                  <option value={3}>3 Columns</option>
+                  <option value={4}>4 Columns</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  CSS Classes
+                </label>
+                <input
+                  type="text"
+                  value={component.className || ''}
+                  onChange={(e) => updateComponent(selectedComponent!, { className: e.target.value })}
+                  placeholder="grid-rows-2"
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Entities ({(component.entities || []).length})
+                </label>
+                <button
+                  onClick={() => setIsEntityPopupOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-theme-accent text-black rounded-lg hover:opacity-80 transition-colors"
+                >
+                  <Icon path={mdiCogOutline} className="h-4 w-4" />
+                  Configure Entities
+                </button>
+                {(component.entities || []).length > 0 && (
+                  <div className="mt-2 text-xs text-theme-text-secondary">
+                    Selected: {(component.entities || []).map((e: any) => e.id).join(', ')}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Special properties for entities_card */}
+          {component.type === 'entities_card' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Card Title
+                </label>
+                <input
+                  type="text"
+                  value={component.title || ''}
+                  onChange={(e) => updateComponent(selectedComponent!, { title: e.target.value })}
+                  placeholder="Card Title"
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Column Span
+                </label>
+                <select
+                  value={component.colspan || 1}
+                  onChange={(e) => updateComponent(selectedComponent!, { colspan: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+                >
+                  <option value={1}>1 Column</option>
+                  <option value={2}>2 Columns</option>
+                  <option value={3}>3 Columns</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={component.showTitles || false}
+                    onChange={(e) => updateComponent(selectedComponent!, { showTitles: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label className="text-sm text-theme-text">Show Entity Titles</label>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={component.showLastChanged || false}
+                    onChange={(e) => updateComponent(selectedComponent!, { showLastChanged: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label className="text-sm text-theme-text">Show Last Changed</label>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={component.showAllOn || false}
+                    onChange={(e) => updateComponent(selectedComponent!, { showAllOn: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label className="text-sm text-theme-text">Show All On Button</label>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={component.disableClick || false}
+                    onChange={(e) => updateComponent(selectedComponent!, { disableClick: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label className="text-sm text-theme-text">Disable Click</label>
+                </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={component.openTab || false}
+                    onChange={(e) => updateComponent(selectedComponent!, { openTab: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label className="text-sm text-theme-text">Open Tab</label>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Entities ({(component.entities || []).length})
+                </label>
+                <button
+                  onClick={() => setIsEntityPopupOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-theme-accent text-black rounded-lg hover:opacity-80 transition-colors"
+                >
+                  <Icon path={mdiCogOutline} className="h-4 w-4" />
+                  Configure Entities
+                </button>
+                {(component.entities || []).length > 0 && (
+                  <div className="mt-2 text-xs text-theme-text-secondary">
+                    Selected: {(component.entities || []).map((e: any) => e.id).join(', ')}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
           
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={component.dimmer || false}
-                onChange={(e) => updateComponent(selectedComponent!, { dimmer: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-sm text-theme-text">Enable Dimmer</label>
+          {/* Standard entity properties */}
+          {component.type !== 'custom_grid' && component.type !== 'entities_card' && (
+            <div className="space-y-2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={component.dimmer || false}
+                  onChange={(e) => updateComponent(selectedComponent!, { dimmer: e.target.checked })}
+                  className="mr-2"
+                />
+                <label className="text-sm text-theme-text">Enable Dimmer</label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={component.temperature || false}
+                  onChange={(e) => updateComponent(selectedComponent!, { temperature: e.target.checked })}
+                  className="mr-2"
+                />
+                <label className="text-sm text-theme-text">Temperature Control</label>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={component.color || false}
+                  onChange={(e) => updateComponent(selectedComponent!, { color: e.target.checked })}
+                  className="mr-2"
+                />
+                <label className="text-sm text-theme-text">Color Control</label>
+              </div>
             </div>
-            
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={component.temperature || false}
-                onChange={(e) => updateComponent(selectedComponent!, { temperature: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-sm text-theme-text">Temperature Control</label>
-            </div>
-            
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={component.color || false}
-                onChange={(e) => updateComponent(selectedComponent!, { color: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-sm text-theme-text">Color Control</label>
-            </div>
-          </div>
+          )}
         </>
       ) : (
         <div className="text-center text-theme-text-secondary py-8">
@@ -284,6 +448,17 @@ const ComponentConfig = ({
             : 'Select a component to configure'
           }
         </div>
+      )}
+
+      {/* Entity Selector Popup */}
+      {component && (component.type === 'custom_grid' || component.type === 'entities_card') && (
+        <EntitySelectorPopup
+          isOpen={isEntityPopupOpen}
+          onClose={() => setIsEntityPopupOpen(false)}
+          selectedEntities={component.entities || []}
+          onEntitiesChange={(entities: any) => updateComponent(selectedComponent!, { entities })}
+          title={`Configure ${component.type === 'custom_grid' ? 'Custom Grid' : 'Entities Card'} Entities`}
+        />
       )}
     </div>
   );

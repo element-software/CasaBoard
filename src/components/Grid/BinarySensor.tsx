@@ -2,6 +2,7 @@
 import { EntityName, useEntity } from "@hakit/core";
 import classNames from "classnames";
 import { BinarySensorUtils } from "@/utils";
+import EntityIcon from "@/components/EntityIcon";
 
 interface GridItemProps {
   entityId: EntityName;
@@ -26,7 +27,10 @@ export const BinarySensor = ({ entityId, friendlyName, asCard = true }: GridItem
       <h3 className="w-full text-base capitalize text-theme-text">
         {friendlyName || entity.attributes.friendly_name}
       </h3>
-      {BinarySensorUtils.renderIcon(entity)}
+      <EntityIcon 
+        entity={entity} 
+        className={BinarySensorUtils.stateClassNameIcon(entity)}
+      />
       <p
         className={classNames(
           "text-base",

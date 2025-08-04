@@ -9,7 +9,7 @@ import { DraggableEntityCard } from './DraggableEntityCard';
 import { SetupNavigation } from './SetupNavigation';
 
 export const SetupEditor = () => {
-  const { activeId, handleDragStart, handleDragEnd, handleDragOver } = useDragDrop();
+  const { activeId, handleDragStart, handleDragEnd, handleDragOver, currentPage } = useDragDrop();
 
   return (
     <DndContext
@@ -31,7 +31,7 @@ export const SetupEditor = () => {
           <div className="flex-1 flex flex-col">
             {/* Main Content */}
             <div className="flex-1 overflow-y-auto">
-              <GridEditor />
+              <GridEditor selectedPage={currentPage} />
             </div>
           </div>
 

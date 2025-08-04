@@ -1,30 +1,4 @@
 import { HassEntityWithService } from "@hakit/core";
-import {
-  mdiTrackLight,
-  mdiLightRecessed,
-  mdiLightbulb,
-  mdiDiamondStone,
-  mdiCeilingFanLight,
-  mdiBaby,
-  mdiStairsUp,
-  mdiBed,
-  mdiLedStrip,
-} from "@mdi/js";
-import Icon from "@mdi/react";
-import classNames from "classnames";
-
-// Icon mapping for better performance and maintainability
-const ICON_MAP = {
-  "mdi:track-light": mdiTrackLight,
-  "mdi:led-strip": mdiLedStrip,
-  "mdi:light-recessed": mdiLightRecessed,
-  "mdi:lightbulb": mdiLightbulb,
-  "mdi:diamond-stone": mdiDiamondStone,
-  "mdi:ceiling-fan-light": mdiCeilingFanLight,
-  "mdi:baby": mdiBaby,
-  "mdi:bed": mdiBed,
-  "mdi:stairs-up": mdiStairsUp,
-} as const;
 
 // State class mappings for consistency
 const STATE_CLASSES = {
@@ -38,21 +12,6 @@ const STATE_BG_CLASSES = {
   off: "bg-stone-800", 
   unavailable: "bg-theme-error",
 } as const;
-
-export const renderIcon = (
-  entity: HassEntityWithService<"light">,
-  stateClassNameIcon: () => string
-) => {
-  const iconPath = ICON_MAP[entity.attributes.icon as keyof typeof ICON_MAP] || mdiLightbulb;
-  
-  return (
-    <Icon
-      path={iconPath}
-      className={classNames("h-10 w-10", stateClassNameIcon())}
-      aria-hidden="true"
-    />
-  );
-};
 
 export const stateClassNameBg = (entity: HassEntityWithService<"light">) => {
   return STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] || STATE_BG_CLASSES.unavailable;

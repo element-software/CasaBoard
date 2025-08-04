@@ -15,6 +15,23 @@ interface GridComponent {
   position?: { row: number; col: number };
   colspan?: number;
   graphType?: string;
+  // Special component properties
+  gridCols?: number;
+  className?: string;
+  title?: string;
+  entities?: Array<{
+    id: string;
+    icon: string;
+    showState?: boolean;
+    showTitle?: boolean;
+    showLastChanged?: boolean;
+  }>;
+  children?: any[];
+  showTitles?: boolean;
+  showLastChanged?: boolean;
+  showAllOn?: boolean;
+  disableClick?: boolean;
+  openTab?: boolean;
 }
 
 interface DragDropContextType {
@@ -67,10 +84,105 @@ export const DragDropProvider = ({ children }: DragDropProviderProps) => {
   const [canRedo, setCanRedo] = useState(false);
   const [isApplyingChanges, setIsApplyingChanges] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const configService = ConfigurationService.getInstance();
   const { config, updateConfig } = useConfiguration();
   const historyManager = useRef(new HistoryManager());
+
+  // Define loadFromCurrentConfig early so it can be used in useEffects
+  const loadFromCurrentConfig = useCallback((pageId: string) => {
+    const config = configService.getCurrentConfig();
+    const pageConfig = config.pages[pageId as keyof typeof config.pages];
+    
+    if (pageConfig) {
+      // Convert existing components to grid format
+      const convertedComponents: Record<string, GridComponent> = {};
+      
+      pageConfig.layout.components.forEach((component: any, index: number) => {
+        const row = Math.floor(index / pageConfig.layout.columns);
+        const col = index % pageConfig.layout.columns;
+        const cellId = `cell-${row}-${col}`;
+        
+        convertedComponents[cellId] = {
+          type: component.type,
+          id: component.id,
+          icon: component.icon,
+          dimmer: component.dimmer,
+          temperature: component.temperature,
+          color: component.color,
+          colspan: component.colspan,
+          graphType: component.graphType,
+          position: { row, col },
+          // Special component properties
+          gridCols: component.gridCols,
+          className: component.className,
+          title: component.title,
+          entities: component.entities || [],
+          children: component.children || [],
+          showTitles: component.showTitles,
+          showLastChanged: component.showLastChanged,
+          showAllOn: component.showAllOn,
+          disableClick: component.disableClick,
+          openTab: component.openTab,
+        };
+      });
+      
+      setGridComponents(convertedComponents);
+      setGridSize({
+        columns: pageConfig.layout.columns,
+        rows: Math.max(4, Math.ceil(pageConfig.layout.components.length / pageConfig.layout.columns)),
+      });
+    }
+    
+    setCurrentPage(pageId);
+  }, [configService]);
+
+  // Initialize setup editor with current configuration
+  // This effect is removed since initialization is now handled in the localStorage effect
+  // useEffect(() => {
+  //   if (!isInitialized) {
+  //     loadFromCurrentConfig(currentPage);
+  //     setIsInitialized(true);
+  //   }
+  // }, [isInitialized, currentPage, loadFromCurrentConfig]);
+
+  // Save setup state to localStorage
+  useEffect(() => {
+    if (isInitialized) {
+      const setupState = {
+        gridComponents,
+        gridSize,
+        currentPage,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('dashboardSetupState', JSON.stringify(setupState));
+    }
+  }, [gridComponents, gridSize, currentPage, isInitialized]);
+
+  // Load setup state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('dashboardSetupState');
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        // Only restore if it's relatively recent (within 24 hours)
+        if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+          setGridComponents(parsed.gridComponents || {});
+          setGridSize(parsed.gridSize || { columns: 3, rows: 4 });
+          setCurrentPage(parsed.currentPage || 'kitchen');
+          setIsInitialized(true);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load setup state from localStorage:', error);
+    }
+    
+    // If no valid localStorage state, load from current config
+    loadFromCurrentConfig(currentPage);
+    setIsInitialized(true);
+  }, [loadFromCurrentConfig, currentPage]);
 
   // Save state to history when components change
   const saveToHistory = useCallback(() => {
@@ -96,16 +208,56 @@ export const DragDropProvider = ({ children }: DragDropProviderProps) => {
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     
-    if (!over) {
+    if (!over || !over.data.current) {
       setActiveId(null);
       return;
     }
 
+    // Handle reordering existing grid components
+    if (active.data.current?.type === 'grid-cell' && over.data.current.type === 'grid-cell') {
+      const activeId = active.id as string;
+      const overId = over.id as string;
+      
+      if (activeId !== overId) {
+        saveToHistory(); // Save current state before making changes
+        
+        setGridComponents(prev => {
+          const newComponents = { ...prev };
+          
+          // Get the component being moved
+          const movingComponent = newComponents[activeId];
+          
+          // If there's a component at the target location, swap them
+          if (newComponents[overId]) {
+            const targetComponent = newComponents[overId];
+            newComponents[activeId] = {
+              ...targetComponent,
+              position: { row: over.data.current!.row, col: over.data.current!.col }
+            };
+          } else {
+            // Target is empty, just remove from source
+            delete newComponents[activeId];
+          }
+          
+          // Place the moving component at the target
+          if (movingComponent) {
+            newComponents[overId] = {
+              ...movingComponent,
+              position: { row: over.data.current!.row, col: over.data.current!.col }
+            };
+          }
+          
+          return newComponents;
+        });
+      }
+    }
     // Handle dropping entity onto grid cell
-    if (active.data.current?.type === 'entity' && over.data.current?.type === 'grid-cell') {
+    else if (active.data.current?.type === 'entity' && over.data.current.type === 'grid-cell') {
       const entityId = active.data.current.entityId;
       const entityType = active.data.current.entityType;
       const cellId = over.id as string;
+
+      saveToHistory(); // Save current state before making changes
 
       const newComponent: GridComponent = {
         type: entityType,
@@ -130,9 +282,38 @@ export const DragDropProvider = ({ children }: DragDropProviderProps) => {
         [cellId]: newComponent,
       }));
     }
+    // Handle dropping special component onto grid cell
+    else if (active.data.current?.type === 'special-component' && over.data.current.type === 'grid-cell') {
+      const specialType = active.data.current.specialType;
+      const cellId = over.id as string;
+
+      saveToHistory(); // Save current state before making changes
+
+      const newComponent: GridComponent = {
+        type: specialType,
+        icon: getDefaultIcon(specialType),
+        position: {
+          row: over.data.current.row,
+          col: over.data.current.col,
+        },
+      };
+
+      // Add special component defaults
+      if (specialType === 'custom_grid') {
+        newComponent.gridCols = 2;
+      }
+      if (specialType === 'entities_card') {
+        newComponent.colspan = 1;
+      }
+
+      setGridComponents(prev => ({
+        ...prev,
+        [cellId]: newComponent,
+      }));
+    }
 
     setActiveId(null);
-  }, []);
+  }, [saveToHistory]);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
     // Handle drag over logic for visual feedback
@@ -216,42 +397,6 @@ export const DragDropProvider = ({ children }: DragDropProviderProps) => {
     // Show success message
     console.log('Configuration saved to dashboard.config.ts');
   }, [currentPage, gridComponents, gridSize, configService]);
-
-  const loadFromCurrentConfig = useCallback((pageId: string) => {
-    const config = configService.getCurrentConfig();
-    const pageConfig = config.pages[pageId as keyof typeof config.pages];
-    
-    if (pageConfig) {
-      // Convert existing components to grid format
-      const convertedComponents: Record<string, GridComponent> = {};
-      
-      pageConfig.layout.components.forEach((component: any, index: number) => {
-        const row = Math.floor(index / pageConfig.layout.columns);
-        const col = index % pageConfig.layout.columns;
-        const cellId = `cell-${row}-${col}`;
-        
-        convertedComponents[cellId] = {
-          type: component.type,
-          id: component.id,
-          icon: component.icon,
-          dimmer: component.dimmer,
-          temperature: component.temperature,
-          color: component.color,
-          colspan: component.colspan,
-          graphType: component.graphType,
-          position: { row, col },
-        };
-      });
-      
-      setGridComponents(convertedComponents);
-      setGridSize({
-        columns: pageConfig.layout.columns,
-        rows: Math.max(4, Math.ceil(pageConfig.layout.components.length / pageConfig.layout.columns)),
-      });
-    }
-    
-    setCurrentPage(pageId);
-  }, [configService]);
 
   const applyToLiveDashboard = useCallback(async () => {
     setIsApplyingChanges(true);
@@ -359,6 +504,8 @@ const getDefaultIcon = (entityType: string) => {
     case 'binary_sensor': return 'mdiMotionSensor';
     case 'alarm_control_panel': return 'mdiShieldHome';
     case 'climate': return 'mdiThermostat';
+    case 'custom_grid': return 'mdiGrid';
+    case 'entities_card': return 'mdiCards';
     default: return 'mdiHelpCircle';
   }
 };

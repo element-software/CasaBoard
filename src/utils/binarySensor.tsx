@@ -5,8 +5,6 @@ import {
   mdiMotionSensor,
   mdiMotionSensorOff,
 } from "@mdi/js";
-import Icon from "@mdi/react";
-import classNames from "classnames";
 
 // State class mappings for consistency
 const STATE_BG_CLASSES = {
@@ -64,24 +62,6 @@ export const stateClassNameIcon = (
   entity: HassEntityWithService<"binarySensor">
 ) => {
   return STATE_ICON_CLASSES[entity.state as keyof typeof STATE_ICON_CLASSES] || STATE_ICON_CLASSES.on;
-};
-
-export const renderIcon = (entity: HassEntityWithService<"binarySensor">) => {
-  const deviceClass = entity.attributes.device_class as keyof typeof DEVICE_CLASS_CONFIG;
-  const deviceConfig = DEVICE_CLASS_CONFIG[deviceClass];
-  
-  if (!deviceConfig || !('icons' in deviceConfig)) return null;
-  
-  const config = deviceConfig.icons;
-  const iconConfig = config[entity.state as keyof typeof config] || config.default;
-  
-  return (
-    <Icon
-      path={iconConfig.path}
-      className={classNames(iconConfig.className, iconConfig.color)}
-      aria-hidden="true"
-    />
-  );
 };
 
 export const renderState = (entity: HassEntityWithService<"binarySensor">) => {

@@ -11,6 +11,23 @@ interface GridComponent {
   position?: { row: number; col: number };
   colspan?: number;
   graphType?: string;
+  // Special component properties
+  gridCols?: number;
+  className?: string;
+  title?: string;
+  entities?: Array<{
+    id: string;
+    icon: string;
+    showState?: boolean;
+    showTitle?: boolean;
+    showLastChanged?: boolean;
+  }>;
+  children?: any[];
+  showTitles?: boolean;
+  showLastChanged?: boolean;
+  showAllOn?: boolean;
+  disableClick?: boolean;
+  openTab?: boolean;
 }
 
 export class ConfigurationService {
@@ -43,6 +60,29 @@ export class ConfigurationService {
       if (component.color) configComponent.color = true;
       if (component.graphType) configComponent.graphType = component.graphType;
       if (component.colspan) configComponent.colspan = component.colspan;
+
+      // Add special component properties
+      if (component.type === 'custom_grid') {
+        if (component.gridCols) configComponent.gridCols = component.gridCols;
+        if (component.className) configComponent.className = component.className;
+        if (component.entities) configComponent.entities = component.entities;
+        if (component.children) configComponent.children = component.children;
+        // Remove id for custom_grid as it's not needed
+        delete configComponent.id;
+      }
+
+      if (component.type === 'entities_card') {
+        if (component.title) configComponent.title = component.title;
+        if (component.entities) configComponent.entities = component.entities;
+        if (component.children) configComponent.children = component.children;
+        if (component.showTitles !== undefined) configComponent.showTitles = component.showTitles;
+        if (component.showLastChanged !== undefined) configComponent.showLastChanged = component.showLastChanged;
+        if (component.showAllOn !== undefined) configComponent.showAllOn = component.showAllOn;
+        if (component.disableClick !== undefined) configComponent.disableClick = component.disableClick;
+        if (component.openTab !== undefined) configComponent.openTab = component.openTab;
+        // Remove id for entities_card as it's not needed
+        delete configComponent.id;
+      }
 
       return configComponent;
     });

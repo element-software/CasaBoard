@@ -86,7 +86,7 @@ const EntitiesCard = ({
           onClick={
             disableClick
               ? undefined
-              : () => toggleLighting(entities.map((entity) => entity.id))
+              : () => toggleLighting((entities || []).map((entity) => entity.id))
           }
           className={classNames({
             "block": showAllOn,
@@ -110,7 +110,7 @@ const EntitiesCard = ({
         </div>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 w-full items-start justify-between gap-4">
-        {entities.map((entity) => (
+        {(entities || []).map((entity) => (
           <EntityCard
             key={entity.id}
             entityId={entity.id}

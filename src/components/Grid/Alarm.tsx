@@ -4,6 +4,7 @@ import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
 import { AlarmUtils } from "@/utils";
+import EntityIcon from "@/components/EntityIcon";
 
 interface GridItemProps {
   entityId: EntityName;
@@ -39,7 +40,7 @@ export const Alarm = ({ entityId }: GridItemProps) => {
         AlarmUtils.stateClassNameBg(entity)
       )}
     >
-      {AlarmUtils.renderIcon(entity)}
+      <EntityIcon entity={entity} />
       {entity.state.split("_")[0][0].toUpperCase() +
         entity.state.split("_")[0].slice(1) +
         " " +

@@ -1,6 +1,6 @@
-import { DomainService, EntityName, HassEntityWithService, useEntity, useHass } from "@hakit/core";
-import { useCallback, useState } from "react";
-import { renderIcon } from "./utils";
+import { DomainService, EntityName, useEntity, useHass } from "@hakit/core";
+import { useCallback } from "react";
+import EntityIcon from "@/components/EntityIcon";
 import { renderState } from "@/utils/binarySensor";
 import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
@@ -63,7 +63,7 @@ const EntityCard = ({
       onClick={() => toggleLighting("toggle", entityId)}
       className="flex flex-col items-center gap-2 text-center"
     >
-      {renderIcon(entity, icon)}
+      <EntityIcon entity={entity} size="h-8 w-8" />
       {showTitle && (
         <div className="text-xs">{entity.attributes.friendly_name}</div>
       )}

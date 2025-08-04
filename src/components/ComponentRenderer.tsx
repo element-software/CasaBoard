@@ -43,7 +43,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
       return (
         <EntitiesCard
           title={entitiesCardConfig.title}
-          entities={entitiesCardConfig.entities}
+          entities={entitiesCardConfig.entities || []}
           colspan={entitiesCardConfig.colspan}
           showTitles={entitiesCardConfig.showTitles}
           showLastChanged={entitiesCardConfig.showLastChanged}
@@ -74,7 +74,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
           },
           customGridConfig.className
         )}>
-          {customGridConfig.entities.map((entity, index) => (
+          {(customGridConfig.entities || []).map((entity, index) => (
             <EntityCard
               key={`entity-${index}`}
               entityId={entity.id}
@@ -84,7 +84,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
               showLastChanged={entity.showLastChanged}
             />
           ))}
-          {customGridConfig.children?.map((childConfig, index) => (
+          {(customGridConfig.children || []).map((childConfig, index) => (
             <ComponentRenderer key={`child-${index}`} config={childConfig} />
           ))}
         </div>

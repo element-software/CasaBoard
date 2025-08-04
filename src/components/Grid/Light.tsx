@@ -8,6 +8,7 @@ import { mdiPalette, mdiThermometer, mdiWeatherSunny } from "@mdi/js";
 import { HuePicker } from "react-color";
 import { LightUtils } from "@/utils";
 import { Slider } from "../RangeSlider/RangeSlider";
+import EntityIcon from "@/components/EntityIcon";
 
 interface LightProps {
   entityId: EntityName;
@@ -142,9 +143,10 @@ export const Light = ({
         className="flex flex-row w-full items-center justify-between"
         onClick={() => handleToggle(entity.entity_id as EntityName)}
       >
-        {LightUtils.renderIcon(entity, () =>
-          LightUtils.stateClassNameIcon(entity)
-        )}
+        <EntityIcon 
+          entity={entity} 
+          className={LightUtils.stateClassNameIcon(entity)}
+        />
         <Toggle
           enabled={entity.state === "on" ? true : false}
           onToggle={() =>

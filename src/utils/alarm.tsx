@@ -1,7 +1,5 @@
 import { HassEntityWithService } from "@hakit/core";
 import { mdiShieldLock, mdiShieldLockOpen, mdiShieldAlert } from "@mdi/js";
-import Icon from "@mdi/react";
-import classNames from "classnames";
 
 // State class mappings for consistency
 const STATE_BG_CLASSES = {
@@ -26,19 +24,4 @@ export const stateClassNameBg = (
   entity: HassEntityWithService<"alarmControlPanel">
 ) => {
   return STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] || "";
-};
-
-export const renderIcon = (
-  entity: HassEntityWithService<"alarmControlPanel">
-) => {
-  const config = ALARM_STATE_CONFIG[entity.state as keyof typeof ALARM_STATE_CONFIG] || ALARM_STATE_CONFIG.default;
-  const iconConfig = config.icon;
-  
-  return (
-    <Icon
-      path={iconConfig.path}
-      className={classNames(iconConfig.className, iconConfig.color)}
-      aria-hidden="true"
-    />
-  );
 };

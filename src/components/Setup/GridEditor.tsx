@@ -1,10 +1,9 @@
 "use client";
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { dashboardConfig } from '@/config/dashboard.config';
 import { DroppableGridCell } from './DroppableGridCell';
-import { ComponentRenderer } from '@/components/ComponentRenderer';
+import { useDragDrop } from './DragDropProvider';
 import classNames from 'classnames';
 
 interface GridEditorProps {
@@ -12,11 +11,8 @@ interface GridEditorProps {
 }
 
 export const GridEditor = ({ selectedPage }: GridEditorProps) => {
-  const [gridSize, setGridSize] = useState({ columns: 3, rows: 4 });
+  const { gridComponents, gridSize, setGridSize, currentPage } = useDragDrop();
   
-  const pageConfig = dashboardConfig.pages[selectedPage as keyof typeof dashboardConfig.pages];
-  const components = pageConfig?.layout.components || [];
-
   // Create grid cells
   const gridCells = useMemo(() => {
     const cells = [];
@@ -27,12 +23,15 @@ export const GridEditor = ({ selectedPage }: GridEditorProps) => {
           id: cellId,
           row,
           col,
-          component: null, // Will be populated based on configuration
+          component: gridComponents[cellId],
         });
       }
     }
     return cells;
-  }, [gridSize]);
+  }, [gridSize, gridComponents]);
+
+  // Get current components for display
+  const components = Object.values(gridComponents);
 
   const { setNodeRef } = useDroppable({
     id: 'grid-container',
@@ -54,7 +53,7 @@ export const GridEditor = ({ selectedPage }: GridEditorProps) => {
               min="1"
               max="6"
               value={gridSize.columns}
-              onChange={(e) => setGridSize(prev => ({ ...prev, columns: parseInt(e.target.value) }))}
+              onChange={(e) => setGridSize({ ...gridSize, columns: parseInt(e.target.value) })}
               className="w-16 px-2 py-1 bg-theme-background border border-theme-border rounded text-theme-text"
             />
           </div>
@@ -66,7 +65,7 @@ export const GridEditor = ({ selectedPage }: GridEditorProps) => {
               min="1"
               max="8"
               value={gridSize.rows}
-              onChange={(e) => setGridSize(prev => ({ ...prev, rows: parseInt(e.target.value) }))}
+              onChange={(e) => setGridSize({ ...gridSize, rows: parseInt(e.target.value) })}
               className="w-16 px-2 py-1 bg-theme-background border border-theme-border rounded text-theme-text"
             />
           </div>
