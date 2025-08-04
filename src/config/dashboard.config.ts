@@ -50,6 +50,7 @@ export const dashboardConfig: DashboardConfig = {
             title: "Media Wall",
             openTab: true,
             colspan: 1,
+            columns: 3,
             showTitles: true,
             showAllOn: true,
             entities: [

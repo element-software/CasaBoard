@@ -32,6 +32,7 @@ interface GridComponent {
   showAllOn?: boolean;
   disableClick?: boolean;
   openTab?: boolean;
+  columns?: number;
 }
 
 interface DragDropContextType {

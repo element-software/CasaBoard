@@ -31,6 +31,7 @@ export interface EntitiesCardConfig {
   title: string;
   entities: EntityConfig[];
   colspan?: number;
+  columns?: number;
   showTitles?: boolean;
   showLastChanged?: boolean;
   showAllOn?: boolean;

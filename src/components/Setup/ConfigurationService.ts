@@ -1,5 +1,5 @@
-import { DashboardConfig } from '@/config/dashboard.types';
-import { dashboardConfig } from '@/config/dashboard.config';
+import { DashboardConfig } from "@/config/dashboard.types";
+import { dashboardConfig } from "@/config/dashboard.config";
 
 interface GridComponent {
   type: string;
@@ -28,6 +28,7 @@ interface GridComponent {
   showAllOn?: boolean;
   disableClick?: boolean;
   openTab?: boolean;
+  columns?: number;
 }
 
 export class ConfigurationService {
@@ -45,9 +46,13 @@ export class ConfigurationService {
     return this.config;
   }
 
-  updatePageConfig(pageId: string, gridComponents: Record<string, GridComponent>, gridSize: { columns: number; rows: number }): void {
+  updatePageConfig(
+    pageId: string,
+    gridComponents: Record<string, GridComponent>,
+    gridSize: { columns: number; rows: number }
+  ): void {
     // Convert grid components to dashboard config format
-    const components = Object.values(gridComponents).map(component => {
+    const components = Object.values(gridComponents).map((component) => {
       const configComponent: any = {
         type: component.type,
         id: component.id,
@@ -62,24 +67,32 @@ export class ConfigurationService {
       if (component.colspan) configComponent.colspan = component.colspan;
 
       // Add special component properties
-      if (component.type === 'custom_grid') {
+      if (component.type === "custom_grid") {
         if (component.gridCols) configComponent.gridCols = component.gridCols;
-        if (component.className) configComponent.className = component.className;
+        if (component.className)
+          configComponent.className = component.className;
         if (component.entities) configComponent.entities = component.entities;
         if (component.children) configComponent.children = component.children;
         // Remove id for custom_grid as it's not needed
         delete configComponent.id;
       }
 
-      if (component.type === 'entities_card') {
+      if (component.type === "entities_card") {
         if (component.title) configComponent.title = component.title;
         if (component.entities) configComponent.entities = component.entities;
         if (component.children) configComponent.children = component.children;
-        if (component.showTitles !== undefined) configComponent.showTitles = component.showTitles;
-        if (component.showLastChanged !== undefined) configComponent.showLastChanged = component.showLastChanged;
-        if (component.showAllOn !== undefined) configComponent.showAllOn = component.showAllOn;
-        if (component.disableClick !== undefined) configComponent.disableClick = component.disableClick;
-        if (component.openTab !== undefined) configComponent.openTab = component.openTab;
+        if (component.columns !== undefined)
+          configComponent.columns = component.columns;
+        if (component.showTitles !== undefined)
+          configComponent.showTitles = component.showTitles;
+        if (component.showLastChanged !== undefined)
+          configComponent.showLastChanged = component.showLastChanged;
+        if (component.showAllOn !== undefined)
+          configComponent.showAllOn = component.showAllOn;
+        if (component.disableClick !== undefined)
+          configComponent.disableClick = component.disableClick;
+        if (component.openTab !== undefined)
+          configComponent.openTab = component.openTab;
         // Remove id for entities_card as it's not needed
         delete configComponent.id;
       }
@@ -89,8 +102,12 @@ export class ConfigurationService {
 
     // Update the configuration
     if (this.config.pages[pageId as keyof typeof this.config.pages]) {
-      this.config.pages[pageId as keyof typeof this.config.pages].layout.components = components;
-      this.config.pages[pageId as keyof typeof this.config.pages].layout.columns = gridSize.columns;
+      this.config.pages[
+        pageId as keyof typeof this.config.pages
+      ].layout.components = components;
+      this.config.pages[
+        pageId as keyof typeof this.config.pages
+      ].layout.columns = gridSize.columns;
     }
   }
 
@@ -98,16 +115,20 @@ export class ConfigurationService {
     const configString = `import { DashboardConfig } from "./dashboard.types";
 
 export const dashboardConfig: DashboardConfig = ${JSON.stringify(this.config, null, 2)};`;
-    
+
     return configString;
   }
 
   exportConfig(): string {
-    return JSON.stringify({
-      config: this.config,
-      exportDate: new Date().toISOString(),
-      version: '1.0'
-    }, null, 2);
+    return JSON.stringify(
+      {
+        config: this.config,
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+      },
+      null,
+      2
+    );
   }
 
   importConfig(configString: string): boolean {
@@ -119,19 +140,21 @@ export const dashboardConfig: DashboardConfig = ${JSON.stringify(this.config, nu
       }
       return false;
     } catch (error) {
-      console.error('Failed to import configuration:', error);
+      console.error("Failed to import configuration:", error);
       return false;
     }
   }
 
   private validateConfig(config: any): boolean {
     // Basic validation - check if it has the required structure
-    return config && 
-           typeof config === 'object' &&
-           config.pages &&
-           typeof config.pages === 'object' &&
-           config.sidebar &&
-           config.global;
+    return (
+      config &&
+      typeof config === "object" &&
+      config.pages &&
+      typeof config.pages === "object" &&
+      config.sidebar &&
+      config.global
+    );
   }
 
   resetToDefault(): void {

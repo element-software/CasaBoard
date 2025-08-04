@@ -333,6 +333,28 @@ const ComponentConfig = ({
                   <option value={3}>3 Columns</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-theme-text mb-2">
+                  Grid Columns (Entities Layout)
+                </label>
+                <select
+                  value={component.columns || 4}
+                  onChange={(e) => updateComponent(selectedComponent!, { columns: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 bg-theme-background border border-theme-border rounded-lg text-theme-text"
+                >
+                  <option value={1}>1 Column</option>
+                  <option value={2}>2 Columns</option>
+                  <option value={3}>3 Columns</option>
+                  <option value={4}>4 Columns (Default)</option>
+                  <option value={5}>5 Columns</option>
+                  <option value={6}>6 Columns</option>
+                  <option value={7}>7 Columns</option>
+                  <option value={8}>8 Columns</option>
+                  <option value={9}>9 Columns</option>
+                  <option value={10}>10 Columns</option>
+                </select>
+              </div>
               
               <div className="space-y-2">
                 <div className="flex items-center">

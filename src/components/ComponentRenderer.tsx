@@ -45,6 +45,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
           title={entitiesCardConfig.title}
           entities={entitiesCardConfig.entities || []}
           colspan={entitiesCardConfig.colspan}
+          columns={entitiesCardConfig.columns}
           showTitles={entitiesCardConfig.showTitles}
           showLastChanged={entitiesCardConfig.showLastChanged}
           showAllOn={entitiesCardConfig.showAllOn}
