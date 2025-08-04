@@ -6,7 +6,7 @@ import { dashboardConfig } from "@/config/dashboard.config";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { usePathname } from "next/navigation";
 
-const HASS_URL = "https://ha.iqbalibrahim.co.uk";
+const HASS_URL = process.env.NEXT_PUBLIC_VITE_HA_URL;
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -26,6 +26,11 @@ export default function Template({ children }: { children: React.ReactNode }) {
     brandingImage: "https://element-connect.co.uk/wp-content/uploads/2024/02/EC-Logo-V2-Trimmed-White.png",
     brandingText: "Powered by",
   };
+
+  if (!HASS_URL) {
+    console.error("HASS_URL is not defined. Please set the VITE_HA_URL environment variable.");
+    return null;
+  }
 
   return (
     <ErrorBoundary>
