@@ -57,8 +57,18 @@ export const EntitySelectorPopup = ({
     // Find the full entity object from the entities store
     const entityObj = entities ? entities[entityId] : null;
     
-    // Use the new icon detection utility
-    const iconName = entityObj ? getEntityIconName(entityObj) : 'mdiGauge';
+    // Prioritize the entity's actual icon from Home Assistant
+    let iconName = 'mdiGauge'; // fallback
+    
+    if (entityObj) {
+      if (entityObj.attributes?.icon) {
+        // Use the actual icon from Home Assistant if available
+        iconName = entityObj.attributes.icon;
+      } else {
+        // Fall back to auto-detection only if no icon is provided
+        iconName = getEntityIconName(entityObj);
+      }
+    }
     
     const newEntity = {
       id: entityId,

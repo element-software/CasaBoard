@@ -10,7 +10,6 @@ import {
   mdiShieldHome,
   mdiShieldAlert,
   mdiThermostat,
-  mdiWater,
   mdiPropaneTank,
   mdiLightSwitch,
   mdiToggleSwitch,
@@ -39,7 +38,15 @@ import {
   mdiHvac,
   mdiHomeAssistant,
   mdiDevices,
-  mdiCog
+  mdiCog,
+  mdiStove,
+  mdiFileCabinet,
+  mdiDiamondStone,
+  mdiTableFurniture,
+  mdiWashingMachine,
+  mdiTumbleDryer,
+  mdiToasterOven,
+  mdiMicrowave
 } from '@mdi/js';
 
 export interface EntityIconConfig {
@@ -167,6 +174,84 @@ const CLIMATE_SPECIFIC_ICONS: Record<string, EntityIconConfig> = {
 };
 
 /**
+ * Map Home Assistant icon names (e.g., "lightbulb", "motion-sensor") to MDI paths
+ * This provides comprehensive mapping for common HA icons
+ */
+function findMdiIconByName(iconName: string): string | null {
+  // Convert kebab-case to underscore and normalize
+  const normalizedName = iconName.toLowerCase().replace(/-/g, '_');
+  
+  // Common icon mappings from HA format to MDI paths
+  const iconMappings: Record<string, string> = {
+    // Lights
+    'lightbulb': mdiLightbulb,
+    'lightbulb_outline': mdiLightbulbOutline,
+    'track_light': mdiTrackLight,
+    'light_recessed': mdiLightRecessed,
+    'ceiling_light': mdiCeilingLight,
+    'floor_lamp': mdiFloorLamp,
+    'desk_lamp': mdiDeskLamp,
+    'led_strip': mdiLedStripVariant,
+    'led_strip_variant': mdiLedStripVariant,
+    
+    // Sensors  
+    'gauge': mdiGauge,
+    'thermometer': mdiThermometer,
+    'water_percent': mdiWaterPercent,
+    'car_battery': mdiCarBattery,
+    'power': mdiPower,
+    'electric_switch': mdiElectricSwitch,
+    
+    // Binary sensors
+    'motion_sensor': mdiMotionSensor,
+    'motion_sensor_off': mdiMotionSensorOff,
+    'door': mdiDoor,
+    'door_open': mdiDoorOpen,
+    'door_closed': mdiDoorClosed,
+    'window_open': mdiWindowOpen,
+    'window_closed': mdiWindowClosed,
+    'smoke_detector': mdiSmokeDetector,
+    'security': mdiSecurity,
+    'propane_tank': mdiPropaneTank,
+    'vibrate': mdiVibrate,
+    'eye': mdiEye,
+    'heart_pulse': mdiHeartPulse,
+    
+    // Locks
+    'lock': mdiLock,
+    'lock_open': mdiLockOpen,
+    
+    // Alarms
+    'shield_home': mdiShieldHome,
+    'shield_alert': mdiShieldAlert,
+    
+    // Climate
+    'thermostat': mdiThermostat,
+    'air_conditioner': mdiAirConditioner,
+    'radiator': mdiRadiator,
+    'hvac': mdiHvac,
+    
+    // Switches
+    'light_switch': mdiLightSwitch,
+    'toggle_switch': mdiToggleSwitch,
+    
+    // General
+    'cog': mdiCog,
+    'home_assistant': mdiHomeAssistant,
+    'devices': mdiDevices,
+    'stove': mdiStove,
+    'diamond_stone': mdiDiamondStone,
+    'file_cabinet': mdiFileCabinet,
+    'table_furniture': mdiTableFurniture,
+    'washing_machine': mdiWashingMachine,
+    'tumble_dryer': mdiTumbleDryer,
+    'toaster_oven': mdiToasterOven,
+  };
+  
+  return iconMappings[normalizedName] || null;
+}
+
+/**
  * Get the appropriate icon configuration for an entity based on its type, device class, and entity attributes
  */
 export function getEntityIcon(entity: any): { path: string; className: string } {
@@ -187,17 +272,25 @@ export function getEntityIcon(entity: any): { path: string; className: string } 
 
   let iconPath = mdiHomeAssistant; // default
 
-  // Check if entity has a custom icon class
+  // PRIORITY 1: Check if entity has a custom icon attribute from Home Assistant
   if (entity.attributes?.icon) {
-    // Convert Home Assistant icon format (mdi:icon-name) to MDI format
+    // Try to map Home Assistant icon format (mdi:icon-name) to MDI paths
     const iconMatch = entity.attributes.icon.match(/mdi:(.+)/);
     if (iconMatch) {
-      // For now, we'll fall back to auto-detection since we'd need a comprehensive
-      // mapping from HA icon names to MDI paths
-      // TODO: Add comprehensive icon mapping
+      const iconName = iconMatch[1];
+      // Try to find a matching MDI icon in our predefined mappings
+      const mappedIcon = findMdiIconByName(iconName);
+      if (mappedIcon) {
+        return {
+          path: mappedIcon,
+          className: defaultClassName
+        };
+      }
+      // If we can't map it, fall through to auto-detection
     }
   }
 
+  // PRIORITY 2: Auto-detect icon based on entity type, device class, and attributes
   // Handle specific entity types with special logic
   switch (entityType) {
     case 'binary_sensor':

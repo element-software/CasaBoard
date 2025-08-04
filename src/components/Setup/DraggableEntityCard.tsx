@@ -1,8 +1,9 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
 import Icon from '@mdi/react';
-import { mdiLightbulb, mdiGauge, mdiMotionSensor, mdiShieldHome, mdiThermostat, mdiDrag, mdiGrid, mdiCards } from '@mdi/js';
+import { mdiDrag, mdiGrid, mdiCards, mdiGauge } from '@mdi/js';
 import classNames from 'classnames';
+import EntityIcon from '@/components/EntityIcon';
 
 interface DraggableEntityCardProps {
   id: string;
@@ -21,12 +22,8 @@ const getEntityIcon = (entityId: string, isSpecialComponent?: boolean, specialTy
     }
   }
   
-  if (entityId.startsWith('light.')) return mdiLightbulb;
-  if (entityId.startsWith('sensor.')) return mdiGauge;
-  if (entityId.startsWith('binary_sensor.')) return mdiMotionSensor;
-  if (entityId.startsWith('alarm_control_panel.')) return mdiShieldHome;
-  if (entityId.startsWith('climate.')) return mdiThermostat;
-  return mdiGauge;
+  // Fallback icons only when no entity data is available
+  return mdiGauge; // Generic fallback
 };
 
 const getEntityType = (entityId: string, isSpecialComponent?: boolean, specialType?: string) => {
@@ -82,13 +79,26 @@ export const DraggableEntityCard = ({
     >
       <div className="flex items-center gap-3">
         <Icon path={mdiDrag} className="h-4 w-4 text-theme-text-secondary" />
-        <Icon 
-          path={getEntityIcon(id, isSpecialComponent, specialType)} 
-          className={classNames("h-5 w-5", {
-            "text-theme-primary": !isSpecialComponent,
-            "text-theme-accent": isSpecialComponent,
-          })} 
-        />
+        
+        {/* Use EntityIcon when entity data is available, fallback to basic icon for special components */}
+        {isSpecialComponent ? (
+          <Icon 
+            path={getEntityIcon(id, isSpecialComponent, specialType)} 
+            className="h-5 w-5 text-theme-accent" 
+          />
+        ) : entity ? (
+          <EntityIcon 
+            entity={entity} 
+            size="h-5 w-5"
+            className="text-theme-primary"
+          />
+        ) : (
+          <Icon 
+            path={getEntityIcon(id, isSpecialComponent, specialType)} 
+            className="h-5 w-5 text-theme-primary" 
+          />
+        )}
+        
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-theme-text truncate">
             {friendlyName}
