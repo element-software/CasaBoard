@@ -1,0 +1,191 @@
+"use client";
+import { EntityName, useEntity } from "@hakit/core";
+import Clock from "@repo/ui/Clock";
+import Thermostat from "@repo/ui/Thermostat";
+import Image from "next/image";
+import { SidebarConfig } from "@/config/dashboard.types";
+import { MobileHeader } from "@repo/ui/Header/MobileHeader";
+import { ThemeSwitch } from "@repo/ui/ThemeSwitch";
+import { useState, useEffect } from "react";
+import { useConfiguration } from "@repo/ui/ConfigurationProvider";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+
+interface ConfigurableSidebarProps {
+  children: React.ReactNode;
+  fallbackConfig: SidebarConfig;
+  currentPage?: string; // Current page identifier
+}
+
+export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: ConfigurableSidebarProps) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const { config } = useConfiguration();
+  const supabase = createClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Use per-page sidebar config if available, otherwise use global config, fallback during SSR
+  const sidebarConfig = isClient 
+    ? (currentPage && config.pages[currentPage]?.sidebar) || config.sidebar 
+    : fallbackConfig;
+
+
+  // Thermostat component with optional rendering
+  const ThermostatComponent = ({ entityId }: { entityId: string }) => {
+    const thermostatEntity = useEntity(entityId as EntityName);
+    
+    // Don't render if no entityId provided or if entity doesn't exist or is unavailable
+    if (!entityId || typeof entityId !== 'string' || !thermostatEntity || thermostatEntity.state === 'unavailable' || thermostatEntity.state === 'unknown') {
+      return null;
+    }
+
+    return <Thermostat entityId={entityId as EntityName} />;
+  };
+
+  // Close mobile menu when screen size changes to desktop
+  useEffect(() => {
+    // Check if we're on the client side
+    if (typeof window === 'undefined') return;
+    
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const SidebarContent = () => (
+    <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4 h-full">
+      {sidebarConfig?.showClock && (
+        <div className="flex flex-col">
+          <Clock />
+        </div>
+      )}
+      
+      {sidebarConfig?.showThermostat && sidebarConfig.thermostat && (
+        <div className="flex flex-1 flex-col w-full">
+          <ThermostatComponent entityId={sidebarConfig.thermostat} />
+        </div>
+      )}
+      
+      {sidebarConfig?.showBranding && (
+        <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-theme-text text-xs">
+          {sidebarConfig.brandingText}
+          {sidebarConfig.brandingImage && (
+            <Image 
+              src={sidebarConfig.brandingImage} 
+              alt="branding" 
+              width={100} 
+              height={100} 
+            />
+          )}
+        </div>
+      )}
+      
+      {/* Theme switch and logout for desktop */}
+      <div className="mt-auto pt-4 border-t border-theme-border space-y-3">
+        <ThemeSwitch />
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center px-3 py-2 text-sm font-medium text-theme-text hover:bg-theme-secondary rounded-md transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="min-h-screen bg-theme-background">
+        {/* Mobile header */}
+        <MobileHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
+
+        {/* Mobile sidebar overlay */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            {/* Overlay backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/50" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            
+            {/* Sidebar panel */}
+            <div className="relative flex flex-col w-80 max-w-sm bg-theme-background border-r border-theme-border">
+              {/* Close button */}
+              <div className="absolute top-1 right-1">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-theme-text hover:bg-theme-secondary rounded-lg transition-colors"
+                  aria-label="Close menu"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <SidebarContent />
+            </div>
+          </div>
+        )}
+
+        {/* Desktop sidebar */}
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col bg-theme-background border-r border-theme-border">
+          <SidebarContent />
+        </div>
+
+        {/* Main content */}
+        <div className="lg:pl-72">
+          <div className="relative min-h-screen pt-24 lg:pt-0">
+            <div className="absolute bg-theme-background left-0 top-0 w-full h-full opacity-35 pointer-events-none" style={{ zIndex: "-1" }} />
+            <div className="relative z-10">
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};

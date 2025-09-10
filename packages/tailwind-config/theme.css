@@ -1,0 +1,124 @@
+/* Theme CSS Custom Properties */
+/* These are applied dynamically by the theme system */
+
+:root {
+  /* Base colors */
+  --theme-background: #171717;
+  --theme-surface: #262626;
+  --theme-text: #ffffff;
+  --theme-text-primary: #f59e0b;
+  --theme-text-secondary: #a3a3a3;
+  --theme-border: #404040;
+  
+  /* Brand colors */
+  --theme-primary: #f59e0b;
+  --theme-secondary: #6b7280;
+  --theme-accent: #fbbf24;
+  
+  /* State colors */
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  
+  /* Component-specific colors */
+  --theme-card-background: #262626;
+  --theme-card-border: #404040;
+  --theme-card-hover: #2a2a2a;
+  
+  /* Entity state colors */
+  --theme-entity-on: #10b981;
+  --theme-entity-off: #6b7280;
+  --theme-entity-unavailable: #ef4444;
+  --theme-entity-unknown: #f59e0b;
+  
+  /* Interactive elements */
+  --theme-button-primary: #f59e0b;
+  --theme-button-secondary: #6b7280;
+  --theme-button-success: #10b981;
+  --theme-button-warning: #f59e0b;
+  --theme-button-error: #ef4444;
+  
+  /* Slider colors */
+  --theme-slider-track: #404040;
+  --theme-slider-thumb: #f59e0b;
+  --theme-slider-active: #fbbf24;
+}
+
+/* Light theme overrides */
+.light {
+  --theme-background: #ffffff;
+  --theme-surface: #f9fafb;
+  --theme-text: #111827;
+  --theme-text-secondary: #6b7280;
+  --theme-border: #e5e7eb;
+  
+  --theme-primary: #3b82f6;
+  --theme-secondary: #6b7280;
+  --theme-accent: #2563eb;
+  
+  --theme-card-background: #ffffff;
+  --theme-card-border: #e5e7eb;
+  --theme-card-hover: #f9fafb;
+  
+  --theme-slider-track: #e5e7eb;
+  --theme-slider-thumb: #3b82f6;
+  --theme-slider-active: #2563eb;
+}
+
+/* Utility classes for theme colors */
+.bg-theme-background {
+  background-color: var(--theme-background);
+}
+
+.bg-theme-surface {
+  background-color: var(--theme-surface);
+}
+
+.text-theme-text {
+  color: var(--theme-text);
+}
+
+.text-theme-text-primary {
+  color: var(--theme-text-primary);
+}
+
+.text-theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.border-theme-border {
+  border-color: var(--theme-border);
+}
+
+.bg-theme-primary {
+  background-color: var(--theme-primary);
+}
+
+.text-theme-primary {
+  color: var(--theme-primary);
+}
+
+.bg-theme-success {
+  background-color: var(--theme-success);
+}
+
+.text-theme-success {
+  color: var(--theme-success);
+}
+
+.bg-theme-warning {
+  background-color: var(--theme-warning);
+}
+
+.text-theme-warning {
+  color: var(--theme-warning);
+}
+
+.bg-theme-error {
+  background-color: var(--theme-error);
+}
+
+.text-theme-error {
+  color: var(--theme-error);
+}
