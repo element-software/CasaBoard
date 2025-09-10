@@ -1,15 +1,15 @@
 "use client";
 import { EntityName, useEntity } from "@hakit/core";
-import Clock from "@repo/ui/Clock";
-import Thermostat from "@repo/ui/Thermostat";
+import Clock from "@repo/ui/components/Clock/index";
+import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";
-import { SidebarConfig } from "@/config/dashboard.types";
-import { MobileHeader } from "@repo/ui/Header/MobileHeader";
-import { ThemeSwitch } from "@repo/ui/ThemeSwitch";
+import { MobileHeader } from "@repo/ui/components/Header/MobileHeader";
+import { ThemeSwitch } from "@repo/ui/components/ThemeSwitch/index";
 import { useState, useEffect } from "react";
-import { useConfiguration } from "@repo/ui/ConfigurationProvider";
-import { createClient } from "@/lib/supabase/client";
+import { useConfiguration } from "@repo/ui/components/ConfigurationProvider";
+import { SupabaseClient } from "@repo/lib";
 import { useRouter } from "next/navigation";
+import { SidebarConfig } from "@repo/config";
 
 interface ConfigurableSidebarProps {
   children: React.ReactNode;
@@ -21,7 +21,7 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { config } = useConfiguration();
-  const supabase = createClient();
+  const supabase = SupabaseClient.createClient();
   const router = useRouter();
 
   useEffect(() => {

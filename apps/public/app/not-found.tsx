@@ -1,6 +1,5 @@
-"use client";
-import { mdiCog } from "@mdi/js";
-import Icon from "@mdi/react";
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 
 export default function NotFound() {
@@ -16,11 +15,10 @@ export default function NotFound() {
         </p>
         <div className="flex gap-4 justify-center">
           <Link
-            href="/setup"
+            href="/"
             className="flex items-center gap-2 px-4 py-2 bg-theme-secondary border border-theme-border text-theme-text rounded-lg hover:bg-theme-background transition-colors"
           >
-            <Icon path={mdiCog} className="h-4 w-4" />
-            Setup
+            Home
           </Link>
         </div>
       </div>
