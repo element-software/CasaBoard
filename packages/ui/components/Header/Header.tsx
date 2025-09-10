@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { SupabaseClient } from "@repo/lib";
 import { Breadcrumbs } from "@repo/ui/components/Setup/Breadcrumbs";
 import Icon from "@mdi/react";
-import { mdiAccount, mdiLogout, mdiMenu, mdiChevronDown } from "@mdi/js";
+import { mdiAccount, mdiLogout, mdiChevronDown } from "@mdi/js";
 import { CasaBoardLogo } from "../Logo";
+import { Button } from "@heroui/react";
+import Link from "next/link";
 
 // User Menu Component
 function UserMenu() {
@@ -107,11 +109,12 @@ function UserMenu() {
 }
 
 interface HeaderProps {
-  onMobileMenuClick?: () => void;
   public?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMobileMenuClick, public: isPublic = false }) => {
+export const Header: React.FC<HeaderProps> = ({ public: isPublic = false }) => {
+  const pathname = usePathname();
+  const hideBreadcrumbs = isPublic && pathname === "/";
   return (
     <header className="sticky top-0 z-30 bg-theme-background/80 backdrop-blur-md border-b border-theme-border/50 max-w-7xl mx-auto">
       <div className="px-0 mx-auto">
@@ -129,17 +132,24 @@ export const Header: React.FC<HeaderProps> = ({ onMobileMenuClick, public: isPub
 
 
           {/* Right side - User Menu (only show if not public) */}
-          {!isPublic && (
+          {!isPublic ? (
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
               <UserMenu />
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
+              <Button as={Link} color="primary" href="https://app.casaboard.dev" className="text-white font-medium hover:text-theme-text-primary/80 transition-colors">Get Started</Button>
+              <Button as={Link} variant="bordered" color="primary" href="https://demo.casaboard.dev" className="text-theme-text-primary hover:text-theme-text-primary/80 transition-colors">View Demo</Button>
             </div>
           )}
         </div>
         
-        {/* Breadcrumbs - shown below main header on all devices */}
-        <div className="border-t border-theme-border/50 px-2 py-2">
-          <Breadcrumbs showHome={!isPublic} />
-        </div>
+        {/* Breadcrumbs - hide on public homepage */}
+        {!hideBreadcrumbs && (
+          <div className="border-t border-theme-border/50 px-2 py-2">
+            <Breadcrumbs showHome={!isPublic} />
+          </div>
+        )}
       </div>
     </header>
   );
