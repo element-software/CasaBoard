@@ -1,7 +1,7 @@
 "use client";
 import { HassConnect } from "@hakit/core";
 import React from "react";
-import { UserSettings } from "@/types/userSettings";
+import { UserSettings } from "@repo/types/userSettings";
 import { usePathname } from "next/navigation";
 
 interface HassConnectWrapperProps {

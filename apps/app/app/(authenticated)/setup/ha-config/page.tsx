@@ -1,4 +1,4 @@
-import { HAConfiguration } from '@repo/ui/Setup';
+import { HAConfiguration } from '@repo/ui/components/Setup/HAConfiguration';
 import Icon from '@mdi/react';
 import { mdiHomeAssistant } from '@mdi/js';
 

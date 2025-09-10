@@ -1,10 +1,10 @@
 // Theme utility functions for components
 // Provides consistent theming across all components
 
-import { ThemeConfig } from "@/config/theme.config";
+import { ThemeConfig, IThemeConfig } from "@repo/config";
 
 // Entity state utilities
-export const getEntityStateColor = (state: string, theme: ThemeConfig): string => {
+export const getEntityStateColor = (state: string, theme: IThemeConfig): string => {
   switch (state) {
     case "on":
       return theme.colors.entity.on;
@@ -35,7 +35,7 @@ export const getEntityStateVariant = (state: string): "success" | "default" | "d
 };
 
 // Card utilities
-export const getCardStyles = (theme: ThemeConfig, state?: string) => {
+export const getCardStyles = (theme: IThemeConfig, state?: string) => {
   const baseStyles = {
     backgroundColor: theme.colors.card.background,
     borderColor: theme.colors.card.border,
@@ -56,12 +56,12 @@ export const getCardStyles = (theme: ThemeConfig, state?: string) => {
 };
 
 // Button utilities
-export const getButtonColor = (variant: "primary" | "secondary" | "success" | "warning" | "error", theme: ThemeConfig): string => {
+export const getButtonColor = (variant: "primary" | "secondary" | "success" | "warning" | "error", theme: IThemeConfig): string => {
   return theme.colors.button[variant];
 };
 
 // Slider utilities
-export const getSliderStyles = (theme: ThemeConfig, state?: string) => {
+export const getSliderStyles = (theme: IThemeConfig, state?: string) => {
   const stateColor = state ? getEntityStateColor(state, theme) : theme.colors.primary;
   
   return {
@@ -72,17 +72,17 @@ export const getSliderStyles = (theme: ThemeConfig, state?: string) => {
 };
 
 // Text utilities
-export const getTextColor = (variant: "primary" | "secondary", theme: ThemeConfig): string => {
+export const getTextColor = (variant: "primary" | "secondary", theme: IThemeConfig): string => {
   return variant === "primary" ? theme.colors.text : theme.colors.textSecondary;
 };
 
 // Background utilities
-export const getBackgroundColor = (variant: "background" | "surface", theme: ThemeConfig): string => {
+export const getBackgroundColor = (variant: "background" | "surface", theme: IThemeConfig): string => {
   return variant === "background" ? theme.colors.background : theme.colors.surface;
 };
 
 // Border utilities
-export const getBorderColor = (theme: ThemeConfig, state?: string): string => {
+export const getBorderColor = (theme: IThemeConfig, state?: string): string => {
   if (state) {
     return getEntityStateColor(state, theme);
   }
@@ -106,12 +106,12 @@ export const getChipColor = (state: string): "success" | "default" | "danger" | 
 };
 
 // Icon utilities
-export const getIconColor = (state: string, theme: ThemeConfig): string => {
+export const getIconColor = (state: string, theme: IThemeConfig): string => {
   return getEntityStateColor(state, theme);
 };
 
 // Gradient utilities
-export const getGradientStyles = (theme: ThemeConfig, state?: string) => {
+export const getGradientStyles = (theme: IThemeConfig, state?: string) => {
   if (state && state === "on") {
     const stateColor = getEntityStateColor(state, theme);
     return {
@@ -125,7 +125,7 @@ export const getGradientStyles = (theme: ThemeConfig, state?: string) => {
 };
 
 // Shadow utilities
-export const getShadowStyles = (theme: ThemeConfig, state?: string) => {
+export const getShadowStyles = (theme: IThemeConfig, state?: string) => {
   const baseShadow = theme.isDark 
     ? "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)"
     : "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
@@ -143,7 +143,7 @@ export const getShadowStyles = (theme: ThemeConfig, state?: string) => {
 };
 
 // Hover utilities
-export const getHoverStyles = (theme: ThemeConfig, state?: string) => {
+export const getHoverStyles = (theme: IThemeConfig, state?: string) => {
   const baseHover = {
     backgroundColor: theme.colors.card.hover,
   };

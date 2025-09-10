@@ -5,7 +5,7 @@ import Icon from "@mdi/react";
 import { mdiOpenInNew, mdiPower } from "@mdi/js";
 import { useCallback, useState } from "react";
 import Popup from "../Popup";
-import { Entity } from "@/types/shared";
+import { Entity } from "@repo/types/shared";
 import EntityCard from "./EntityCard";
 
 interface EntitiesCardProps {

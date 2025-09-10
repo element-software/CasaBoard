@@ -1,5 +1,6 @@
-import PageEditorClient from "@repo/ui/puck/PageEditorClient";
-import { createClient } from '@/app/lib/supabase/server';
+
+import { SupabaseServer } from "@repo/lib";
+import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
 import { notFound } from 'next/navigation';
 
 // Enable dynamic params for unknown routes
@@ -15,7 +16,7 @@ interface PageProps {
 
 export default async function PageEdit({ params }: PageProps) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = await SupabaseServer.createClient();
 
   // Get the page data
   const { data: page, error } = await supabase

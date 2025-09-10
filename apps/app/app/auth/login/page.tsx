@@ -1,8 +1,5 @@
 "use client";
 
-// Force dynamic rendering
-export const dynamic = "force-dynamic";
-
 import { useState, Suspense } from "react";
 import { SupabaseClient } from "@repo/lib";
 import { useRouter, useSearchParams } from "next/navigation";

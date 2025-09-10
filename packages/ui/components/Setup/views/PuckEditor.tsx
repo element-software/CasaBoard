@@ -3,7 +3,7 @@ import { Puck, Data } from "@measured/puck";
 import { config as puckConfig } from '../../../lib/puck/puck.config';
 import { useState, useEffect } from 'react';
 import { usePages } from '@repo/hooks/usePages';
-import { Page } from '@/types/page';
+import { Page } from '@repo/types/page';
 
 interface PuckEditorViewProps {
   currentPage: string;

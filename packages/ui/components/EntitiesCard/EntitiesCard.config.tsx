@@ -1,7 +1,7 @@
 "use client";
 
 import EntitiesCard from "./index";
-import { Entity } from "@/types/shared";
+import { Entity } from "@repo/types/shared";
 
 interface EntitiesCardProps {
   title: string;
