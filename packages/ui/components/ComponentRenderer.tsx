@@ -1,6 +1,14 @@
 "use client";
 import React from "react";
-import { ComponentConfig, LightConfig, AlarmConfig, BinarySensorConfig, SensorConfig, EntitiesCardConfig, CustomGridConfig } from "../../config/dashboard.types";
+import {
+  ComponentConfig,
+  LightConfig,
+  AlarmConfig,
+  BinarySensorConfig,
+  SensorConfig,
+  EntitiesCardConfig,
+  CustomGridConfig,
+} from "@repo/config";
 import { Light } from "./Light";
 import { Alarm } from "./Alarm";
 import { BinarySensor } from "./BinarySensor";
@@ -13,7 +21,9 @@ interface ComponentRendererProps {
   config: ComponentConfig;
 }
 
-export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) => {
+export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
+  config,
+}) => {
   switch (config.type) {
     case "light":
       const lightConfig = config as LightConfig;
@@ -65,16 +75,19 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ config }) 
     case "custom_grid":
       const customGridConfig = config as CustomGridConfig;
       return (
-        <div className={classNames(
-          "relative w-full items-center justify-between cursor-pointer text-theme-text rounded-2xl grid gap-4",
-          {
-            "grid-cols-1": !customGridConfig.gridCols || customGridConfig.gridCols === 1,
-            "grid-cols-2": customGridConfig.gridCols === 2,
-            "grid-cols-3": customGridConfig.gridCols === 3,
-            "grid-cols-4": customGridConfig.gridCols === 4,
-          },
-          customGridConfig.className
-        )}>
+        <div
+          className={classNames(
+            "relative w-full items-center justify-between cursor-pointer text-theme-text rounded-2xl grid gap-4",
+            {
+              "grid-cols-1":
+                !customGridConfig.gridCols || customGridConfig.gridCols === 1,
+              "grid-cols-2": customGridConfig.gridCols === 2,
+              "grid-cols-3": customGridConfig.gridCols === 3,
+              "grid-cols-4": customGridConfig.gridCols === 4,
+            },
+            customGridConfig.className
+          )}
+        >
           {(customGridConfig.entities || []).map((entity, index) => (
             <EntityCard
               key={`entity-${index}`}
