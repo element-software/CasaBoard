@@ -1,9 +1,10 @@
 "use client";
 import { EntityName, useEntity } from "@hakit/core";
-import { Card, CardBody, Chip } from "@heroui/react";
+import { Card, CardBody, Chip, cn } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiMotionSensor, mdiAlert } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
+import { BinarySensorUtils } from "@repo/utils";
 
 interface BinarySensorProps {
   entityId: EntityName;
@@ -41,12 +42,15 @@ export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
     );
   }
 
+  const bgClass = BinarySensorUtils.stateClassNameBg(entity as any);
+  const iconClass = BinarySensorUtils.stateClassNameIcon(entity as any);
+
   return (
-    <Card key={entity.entity_id} className="w-full transition-all duration-200">
+    <Card key={entity.entity_id} className={cn("w-full transition-all duration-200", bgClass)}>
       <CardBody className="p-4">
         <div className="flex flex-row w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <EntityIcon entity={entity} className="h-8 w-8" />
+            <EntityIcon entity={entity} className={cn("h-8 w-8", iconClass)} />
             <div>
               <h3 className="text-base font-medium capitalize">
                 {entity.attributes.friendly_name}
@@ -58,7 +62,7 @@ export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
                   <Icon path={mdiMotionSensor} className="h-3 w-3" />
                 }
               >
-                {entity.state === "on" ? "Detected" : "Clear"}
+                {BinarySensorUtils.renderState(entity as any)}
               </Chip>
             </div>
           </div>
