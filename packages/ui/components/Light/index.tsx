@@ -5,7 +5,6 @@ import { Card, CardBody } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiAlert, mdiLightbulb } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
-import { useComponentTheme } from "@repo/hooks/useTheme";
 import { useDebouncedSlider } from "@repo/hooks/useDebounce";
 
 interface LightProps {
@@ -24,7 +23,6 @@ export const Light = ({
   ...props
 }: LightProps) => {
   console.log("Light:: entityId", entityId);
-  const themeUtils = useComponentTheme();
 
   // Local state for immediate slider feedback
   const [localBrightness, setLocalBrightness] = useState<number | null>(null);
@@ -134,8 +132,14 @@ export const Light = ({
   );
 
   // Debounced handlers for slider actions
-  const debouncedSetBrightness = useDebouncedSlider(setBrightnessImmediate, 150);
-  const debouncedSetTemperature = useDebouncedSlider(setTemperatureImmediate, 150);
+  const debouncedSetBrightness = useDebouncedSlider(
+    setBrightnessImmediate,
+    150
+  );
+  const debouncedSetTemperature = useDebouncedSlider(
+    setTemperatureImmediate,
+    150
+  );
   const debouncedSetColor = useDebouncedSlider(setColorImmediate, 150);
 
   const handleBrightnessChange = useCallback(
@@ -177,33 +181,27 @@ export const Light = ({
     }
   }, [entity, localBrightness, localTemperature, localColor]);
 
-
-  // Get theme styles
-  const cardStyles = themeUtils.getCardStyles(entity?.state);
-  const shadowStyles = themeUtils.getShadowStyles(entity?.state);
-  const hoverStyles = themeUtils.getHoverStyles(entity?.state);
-
   // Calculate brightness percentage for background - use entity brightness for initial value
   const entityBrightness = entity?.attributes.brightness || 0;
   const currentBrightness = localBrightness ?? entityBrightness;
   const brightnessPercentage = Math.round((currentBrightness / 255) * 100);
   const isOn = entity?.state === "on";
-  
+
   // Create background color based on brightness - make it look like a slider
   const getBackgroundColor = () => {
-    if (!isOn) return themeUtils.getCardStyles().backgroundColor;
-    
+    if (!isOn) return "background";
+
     // For non-dimmable lights, fill the entire background when on
     if (!dimmer) {
-      const primaryColor = themeUtils.getEntityStateColor("on");
+      const primaryColor = "on";
       return primaryColor;
     }
-    
+
     // For dimmable lights, use gradient based on brightness
     const percentage = brightnessPercentage;
-    const primaryColor = themeUtils.getEntityStateColor("on");
-    const baseColor = themeUtils.getCardStyles().backgroundColor;
-    
+    const primaryColor = "on";
+    const baseColor = "background";
+
     // Create a linear gradient that fills the card based on brightness percentage
     // Add a subtle transition at the edge for better visual feedback
     return `linear-gradient(to right, ${primaryColor} 0%, ${primaryColor} ${percentage}%, ${baseColor} ${Math.min(percentage + 2, 100)}%, ${baseColor} 100%)`;
@@ -217,32 +215,38 @@ export const Light = ({
   }, [entity, isDragging, hasDragged, handleToggle]);
 
   // Handle drag for brightness adjustment (only if dimmer is enabled and light is on)
-  const handleCardDrag = useCallback((e: React.MouseEvent) => {
-    if (!dimmer || !isOn || !isDragging) return;
-    
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Mark that we've dragged
-    setHasDragged(true);
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    const brightness = Math.round((percentage / 100) * 255);
-    
-    handleBrightnessChange(brightness);
-  }, [dimmer, isOn, isDragging, handleBrightnessChange]);
+  const handleCardDrag = useCallback(
+    (e: React.MouseEvent) => {
+      if (!dimmer || !isOn || !isDragging) return;
 
-  // Handle mouse down to start dragging (only for dimmable lights)
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (dimmer && isOn) {
       e.preventDefault();
       e.stopPropagation();
-      setIsDragging(true);
-      handleCardDrag(e);
-    }
-  }, [dimmer, isOn, handleCardDrag]);
+
+      // Mark that we've dragged
+      setHasDragged(true);
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      const brightness = Math.round((percentage / 100) * 255);
+
+      handleBrightnessChange(brightness);
+    },
+    [dimmer, isOn, isDragging, handleBrightnessChange]
+  );
+
+  // Handle mouse down to start dragging (only for dimmable lights)
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (dimmer && isOn) {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+        handleCardDrag(e);
+      }
+    },
+    [dimmer, isOn, handleCardDrag]
+  );
 
   // Handle mouse up to stop dragging
   const handleMouseUp = useCallback(() => {
@@ -267,35 +271,28 @@ export const Light = ({
     };
 
     if (isDragging) {
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      document.addEventListener('mouseleave', handleGlobalMouseUp);
+      document.addEventListener("mouseup", handleGlobalMouseUp);
+      document.addEventListener("mouseleave", handleGlobalMouseUp);
     }
 
     return () => {
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-      document.removeEventListener('mouseleave', handleGlobalMouseUp);
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
+      document.removeEventListener("mouseleave", handleGlobalMouseUp);
     };
   }, [isDragging]);
 
-   // Early return for missing entityId - must come after all hooks
-   if (!entityId) {
+  // Early return for missing entityId - must come after all hooks
+  if (!entityId) {
     return (
       <Card
         className="p-4 border-2 border-dashed"
         style={{
-          borderColor: themeUtils.getBorderColor(),
-          backgroundColor: themeUtils.getCardStyles().backgroundColor,
+          borderColor: "border",
+          backgroundColor: "background",
         }}
       >
-        <CardBody
-          className="text-center"
-          style={{ color: themeUtils.getTextColor("secondary") }}
-        >
-          <Icon
-            path={mdiLightbulb}
-            className="h-12 w-12 mx-auto mb-2"
-            style={{ color: themeUtils.getTextColor("secondary") }}
-          />
+        <CardBody className="text-center">
+          <Icon path={mdiLightbulb} className="h-12 w-12 mx-auto mb-2" />
           <p>Configure Light Entity</p>
         </CardBody>
       </Card>
@@ -305,22 +302,9 @@ export const Light = ({
   // Error state
   if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
     return (
-      <Card
-        className="p-4 border-2 border-dashed"
-        style={{
-          borderColor: themeUtils.getBorderColor(),
-          backgroundColor: themeUtils.getCardStyles().backgroundColor,
-        }}
-      >
-        <CardBody
-          className="text-center"
-          style={{ color: themeUtils.getTextColor("secondary") }}
-        >
-          <Icon
-            path={mdiAlert}
-            className="h-12 w-12 mx-auto mb-2"
-            style={{ color: themeUtils.getTextColor("secondary") }}
-          />
+      <Card className="p-4 border-2 border-dashed">
+        <CardBody className="text-center">
+          <Icon path={mdiAlert} className="h-12 w-12 mx-auto mb-2" />
           <p>Light not available</p>
         </CardBody>
       </Card>
@@ -331,14 +315,6 @@ export const Light = ({
     <Card
       key={entity.entity_id}
       className="w-full cursor-pointer transition-all duration-200 hover:shadow-lg select-none"
-      style={{
-        ...shadowStyles,
-        ...hoverStyles,
-        background: getBackgroundColor(),
-        borderColor: isOn ? themeUtils.getEntityStateColor("on") : themeUtils.getBorderColor(),
-        color: isOn ? themeUtils.getTextColor("primary") : themeUtils.getTextColor("secondary"),
-        position: 'relative',
-      }}
       isPressable
       onPress={handleCardClick}
       onMouseMove={dimmer ? handleCardDrag : undefined}
@@ -349,39 +325,22 @@ export const Light = ({
       <CardBody className="p-3 relative overflow-hidden">
         <div className="flex items-center gap-3 w-full">
           {/* Entity Icon */}
-          <EntityIcon
-            entity={entity}
-            className="h-8 w-8 flex-shrink-0"
-            style={{ 
-              color: isOn ? '#ffffff' : themeUtils.getTextColor("secondary"),
-              filter: isOn ? 'none' : 'grayscale(100%)',
-              textShadow: isOn ? '0 0 6px rgba(0,0,0,0.5)' : 'none',
-              backgroundColor: isOn ? 'rgba(0,0,0,0.2)' : 'transparent',
-              borderRadius: '50%',
-              padding: '4px'
-            }}
-          />
-          
+          <EntityIcon entity={entity} className="h-8 w-8 flex-shrink-0" />
+
           {/* Entity Name and Brightness */}
           <div className="flex flex-col flex-1 min-w-0">
             {/* Entity Name */}
-            <h3
-              className="text-sm font-semibold capitalize truncate"
-              style={{ 
-                color: isOn ? '#ffffff' : themeUtils.getTextColor("secondary"),
-                textShadow: isOn ? '0 0 4px rgba(0,0,0,0.7)' : 'none'
-              }}
-            >
+            <h3 className="text-sm font-semibold capitalize truncate">
               {entity.attributes.friendly_name}
             </h3>
-            
+
             {/* Brightness Percentage (only show if dimmer is enabled and light is on) */}
             {dimmer && isOn && (
               <div
                 className="text-xs font-medium"
-                style={{ 
-                  color: '#ffffff',
-                  textShadow: '0 0 4px rgba(0,0,0,0.8)'
+                style={{
+                  color: "#ffffff",
+                  textShadow: "0 0 4px rgba(0,0,0,0.8)",
                 }}
               >
                 {brightnessPercentage}%
@@ -389,18 +348,10 @@ export const Light = ({
             )}
           </div>
         </div>
-        
+
         {/* Visual brightness indicator line */}
         {dimmer && isOn && (
-          <div 
-            className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
-            style={{
-              width: `${brightnessPercentage}%`,
-              backgroundColor: themeUtils.getEntityStateColor("on"),
-              boxShadow: `0 0 4px ${themeUtils.getEntityStateColor("on")}40`,
-              maxWidth: '100%'
-            }}
-          />
+          <div className="absolute bottom-0 left-0 h-0.5 rounded-b-lg" />
         )}
       </CardBody>
     </Card>

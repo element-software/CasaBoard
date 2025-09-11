@@ -27,7 +27,6 @@ import {
   mdiCog,
   mdiAlert,
 } from "@mdi/js";
-import { useComponentTheme } from "@repo/hooks/useTheme";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 
 export interface EntityOption {
@@ -95,7 +94,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
   const entities = useStore((state) => state.entities);
   const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const themeUtils = useComponentTheme();
 
   // Get all entities and filter by domain if specified
   const entityOptions = useMemo(() => {
@@ -182,7 +180,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
           <Icon
             path={mdiMagnify}
             className="h-4 w-4 text-default-400"
-            style={{ color: themeUtils.getTextColor("secondary") }}
           />
         }
         endContent={
@@ -198,7 +195,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
               <Icon
                 path={mdiClose}
                 className="h-3 w-3"
-                style={{ color: themeUtils.getTextColor("secondary") }}
               />
             </Button>
           )
@@ -226,7 +222,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
                   <EntityIcon
                     entity={entity.entity}
                     className="h-5 w-5"
-                    style={{ color: themeUtils.getIconColor(entity.state) }}
                   />
                 </div>
               )}
@@ -235,14 +230,12 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
                 <div className="flex items-center gap-2">
                   <span
                     className="font-medium truncate"
-                    style={{ color: themeUtils.getTextColor("primary") }}
                   >
                     {entity.friendly_name}
                   </span>
                   {showEntityState && (
                     <Chip
                       size="sm"
-                      color={themeUtils.getChipColor(entity.state)}
                       variant="flat"
                       className="flex-shrink-0"
                     >
@@ -252,7 +245,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
                 </div>
                 <div
                   className="text-xs truncate"
-                  style={{ color: themeUtils.getTextColor("secondary") }}
                 >
                   {entity.id}
                 </div>
