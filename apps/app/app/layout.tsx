@@ -1,5 +1,4 @@
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -22,9 +21,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Analytics />
-      <body className={inter.className}>{children}</body>
-      <GoogleAnalytics gaId="G-P2JEHMNT4C" />
+      <body className={inter.className}>
+        {children}
+        <AnalyticsWrapper gaId="G-P2JEHMNT4C" />
+      </body>
     </html>
   );
 }

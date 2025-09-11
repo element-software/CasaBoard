@@ -1,5 +1,4 @@
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import { Inter } from "next/font/google";
 import "./globals.css";
 export const metadata = {
@@ -34,9 +33,10 @@ export default function PublicLayout({
 }) {
   return (
     <html lang="en">
-      <Analytics />
-      <body className={inter.className}>{children}</body>
-      <GoogleAnalytics gaId="G-4N9M4MTHP1" />
+      <body className={inter.className}>
+        {children}
+        <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
+      </body>
     </html>
   );
 }
