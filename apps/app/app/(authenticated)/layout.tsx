@@ -1,5 +1,4 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
-import { ThemeProvider } from "@repo/ui/components/ThemeSwitch/ThemeProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
 import { Header } from "@repo/ui/components/Header/Header";
 import { UserSettingsActions, SupabaseServer, Encryption, ConfigService } from "@repo/lib";
@@ -42,7 +41,6 @@ export default async function AuthenticatedLayout({
   }
 
   return (
-    <ThemeProvider>
       <ConfigurationProvider initialConfig={initialConfig}>
         <HassConnectWrapper 
           userSettings={userSettings}
@@ -56,6 +54,5 @@ export default async function AuthenticatedLayout({
           </div>
         </HassConnectWrapper>
       </ConfigurationProvider>
-    </ThemeProvider>
   );
 }
