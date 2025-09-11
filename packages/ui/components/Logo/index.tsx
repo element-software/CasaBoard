@@ -85,7 +85,7 @@ export const CasaBoardLogo = ({
         <div className={cn(
           config.iconSize,
           variantStyles.iconBg,
-          "rounded-xl flex items-center justify-center shadow-sm"
+          "rounded-md flex items-center justify-center shadow-sm"
         )}>
           <svg
             width={size === "small" ? "16" : config.svgSize}

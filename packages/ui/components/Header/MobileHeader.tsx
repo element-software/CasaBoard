@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { dashboardConfig } from "@/config/dashboard.config";
+import { dashboardConfig } from "@repo/config";
 import Link from "next/link";
 import classNames from "classnames";
-import { ThemeSwitch } from "@repo/ui/ThemeSwitch";
 
 interface MobileHeaderProps {
   onMenuClick: () => void;
@@ -79,9 +78,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuClick }) => {
         </div>
         
         {/* Actions */}
-        <div className="flex items-center space-x-2">
-          <ThemeSwitch showLabel={false} />
-          
+        <div className="flex items-center space-x-2">          
           <Link
             href="/config"
             className="p-2 text-theme-secondary hover:text-theme-text hover:bg-theme-secondary rounded-lg transition-colors"

@@ -1,40 +1,25 @@
 "use client";
 import { EntityName, useEntity } from "@hakit/core";
-import { Card, CardBody, Chip } from "@heroui/react";
+import { Card, CardBody, Chip, cn } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiMotionSensor, mdiAlert } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
-import { useComponentTheme } from "@repo/hooks/useTheme";
+import { BinarySensorUtils } from "@repo/utils";
 
 interface BinarySensorProps {
   entityId: EntityName;
   [key: string]: any;
 }
 
-export const BinarySensor = ({
-  entityId,
-  ...props
-}: BinarySensorProps) => {
-  const themeUtils = useComponentTheme();
-  
+export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
   // All hooks must be called before any conditional returns
   const entity = useEntity(entityId, { returnNullIfNotFound: true });
 
   if (!entityId) {
     return (
-      <Card
-        className="p-4 border-2 border-dashed"
-        style={{
-          borderColor: themeUtils.getBorderColor(),
-          backgroundColor: themeUtils.getCardStyles().backgroundColor,
-        }}
-      >
-        <CardBody className="text-center" style={{ color: themeUtils.getTextColor("secondary") }}>
-          <Icon
-            path={mdiMotionSensor}
-            className="h-12 w-12 mx-auto mb-2"
-            style={{ color: themeUtils.getTextColor("secondary") }}
-          />
+      <Card className="p-4 border-2 border-dashed">
+        <CardBody className="text-center">
+          <Icon path={mdiMotionSensor} className="h-12 w-12 mx-auto mb-2" />
           <p>Configure Binary Sensor Entity</p>
         </CardBody>
       </Card>
@@ -42,18 +27,14 @@ export const BinarySensor = ({
   }
 
   if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
-    const errorColor = themeUtils.getEntityStateColor("unavailable");
     return (
-      <Card
-        style={{
-          backgroundColor: `${errorColor}20`,
-          borderColor: `${errorColor}50`,
-        }}
-      >
-        <CardBody className="flex flex-col items-center justify-center p-6 gap-2" style={{ color: errorColor }}>
-          <Icon path={mdiAlert} className="h-8 w-8" style={{ color: errorColor }} />
+      <Card>
+        <CardBody className="flex flex-col items-center justify-center p-6 gap-2">
+          <Icon path={mdiAlert} className="h-8 w-8" />
           <div className="text-center">
-            <div className="text-sm font-medium">Binary Sensor Entity Not Found</div>
+            <div className="text-sm font-medium">
+              Binary Sensor Entity Not Found
+            </div>
             <div className="text-xs opacity-80 break-all">{entityId}</div>
           </div>
         </CardBody>
@@ -61,47 +42,27 @@ export const BinarySensor = ({
     );
   }
 
-  const cardStyles = themeUtils.getCardStyles(entity.state);
-  const shadowStyles = themeUtils.getShadowStyles(entity.state);
-  const hoverStyles = themeUtils.getHoverStyles(entity.state);
+  const bgClass = BinarySensorUtils.stateClassNameBg(entity as any);
+  const iconClass = BinarySensorUtils.stateClassNameIcon(entity as any);
 
   return (
-    <Card
-      key={entity.entity_id}
-      className="w-full transition-all duration-200"
-      style={{
-        ...cardStyles,
-        ...shadowStyles,
-        ...hoverStyles,
-      }}
-    >
+    <Card key={entity.entity_id} className={cn("w-full transition-all duration-200", bgClass)}>
       <CardBody className="p-4">
         <div className="flex flex-row w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <EntityIcon
-              entity={entity}
-              className="h-8 w-8"
-              style={{ color: themeUtils.getIconColor(entity.state) }}
-            />
+            <EntityIcon entity={entity} className={cn("h-8 w-8", iconClass)} />
             <div>
-              <h3
-                className="text-base font-medium capitalize"
-                style={{ color: themeUtils.getTextColor("primary") }}
-              >
+              <h3 className="text-base font-medium capitalize">
                 {entity.attributes.friendly_name}
               </h3>
               <Chip
                 size="sm"
-                color={themeUtils.getChipColor(entity.state)}
                 variant="flat"
                 startContent={
-                  <Icon
-                    path={mdiMotionSensor}
-                    className="h-3 w-3"
-                  />
+                  <Icon path={mdiMotionSensor} className="h-3 w-3" />
                 }
               >
-                {entity.state === "on" ? "Detected" : "Clear"}
+                {BinarySensorUtils.renderState(entity as any)}
               </Chip>
             </div>
           </div>

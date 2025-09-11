@@ -15,6 +15,10 @@ export const AnalyticsWrapper: React.FC<AnalyticsWrapperProps> = ({ gaId }) => {
     setConsent(getCookieConsent());
   }, []);
 
+  if (process.env.NODE_ENV === "development") {
+    return null;
+  }
+
   return (
     <>
       {consent === "accepted" && (
