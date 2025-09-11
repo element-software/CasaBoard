@@ -16,6 +16,39 @@ import {
 import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
 
 export function HomePageContent() {
+  const featureCards = [
+    {
+      icon: mdiDrag,
+      title: "Drag & Drop",
+      text: "Build your dashboard with intuitive drag-and-drop components. No coding required.",
+    },
+    {
+      icon: mdiPalette,
+      title: "Customizable",
+      text: "Choose from multiple themes and customize every aspect of your dashboard.",
+    },
+    {
+      icon: mdiCloud,
+      title: "Cloud Hosted",
+      text: "Access your dashboard from anywhere with our secure cloud hosting.",
+    },
+    {
+      icon: mdiTablet,
+      title: "Mobile Ready",
+      text: "Responsive design that works perfectly on all devices and screen sizes.",
+    },
+    {
+      icon: mdiShield,
+      title: "Secure",
+      text: "Enterprise-grade security with encrypted connections and OAuth authentication.",
+    },
+    {
+      icon: mdiRocket,
+      title: "Fast Setup",
+      text: "Get up and running in minutes with our streamlined setup process.",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-theme-background via-theme-surface to-theme-background">
       {/* Hero Section */}
@@ -31,8 +64,9 @@ export function HomePageContent() {
             Cloud-Hosted Smart Home Dashboard
           </p>
           <p className="text-lg text-theme-text-secondary mb-12 max-w-4xl mx-auto">
-            Create beautiful, customizable dashboards for your Home Assistant setup. 
-            Drag, drop, and design your perfect smart home interface with ease.
+            Create beautiful, customizable dashboards for your Home Assistant
+            setup. Drag, drop, and design your perfect smart home interface with
+            ease.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -59,89 +93,24 @@ export function HomePageContent() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiDrag} className="w-6 h-6 text-theme-primary" />
+          {featureCards.map(({ icon, title, text }) => (
+            <Card
+              key={title}
+              className="bg-theme-surface/50 backdrop-blur-sm hover:bg-primary/20 hover:cursor-pointer border border-secondary"
+            >
+              <CardBody className="p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
+                    <Icon path={icon} className="w-6 h-6 text-theme-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-theme-text">
+                    {title}
+                  </h3>
                 </div>
-                <h3 className="text-xl font-semibold text-theme-text">Drag & Drop</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Build your dashboard with intuitive drag-and-drop components. No coding required.
-              </p>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiPalette} className="w-6 h-6 text-theme-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-theme-text">Customizable</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Choose from multiple themes and customize every aspect of your dashboard.
-              </p>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiCloud} className="w-6 h-6 text-theme-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-theme-text">Cloud Hosted</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Access your dashboard from anywhere with our secure cloud hosting.
-              </p>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiTablet} className="w-6 h-6 text-theme-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-theme-text">Mobile Ready</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Responsive design that works perfectly on all devices and screen sizes.
-              </p>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiShield} className="w-6 h-6 text-theme-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-theme-text">Secure</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Enterprise-grade security with encrypted connections and OAuth authentication.
-              </p>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-theme-surface/50 backdrop-blur-sm">
-            <CardBody className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-theme-primary/20 rounded-lg flex items-center justify-center">
-                  <Icon path={mdiRocket} className="w-6 h-6 text-theme-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-theme-text">Fast Setup</h3>
-              </div>
-              <p className="text-theme-text-secondary">
-                Get up and running in minutes with our streamlined setup process.
-              </p>
-            </CardBody>
-          </Card>
+                <p className="text-theme-text-secondary">{text}</p>
+              </CardBody>
+            </Card>
+          ))}
         </div>
 
         {/* How It Works */}
@@ -158,7 +127,9 @@ export function HomePageContent() {
                 <div className="w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center text-2xl font-bold text-black mx-auto mb-4">
                   1
                 </div>
-                <h3 className="text-lg font-semibold text-theme-text mb-2">Sign In</h3>
+                <h3 className="text-lg font-semibold text-theme-text mb-2">
+                  Sign In
+                </h3>
                 <p className="text-theme-text-secondary text-sm">
                   Connect with your Google account for secure authentication
                 </p>
@@ -167,7 +138,9 @@ export function HomePageContent() {
                 <div className="w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center text-2xl font-bold text-black mx-auto mb-4">
                   2
                 </div>
-                <h3 className="text-lg font-semibold text-theme-text mb-2">Connect HA</h3>
+                <h3 className="text-lg font-semibold text-theme-text mb-2">
+                  Connect HA
+                </h3>
                 <p className="text-theme-text-secondary text-sm">
                   Link your Home Assistant instance with your dashboard
                 </p>
@@ -176,7 +149,9 @@ export function HomePageContent() {
                 <div className="w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center text-2xl font-bold text-black mx-auto mb-4">
                   3
                 </div>
-                <h3 className="text-lg font-semibold text-theme-text mb-2">Design</h3>
+                <h3 className="text-lg font-semibold text-theme-text mb-2">
+                  Design
+                </h3>
                 <p className="text-theme-text-secondary text-sm">
                   Drag and drop components to build your perfect dashboard
                 </p>
@@ -185,7 +160,9 @@ export function HomePageContent() {
                 <div className="w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center text-2xl font-bold text-black mx-auto mb-4">
                   4
                 </div>
-                <h3 className="text-lg font-semibold text-theme-text mb-2">Enjoy</h3>
+                <h3 className="text-lg font-semibold text-theme-text mb-2">
+                  Enjoy
+                </h3>
                 <p className="text-theme-text-secondary text-sm">
                   Access your beautiful dashboard from anywhere
                 </p>
@@ -202,8 +179,8 @@ export function HomePageContent() {
                 Ready to Get Started?
               </h2>
               <p className="text-center text-theme-text-secondary text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of smart home enthusiasts who have already transformed 
-                their Home Assistant experience with CasaBoard.
+                Join thousands of smart home enthusiasts who have already
+                transformed their Home Assistant experience with CasaBoard.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -211,7 +188,7 @@ export function HomePageContent() {
                   className="bg-theme-primary text-black font-semibold px-8 py-3"
                   endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
                   href="https://app.casaboard.dev"
-                  as={Link} 
+                  as={Link}
                 >
                   Start Building Now
                 </Button>

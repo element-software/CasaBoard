@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false }) => {
   const pathname = usePathname();
   const hideBreadcrumbs = isPublic && pathname === "/";
   return (
-    <header className="sticky top-0 z-30 bg-theme-background/80 backdrop-blur-md border-b border-theme-border/50 max-w-7xl mx-auto">
+    <header className="sticky top-0 z-30 bg-theme-background/80 backdrop-blur-md border-b border-r border-l rounded-b-xl border-theme-border/20 max-w-7xl mx-auto">
       <div className="px-0 mx-auto">
         <div className="flex items-center h-14 sm:px-4 px-2 sm:h-16">
           {/* Left side - Mobile Menu and Logo */}
