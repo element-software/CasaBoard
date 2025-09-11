@@ -1,6 +1,7 @@
 import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
   description: "Cloud-hosted, customizable dashboard for Home Assistant",
