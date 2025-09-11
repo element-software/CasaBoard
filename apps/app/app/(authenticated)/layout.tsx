@@ -3,6 +3,7 @@ import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
 import { Header } from "@repo/ui/components/Header/Header";
 import { UserSettingsActions, SupabaseServer, Encryption, ConfigService } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
+import { Footer } from "@repo/ui/components/Footer";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,7 @@ export default async function AuthenticatedLayout({
             <main className="flex-1">
               {children}
             </main>
+            <Footer />
           </div>
         </HassConnectWrapper>
       </ConfigurationProvider>

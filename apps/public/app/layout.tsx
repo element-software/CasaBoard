@@ -1,4 +1,5 @@
 import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
+import { Footer } from "@repo/ui/components/Footer";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function PublicLayout({
       <body className={inter.className}>
         {children}
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
+        <Footer />
       </body>
     </html>
   );
