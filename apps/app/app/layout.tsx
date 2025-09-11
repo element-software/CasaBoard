@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: "CasaBoard — Dashboard",
   description: "CasaBoard Dashboard",
   icons: {
-    icon: "/app/icon.svg",
+    icon: "./icon.svg",
   },
-  manifest: "/app/manifest.webmanifest",
+  manifest: "./manifest.webmanifest",
 };
 
 export default function RootLayout({

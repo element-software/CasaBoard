@@ -16,6 +16,7 @@ import GraphCard from "./GraphCard";
 import EntitiesCard from "./EntitiesCard";
 import EntityCard from "./EntitiesCard/EntityCard";
 import classNames from "classnames";
+import ClientOnly from "./ClientOnly";
 
 interface ComponentRendererProps {
   config: ComponentConfig;
@@ -65,7 +66,9 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
           {entitiesCardConfig.children && (
             <div className="grid grid-cols-2 gap-2">
               {entitiesCardConfig.children.map((childConfig, index) => (
-                <ComponentRenderer key={index} config={childConfig} />
+                <ClientOnly>
+                  <ComponentRenderer key={index} config={childConfig} />
+                </ClientOnly>
               ))}
             </div>
           )}
@@ -99,7 +102,9 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
             />
           ))}
           {(customGridConfig.children || []).map((childConfig, index) => (
-            <ComponentRenderer key={`child-${index}`} config={childConfig} />
+            <ClientOnly>
+              <ComponentRenderer key={`child-${index}`} config={childConfig} />
+            </ClientOnly>
           ))}
         </div>
       );

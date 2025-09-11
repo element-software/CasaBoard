@@ -7,9 +7,9 @@ export const metadata = {
   description: "Cloud-hosted, customizable dashboard for Home Assistant",
   metadataBase: new URL("https://casaboard.dev"),
   icons: {
-    icon: "/app/icon.svg",
+    icon: "./icon.svg",
   },
-  manifest: "/app/manifest.webmanifest",
+  manifest: "./manifest.webmanifest",
   openGraph: {
     title: "CasaBoard — Smart Home Dashboard",
     description: "Cloud-hosted, customizable dashboard for Home Assistant",
