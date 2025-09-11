@@ -1,6 +1,8 @@
 import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@repo/ui/components/ThemeSwitch/ThemeProvider";
+import { Header } from "@repo/ui/components/Header/Header";
 
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
@@ -35,7 +37,12 @@ export default function PublicLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <ThemeProvider>
+          <div className="min-h-screen bg-theme-background">
+            <Header public={true} />
+            <main className="flex-1">{children}</main>
+          </div>
+        </ThemeProvider>
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
       </body>
     </html>

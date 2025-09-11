@@ -1,7 +1,6 @@
 "use client";
 
 import { Switch } from ".";
-import { HassConnectWrapper } from "../HassConnectWrapper";
 import { EntityField } from "../EntityAutocomplete/EntityField";
 
 export const SwitchConfig = {
@@ -11,7 +10,13 @@ export const SwitchConfig = {
       type: "custom",
       label: "Switch Entity",
       description: "Select a switch entity from your Home Assistant",
-      render: ({ value, onChange }: { value?: string; onChange: (value: string | null) => void }) => (
+      render: ({
+        value,
+        onChange,
+      }: {
+        value?: string;
+        onChange: (value: string | null) => void;
+      }) => (
         <EntityField
           value={value}
           onChange={onChange}
@@ -25,12 +30,5 @@ export const SwitchConfig = {
   defaultProps: {
     entityId: "",
   },
-  render: (props: any) => (
-    <HassConnectWrapper
-      userSettings={props.userSettings}
-      decryptedToken={props.decryptedToken}
-    >
-      <Switch {...props} />
-    </HassConnectWrapper>
-  ),
+  render: (props: any) => <Switch {...props} />,
 };

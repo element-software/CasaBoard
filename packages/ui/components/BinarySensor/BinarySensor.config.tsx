@@ -1,7 +1,6 @@
 "use client";
 
 import { BinarySensor } from ".";
-import { HassConnectWrapper } from "../HassConnectWrapper";
 import { EntityField } from "../EntityAutocomplete/EntityField";
 
 export const BinarySensorConfig = {
@@ -11,7 +10,13 @@ export const BinarySensorConfig = {
       type: "custom",
       label: "Binary Sensor Entity",
       description: "Select a binary sensor entity from your Home Assistant",
-      render: ({ value, onChange }: { value?: string; onChange: (value: string | null) => void }) => (
+      render: ({
+        value,
+        onChange,
+      }: {
+        value?: string;
+        onChange: (value: string | null) => void;
+      }) => (
         <EntityField
           value={value}
           onChange={onChange}
@@ -25,12 +30,5 @@ export const BinarySensorConfig = {
   defaultProps: {
     entityId: "",
   },
-  render: (props: any) => (
-    <HassConnectWrapper
-      userSettings={props.userSettings}
-      decryptedToken={props.decryptedToken}
-    >
-      <BinarySensor {...props} />
-    </HassConnectWrapper>
-  ),
+  render: (props: any) => <BinarySensor {...props} />,
 };
