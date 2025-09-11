@@ -138,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false }) => {
             </div>
           ) : (
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
-              <Button as={Link} color="primary" href="https://app.casaboard.dev" className="text-white font-medium hover:text-theme-text-primary/80 transition-colors">Get Started</Button>
+              <Button as={Link} color="primary" href="https://app.casaboard.dev" className="text-white font-medium hover:text-theme-text-primary/80 transition-colors">Login</Button>
               <Button as={Link} variant="bordered" color="primary" href="https://demo.casaboard.dev" className="text-theme-text-primary hover:text-theme-text-primary/80 transition-colors">View Demo</Button>
             </div>
           )}
