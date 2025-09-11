@@ -24,12 +24,6 @@ const quickActions: QuickAction[] = [
     description: 'New dashboard page'
   },
   {
-    href: '/',
-    icon: mdiHome,
-    title: 'View Dashboard',
-    description: 'Go to main dashboard'
-  },
-  {
     href: '/setup/pages',
     icon: mdiWeb,
     title: 'All Pages',
