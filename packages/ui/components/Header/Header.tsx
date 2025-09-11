@@ -5,7 +5,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { SupabaseClient } from "@repo/lib";
 import { Breadcrumbs } from "@repo/ui/components/Setup/Breadcrumbs";
 import Icon from "@mdi/react";
-import { mdiAccount, mdiLogout, mdiChevronDown } from "@mdi/js";
+import {
+  mdiAccount,
+  mdiLogout,
+  mdiChevronDown,
+  mdiCog,
+  mdiInformation,
+} from "@mdi/js";
 import { CasaBoardLogo } from "../Logo";
 import {
   Button,
@@ -108,10 +114,21 @@ function UserMenu() {
               <Button
                 as={Link}
                 color="primary"
-                href="/about"
+                href="/setup"
                 className="text-white font-medium"
               >
+                Setup Dashboard
+                <Icon path={mdiCog} className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+              <Button
+                as={Link}
+                variant="bordered"
+                color="primary"
+                href="/about"
+                className="text-theme-text-primary font-medium"
+              >
                 About
+                <Icon path={mdiInformation} className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 as={Link}
