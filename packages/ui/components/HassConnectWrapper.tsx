@@ -1,5 +1,5 @@
 "use client";
-import { HassConnect } from "@hakit/core";
+import dynamic from "next/dynamic";
 import React from "react";
 import { UserSettings } from "@repo/types/userSettings";
 import { usePathname } from "next/navigation";
@@ -15,6 +15,11 @@ export const HassConnectWrapper = ({
   userSettings, 
   decryptedToken 
 }: HassConnectWrapperProps) => {
+  // Load @hakit/core only on the client to avoid 'window is not defined'
+  const HassConnect = dynamic(
+    () => import("@hakit/core").then((m) => m.HassConnect),
+    { ssr: false }
+  );
   const pathname = usePathname();
 
   // Pages that don't need HA connectivity

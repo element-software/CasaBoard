@@ -1,7 +1,7 @@
 "use client";
 
 import { Puck, Data } from "@measured/puck";
-import { PuckConfig } from "@repo/config";
+import { PuckConfig } from "./puck.config";
 import { useEffect, useState, useTransition } from "react";
 import {
   Button,
@@ -73,8 +73,7 @@ export default function PageEditorClient({
       try {
         const pageData = {
           name: (data.root.props as any).title,
-          slug:
-            (data.root.props as any).slug,
+          slug: (data.root.props as any).slug,
           puck_data: data,
           published: isPublished, // Use current published state
         };
@@ -85,7 +84,10 @@ export default function PageEditorClient({
         let saved;
 
         if (isEdit) {
-          saved = await PageActions.updatePage((data.root.props as any).slug, pageData);
+          saved = await PageActions.updatePage(
+            (data.root.props as any).slug,
+            pageData
+          );
         } else {
           saved = await PageActions.createPage(pageData);
           if (saved?.id) {
@@ -96,10 +98,14 @@ export default function PageEditorClient({
           }
         }
 
-        console.log(`Page saved as ${isPublished ? 'published' : 'draft'} successfully`);
+        console.log(
+          `Page saved as ${isPublished ? "published" : "draft"} successfully`
+        );
       } catch (error) {
         console.error("Error saving page:", error);
-        setError(error instanceof Error ? error.message : "Failed to save page");
+        setError(
+          error instanceof Error ? error.message : "Failed to save page"
+        );
       }
     });
   };
@@ -110,7 +116,7 @@ export default function PageEditorClient({
       try {
         // Toggle published state
         const newPublishedState = !isPublished;
-        
+
         const pageData = {
           name: (data.root.props as any).title,
           slug:
@@ -124,7 +130,10 @@ export default function PageEditorClient({
         let saved;
 
         if (isEdit) {
-          saved = await PageActions.updatePage((data.root.props as any).slug, pageData);
+          saved = await PageActions.updatePage(
+            (data.root.props as any).slug,
+            pageData
+          );
         } else {
           saved = await PageActions.createPage(pageData);
           if (saved?.id) {
@@ -136,14 +145,17 @@ export default function PageEditorClient({
         }
 
         setIsPublished(newPublishedState);
-        console.log(`Page ${newPublishedState ? 'published' : 'unpublished'} successfully`);
+        console.log(
+          `Page ${newPublishedState ? "published" : "unpublished"} successfully`
+        );
       } catch (error) {
         console.error("Error updating page:", error);
-        setError(error instanceof Error ? error.message : "Failed to update page");
+        setError(
+          error instanceof Error ? error.message : "Failed to update page"
+        );
       }
     });
   };
-
 
   const openSettings = () => {
     const props = (data.root.props as any) || {};
@@ -249,12 +261,14 @@ export default function PageEditorClient({
                       setSettings({ ...settings, slug: e.target.value })
                     }
                   />
-                  
+
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">Published</p>
                       <p className="text-sm text-gray-500">
-                        {isPublished ? "This page is published and visible to users" : "This page is a draft and not visible to users"}
+                        {isPublished
+                          ? "This page is published and visible to users"
+                          : "This page is a draft and not visible to users"}
                       </p>
                     </div>
                     <Switch

@@ -1,9 +1,9 @@
 "use client";
-import { Render, Data } from "@measured/puck";
+import { Render } from "@measured/puck";
 import { useState, useEffect } from 'react';
 import { usePages } from '@repo/hooks/usePages';
 import { Page } from '@repo/types/page'
-import { PuckConfig } from '@repo/config';
+import { PuckConfig } from './puck/puck.config';
 interface PuckRendererProps {
   pageId: string;
   pageData?: Page;
