@@ -2,19 +2,22 @@ import { HassEntityWithService } from "@hakit/core";
 
 // State class mappings for consistency
 const STATE_CLASSES = {
-  on: "text-theme-primary",
-  off: "text-theme-secondary",
+  on: "text-white",
+  off: "text-secondary",
   unavailable: "text-theme-error",
 } as const;
 
 const STATE_BG_CLASSES = {
-  on: "bg-stone-800",
-  off: "bg-stone-800", 
+  on: "bg-primary",
+  off: "bg-background",
   unavailable: "bg-theme-error",
 } as const;
 
 export const stateClassNameBg = (entity: HassEntityWithService<"light">) => {
-  return STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] || STATE_BG_CLASSES.unavailable;
+  return (
+    STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] ||
+    STATE_BG_CLASSES.unavailable
+  );
 };
 
 export const stateClassNameIcon = (entity: HassEntityWithService<"light">) => {
@@ -33,16 +36,17 @@ export const sliderBrightnessClassnames = (
   entity: HassEntityWithService<"light">
 ) => {
   const brightness = entity.attributes.brightness;
-  
-  if (!brightness || entity.state === "off") {
-    return "accent-theme-secondary text-theme-secondary";
+
+  // Off: no highlight
+  if (entity.state === "off") return "text-theme-text-secondary";
+
+  // No dimmer: fill fully with primary and ensure white text contrast
+  if (!brightness && brightness !== 0) {
+    return "bg-theme-primary text-white";
   }
 
-  const level = BRIGHTNESS_LEVELS.find(
-    ({ min, max }) => brightness >= min && brightness <= max
-  );
-  
-  return `${level?.classes || "accent-theme-secondary text-theme-secondary"} ${level?.opacity || ""}`.trim();
+  const level = BRIGHTNESS_LEVELS.find(({ min, max }) => brightness >= min && brightness <= max);
+  return `${level?.classes || "accent-theme-primary text-theme-primary"} ${level?.opacity || ""}`.trim();
 };
 
 // Temperature level configuration  

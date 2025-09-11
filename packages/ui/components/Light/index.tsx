@@ -1,11 +1,12 @@
 "use client";
 import { EntityName, useEntity, useHass } from "@hakit/core";
 import { useCallback, useState, useEffect } from "react";
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody, cn } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiAlert, mdiLightbulb } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 import { useDebouncedSlider } from "@repo/hooks/useDebounce";
+import { LightUtils } from "@repo/utils";
 
 interface LightProps {
   entityId: EntityName;
@@ -314,18 +315,38 @@ export const Light = ({
   return (
     <Card
       key={entity.entity_id}
-      className="w-full cursor-pointer transition-all duration-200 hover:shadow-lg select-none"
+      className={cn(
+        "w-full cursor-pointer transition-all duration-200 hover:shadow-lg select-none",
+        // If no dimmer and on → full primary background; else base background
+        isOn && !dimmer ? "bg-theme-primary text-white" : LightUtils.stateClassNameBg(entity)
+      )}
       isPressable
       onPress={handleCardClick}
       onMouseMove={dimmer ? handleCardDrag : undefined}
       onMouseDown={dimmer ? handleMouseDown : undefined}
       onMouseUp={dimmer ? handleMouseUp : undefined}
       onMouseLeave={dimmer ? handleMouseLeave : undefined}
+      style={
+        dimmer && isOn
+          ? {
+              background: `linear-gradient(to right, var(--theme-primary) 0%, var(--theme-primary) ${brightnessPercentage}%, var(--theme-card-background) ${Math.min(
+                brightnessPercentage + 2,
+                100
+              )}%, var(--theme-card-background) 100%)`,
+            }
+          : undefined
+      }
     >
       <CardBody className="p-3 relative overflow-hidden">
         <div className="flex items-center gap-3 w-full">
           {/* Entity Icon */}
-          <EntityIcon entity={entity} className="h-8 w-8 flex-shrink-0" />
+          <EntityIcon
+            entity={entity}
+            className={cn(
+              "h-8 w-8 flex-shrink-0",
+              isOn && !dimmer ? "text-white" : LightUtils.stateClassNameIcon(entity)
+            )}
+          />
 
           {/* Entity Name and Brightness */}
           <div className="flex flex-col flex-1 min-w-0">
@@ -336,22 +357,22 @@ export const Light = ({
 
             {/* Brightness Percentage (only show if dimmer is enabled and light is on) */}
             {dimmer && isOn && (
-              <div
-                className="text-xs font-medium"
-                style={{
-                  color: "#ffffff",
-                  textShadow: "0 0 4px rgba(0,0,0,0.8)",
-                }}
-              >
-                {brightnessPercentage}%
-              </div>
+              <div className="text-xs font-medium">{brightnessPercentage}%</div>
             )}
           </div>
         </div>
 
         {/* Visual brightness indicator line */}
         {dimmer && isOn && (
-          <div className="absolute bottom-0 left-0 h-0.5 rounded-b-lg" />
+          <div
+            className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
+            style={{
+              width: `${brightnessPercentage}%`,
+              backgroundColor: "var(--theme-primary)",
+              boxShadow: `0 0 4px var(--theme-primary)40`,
+              maxWidth: "100%",
+            }}
+          />
         )}
       </CardBody>
     </Card>
