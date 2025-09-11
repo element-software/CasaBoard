@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, CardHeader, Button } from "@heroui/react";
+import { Card, CardBody, CardHeader, Button, Link } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
   mdiArrowRight,
@@ -40,6 +40,7 @@ export function HomePageContent() {
               className="bg-theme-primary text-black font-semibold px-8 py-3"
               endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
               href="https://app.casaboard.dev"
+              as={Link}
             >
               Get Started
             </Button>
@@ -49,6 +50,7 @@ export function HomePageContent() {
               className="border-theme-primary text-theme-primary font-semibold px-8 py-3"
               startContent={<Icon path={mdiEye} className="w-5 h-5" />}
               href="https://demo.casaboard.dev"
+              as={Link}
             >
               View Demo
             </Button>
@@ -209,6 +211,7 @@ export function HomePageContent() {
                   className="bg-theme-primary text-black font-semibold px-8 py-3"
                   endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
                   href="https://app.casaboard.dev"
+                  as={Link} 
                 >
                   Start Building Now
                 </Button>
@@ -218,6 +221,7 @@ export function HomePageContent() {
                   className="border-theme-primary text-theme-primary font-semibold px-8 py-3"
                   startContent={<Icon path={mdiCog} className="w-5 h-5" />}
                   href="/about"
+                  as={Link}
                 >
                   Learn More
                 </Button>
