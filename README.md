@@ -1,135 +1,95 @@
-# Turborepo starter
+# CasaBoard Turbo Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+A multi-app monorepo for CasaBoard, a cloud‑hosted smart‑home dashboard for Home Assistant. A DaaS (dashboard-as-a-service) for Home Assistant.
 
-## Using this example
+## Apps
 
-Run the following command:
+- `apps/app` – Dashboard that requires authentication (Next.js App Router)
+- `apps/public` – Marketing site / public landing (Next.js App Router)
 
-```sh
-npx create-turbo@latest
+## Packages
+
+- `packages/ui` – Shared UI components (HeroUI, Material and Hero Icons, Puck page editor)
+- `packages/config` – Various config items
+- `packages/utils` – Entity utils (lights, binary sensors, icons)
+- `packages/hooks` – Shared hooks (theme, pages, etc.)
+- `packages/lib` – Services, Supabase clients, actions, encryption
+- `packages/types` – Shared TypeScript types
+
+## Local Development
+
+Requirements: Node 18+, npm 10+, PNPM/NPM/Yarn (repo uses npm). From the repo root:
+
+```bash
+npm install
+npm run dev
 ```
 
-## What's inside?
+That starts both apps. Visit:
 
-This Turborepo includes the following packages/apps:
+- App: http://localhost:3000
+- Public: http://localhost:3001
 
-### Apps and Packages
+To run a single app:
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+npm run dev --workspace=app
+npm run dev --workspace=public
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Environment
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+Place environment variables per app:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- `apps/app/.env.local`
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+  - `SUPABASE_SECRET_KEY`
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
 
-### Develop
+Public app typically needs none (marketing only).
 
-To develop all apps and packages, run the following command:
+## Tailwind CSS v4
 
-```
-cd my-turborepo
+Shared Tailwind + PostCSS lives in `packages/tailwind-config`. Each app:
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- Imports `./app/globals.css` which in turn imports the shared CSS and adds `@source` globs for that app and `packages/ui`.
+- Has a `postcss.config.js` re-exporting `@repo/tailwind-config/postcss` so Vercel picks up Tailwind during build.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## Theming
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- Uses HeroUI Theme Provider and allows configuring the theme in `hero.ts` in the `tailwind-config` package.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+## Analytics & Consent
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+- `AnalyticsWrapper` loads Vercel Analytics and Google Analytics only after consent.
+- `CookieConsent` (HeroUI modal) persists choice in `localStorage` under `casaboard-cookie-consent`.
 
-### Remote Caching
+## Home Assistant Integration
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- Client components rely on `@hakit/core`. To avoid `window is not defined` during SSR we dynamically import client‑only modules (e.g., `HassConnectWrapper`).
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Puck Editor
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- Puck component registry under `packages/ui/components/puck/puck.config.tsx`.
+- Import Puck config directly from that file to keep server bundles clean.
 
-```
-cd my-turborepo
+## Build & Deploy
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+npm run build
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Currently deployed to Vercel. The CasaBoard app is available at [https://app.casaboard.dev](https://app.casaboard.dev) and the marketing website is at [https://casaboard.dev](https://casaboard.dev).
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## Scripts
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+- `dev` – run all apps in dev
+- `build` – build all apps/packages
+- `lint` – ESLint across the repo
+- `check-types` – typecheck
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+## License
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+MIT © CasaBoard
