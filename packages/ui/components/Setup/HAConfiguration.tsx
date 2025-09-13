@@ -1,10 +1,6 @@
 "use client";
 import { useState, useEffect, useTransition } from "react";
-import {
-  UserSettingsActions,
-  Encryption,
-  SupabaseClient,
-} from "@repo/lib";
+import { UserSettingsActions, Encryption, SupabaseClient } from "@repo/lib";
 import { UserSettings } from "@repo/types/userSettings";
 import {
   Button,
@@ -22,6 +18,7 @@ import {
   mdiLoading,
   mdiPencil,
   mdiCheckCircle,
+  mdiDelete,
 } from "@mdi/js";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +27,10 @@ interface HAConfigurationProps {
   minimal?: boolean; // New prop for minimal view without card wrapper
 }
 
-export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigurationProps) => {
+export const HAConfiguration = ({
+  compact = false,
+  minimal = false,
+}: HAConfigurationProps) => {
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,8 +53,19 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
 
   useEffect(() => {
     initializeUserSession();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleReset = async () => {
+    startTransition(async () => {
+      try {
+        await UserSettingsActions.deleteUserHassSettings();
+        router.replace("/setup/ha-config");
+      } catch (e: any) {
+        setError(e?.message || "Failed to delete settings");
+      }
+    });
+  };
 
   const initializeUserSession = async () => {
     try {
@@ -149,7 +160,8 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
           hass_token: encryptedToken,
         };
 
-        const updatedSettings = await UserSettingsActions.updateUserSettings(dataToSave);
+        const updatedSettings =
+          await UserSettingsActions.updateUserSettings(dataToSave);
         setSettings(updatedSettings);
         setConnectionStatus("success");
         setIsEditing(false); // Exit editing mode after successful save
@@ -190,7 +202,8 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
         hass_token: encryptedToken,
       };
 
-      const updatedSettings = await UserSettingsActions.updateUserSettings(dataToSave);
+      const updatedSettings =
+        await UserSettingsActions.updateUserSettings(dataToSave);
       setSettings(updatedSettings);
       setIsEditing(false); // Exit editing mode
     } catch (err) {
@@ -216,7 +229,7 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
         </div>
       );
     }
-    
+
     return (
       <Card className="w-full">
         <CardBody className="flex items-center justify-center p-8">
@@ -246,13 +259,10 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
             {error}
           </div>
         )}
-        
+
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <Icon
-              path={mdiCheckCircle}
-              className="w-5 h-5 text-green-600"
-            />
+            <Icon path={mdiCheckCircle} className="w-5 h-5 text-green-600" />
             <span className="font-semibold text-green-800">
               Connected to Home Assistant
             </span>
@@ -275,6 +285,14 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
             startContent={<Icon path={mdiCheck} className="w-4 h-4" />}
           >
             Test Connection
+          </Button>
+          <Button
+            color="danger"
+            onPress={handleReset}
+            isLoading={isPending}
+            startContent={<Icon path={mdiDelete} className="w-4 h-4" />}
+          >
+            Delete Configuration
           </Button>
           <Button
             variant="bordered"
@@ -406,8 +424,8 @@ export const HAConfiguration = ({ compact = false, minimal = false }: HAConfigur
                   access tokens → Create token
                 </p>
                 <p className="mt-1">
-                  <strong>Test Connection:</strong> Click &quot;Test Connection&quot; to
-                  verify your URL and token work correctly.
+                  <strong>Test Connection:</strong> Click &quot;Test
+                  Connection&quot; to verify your URL and token work correctly.
                 </p>
               </div>
             </div>

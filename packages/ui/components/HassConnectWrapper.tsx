@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import React from "react";
+import HassErrorFallback from "./HassErrorFallback";
 import { UserSettings } from "@repo/types/userSettings";
 import { usePathname } from "next/navigation";
 
@@ -42,6 +43,9 @@ export const HassConnectWrapper = ({
     <HassConnect 
       hassUrl={userSettings.hass_url}
       hassToken={decryptedToken}
+      options={{
+        renderError: (error) => <HassErrorFallback error={error} />,
+      }}
     >
       {children}
     </HassConnect>
