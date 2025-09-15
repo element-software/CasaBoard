@@ -20,7 +20,7 @@ export class SubscriptionService {
     }
 
     const createdAt = user.created_at ? new Date(user.created_at) : null;
-    const trialDays = 30;
+    const trialDays = process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS) : 3;
     const trialEndsAt = createdAt
       ? new Date(createdAt.getTime() + trialDays * 24 * 60 * 60 * 1000).toISOString()
       : null;
