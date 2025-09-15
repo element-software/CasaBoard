@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useState, useTransition } from "react";
 import { HAInstanceActions, UserSettingsActions } from "@repo/lib";
-import { Button, Card, CardBody, CardHeader, Input, Link, Chip } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Input,
+  Link,
+  Chip,
+} from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant, mdiCheckCircle } from "@mdi/js";
 interface InstanceSummary {
@@ -92,19 +100,20 @@ export function HAInstanceManager({
     });
 
   return (
-    <Card className="w-full mt-8">
-      <CardHeader>
-        <div className="flex items-center justify-between w-full">
-          <Icon
-            path={mdiHomeAssistant}
-            className="w-6 h-6 text-theme-primary"
-          />
-          <h3 className="text-lg font-semibold">Home Assistant Instances</h3>
-          {entitlements && entitlements.maxHAInstances >= 0 && (
-            <span className="text-sm text-foreground-500">
-              {instances.length}/{entitlements.maxHAInstances}
-            </span>
-          )}
+    <Card className="w-full">
+      <CardHeader className="flex items-center justify-between p-4 sm:p-6">
+        <div className="flex items-center min-w-0 flex-1">
+          <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+            <Icon path={mdiHomeAssistant} className="w-6 h-6 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-semibold">Home Assistant Instances</h3>
+            {entitlements && entitlements.maxHAInstances >= 0 && (
+              <span className="text-sm text-foreground-500">
+                {instances.length}/{entitlements.maxHAInstances}
+              </span>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardBody className="space-y-4">
@@ -132,7 +141,16 @@ export function HAInstanceManager({
                   <div className="flex items-center gap-2 text-sm text-foreground-500">
                     <span>{i.hass_url}</span>
                     {activeUrl && i.hass_url === activeUrl && (
-                      <Chip size="sm" color="success" variant="flat" startContent={<Icon path={mdiCheckCircle} className="w-3 h-3" />}>Active</Chip>
+                      <Chip
+                        size="sm"
+                        color="success"
+                        variant="flat"
+                        startContent={
+                          <Icon path={mdiCheckCircle} className="w-3 h-3" />
+                        }
+                      >
+                        Active
+                      </Chip>
                     )}
                   </div>
                 </div>
@@ -142,7 +160,10 @@ export function HAInstanceManager({
                     variant="flat"
                     onPress={() => onSetActive(i.id)}
                     isLoading={isPending}
-                    isDisabled={instances.length === 1 || (activeUrl !== null && i.hass_url === activeUrl)}
+                    isDisabled={
+                      instances.length === 1 ||
+                      (activeUrl !== null && i.hass_url === activeUrl)
+                    }
                   >
                     Set active
                   </Button>
@@ -198,7 +219,11 @@ export function HAInstanceManager({
           </>
         ) : (
           <p className="text-white text-md w-full text-center">
-            You've reached the limit of HA instances for your plan. Please <Link href="/billing" className="text-primary underline">upgrade your plan</Link> to add more instances.
+            You've reached the limit of HA instances for your plan. Please{" "}
+            <Link href="/billing" className="text-primary underline">
+              upgrade your plan
+            </Link>{" "}
+            to add more instances.
           </p>
         )}
       </CardBody>
