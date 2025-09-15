@@ -1,12 +1,13 @@
 import { QuickActions } from "@repo/ui/components/Setup/QuickActions";
-import { PageActions } from "@repo/lib";
-import { Setup } from "./pages/setup";
+import { PageActions, SubscriptionService } from "@repo/lib";
+import { Setup } from "./setup";
 
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
   let pages = [];
   let error = null;
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
 
   try {
     pages = await PageActions.getAllPages();
@@ -22,7 +23,11 @@ export default async function SetupPage() {
           Manage your dashboard pages and Home Assistant configuration
         </p>
       </div>
-      <Setup pages={pages} error={error || undefined} />
+      <Setup
+        pages={pages}
+        error={error || undefined}
+        entitlements={entitlements}
+      />
       {/* Quick Actions */}
       <div className="mt-8">
         <QuickActions />

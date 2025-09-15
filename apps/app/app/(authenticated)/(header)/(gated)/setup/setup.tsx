@@ -14,7 +14,7 @@ export const Setup = ({ pages, error, entitlements }: SetupProps) => {
   return (
     <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
       <PagesManagement initialPages={pages} initialError={error} />
-      <HAInstanceManager entitlements={entitlements} />
+      <HAInstanceManager entitlements={entitlements} compact />
     </div>
   );
 };

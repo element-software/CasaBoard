@@ -9,6 +9,7 @@ import {
   Input,
   Link,
   Chip,
+  Spinner,
 } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant, mdiCheckCircle } from "@mdi/js";
@@ -26,8 +27,10 @@ interface EntitlementsInput {
 
 export function HAInstanceManager({
   entitlements,
+  compact = false,
 }: {
   entitlements: EntitlementsInput;
+  compact?: boolean;
 }) {
   const [instances, setInstances] = useState<InstanceSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +102,54 @@ export function HAInstanceManager({
       }
     });
 
+  if (compact) {
+    return (
+      <Card className="w-full">
+        <CardHeader className="flex items-center justify-between p-4 sm:p-6">
+          <div className="flex items-center min-w-0 flex-1">
+            <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+              <Icon path={mdiHomeAssistant} className="w-6 h-6 text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-semibold">Home Assistant Instances</h3>
+              {entitlements && entitlements.maxHAInstances >= 0 && (
+                <span className="text-sm text-foreground-500">
+                  {instances.length}/{entitlements.maxHAInstances}
+                </span>
+              )}
+            </div>
+          </div>
+          <Button as={Link} href="/setup/ha-config" size="sm" variant="bordered">Manage Instances</Button>
+        </CardHeader>
+        <CardBody className="space-y-3">
+          {loading ? (
+            <div className="flex items-center justify-center py-6">
+              <Spinner color="primary" label="Loading instances…" />
+            </div>
+          ) : instances.length === 0 ? (
+            <p className="text-foreground-500">No instances yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {instances.map((i) => (
+                <div key={i.id} className="flex items-center justify-between gap-3 p-3 bg-content2 rounded">
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{i.name}</div>
+                    <div className="flex items-center gap-2 text-sm text-foreground-500 truncate">
+                      <span className="truncate">{i.hass_url}</span>
+                      {activeUrl && i.hass_url === activeUrl && (
+                        <Chip size="sm" color="success" variant="flat" startContent={<Icon path={mdiCheckCircle} className="w-3 h-3" />}>Active</Chip>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardBody>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader className="flex items-center justify-between p-4 sm:p-6">
@@ -124,7 +175,9 @@ export function HAInstanceManager({
         )}
 
         {loading ? (
-          <p>Loading instances…</p>
+          <div className="flex items-center justify-center py-6">
+            <Spinner color="primary" label="Loading instances…" />
+          </div>
         ) : instances.length === 0 ? (
           <p className="text-foreground-500">
             No instances yet. Create one below.
