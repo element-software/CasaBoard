@@ -1,5 +1,6 @@
 "use client";
-import { Card, CardBody, Button, Avatar, Chip } from "@heroui/react";
+import { Card, CardBody, Button, Avatar, Chip, Divider } from "@heroui/react";
+import { Entitlements } from "@repo/types/subscription";
 import { useRouter } from "next/navigation";
 
 type Profile = {
@@ -9,52 +10,61 @@ type Profile = {
   lastSignIn: string | null;
 };
 
-type Entitlements = {
-  planId: string;
-  active: boolean;
-  trialEndsAt: string | null;
-  maxDashboards: number;
-  maxHAInstances: number;
-};
-
 export default function ProfileClient({ profile, entitlements }: { profile: Profile; entitlements: Entitlements }) {
   const router = useRouter();
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-2xl font-bold text-theme-text mb-4">Your Profile</h1>
-      <Card className="bg-theme-background border border-theme-border">
-        <CardBody className="p-6">
-          <div className="flex items-start gap-4">
-            <Avatar
-              name={(profile.email || "?")[0].toUpperCase()}
-              size="lg"
-              className="bg-theme-primary text-black"
-            />
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2">
-                <p className="text-theme-text font-medium">{profile.email}</p>
-                {profile.verified ? (
-                  <Chip size="sm" color="success" variant="flat">
-                    Verified
-                  </Chip>
-                ) : (
-                  <Chip size="sm" variant="flat">
-                    Unverified
-                  </Chip>
-                )}
-              </div>
-              <p className="text-theme-text-secondary text-sm">
-                User ID: {profile.id}
-              </p>
-              {profile.lastSignIn && (
-                <p className="text-theme-text-secondary text-sm">
-                  Last sign in: {new Date(profile.lastSignIn).toLocaleString()}
-                </p>
-              )}
-            </div>
-          </div>
+    <div className="max-w-7xl mx-auto py-10 px-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-theme-text">Profile</h1>
+        <p className="text-theme-text-secondary">Manage your account and subscription</p>
+      </div>
 
-          <div className="mt-6 grid gap-4">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="bg-theme-background border border-theme-border lg:col-span-2">
+          <CardBody className="p-6 flex flex-col items-stretch">
+            <div className="flex items-start gap-4">
+              <Avatar
+                name={(profile.email || "?")[0].toUpperCase()}
+                size="lg"
+                className="bg-theme-primary text-black"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-theme-text font-medium truncate">{profile.email}</p>
+                  {profile.verified ? (
+                    <Chip size="sm" color="success" variant="flat">Verified</Chip>
+                  ) : (
+                    <Chip size="sm" variant="flat">Unverified</Chip>
+                  )}
+                </div>
+                <div className="mt-2 space-y-1 text-sm text-theme-text-secondary">
+                  <p className="truncate">User ID: {profile.id}</p>
+                  {profile.lastSignIn && (
+                    <p>Last sign in: {new Date(profile.lastSignIn).toLocaleString()}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <Divider className="my-6" />
+
+            <div className="flex flex-row gap-3 h-full items-end">
+              <Button color="primary" variant="bordered" onPress={() => router.push("/setup")}>
+                Go to Dashboard
+              </Button>
+              <Button as="a" href="/billing" color="primary">
+                Manage billing
+              </Button>
+              <Button color="danger" as="a" href="/auth/login?signout=1">
+                Sign out
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="bg-theme-background border border-theme-border">
+          <CardBody className="p-6 space-y-3">
+            <h2 className="text-lg font-semibold">Subscription</h2>
             <div className="flex items-center flex-wrap gap-2">
               <Chip color={entitlements.active ? "success" : "warning"} variant="flat">
                 {entitlements.active ? "Active" : "Inactive"}
@@ -63,32 +73,19 @@ export default function ProfileClient({ profile, entitlements }: { profile: Prof
               {entitlements.trialEndsAt && (
                 <Chip variant="flat">Trial ends: {new Date(entitlements.trialEndsAt).toLocaleDateString()}</Chip>
               )}
-              <Chip variant="flat">Dashboards: {entitlements.maxDashboards < 0 ? "∞" : entitlements.maxDashboards}</Chip>
-              <Chip variant="flat">HA Instances: {entitlements.maxHAInstances < 0 ? "∞" : entitlements.maxHAInstances}</Chip>
             </div>
-
-            <div className="flex gap-3">
-              <Button
-                color="primary"
-                variant="bordered"
-                onPress={() => router.push("/setup")}
-              >
-                Go to Dashboard
-              </Button>
-              <Button
-                as="a"
-                href="/billing"
-                color="primary"
-              >
-                Manage billing
-              </Button>
-              <Button color="danger" as="a" href="/auth/login?signout=1">
-                Sign out
+            <div className="text-sm text-theme-text-secondary">
+              <p>Dashboards: {entitlements.maxDashboards < 0 ? "Unlimited" : entitlements.maxDashboards}</p>
+              <p>HA Instances: {entitlements.maxHAInstances < 0 ? "Unlimited" : entitlements.maxHAInstances}</p>
+            </div>
+            <div className="pt-2">
+              <Button as="a" href="/billing" color="primary" variant="flat" className="w-full">
+                View plans & manage
               </Button>
             </div>
-          </div>
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+      </div>
     </div>
   );
 }
