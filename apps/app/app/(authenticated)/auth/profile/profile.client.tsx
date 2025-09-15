@@ -9,7 +9,15 @@ type Profile = {
   lastSignIn: string | null;
 };
 
-export default function ProfileClient({ profile }: { profile: Profile }) {
+type Entitlements = {
+  planId: string;
+  active: boolean;
+  trialEndsAt: string | null;
+  maxDashboards: number;
+  maxHAInstances: number;
+};
+
+export default function ProfileClient({ profile, entitlements }: { profile: Profile; entitlements: Entitlements }) {
   const router = useRouter();
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -46,17 +54,38 @@ export default function ProfileClient({ profile }: { profile: Profile }) {
             </div>
           </div>
 
-          <div className="mt-6 flex gap-3">
-            <Button
-              color="primary"
-              variant="bordered"
-              onPress={() => router.push("/setup")}
-            >
-              Go to Dashboard
-            </Button>
-            <Button color="danger" as="a" href="/auth/login?signout=1">
-              Sign out
-            </Button>
+          <div className="mt-6 grid gap-4">
+            <div className="flex items-center flex-wrap gap-2">
+              <Chip color={entitlements.active ? "success" : "warning"} variant="flat">
+                {entitlements.active ? "Active" : "Inactive"}
+              </Chip>
+              <Chip variant="flat">Plan: {entitlements.planId}</Chip>
+              {entitlements.trialEndsAt && (
+                <Chip variant="flat">Trial ends: {new Date(entitlements.trialEndsAt).toLocaleDateString()}</Chip>
+              )}
+              <Chip variant="flat">Dashboards: {entitlements.maxDashboards < 0 ? "∞" : entitlements.maxDashboards}</Chip>
+              <Chip variant="flat">HA Instances: {entitlements.maxHAInstances < 0 ? "∞" : entitlements.maxHAInstances}</Chip>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                color="primary"
+                variant="bordered"
+                onPress={() => router.push("/setup")}
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                as="a"
+                href="/billing"
+                color="primary"
+              >
+                Manage billing
+              </Button>
+              <Button color="danger" as="a" href="/auth/login?signout=1">
+                Sign out
+              </Button>
+            </div>
           </div>
         </CardBody>
       </Card>

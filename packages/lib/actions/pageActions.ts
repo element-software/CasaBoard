@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from '../supabase/server';
+import { SubscriptionService } from '../services/subscriptionService';
 import { CreatePageData, UpdatePageData } from '@repo/types/page';
 import { revalidatePath } from 'next/cache';
 
@@ -23,6 +24,16 @@ export async function createPage(data: CreatePageData) {
 
     if (existingPage) {
       throw new Error('A page with this slug already exists');
+    }
+
+    // Enforce entitlement: limit dashboards
+    const { count: dashboardCount } = await supabase
+      .from('pages')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+    const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+    if (entitlements.active && entitlements.maxDashboards >= 0 && (dashboardCount ?? 0) >= entitlements.maxDashboards) {
+      throw new Error('Dashboard limit reached for your plan');
     }
 
     const { data: page, error } = await supabase

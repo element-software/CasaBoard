@@ -19,6 +19,7 @@ import {
   mdiClock
 } from '@mdi/js';
 import { Button, Card, CardBody, Chip } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 interface PagesManagementProps {
   showAllPages?: boolean;
@@ -37,26 +38,7 @@ export const PagesManagement = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
-
-  // Only load pages if no initial data was provided
-  useEffect(() => {
-    if (initialPages.length === 0 && !initialError) {
-      loadPages();
-    }
-  }, [initialPages.length, initialError]);
-
-  const loadPages = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const pagesData = await PageService.getAllPages();
-      setPages(pagesData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load pages');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const router = useRouter();
 
   const handleDeletePage = async (slug: string, pageName: string) => {
     if (!confirm(`Are you sure you want to delete "${pageName}"? This action cannot be undone.`)) {
@@ -99,6 +81,8 @@ export const PagesManagement = ({
 
   const displayPages = showAllPages ? pages : pages.slice(0, maxPages);
 
+  console.log("PagesManagement:: displayPages:", displayPages, "error:", error)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -120,7 +104,7 @@ export const PagesManagement = ({
             color="danger"
             variant="bordered"
             size="sm"
-            onPress={loadPages}
+            onPress={() => router.refresh()}
             startContent={<Icon path={mdiRefresh} className="w-4 h-4" />}
           >
             Try Again

@@ -1,4 +1,4 @@
-import { SupabaseServer } from "@repo/lib";
+import { SupabaseServer, SubscriptionService } from "@repo/lib";
 import { redirect } from "next/navigation";
 import ProfileClient from "./profile.client";
 
@@ -18,6 +18,8 @@ export default async function ProfilePage() {
     lastSignIn: user?.last_sign_in_at || null,
   };
 
-  return <ProfileClient profile={profile} />;
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+
+  return <ProfileClient profile={profile} entitlements={entitlements} />;
 }
 

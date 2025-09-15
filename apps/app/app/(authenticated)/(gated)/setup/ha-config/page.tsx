@@ -1,12 +1,14 @@
 import { HAConfiguration } from '@repo/ui/components/Setup/HAConfiguration';
+import { HAInstanceManager } from '@repo/ui/components/Setup/HAInstanceManager';
+import { SubscriptionService } from '@repo/lib';
 import Icon from '@mdi/react';
 import { mdiHomeAssistant } from '@mdi/js';
 
 // Force dynamic rendering for this page since it's under the authenticated layout that uses cookies
 export const dynamic = 'force-dynamic';
 
-export default function HAConfigPage() {
-
+export default async function HAConfigPage() {
+  const ent = await SubscriptionService.getEntitlementsForCurrentUser();
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -24,7 +26,7 @@ export default function HAConfigPage() {
           </div>
         </div>
 
-        <HAConfiguration />
+        <HAInstanceManager entitlements={{ maxHAInstances: ent.maxHAInstances, active: ent.active }} />
       </div>
   );
 }
