@@ -2,7 +2,9 @@
 import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCheck, mdiClose, mdiStar } from "@mdi/js";
+import { mdiCheck, mdiClose } from "@mdi/js";
+import { useState } from "react";
+import { Plan } from "@repo/types/subscription";
 
 interface Entitlements {
   planId: string;
@@ -17,56 +19,49 @@ export default function BillingContent({
 }: {
   entitlements: Entitlements;
 }) {
-  const plans = [
+  const labelForPlan = (planId: string) => {
+    if (entitlements.active) {
+      return entitlements.planId === planId ? "Current plan" : "Upgrade";
+    }
+    return "Subscribe";
+  };
+
+  const [billing, setBilling] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
+
+  const plans: Plan[] = [
     {
       id: "starter",
       name: "Starter",
-      price: "£5/mo",
+      monthly: 5,
+      yearly: 50,
       dashboards: 1,
-      ha: 1,
-      multiHa: false,
-      priority: false,
       popular: false,
     },
     {
       id: "mid",
       name: "Mid",
-      price: "£8/mo",
+      monthly: 8,
+      yearly: 80,
       dashboards: 3,
-      ha: 1,
-      multiHa: false,
-      priority: false,
-      popular: false,
+      popular: true
     },
     {
       id: "pro",
       name: "Pro",
-      price: "£10/mo",
+      monthly: 10,
+      yearly: 100,
       dashboards: 6,
-      ha: 1,
-      multiHa: false,
-      priority: true,
-      popular: true,
+      popular: false,
     },
-  ];
-
-  const features: {
-    label: string;
-    get: (p: (typeof plans)[number]) => string | boolean;
-  }[] = [
-    { label: "Dashboards", get: (p) => `${p.dashboards}` },
-    { label: "HA instances", get: (p) => `${p.ha}` },
-    { label: "Multi‑HA", get: (p) => p.multiHa },
-    { label: "Priority support", get: (p) => p.priority },
-  ];
+  ] as const;
 
   return (
     <div className="max-w-7xl w-full mx-auto py-10 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold">Billing</h1>
-        <p className="text-foreground-500 mt-1">
-          Choose the plan that fits your needs.
-        </p>
+        <h1 className="text-3xl font-semibold">Subscription</h1>
+        <p className="text-foreground-500 mt-1">Pick a plan that suits you.</p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Chip
             color={entitlements.active ? "success" : "warning"}
@@ -87,138 +82,80 @@ export default function BillingContent({
             </Chip>
           )}
         </div>
-      </div>
 
-      {/* Desktop comparison table */}
-      <div className="hidden md:block overflow-x-auto">
-        <div className="min-w-[860px] rounded-lg border border-default-200">
-          {/* Headers */}
-          <div className="grid grid-cols-4">
-            <div className="p-6 border-b border-default-200"></div>
-            {plans.map((p) => (
-              <div
-                key={p.id}
-                className={cn("p-6 border-b border-l border-default-200", {
-                  relative: p.popular,
-                })}
-              >
-                {p.popular && (
-                  <span className="absolute top-2 right-2 text-xs bg-primary text-white px-2 py-0.5 rounded-full flex items-center gap-1 w-fit self-center mb-2">
-                    <Icon path={mdiStar} className="w-3 h-3" /> Popular
-                  </span>
-                )}
-                <div className="text-center space-y-1">
-                  <div className="text-sm text-foreground-500 font-medium">
-                    {p.name}
-                  </div>
-                  <div className="text-2xl font-semibold">{p.price}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Feature rows */}
-          {features.map((f, idx) => (
-            <div
-              key={f.label}
-              className={`grid grid-cols-4 ${idx % 2 === 0 ? "bg-content2/30" : "bg-transparent"}`}
-            >
-              <div className="p-4 text-sm font-medium text-foreground-600 border-t border-default-200">
-                {f.label}
-              </div>
-              {plans.map((p) => {
-                const value = f.get(p);
-                const isBool = typeof value === "boolean";
-                return (
-                  <div
-                    key={p.id + f.label}
-                    className="p-4 text-center border-t border-l border-default-200"
-                  >
-                    {isBool ? (
-                      (value as boolean) ? (
-                        <Icon
-                          path={mdiCheck}
-                          className="w-5 h-5 text-success mx-auto"
-                        />
-                      ) : (
-                        <Icon
-                          path={mdiClose}
-                          className="w-5 h-5 text-foreground-400 mx-auto"
-                        />
-                      )
-                    ) : (
-                      <span className="text-sm">{value as string}</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-
-          {/* CTA row */}
-          <div className="grid grid-cols-4">
-            <div className="p-4 border-t border-default-200"></div>
-            {plans.map((p) => (
-              <div
-                key={p.id}
-                className="p-4 border-t border-l border-default-200"
-              >
-                <form
-                  action={`/api/billing/checkout?plan=${p.id}`}
-                  method="post"
-                >
-                  <Button
-                    color="primary"
-                    type="submit"
-                    className="w-full"
-                    isDisabled={entitlements.planId === p.id && entitlements.active}
-                  >
-                    {entitlements.active
-                      ? entitlements.planId === p.id
-                        ? "Current plan"
-                        : "Upgrade"
-                      : "Subscribe"}
-                  </Button>
-                </form>
-              </div>
-            ))}
-          </div>
+        {/* Billing toggle */}
+        <div className="mt-6 inline-flex rounded-full bg-content2 p-1 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setBilling("monthly")}
+            className={cn(
+              "px-4 py-1 text-sm rounded-full transition-colors",
+              billing === "monthly"
+                ? "bg-background shadow text-foreground"
+                : "text-foreground-500"
+            )}
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            onClick={() => setBilling("yearly")}
+            className={cn(
+              "px-4 py-1 text-sm rounded-full transition-colors",
+              billing === "yearly"
+                ? "bg-background shadow text-foreground"
+                : "text-foreground-500"
+            )}
+          >
+            Yearly
+          </button>
         </div>
       </div>
 
-      {/* Mobile cards */}
-      <div className="grid gap-6 md:hidden sm:grid-cols-2">
-        {plans.map((p) => (
-          <Card key={p.id} className="border border-default-200">
-            <CardBody className="space-y-3 p-6">
-              <div className="flex items-baseline justify-between">
-                <h2 className="text-xl font-semibold">{p.name}</h2>
-                <span className="text-lg text-foreground-600">{p.price}</span>
-              </div>
-              <ul className="space-y-1 text-sm text-foreground-500">
-                <li>Dashboards: {p.dashboards}</li>
-                <li>HA instances: {p.ha}</li>
-                <li>Multi‑HA: {p.multiHa ? "Yes" : "No"}</li>
-                <li>Priority support: {p.priority ? "Yes" : "No"}</li>
-              </ul>
-              <form action={`/api/billing/checkout?plan=${p.id}`} method="post">
-                <Button
-                  color="primary"
-                  type="submit"
-                  className="w-full"
-                  isDisabled={entitlements.planId === p.id && entitlements.active}
-                >
-                  {entitlements.active
-                    ? entitlements.planId === p.id
-                      ? "Current plan"
-                      : "Upgrade"
-                    : "Subscribe"}
-                </Button>
-              </form>
-            </CardBody>
-          </Card>
-        ))}
+      {/* Pricing cards like the reference */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {plans.map((p, idx) => {
+          const isActive = entitlements.planId === p.id && entitlements.active;
+          const isPopular = p.popular === true;
+          const price = billing === "monthly" ? p.monthly : p.yearly;
+          return (
+            <Card
+              key={p.id}
+              className={cn(
+                "border-default-200",
+                isPopular ? "bg-primary/10 border-primary/40" : ""
+              )}
+            >
+              <CardBody className="p-6 space-y-4">
+                <div className="space-y-1">
+                  <div className="text-sm text-foreground-500 font-medium">
+                    {billing === "monthly" ? "Monthly" : "Yearly"}
+                  </div>
+                  <h3 className="text-lg font-semibold">{p.name}</h3>
+                </div>
+                <div className="text-4xl font-semibold">£{price}<span className="text-base font-normal text-foreground-500">/{billing === "monthly" ? "mo" : "yr"}</span></div>
+                <ul className="text-sm text-foreground-500 space-y-1">
+                  <li className="flex items-center gap-2"><Icon path={mdiCheck} className="w-4 h-4 text-success" /> {p.dashboards} dashboards</li>
+                  <li className="flex items-center gap-2"><Icon path={mdiCheck} className="w-4 h-4 text-success" /> 1 Home Assistant instance</li>
+                  <li className="flex items-center gap-2"><Icon path={mdiClose} className="w-4 h-4 text-foreground-400" /> Multi‑HA</li>
+                </ul>
+                <form action={`/api/billing/checkout?plan=${p.id}`} method="post">
+                  <Button
+                    color={isPopular ? "primary" : "default"}
+                    type="submit"
+                    className="w-full"
+                    isDisabled={isActive}
+                  >
+                    {labelForPlan(p.id)}
+                  </Button>
+                </form>
+              </CardBody>
+            </Card>
+          );
+        })}
       </div>
+
+      {/* Mobile keeps same cards grid above */}
 
       <div className="mt-10 text-center text-sm text-foreground-500">
         Questions about plans?{" "}

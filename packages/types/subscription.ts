@@ -15,6 +15,15 @@ export interface Entitlements {
   active: boolean; // whether user has active access
 }
 
+export interface Plan {
+  id: PlanId;
+  name: string;
+  monthly: number;
+  yearly: number;
+  dashboards: number;
+  popular: boolean;
+}
+
 export interface SubscriptionRecord {
   plan_id: PlanId;
   current_period_end: string; // ISO
