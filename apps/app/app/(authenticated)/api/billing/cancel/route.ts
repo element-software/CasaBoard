@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Cancel at period end
-    await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true });
+    const updated = await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true });
 
     const origin = req.headers.get("origin") || new URL(req.url).origin;
-    return NextResponse.redirect(`${origin}/billing/cancel`);
+    return NextResponse.redirect(`${origin}/billing/cancel?sub_id=${updated.id}`);
   } catch (e) {
     return NextResponse.json({ error: "Cancel failed" }, { status: 500 });
   }
