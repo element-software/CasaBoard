@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const plan = searchParams.get("plan");
+    const interval = (searchParams.get("interval") as "monthly" | "yearly" | null) || "monthly";
     if (!plan) {
       return NextResponse.json({ error: "Missing plan" }, { status: 400 });
     }
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const stripe = StripeService.getStripe();
-    const price = await StripeService.getCheckoutPriceForPlan(plan as any);
+    const price = await StripeService.getCheckoutPriceForPlan(plan as any, interval);
     let existingCustomerId = await SubscriptionService.getStripeCustomerIdForCurrentUser();
 
     // Ensure Stripe customer exists and map into billing_customers via user-scoped insert (RLS allowed)
@@ -45,9 +46,9 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/billing?canceled=true`,
       // Attach metadata to the Checkout Session AND the Subscription that will be created
       client_reference_id: user.id,
-      metadata: { user_id: user.id, plan_id: plan },
+      metadata: { user_id: user.id, plan_id: plan, interval },
       subscription_data: {
-        metadata: { user_id: user.id, plan_id: plan },
+        metadata: { user_id: user.id, plan_id: plan, interval },
       },
     });
     return NextResponse.redirect(session.url!, { status: 303 });

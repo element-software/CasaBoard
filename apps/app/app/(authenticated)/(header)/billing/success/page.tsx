@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { StripeService, SupabaseServer } from "@repo/lib";
+import { StripeService, SupabaseServer, StripeEntitlementsService } from "@repo/lib";
 import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function BillingSuccessPage({ searchParams }: { searchParam
     const sub = subscription as Stripe.Subscription;
     const planId = (sub.metadata?.plan_id as string | undefined) || (sub.items?.data?.[0]?.price?.nickname as string | undefined) || "starter";
     const status = sub.status as string;
-    const periodEnd = typeof sub.ended_at === "number" ? new Date(sub.ended_at * 1000).toISOString() : null;
+    const periodEnd = typeof sub.current_period_end === "number" ? new Date(sub.current_period_end * 1000).toISOString() : null;
 
     const supabase = await SupabaseServer.createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -35,6 +35,8 @@ export default async function BillingSuccessPage({ searchParams }: { searchParam
           status,
           current_period_end: periodEnd,
         });
+      // After successful checkout, sync user's entitlements cache so gating unlocks immediately
+      await StripeEntitlementsService.syncCurrentUserEntitlements();
     }
   } catch (err) {
     // ignore and continue to billing

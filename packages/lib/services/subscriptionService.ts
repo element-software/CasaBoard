@@ -1,6 +1,7 @@
 import { Entitlements, PlanId } from "@repo/types/subscription";
 import { createClient } from "../supabase/server";
 import { resolveEntitlements } from "./billingService";
+import { StripeEntitlementsService } from "./stripeEntitlementsService";
 
 export class SubscriptionService {
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
@@ -19,55 +20,43 @@ export class SubscriptionService {
       };
     }
 
+    // 1) Try local feature cache (synced via webhook or on-demand)
+    const { data: features } = await supabase
+      .from("user_entitlements")
+      .select("feature_key")
+      .eq("user_id", user.id);
+
+    const featureKeys = new Set((features || []).map((r: any) => r.feature_key as string));
+
+    const planFromFeatures = this.getPlanFromFeatureKeys(featureKeys);
+    if (planFromFeatures) {
+      return resolveEntitlements(planFromFeatures, null, true);
+    }
+
+    // 2) Fallback: one-time sync from Stripe then re-check
+    await StripeEntitlementsService.syncCurrentUserEntitlements();
+    const { data: featuresAfter } = await supabase
+      .from("user_entitlements")
+      .select("feature_key")
+      .eq("user_id", user.id);
+    const featureKeysAfter = new Set((featuresAfter || []).map((r: any) => r.feature_key as string));
+    const planAfter = this.getPlanFromFeatureKeys(featureKeysAfter);
+    if (planAfter) {
+      return resolveEntitlements(planAfter, null, true);
+    }
+
+    // 3) Trial fallback by created_at
     const createdAt = user.created_at ? new Date(user.created_at) : null;
     const trialDays = process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS) : 3;
     const trialEndsAt = createdAt
       ? new Date(createdAt.getTime() + trialDays * 24 * 60 * 60 * 1000).toISOString()
       : null;
-    const now = new Date();
-
-    // Get the most recent subscription for this user
-    const { data: subs, error } = await supabase
-      .from("subscriptions")
-      .select("plan_id,status,current_period_end,trial_ends_at,created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (error) {
-      // Fail safe: fall back to trial if within 30 days
-      const isWithinTrial = trialEndsAt && new Date(trialEndsAt) > now;
-      return resolveEntitlements(
-        "free-trial",
-        trialEndsAt,
-        Boolean(isWithinTrial)
-      );
-    }
-
-    const sub = subs && subs.length > 0 ? subs[0] : null;
-    const subStatus = (sub?.status as
-      | "trialing"
-      | "active"
-      | "past_due"
-      | "canceled"
-      | "incomplete"
-      | "unpaid"
-      | undefined) as any;
-
-    const hasActiveSub = subStatus === "active" || subStatus === "trialing";
-    const isWithinTrial = trialEndsAt && new Date(trialEndsAt) > now;
-
-    if (hasActiveSub && sub?.plan_id) {
-      const base = resolveEntitlements(sub.plan_id as PlanId, sub.trial_ends_at || null, true);
-      return { ...base, currentPeriodEnd: sub.current_period_end || null } as any;
-    }
-
+    const isWithinTrial = trialEndsAt ? new Date(trialEndsAt) > new Date() : false;
     if (isWithinTrial) {
       return resolveEntitlements("free-trial", trialEndsAt, true);
     }
 
-    // No active access
-    return resolveEntitlements((sub?.plan_id as PlanId) || "free-trial", trialEndsAt, false);
+    return resolveEntitlements("free-trial", trialEndsAt, false);
   }
 
   static async getStripeCustomerIdForCurrentUser(): Promise<string | null> {
@@ -83,6 +72,17 @@ export class SubscriptionService {
       .eq("user_id", user.id)
       .single();
     return data?.stripe_customer_id ?? null;
+  }
+
+  private static getPlanFromFeatureKeys(keys: Set<string>): PlanId | null {
+    // Map your feature lookup keys -> plan ids
+    if (keys.has("pro-access")) return "pro";
+    if (keys.has("mid-access")) return "mid";
+    if (keys.has("starter-access")) return "starter";
+    if (keys.has("super_60-access")) return "super_60";
+    if (keys.has("super_40-access")) return "super_40";
+    if (keys.has("super_25-access")) return "super_25";
+    return null;
   }
 }
 

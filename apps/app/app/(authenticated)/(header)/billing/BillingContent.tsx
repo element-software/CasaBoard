@@ -58,7 +58,11 @@ export default function BillingContent({
       dashboards: 6,
       ha: 2,
       popular: false,
-      features: ["6 dashboards", "2 Home Assistant instances", "Online support"],
+      features: [
+        "6 dashboards",
+        "2 Home Assistant instances",
+        "Online support",
+      ],
     },
   ] as const;
 
@@ -89,10 +93,17 @@ export default function BillingContent({
         </div>
         {entitlements.active && entitlements.currentPeriodEnd && (
           <p className="mt-2 text-sm text-foreground-500">
-            Current period ends on {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}.
-            If you cancel, access continues until this date.
+            Current period ends on{" "}
+            {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}. If
+            you cancel, access continues until this date.
           </p>
         )}
+
+        {/* @ts-ignore - stripe-pricing-table is a custom component */}
+        {/* <stripe-pricing-table
+          pricing-table-id="prctbl_1S80E1JL80TkAHysgGxTSmui"
+          publishable-key={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        /> */}
 
         {/* Billing toggle */}
         <div className="mt-6 inline-flex rounded-full bg-content2 p-1 shadow-sm">
@@ -159,16 +170,15 @@ export default function BillingContent({
                   </span>
                 </div>
                 <ul className="text-sm text-foreground-500 space-y-1">
-
                   {p.features.map((feature, idx) => (
                     <li className="flex items-center gap-2" key={idx}>
                       <Icon path={mdiCheck} className="w-4 h-4 text-success" />{" "}
                       {feature}
                     </li>
-                  ))}                  
+                  ))}
                 </ul>
                 <form
-                  action={`/api/billing/checkout?plan=${p.id}`}
+                  action={`/api/billing/checkout?plan=${p.id}&interval=${billing}`}
                   method="post"
                 >
                   <Button

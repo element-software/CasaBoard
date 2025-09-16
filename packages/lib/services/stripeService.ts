@@ -16,37 +16,65 @@ export class StripeService {
     return this.stripeSingleton;
   }
 
-  static getPriceIdForPlan(planId: PlanId): string {
-    const priceMap: Record<PlanId, string | undefined> = {
-      "free-trial": undefined,
-      starter: "prod_T37yH2eRvaylZ0",
-      mid: "prod_T37y69atl58dbS",
-      pro: "prod_T37yFsR2kCSbFE",
-      super_25: process.env.STRIPE_PRICE_SUPER_25,
-      super_40: process.env.STRIPE_PRICE_SUPER_40,
-      super_60: process.env.STRIPE_PRICE_SUPER_60,
-    };
-    const priceId = priceMap[planId];
-    if (!priceId) {
-      throw new Error(`Missing Stripe price env for plan: ${planId}`);
-    }
-    return priceId;
+  private static planNames: Record<PlanId, string[]> = {
+    "free-trial": ["Free Trial", "Trial"],
+    starter: ["Starter"],
+    mid: ["Mid", "Standard"],
+    pro: ["Pro", "Professional"],
+    super_25: ["Super 25"],
+    super_40: ["Super 40"],
+    super_60: ["Super 60"],
+  };
+
+  private static matchesPlan(product: Stripe.Product, planId: PlanId): boolean {
+    const names = this.planNames[planId] || [];
+    const byMeta = (product.metadata?.plan_id || product.metadata?.lookup_key || "").toLowerCase();
+    if (byMeta === planId.toLowerCase()) return true;
+    const productName = (product.name || "").toLowerCase();
+    if (names.some((n) => n.toLowerCase() === productName)) return true;
+    // allow loose contains match as a last resort
+    if (names.some((n) => productName.includes(n.toLowerCase()))) return true;
+    if (productName === planId.toLowerCase()) return true;
+    return false;
   }
 
-  static async getCheckoutPriceForPlan(planId: PlanId): Promise<string> {
-    const id = this.getPriceIdForPlan(planId);
-    if (id.startsWith("price_")) return id;
-    if (id.startsWith("prod_")) {
-      const stripe = this.getStripe();
-      const product = await stripe.products.retrieve(id, { expand: ["default_price"] });
-      const defaultPrice = (product.default_price as any)?.id as string | undefined;
-      if (defaultPrice && defaultPrice.startsWith("price_")) return defaultPrice;
-      const prices = await stripe.prices.list({ product: id, active: true, limit: 1 });
-      const first = prices.data[0]?.id;
-      if (first) return first;
-      throw new Error(`No active prices found for product ${id}`);
+  static async findProductForPlan(planId: PlanId): Promise<Stripe.Product> {
+    const stripe = this.getStripe();
+    // Prefer search, fallback to list if search not enabled
+    try {
+      // @ts-ignore - search may not be available on older typings
+      if (typeof (stripe.products as any).search === "function") {
+        const query = `active:'true' AND (metadata['plan_id']:'${planId}' OR metadata['lookup_key']:'${planId}' OR name:'${this.planNames[planId]?.[0] || planId}')`;
+        const res = await (stripe.products as any).search({ query, limit: 20 });
+        const found = res?.data?.find((p: Stripe.Product) => this.matchesPlan(p, planId));
+        if (found) return found;
+      }
+    } catch {}
+    // Fallback: list and filter
+    const list = await stripe.products.list({ active: true, limit: 100 });
+    const prod = list.data.find((p) => this.matchesPlan(p, planId));
+    if (!prod) throw new Error(`Stripe product not found for plan ${planId}`);
+    return prod;
+  }
+
+  static async getCheckoutPriceForPlan(planId: PlanId, interval: "monthly" | "yearly" = "monthly"): Promise<string> {
+    const product = await this.findProductForPlan(planId);
+    const stripe = this.getStripe();
+    const wantedInterval = interval === "yearly" ? "year" : "month";
+    const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 });
+    // Prefer interval_count 1
+    const candidates = prices.data.filter((p) => p.recurring?.interval === wantedInterval);
+    const preferred = candidates.find((p) => (p.recurring?.interval_count || 1) === 1) || candidates[0];
+    if (preferred?.id) return preferred.id;
+    // Fallback to product.default_price if it matches
+    if (product.default_price && typeof product.default_price !== "string") {
+      const rp = product.default_price;
+      if (rp?.id && rp.recurring?.interval === wantedInterval) return rp.id;
+    } else if (typeof product.default_price === "string") {
+      const dp = await stripe.prices.retrieve(product.default_price);
+      if (dp?.id && dp.recurring?.interval === wantedInterval) return dp.id;
     }
-    throw new Error(`Unrecognized Stripe id format for plan ${planId}: ${id}`);
+    throw new Error(`No active ${interval} price found for plan ${planId}`);
   }
 }
 

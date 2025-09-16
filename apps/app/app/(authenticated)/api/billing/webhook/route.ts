@@ -27,6 +27,59 @@ export async function POST(req: NextRequest) {
 
   const supabase = await SupabaseServer.createClient();
   switch (event.type) {
+    case "entitlements.active_entitlement_summary.updated": {
+      // Sync local cache when Stripe signals a change in active entitlements
+      // We cannot trust session user here; resolve by customer id -> user
+      try {
+        const payload: any = event.data.object;
+        const customerId: string | undefined = payload?.customer as string | undefined;
+        if (customerId) {
+          const { data: map } = await supabase
+            .from("billing_customers")
+            .select("user_id")
+            .eq("stripe_customer_id", customerId)
+            .single();
+          const userId = map?.user_id as string | undefined;
+          if (userId) {
+            const stripe = StripeService.getStripe();
+            let keys: string[] = [];
+            // Try customers.retrieveEntitlements
+            try {
+              const entSummary: any = await (stripe.customers as any)?.retrieveEntitlements?.(customerId, { limit: 100, active: true });
+              if (entSummary && Array.isArray(entSummary.data)) {
+                keys = entSummary.data
+                  .filter((e: any) => e?.active === true || e?.status === "active")
+                  .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
+                  .filter(Boolean);
+              }
+            } catch {}
+            if (keys.length === 0) {
+              try {
+                const entitlements: any = await (stripe as any).entitlements?.list?.({ customer: customerId, limit: 100 });
+                if (entitlements && Array.isArray(entitlements.data)) {
+                  keys = entitlements.data
+                    .filter((e: any) => e?.active === true || e?.status === "active")
+                    .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
+                    .filter(Boolean);
+                }
+              } catch {}
+            }
+
+            // Replace cache for userId
+            await supabase.from("user_entitlements").delete().eq("user_id", userId);
+            if (keys.length > 0) {
+              await supabase
+                .from("user_entitlements")
+                .upsert(
+                  keys.map((k) => ({ user_id: userId, feature_key: k, active: true, updated_at: new Date().toISOString() })),
+                  { onConflict: "user_id,feature_key" }
+                );
+            }
+          }
+        }
+      } catch {}
+      break;
+    }
     case "checkout.session.completed": {
       console.log("[stripe:webhook] event.type: checkout.session.completed");
       const session: any = event.data.object;
@@ -104,6 +157,26 @@ export async function POST(req: NextRequest) {
           status: sub.status,
           current_period_end: periodEndIso,
         });
+        // Also refresh the entitlements cache for this user via customer id mapping
+        try {
+          const customerId = sub.customer as string | undefined;
+          if (customerId) {
+            const stripe = StripeService.getStripe();
+            const entitlements: any = await (stripe as any).entitlements?.list?.({ customer: customerId, limit: 100 });
+            const keys: string[] = Array.isArray(entitlements?.data)
+              ? entitlements.data
+                  .filter((e: any) => e?.active === true || e?.status === "active")
+                  .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
+                  .filter(Boolean)
+              : [];
+            await supabase.from("user_entitlements").delete().eq("user_id", userId);
+            if (keys.length > 0) {
+              await supabase
+                .from("user_entitlements")
+                .upsert(keys.map((k) => ({ user_id: userId, feature_key: k, active: true, updated_at: new Date().toISOString() })), { onConflict: "user_id,feature_key" });
+            }
+          }
+        } catch {}
       } else {
         console.log(
           "[stripe:webhook] event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted, No user ID found when updating subscription"

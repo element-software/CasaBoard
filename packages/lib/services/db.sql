@@ -17,6 +17,16 @@ create table if not exists public.billing_customers (
   created_at timestamptz not null default now()
 );
 
+-- cache of active feature entitlements per user (synced from Stripe)
+create table if not exists public.user_entitlements (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  feature_key text not null,
+  active boolean not null default true,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, feature_key)
+);
+create index if not exists user_entitlements_user_id_idx on public.user_entitlements(user_id);
+
 -- ha_instances table for multi-HA
 create table if not exists public.ha_instances (
   id uuid primary key default gen_random_uuid(),
@@ -69,6 +79,45 @@ do $$ begin
   ) then
     create policy billing_customers_update_own on public.billing_customers
       for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+-- RLS policies for user_entitlements (user can manage their own cached features)
+alter table if exists public.user_entitlements enable row level security;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'user_entitlements' and policyname = 'user_entitlements_select_own'
+  ) then
+    create policy user_entitlements_select_own on public.user_entitlements
+      for select using (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'user_entitlements' and policyname = 'user_entitlements_insert_own'
+  ) then
+    create policy user_entitlements_insert_own on public.user_entitlements
+      for insert with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'user_entitlements' and policyname = 'user_entitlements_update_own'
+  ) then
+    create policy user_entitlements_update_own on public.user_entitlements
+      for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'user_entitlements' and policyname = 'user_entitlements_delete_own'
+  ) then
+    create policy user_entitlements_delete_own on public.user_entitlements
+      for delete using (auth.uid() = user_id);
   end if;
 end $$;
 
