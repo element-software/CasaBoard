@@ -65,6 +65,8 @@ export default async function BillingSuccessPage({
     }
   } catch (err) {
     // ignore and continue to billing
+    console.error("Cancel subscription failed ");
+    console.error(err);
   }
 
   return <SuccessContent planLabel={planLabel} currentPeriodEnd={currentPeriodEnd} />;

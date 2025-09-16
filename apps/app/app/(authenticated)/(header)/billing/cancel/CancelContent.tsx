@@ -21,7 +21,7 @@ export default function CancelContent({
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold text-theme-text">Cancellation scheduled</h1>
             <p className="text-theme-text-secondary">
-              Your subscription{planLabel ? ` (${planLabel})` : ""} will remain active until the end of your current billing period.
+              Your subscription<b>{planLabel ? ` (${planLabel})` : ""}</b> will remain active until the end of your current billing period.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
@@ -29,7 +29,6 @@ export default function CancelContent({
             {currentPeriodEnd && (
               <Chip variant="flat">{new Date(currentPeriodEnd).toLocaleDateString()}</Chip>
             )}
-            {planLabel && <Chip variant="flat">Plan: {planLabel}</Chip>}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Button as={Link} href="/setup" color="primary" className="min-w-[180px]">

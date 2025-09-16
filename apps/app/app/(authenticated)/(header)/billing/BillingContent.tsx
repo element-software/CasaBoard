@@ -1,9 +1,9 @@
 "use client";
-import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
+import { Button, Card, CardBody, Chip, cn, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiCheck } from "@mdi/js";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plan } from "@repo/types/subscription";
 
 interface Entitlements {
@@ -28,6 +28,8 @@ export default function BillingContent({
   };
 
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const cancelFormRef = useRef<HTMLFormElement | null>(null);
 
   const plans: Plan[] = [
     {
@@ -197,14 +199,13 @@ export default function BillingContent({
                     </Button>
                     {isActive && (
                       <div className="mt-8 flex items-center justify-center">
-                        <form action="/api/billing/cancel" method="post">
-                          <Button color="danger" variant="bordered" type="submit">
-                            Cancel at period end
-                          </Button>
-                        </form>
+                        <Button color="danger" variant="bordered" onPress={onOpen}>
+                          Cancel at period end
+                        </Button>
                       </div>
                     )}
                   </form>
+                  <form ref={cancelFormRef} action="/api/billing/cancel" method="post" className="hidden" />
                 </CardBody>
               </Card>
             );
@@ -220,6 +221,27 @@ export default function BillingContent({
           Contact us
         </Link>
       </div>
+
+      {/* Cancel modal */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
+        <ModalContent>
+          {(close) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Cancel subscription?</ModalHeader>
+              <ModalBody>
+                <p>
+                  You will keep access until the end of your current billing period.
+                  Are you sure you want to cancel at the end of the period?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="flat" onPress={close}>Keep subscription</Button>
+                <Button color="danger" onPress={() => { cancelFormRef.current?.submit(); }}>Yes, cancel</Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
