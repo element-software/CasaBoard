@@ -6,7 +6,8 @@ import {
   mdiPlus, 
   mdiHome, 
   mdiWeb, 
-  mdiHomeAssistant 
+  mdiHomeAssistant,
+  mdiCreditCard
 } from '@mdi/js';
 
 interface QuickAction {
@@ -34,6 +35,12 @@ const quickActions: QuickAction[] = [
     icon: mdiHomeAssistant,
     title: 'HA Settings',
     description: 'Configure HA'
+  },
+  {
+    href: '/billing',
+    icon: mdiCreditCard,
+    title: 'Billing',
+    description: 'Manage your billing'
   }
 ];
 
