@@ -2,7 +2,7 @@
 import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCheck, mdiClose } from "@mdi/js";
+import { mdiCheck } from "@mdi/js";
 import { useState } from "react";
 import { Plan } from "@repo/types/subscription";
 
