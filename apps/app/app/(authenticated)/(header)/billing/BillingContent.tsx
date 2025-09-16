@@ -167,9 +167,16 @@ export default function BillingContent({
                   action={`/api/billing/checkout?plan=${p.id}`}
                   method="post"
                 >
-                  <Button color="primary" type="submit" className="w-full">
-                    {entitlements.planId === p.id && entitlements.active
-                      ? "Current plan"
+                  <Button
+                    color="primary"
+                    type="submit"
+                    className="w-full"
+                    isDisabled={entitlements.planId === p.id && entitlements.active}
+                  >
+                    {entitlements.active
+                      ? entitlements.planId === p.id
+                        ? "Current plan"
+                        : "Upgrade"
                       : "Subscribe"}
                   </Button>
                 </form>
@@ -195,9 +202,16 @@ export default function BillingContent({
                 <li>Priority support: {p.priority ? "Yes" : "No"}</li>
               </ul>
               <form action={`/api/billing/checkout?plan=${p.id}`} method="post">
-                <Button color="primary" type="submit" className="w-full">
-                  {entitlements.planId === p.id && entitlements.active
-                    ? "Current plan"
+                <Button
+                  color="primary"
+                  type="submit"
+                  className="w-full"
+                  isDisabled={entitlements.planId === p.id && entitlements.active}
+                >
+                  {entitlements.active
+                    ? entitlements.planId === p.id
+                      ? "Current plan"
+                      : "Upgrade"
                     : "Subscribe"}
                 </Button>
               </form>
