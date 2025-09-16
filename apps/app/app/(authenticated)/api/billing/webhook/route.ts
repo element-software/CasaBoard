@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   // Important: use raw body (req.text) before any parsing
+  console.log("[stripe:webhook] event received");
   const stripe = StripeService.getStripe();
   const sig = req.headers.get("stripe-signature");
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -15,13 +16,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   const raw = await req.text();
 
-  console.log(
-    "[stripe:webhook] hasSig:",
-    Boolean(sig),
-    "hasSecret:",
-    Boolean(whSecret)
-  );
-  console.log("[stripe:webhook] rawLength:", raw?.length || 0);
   let event;
   try {
     event = stripe.webhooks.constructEvent(raw, sig, whSecret);
@@ -29,15 +23,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  console.log("[stripe:webhook] event type:", event.type);
+
   const supabase = await SupabaseServer.createClient();
   switch (event.type) {
     case "checkout.session.completed": {
-      console.log("[stripe:webhook] checkout session completed");
+      console.log("[stripe:webhook] event.type: checkout.session.completed");
       const session: any = event.data.object;
-      const userId = session?.metadata?.user_id || session?.client_reference_id || null;
+      const userId =
+        session?.metadata?.user_id || session?.client_reference_id || null;
       const planId = session?.metadata?.plan_id;
       const stripeCustomerId: string | null = session?.customer ?? null;
-      console.log("[stripe:webhook] userId", userId, "planId", planId, "stripeCustomerId", stripeCustomerId);
+      console.log(
+        "[stripe:webhook] userId",
+        userId,
+        "planId",
+        planId,
+        "stripeCustomerId",
+        stripeCustomerId
+      );
       if (userId && planId) {
         console.log("[stripe:webhook] inserting subscription");
         await supabase.from("subscriptions").insert({
@@ -50,24 +54,31 @@ export async function POST(req: NextRequest) {
           console.log("[stripe:webhook] inserting billing customer");
           await supabase
             .from("billing_customers")
-            .upsert({ user_id: userId, stripe_customer_id: stripeCustomerId }, { onConflict: "user_id" });
+            .upsert(
+              { user_id: userId, stripe_customer_id: stripeCustomerId },
+              { onConflict: "user_id" }
+            );
         } else {
           console.log("[stripe:webhook] no stripe customer ID found");
         }
       } else {
-        console.log("[stripe:webhook] no user ID or plan ID found");  
+        console.log("[stripe:webhook] no user ID or plan ID found");
       }
       break;
     }
     case "customer.subscription.updated":
     case "customer.subscription.created":
     case "customer.subscription.deleted": {
-      console.log("[stripe:webhook] updating subscription");
+      console.log(
+        "[stripe:webhook] event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted"
+      );
       const sub: any = event.data.object;
       let userId: string | null = sub?.metadata?.user_id || null;
       console.log("[stripe:webhook] userId", userId, "customer", sub?.customer);
       if (!userId && sub?.customer) {
-        console.log("[stripe:webhook] No user ID found, looking up by stripe customer ID");
+        console.log(
+          "[stripe:webhook] No user ID found, looking up by stripe customer ID"
+        );
         const { data: map } = await supabase
           .from("billing_customers")
           .select("user_id")
@@ -77,7 +88,9 @@ export async function POST(req: NextRequest) {
         console.log("[stripe:webhook] Found user ID", userId);
       }
       if (userId) {
-        console.log("[stripe:webhook] Updating subscription");
+        console.log(
+          "[stripe:webhook] event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted, Updating subscription"
+        );
         const periodEndIso =
           typeof sub?.current_period_end === "number"
             ? new Date(sub.current_period_end * 1000).toISOString()
@@ -89,7 +102,9 @@ export async function POST(req: NextRequest) {
           current_period_end: periodEndIso,
         });
       } else {
-        console.log("[stripe:webhook] No user ID found when updating subscription");
+        console.log(
+          "[stripe:webhook] event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted, No user ID found when updating subscription"
+        );
       }
       break;
     }
