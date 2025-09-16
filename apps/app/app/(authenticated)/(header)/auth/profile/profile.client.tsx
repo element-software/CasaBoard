@@ -52,9 +52,6 @@ export default function ProfileClient({ profile, entitlements }: { profile: Prof
               <Button color="primary" variant="bordered" onPress={() => router.push("/setup")}>
                 Go to Dashboard
               </Button>
-              <Button as="a" href="/billing" color="primary">
-                Manage billing
-              </Button>
               <Button color="danger" as="a" href="/auth/login?signout=1">
                 Sign out
               </Button>
@@ -79,8 +76,8 @@ export default function ProfileClient({ profile, entitlements }: { profile: Prof
               <p>HA Instances: {entitlements.maxHAInstances < 0 ? "Unlimited" : entitlements.maxHAInstances}</p>
             </div>
             <div className="pt-2">
-              <Button as="a" href="/billing" color="primary" variant="flat" className="w-full">
-                View plans & manage
+              <Button as="a" href="/billing" color="primary" variant="solid" className="w-full">
+                Manage Billing
               </Button>
             </div>
           </CardBody>
