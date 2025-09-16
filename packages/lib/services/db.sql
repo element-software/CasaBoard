@@ -41,6 +41,68 @@ do $$ begin
   end if;
 end $$;
 
+
+-- RLS policies for billing_customers (user can manage their own mapping)
+alter table if exists public.billing_customers enable row level security;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'billing_customers' and policyname = 'billing_customers_select_own'
+  ) then
+    create policy billing_customers_select_own on public.billing_customers
+      for select using (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'billing_customers' and policyname = 'billing_customers_insert_own'
+  ) then
+    create policy billing_customers_insert_own on public.billing_customers
+      for insert with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'billing_customers' and policyname = 'billing_customers_update_own'
+  ) then
+    create policy billing_customers_update_own on public.billing_customers
+      for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+
+-- RLS policies for subscriptions (user can upsert their own rows via success page)
+alter table if exists public.subscriptions enable row level security;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'subscriptions' and policyname = 'subscriptions_select_own'
+  ) then
+    create policy subscriptions_select_own on public.subscriptions
+      for select using (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'subscriptions' and policyname = 'subscriptions_insert_own'
+  ) then
+    create policy subscriptions_insert_own on public.subscriptions
+      for insert with check (auth.uid() = user_id);
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (
+    select 1 from pg_policies where schemaname = 'public' and tablename = 'subscriptions' and policyname = 'subscriptions_update_own'
+  ) then
+    create policy subscriptions_update_own on public.subscriptions
+      for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  end if;
+end $$;
+
 do $$ begin
   if not exists (
     select 1 from pg_policies where schemaname = 'public' and tablename = 'ha_instances' and policyname = 'ha_instances_insert_own'

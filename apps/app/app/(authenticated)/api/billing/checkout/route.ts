@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { StripeService } from "@repo/lib";
-import { SupabaseServer } from "@repo/lib";
+import { StripeService, SubscriptionService, SupabaseServer } from "@repo/lib";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,20 +14,45 @@ export async function POST(req: NextRequest) {
 
     const stripe = StripeService.getStripe();
     const price = await StripeService.getCheckoutPriceForPlan(plan as any);
+    let existingCustomerId = await SubscriptionService.getStripeCustomerIdForCurrentUser();
+
+    // Ensure Stripe customer exists and map into billing_customers via user-scoped insert (RLS allowed)
+    if (!existingCustomerId) {
+      console.log("[stripe:checkout] No existing customer ID found, creating one");
+      const list = await stripe.customers.list({ email: user.email ?? undefined, limit: 1 });
+      existingCustomerId = list.data[0]?.id ?? null;
+      console.log("[stripe:checkout] Existing customer ID found", existingCustomerId);
+      if (!existingCustomerId) {
+        const created = await stripe.customers.create({ email: user.email ?? undefined, metadata: { user_id: user.id } });
+        existingCustomerId = created.id;
+        console.log("[stripe:checkout] Created new customer ID", existingCustomerId);
+      }
+      await supabase
+        .from("billing_customers")
+        .upsert({ user_id: user.id, stripe_customer_id: existingCustomerId }, { onConflict: "user_id" })
+        .throwOnError();
+      console.log("[stripe:checkout] Inserted new customer ID into billing_customers");
+    }
 
     const origin = req.headers.get("origin") || new URL(req.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      customer_email: user.email ?? undefined,
+      // Prefer binding to an existing customer for reliable webhooks → user mapping
+      customer: existingCustomerId ?? undefined,
+      customer_email: existingCustomerId ? undefined : (user.email ?? undefined),
       line_items: [{ price, quantity: 1 }],
-      success_url: `${origin}/billing?success=true`,
+      success_url: `${origin}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/billing?canceled=true`,
+      // Attach metadata to the Checkout Session AND the Subscription that will be created
+      client_reference_id: user.id,
       metadata: { user_id: user.id, plan_id: plan },
+      subscription_data: {
+        metadata: { user_id: user.id, plan_id: plan },
+      },
     });
     return NextResponse.redirect(session.url!, { status: 303 });
   } catch (error) {
+    console.error("[stripe:checkout] Checkout init failed", error);
     return NextResponse.json({ error: "Checkout init failed" }, { status: 500 });
   }
 }
-
-
