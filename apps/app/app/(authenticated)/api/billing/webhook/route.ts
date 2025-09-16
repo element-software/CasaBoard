@@ -97,7 +97,10 @@ export async function POST(req: NextRequest) {
             : null;
         await supabase.from("subscriptions").insert({
           user_id: userId,
-          plan_id: sub.items?.data?.[0]?.price?.nickname ?? "starter",
+          plan_id:
+            sub.items?.data?.[0]?.price?.nickname ??
+            sub.metadata?.plan_id ??
+            "starter",
           status: sub.status,
           current_period_end: periodEndIso,
         });
@@ -108,6 +111,10 @@ export async function POST(req: NextRequest) {
       }
       break;
     }
+    // Stripe uses `customer.subscription.deleted` for immediate cancellations
+    // and `customer.subscription.updated` with status changes for cancel_at_period_end
+    // The deleted case is already handled above; no separate case needed.
+    // Leaving a placeholder comment for clarity.
     default:
       break;
   }

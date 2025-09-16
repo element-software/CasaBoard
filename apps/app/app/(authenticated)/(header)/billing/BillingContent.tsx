@@ -12,6 +12,7 @@ interface Entitlements {
   trialEndsAt: string | null;
   maxDashboards: number;
   maxHAInstances: number;
+  currentPeriodEnd?: string | null;
 }
 
 export default function BillingContent({
@@ -26,9 +27,7 @@ export default function BillingContent({
     return "Subscribe";
   };
 
-  const [billing, setBilling] = useState<"monthly" | "yearly">(
-    "monthly"
-  );
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
 
   const plans: Plan[] = [
     {
@@ -37,7 +36,9 @@ export default function BillingContent({
       monthly: 5,
       yearly: 50,
       dashboards: 1,
+      ha: 1,
       popular: false,
+      features: ["1 dashboard", "1 Home Assistant instance", "Online support"],
     },
     {
       id: "mid",
@@ -45,7 +46,9 @@ export default function BillingContent({
       monthly: 8,
       yearly: 80,
       dashboards: 3,
-      popular: true
+      ha: 1,
+      popular: true,
+      features: ["3 dashboards", "1 Home Assistant instance", "Online support"],
     },
     {
       id: "pro",
@@ -53,7 +56,9 @@ export default function BillingContent({
       monthly: 10,
       yearly: 100,
       dashboards: 6,
+      ha: 2,
       popular: false,
+      features: ["6 dashboards", "2 Home Assistant instances", "Online support"],
     },
   ] as const;
 
@@ -82,6 +87,12 @@ export default function BillingContent({
             </Chip>
           )}
         </div>
+        {entitlements.active && entitlements.currentPeriodEnd && (
+          <p className="mt-2 text-sm text-foreground-500">
+            Current period ends on {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}.
+            If you cancel, access continues until this date.
+          </p>
+        )}
 
         {/* Billing toggle */}
         <div className="mt-6 inline-flex rounded-full bg-content2 p-1 shadow-sm">
@@ -118,6 +129,9 @@ export default function BillingContent({
           const isActive = entitlements.planId === p.id && entitlements.active;
           const isPopular = p.popular === true;
           const price = billing === "monthly" ? p.monthly : p.yearly;
+          const monthlyTotal = p.monthly * 12;
+          const yearlyPrice = p.yearly;
+          const discount = Math.max(0, monthlyTotal - yearlyPrice);
           return (
             <Card
               key={p.id}
@@ -126,22 +140,39 @@ export default function BillingContent({
                 isPopular ? "bg-primary/10 border-primary/40" : ""
               )}
             >
-              <CardBody className="p-6 space-y-4">
+              <CardBody className="p-6 space-y-4 relative">
+                {billing === "yearly" && discount > 0 && (
+                  <span className="absolute top-3 right-3 text-xs bg-success text-white px-2 py-0.5 rounded-full shadow-sm">
+                    Save £{discount}
+                  </span>
+                )}
                 <div className="space-y-1">
                   <div className="text-sm text-foreground-500 font-medium">
                     {billing === "monthly" ? "Monthly" : "Yearly"}
                   </div>
                   <h3 className="text-lg font-semibold">{p.name}</h3>
                 </div>
-                <div className="text-4xl font-semibold">£{price}<span className="text-base font-normal text-foreground-500">/{billing === "monthly" ? "mo" : "yr"}</span></div>
+                <div className="text-4xl font-semibold">
+                  £{price}
+                  <span className="text-base font-normal text-foreground-500">
+                    /{billing === "monthly" ? "mo" : "yr"}
+                  </span>
+                </div>
                 <ul className="text-sm text-foreground-500 space-y-1">
-                  <li className="flex items-center gap-2"><Icon path={mdiCheck} className="w-4 h-4 text-success" /> {p.dashboards} dashboards</li>
-                  <li className="flex items-center gap-2"><Icon path={mdiCheck} className="w-4 h-4 text-success" /> 1 Home Assistant instance</li>
-                  <li className="flex items-center gap-2"><Icon path={mdiClose} className="w-4 h-4 text-foreground-400" /> Multi‑HA</li>
+
+                  {p.features.map((feature, idx) => (
+                    <li className="flex items-center gap-2" key={idx}>
+                      <Icon path={mdiCheck} className="w-4 h-4 text-success" />{" "}
+                      {feature}
+                    </li>
+                  ))}                  
                 </ul>
-                <form action={`/api/billing/checkout?plan=${p.id}`} method="post">
+                <form
+                  action={`/api/billing/checkout?plan=${p.id}`}
+                  method="post"
+                >
                   <Button
-                    color={isPopular ? "primary" : "default"}
+                    color="primary"
                     type="submit"
                     className="w-full"
                     isDisabled={isActive}
@@ -154,6 +185,17 @@ export default function BillingContent({
           );
         })}
       </div>
+
+      {/* Manage subscription */}
+      {entitlements.active && (
+        <div className="mt-8 flex items-center justify-center">
+          <form action="/api/billing/cancel" method="post">
+            <Button color="danger" variant="flat" type="submit">
+              Cancel at period end
+            </Button>
+          </form>
+        </div>
+      )}
 
       {/* Mobile keeps same cards grid above */}
 

@@ -21,7 +21,9 @@ export interface Plan {
   monthly: number;
   yearly: number;
   dashboards: number;
+  ha: number;
   popular: boolean;
+  features: string[];
 }
 
 export interface SubscriptionRecord {

@@ -58,7 +58,8 @@ export class SubscriptionService {
     const isWithinTrial = trialEndsAt && new Date(trialEndsAt) > now;
 
     if (hasActiveSub && sub?.plan_id) {
-      return resolveEntitlements(sub.plan_id as PlanId, sub.trial_ends_at || null, true);
+      const base = resolveEntitlements(sub.plan_id as PlanId, sub.trial_ends_at || null, true);
+      return { ...base, currentPeriodEnd: sub.current_period_end || null } as any;
     }
 
     if (isWithinTrial) {
