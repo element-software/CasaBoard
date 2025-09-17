@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       metadata: { user_id: user.id, plan_id: plan, interval },
       subscription_data: {
         metadata: { user_id: user.id, plan_id: plan, interval },
+        trial_period_days: 30,
       },
     });
     return NextResponse.redirect(session.url!, { status: 303 });
