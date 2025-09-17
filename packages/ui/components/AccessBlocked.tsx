@@ -22,9 +22,6 @@ export function AccessBlocked() {
                 <Button as={Link} href="/auth/profile/billing" color="primary" className="sm:min-w-[160px]">
                   View plans
                 </Button>
-                <Button as={Link} href="/api/billing/portal" variant="flat" className="sm:min-w-[200px]">
-                  Manage subscription
-                </Button>
               </div>
             </div>
           </div>

@@ -37,7 +37,7 @@ const quickActions: QuickAction[] = [
     description: 'Configure HA'
   },
   {
-    href: '/billing',
+    href: '/auth/profile/billing',
     icon: mdiCreditCard,
     title: 'Billing',
     description: 'Manage your billing'

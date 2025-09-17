@@ -26,5 +26,7 @@ export default async function BillingPage() {
       }
     } catch {}
   }
+
+  console.log("Billing:: entitlements", entitlements, "currentPeriodEnd", currentPeriodEnd, "cancelAt", cancelAt);
   return <BillingContent entitlements={entitlements} currentPeriodEnd={currentPeriodEnd} cancelAt={cancelAt} />;
 }

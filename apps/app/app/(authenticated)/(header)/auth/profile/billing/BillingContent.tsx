@@ -100,7 +100,7 @@ export default function BillingContent({
             </Chip>
             <Chip variant="flat">Plan: {entitlements.planId}</Chip>
             {entitlements.trialEndsAt && (
-              <Chip variant="flat">
+              <Chip variant="flat" color="warning">
                 Trial ends:{" "}
                 {new Date(entitlements.trialEndsAt).toLocaleDateString()}
               </Chip>
@@ -110,24 +110,32 @@ export default function BillingContent({
                 Access limited
               </Chip>
             )}
+            {cancelAt && (
+                  <Chip color="warning" variant="flat">
+                    Cancellation is scheduled for{" "}
+                    {new Date(cancelAt).toLocaleDateString()}.
+                  </Chip>
+                )}
+                {currentPeriodEnd && (
+                  <Chip color="success" variant="flat">
+                    Current period ends on{" "}
+                    {new Date(currentPeriodEnd).toLocaleDateString()}.
+                  </Chip>
+                )}
           </div>
-          {entitlements.active && currentPeriodEnd && (
-            <p className="mt-2 text-sm text-foreground-500">
-              Current period ends on {new Date(currentPeriodEnd).toLocaleDateString()}.
-              {cancelAt && (
-                <>
-                  {" "}
-                  Cancellation is scheduled for {new Date(cancelAt).toLocaleDateString()}.
-                </>
-              )}
-            </p>
-          )}
         </div>
-        {entitlements.active && currentPeriodEnd && (
-          <Button as={Link} href="/api/billing/portal" variant="bordered" color="primary" className="min-w-[180px]">
-            Manage Subscription
-          </Button>
-        )}
+        {entitlements.active &&
+          (currentPeriodEnd || cancelAt) && (
+            <Button
+              as={Link}
+              href="/api/billing/portal"
+              variant="bordered"
+              color="primary"
+              className="min-w-[180px]"
+            >
+              Manage Subscription
+            </Button>
+          )}
       </div>
 
       <div className="w-full flex flex-col gap-4 justify-center items-center">

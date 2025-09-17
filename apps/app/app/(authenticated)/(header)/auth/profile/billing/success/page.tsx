@@ -31,7 +31,7 @@ export default async function BillingSuccessPage({
         ? session.subscription
         : undefined;
     if (!subscriptionId) {
-      return redirect("/billing?success=1");
+      return redirect("/auth/profile/billing?success=1");
     }
 
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);

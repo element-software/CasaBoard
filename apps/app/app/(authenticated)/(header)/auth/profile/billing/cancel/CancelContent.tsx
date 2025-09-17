@@ -37,9 +37,6 @@ export default function CancelContent({
             <Button as={Link} href="/auth/profile/billing" variant="flat" className="min-w-[180px]">
               Back to Billing
             </Button>
-            <Button as={Link} href="/api/billing/portal" variant="bordered" className="min-w-[180px]">
-              Manage Subscription
-            </Button>
           </div>
         </CardBody>
       </Card>
