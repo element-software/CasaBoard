@@ -1,5 +1,5 @@
 "use server";
-import { createClient } from "../supabase/server";
+import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { SubscriptionService } from "../services/subscriptionService";
 
 export interface CreateHAInstanceInput {
@@ -10,7 +10,7 @@ export interface CreateHAInstanceInput {
 
 export async function listHAInstances() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
   const { data, error } = await supabase
     .from("ha_instances")
@@ -23,7 +23,7 @@ export async function listHAInstances() {
 
 export async function createHAInstance(input: CreateHAInstanceInput) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
 
   const { count } = await supabase
@@ -75,7 +75,7 @@ export async function createHAInstance(input: CreateHAInstanceInput) {
 
 export async function deleteHAInstance(id: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
   const { error } = await supabase
     .from("ha_instances")
@@ -126,7 +126,7 @@ export async function deleteHAInstance(id: string) {
 
 export async function setActiveHAInstance(id: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
 
   const { data: instance, error: fetchError } = await supabase

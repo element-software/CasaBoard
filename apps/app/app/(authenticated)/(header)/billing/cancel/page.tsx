@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { StripeService, SupabaseServer } from "@repo/lib";
+import { StripeService, SupabaseServer, getCurrentAuthUser } from "@repo/lib";
 import Stripe from "stripe";
 import CancelContent from "./CancelContent";
 
@@ -10,9 +10,7 @@ const getData = async (subId: string) => {
   const subscription = await stripe.subscriptions.retrieve(subId);
   const sub: Stripe.Subscription = subscription as any;
   const supabase = await SupabaseServer.createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) return redirect("/billing");
   const customerId = (sub.customer as string) ?? undefined;
   if (!customerId) return redirect("/billing");

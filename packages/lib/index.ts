@@ -12,3 +12,4 @@ export { StripeEntitlementsService } from './services/stripeEntitlementsService'
 export * as HAInstanceActions from './actions/haInstanceActions';
 export * as Encryption from './encryption';
 export { generateSessionId } from './encryption';
+export { getCurrentAuthUser } from './supabase/server';

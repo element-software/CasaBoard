@@ -17,8 +17,10 @@ interface Entitlements {
 
 export default function BillingContent({
   entitlements,
+  currentPeriodEnd,
 }: {
   entitlements: Entitlements;
+  currentPeriodEnd?: string | null;
 }) {
   const labelForPlan = (planId: string) => {
     if (entitlements.active) {

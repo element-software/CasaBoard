@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SupabaseServer, StripeService } from "@repo/lib";
+import { SupabaseServer, StripeService, getCurrentAuthUser } from "@repo/lib";
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await SupabaseServer.createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Find mapped Stripe customer id

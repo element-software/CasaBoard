@@ -25,22 +25,15 @@ import Link from "next/link";
 import { mdiMenu } from "@mdi/js";
 
 // User Menu Component
-function UserMenu() {
-  const [user, setUser] = useState<any>(null);
+function UserMenu({
+  user,
+}: {
+  user: any;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const supabase = SupabaseClient.createClient();
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    getUser();
-  }, [supabase.auth]);
 
   const handleLogout = async () => {
     try {
@@ -53,15 +46,6 @@ function UserMenu() {
       setIsLoggingOut(false);
     }
   };
-
-  if (!user) {
-    return (
-      <div className="flex items-center gap-2 px-2 py-1.5 text-xs text-theme-text-secondary bg-theme-secondary border border-theme-border rounded-lg">
-        <Icon path={mdiAccount} className="h-3 w-3" />
-        <span className="hidden sm:inline">Loading...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="relative">
@@ -166,9 +150,10 @@ function UserMenu() {
 
 interface HeaderProps {
   public?: boolean;
+  user?: any;
 }
 
-export const Header: React.FC<HeaderProps> = ({ public: isPublic = false }) => {
+export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }) => {
   const pathname = usePathname();
   const hideBreadcrumbs = isPublic && pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -224,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false }) => {
           {/* Right side - User Menu (only show if not public) */}
           {!isPublic ? (
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
-              <UserMenu />
+              <UserMenu user={user} />
             </div>
           ) : (
             <div className="items-center gap-2 flex-shrink-0 ml-auto hidden sm:flex">

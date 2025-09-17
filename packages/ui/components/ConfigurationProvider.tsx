@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
-import { PageService } from '@repo/lib';
+import { getCurrentAuthUser, PageService } from '@repo/lib';
 import { SupabaseClient } from '@repo/lib';
 
 interface ConfigurationContextType {
@@ -41,7 +41,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({
     
     // Save to Supabase if user is authenticated
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentAuthUser();
       if (user) {
         // Update pages in Supabase
         for (const [slug, pageConfig] of Object.entries(newConfig.pages)) {

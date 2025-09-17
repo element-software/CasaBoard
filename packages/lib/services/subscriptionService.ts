@@ -1,14 +1,12 @@
 import { Entitlements, PlanId } from "@repo/types/subscription";
-import { createClient } from "../supabase/server";
+import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { resolveEntitlements } from "./billingService";
 import { StripeEntitlementsService } from "./stripeEntitlementsService";
 
 export class SubscriptionService {
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
 
     if (!user) {
       return {
@@ -61,9 +59,7 @@ export class SubscriptionService {
 
   static async getStripeCustomerIdForCurrentUser(): Promise<string | null> {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return null;
 
     const { data } = await supabase

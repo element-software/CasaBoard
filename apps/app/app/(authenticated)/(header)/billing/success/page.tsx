@@ -1,9 +1,5 @@
 import { redirect } from "next/navigation";
-import {
-  StripeService,
-  SupabaseServer,
-  StripeEntitlementsService,
-} from "@repo/lib";
+import { StripeService, SupabaseServer, StripeEntitlementsService, getCurrentAuthUser } from "@repo/lib";
 import Stripe from "stripe";
 import SuccessContent from "./SuccessContent";
 
@@ -50,9 +46,7 @@ export default async function BillingSuccessPage({
     planLabel = (sub.items?.data?.[0]?.price?.product as any)?.name || planId;
 
     const supabase = await SupabaseServer.createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (user) {
       await supabase.from("subscriptions").insert({
         user_id: user.id,

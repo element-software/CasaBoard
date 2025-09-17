@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createClient } from '@/lib/supabase/middleware';
+import { SupabaseMiddleware } from '@repo/lib';
+import { getCurrentAuthUser } from '@repo/lib';
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -22,12 +23,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { supabase, response } = createClient(request);
+  const { supabase, response } = SupabaseMiddleware.createClient(request);
 
   // Refresh session if expired - required for Server Components
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
 
   // Protect API routes that require authentication
   if (pathname.startsWith('/api/') && !user) {

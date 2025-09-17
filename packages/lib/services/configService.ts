@@ -1,12 +1,11 @@
-import { createClient } from '../supabase/server';
+import { getCurrentAuthUser } from '../supabase/server';
 import { type DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
 import { getAllPages } from '../actions/pageActions';
 
 export async function getServerConfig(): Promise<DashboardConfig> {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     
     if (!user) {
       return defaultConfig;

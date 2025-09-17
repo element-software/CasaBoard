@@ -1,13 +1,11 @@
-import { SupabaseClient } from '@repo/lib'
+import { getCurrentAuthUser, SupabaseClient } from '@repo/lib'
 import { NextRequest, NextResponse } from 'next/server'
 import { CreatePageData } from '@repo/types/page'
 
 export async function GET() {
   const supabase = await SupabaseClient.createClient()
   
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentAuthUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -29,9 +27,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const supabase = await SupabaseClient.createClient()
   
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentAuthUser();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -1,6 +1,6 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
-import { UserSettingsActions, SupabaseServer, Encryption, ConfigService } from "@repo/lib";
+import { UserSettingsActions, SupabaseServer, Encryption, ConfigService, getCurrentAuthUser } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
 
 // Force dynamic rendering for this layout since it uses cookies
@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   if (userSettings?.hass_token) {
     try {
       const supabase = await SupabaseServer.createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentAuthUser();
       
       if (user) {
         const sessionId = generateSessionId(user.id, user.email);

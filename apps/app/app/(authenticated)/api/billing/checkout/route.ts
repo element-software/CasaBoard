@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { StripeService, SubscriptionService, SupabaseServer } from "@repo/lib";
+import { StripeService, SubscriptionService, SupabaseServer, getCurrentAuthUser } from "@repo/lib";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing plan" }, { status: 400 });
     }
     const supabase = await SupabaseServer.createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const stripe = StripeService.getStripe();

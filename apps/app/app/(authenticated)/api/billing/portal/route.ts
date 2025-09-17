@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { StripeService } from "@repo/lib";
 import { SupabaseServer } from "@repo/lib";
+import { getCurrentAuthUser } from "@repo/lib";
 
 export async function GET(req: NextRequest) {
   try {
     const supabase = await SupabaseServer.createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const stripe = StripeService.getStripe();

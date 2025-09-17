@@ -1,7 +1,7 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
 import { Header } from "@repo/ui/components/Header/Header";
-import { UserSettingsActions, SupabaseServer, Encryption, ConfigService } from "@repo/lib";
+import { UserSettingsActions, SupabaseServer, Encryption, ConfigService, getCurrentAuthUser } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
 import { Footer } from "@repo/ui/components/Footer";
 
@@ -23,7 +23,7 @@ export default async function AuthenticatedLayout({
   if (userSettings?.hass_token) {
     try {
       const supabase = await SupabaseServer.createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentAuthUser();
       
       if (user) {
         const sessionId = generateSessionId(user.id, user.email);

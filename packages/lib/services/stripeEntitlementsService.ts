@@ -1,4 +1,4 @@
-import { SupabaseServer, StripeService } from "..";
+import { SupabaseServer, StripeService, getCurrentAuthUser } from "..";
 
 export class StripeEntitlementsService {
   /**
@@ -7,7 +7,7 @@ export class StripeEntitlementsService {
    */
   static async syncCurrentUserEntitlements(): Promise<void> {
     const supabase = await SupabaseServer.createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return;
 
     // Resolve Stripe customer id
@@ -21,8 +21,14 @@ export class StripeEntitlementsService {
 
     const stripe = StripeService.getStripe();
     // Ensure there is an active or trialing subscription
-    const subsAll = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 5 });
-    const hasValidSub = subsAll.data?.some((s: any) => s?.status && ["active", "trialing"].includes(s.status));
+    const subsAll = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 5,
+    });
+    const hasValidSub = subsAll.data?.some(
+      (s: any) => s?.status && ["active", "trialing"].includes(s.status)
+    );
 
     // If no active subscription, clear cached entitlements for this user
     if (!hasValidSub) {
@@ -33,7 +39,9 @@ export class StripeEntitlementsService {
     // Fetch active entitlements from Stripe (try customers.retrieveEntitlements first)
     let activeKeys: string[] = [];
     try {
-      const entSummary: any = await (stripe.customers as any)?.retrieveEntitlements?.(customerId, { limit: 100, active: true });
+      const entSummary: any = await (
+        stripe.customers as any
+      )?.retrieveEntitlements?.(customerId, { limit: 100, active: true });
       if (entSummary && Array.isArray(entSummary.data)) {
         activeKeys = entSummary.data
           .filter((e: any) => e?.active === true || e?.status === "active")
@@ -44,7 +52,10 @@ export class StripeEntitlementsService {
     // Fallback API shape
     if (activeKeys.length === 0) {
       try {
-        const entitlements: any = await (stripe as any).entitlements?.list?.({ customer: customerId, limit: 100 });
+        const entitlements: any = await (stripe as any).entitlements?.list?.({
+          customer: customerId,
+          limit: 100,
+        });
         if (entitlements && Array.isArray(entitlements.data)) {
           activeKeys = entitlements.data
             .filter((e: any) => e?.active === true || e?.status === "active")
@@ -56,9 +67,13 @@ export class StripeEntitlementsService {
 
     // If Entitlements API is not enabled or returns empty, derive from subscription metadata
     if (activeKeys.length === 0) {
-      const activeSub = subsAll.data.find((s: any) => s?.status && ["active", "trialing"].includes(s.status));
+      const activeSub = subsAll.data.find(
+        (s: any) => s?.status && ["active", "trialing"].includes(s.status)
+      );
       const metaPlan = activeSub?.metadata?.plan_id as string | undefined;
-      const nickname = activeSub?.items?.data?.[0]?.price?.nickname as string | undefined;
+      const nickname = activeSub?.items?.data?.[0]?.price?.nickname as
+        | string
+        | undefined;
       const planId = (metaPlan || nickname || "").toLowerCase();
       const planToFeature: Record<string, string> = {
         starter: "starter-access",
@@ -78,11 +93,15 @@ export class StripeEntitlementsService {
       .select("feature_key")
       .eq("user_id", user.id);
 
-    const existingSet = new Set<string>((existing || []).map((r: any) => r.feature_key as string));
+    const existingSet = new Set<string>(
+      (existing || []).map((r: any) => r.feature_key as string)
+    );
     const incomingSet = new Set<string>(activeKeys);
 
     // Delete features no longer active
-    const toDelete: string[] = Array.from(existingSet).filter((k) => !incomingSet.has(k));
+    const toDelete: string[] = Array.from(existingSet).filter(
+      (k) => !incomingSet.has(k)
+    );
     if (toDelete.length > 0) {
       await supabase
         .from("user_entitlements")
@@ -93,12 +112,15 @@ export class StripeEntitlementsService {
 
     // Upsert active features
     if (activeKeys.length > 0) {
-      await supabase
-        .from("user_entitlements")
-        .upsert(
-          activeKeys.map((k) => ({ user_id: user.id, feature_key: k, active: true, updated_at: new Date().toISOString() })),
-          { onConflict: "user_id,feature_key" }
-        );
+      await supabase.from("user_entitlements").upsert(
+        activeKeys.map((k) => ({
+          user_id: user.id,
+          feature_key: k,
+          active: true,
+          updated_at: new Date().toISOString(),
+        })),
+        { onConflict: "user_id,feature_key" }
+      );
     }
   }
   /**
@@ -107,7 +129,7 @@ export class StripeEntitlementsService {
    */
   static async hasFeature(featureLookupKey: string): Promise<boolean> {
     const supabase = await SupabaseServer.createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return false;
 
     // Read from local cache first
@@ -133,7 +155,7 @@ export class StripeEntitlementsService {
 
   static async hasAnyFeature(featureLookupKeys: string[]): Promise<boolean> {
     const supabase = await SupabaseServer.createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) return false;
 
     // Check local cache
@@ -141,7 +163,9 @@ export class StripeEntitlementsService {
       .from("user_entitlements")
       .select("feature_key")
       .eq("user_id", user.id);
-    const set = new Set<string>((data || []).map((r: any) => r.feature_key as string));
+    const set = new Set<string>(
+      (data || []).map((r: any) => r.feature_key as string)
+    );
     if (featureLookupKeys.some((k) => set.has(k))) return true;
 
     // Fallback one-time sync then re-check
@@ -150,9 +174,9 @@ export class StripeEntitlementsService {
       .from("user_entitlements")
       .select("feature_key")
       .eq("user_id", user.id);
-    const setAfter = new Set<string>((after || []).map((r: any) => r.feature_key as string));
+    const setAfter = new Set<string>(
+      (after || []).map((r: any) => r.feature_key as string)
+    );
     return featureLookupKeys.some((k) => setAfter.has(k));
   }
 }
-
-

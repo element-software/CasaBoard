@@ -2,6 +2,10 @@ import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import { Footer } from "@repo/ui/components/Footer";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { HeroUIProvider } from "@heroui/react";
+import { getCurrentAuthUser } from "@repo/lib";
+import { Header } from "@repo/ui/components/Header/Header";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
@@ -28,7 +32,7 @@ export const metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -36,9 +40,14 @@ export default function PublicLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        {children}
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
-        <Footer />
+        <Providers>
+          <div className="min-h-screen bg-theme-background">
+            <Header public={true} />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

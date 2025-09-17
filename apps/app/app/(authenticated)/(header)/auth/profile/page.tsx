@@ -1,10 +1,10 @@
-import { SupabaseServer, SubscriptionService } from "@repo/lib";
+import { SupabaseServer, SubscriptionService, getCurrentAuthUser } from "@repo/lib";
 import { redirect } from "next/navigation";
 import ProfileClient from "./profile.client";
 
 export default async function ProfilePage() {
   const supabase = await SupabaseServer.createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentAuthUser();
   if (!user) {
     redirect("/auth/login?redirectTo=/auth/profile");
   }

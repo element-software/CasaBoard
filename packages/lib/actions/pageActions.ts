@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from '../supabase/server';
+import { createClient, getCurrentAuthUser } from '../supabase/server';
 import { SubscriptionService } from '../services/subscriptionService';
 import { CreatePageData, UpdatePageData } from '@repo/types/page';
 import { revalidatePath } from 'next/cache';
@@ -9,7 +9,7 @@ export async function createPage(data: CreatePageData) {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -64,7 +64,7 @@ export async function updatePage(slug: string, data: UpdatePageData) {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -100,7 +100,7 @@ export async function deletePage(slug: string) {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -127,7 +127,7 @@ export async function getPage(slug: string) {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -157,7 +157,7 @@ export async function getAllPages() {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -183,7 +183,7 @@ export async function getPageBySlug(slug: string) {
   try {
     const supabase = await createClient();
     
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
 
 
     // First, try to get the page
