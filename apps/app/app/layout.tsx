@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "CasaBoard — Dashboard",
   description: "CasaBoard Dashboard",
   icons: {
-    icon: "./icon.svg",
+    icon: "/icon.svg",
   },
   manifest: "./manifest.webmanifest",
 };

@@ -10,7 +10,7 @@ export const metadata = {
   description: "Cloud-hosted, customizable dashboard for Home Assistant",
   metadataBase: new URL("https://casaboard.dev"),
   icons: {
-    icon: "./icon.svg",
+    icon: "/icon.svg",
   },
   manifest: "./manifest.webmanifest",
   openGraph: {
