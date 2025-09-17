@@ -24,16 +24,19 @@ interface Entitlements {
   trialEndsAt: string | null;
   maxDashboards: number;
   maxHAInstances: number;
-  currentPeriodEnd?: string | null;
 }
 
 export default function BillingContent({
   entitlements,
+  currentPeriodEnd,
+  cancelAt,
 }: {
   entitlements: Entitlements;
+  currentPeriodEnd?: string | null;
+  cancelAt?: string | null;
 }) {
   const labelForPlan = (planId: string) => {
-    if (entitlements.active && entitlements.currentPeriodEnd) {
+    if (entitlements.active && (currentPeriodEnd || cancelAt)) {
       return entitlements.planId === planId ? "Current plan" : "Upgrade";
     }
     return "Subscribe";
@@ -108,15 +111,19 @@ export default function BillingContent({
               </Chip>
             )}
           </div>
-          {entitlements.active && entitlements.currentPeriodEnd && (
+          {entitlements.active && currentPeriodEnd && (
             <p className="mt-2 text-sm text-foreground-500">
-              Current period ends on{" "}
-              {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}. If
-              you cancel, access continues until this date.
+              Current period ends on {new Date(currentPeriodEnd).toLocaleDateString()}.
+              {cancelAt && (
+                <>
+                  {" "}
+                  Cancellation is scheduled for {new Date(cancelAt).toLocaleDateString()}.
+                </>
+              )}
             </p>
           )}
         </div>
-        {entitlements.active && entitlements.currentPeriodEnd && (
+        {entitlements.active && currentPeriodEnd && (
           <Button as={Link} href="/api/billing/portal" variant="bordered" color="primary" className="min-w-[180px]">
             Manage Subscription
           </Button>

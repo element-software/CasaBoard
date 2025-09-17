@@ -12,10 +12,11 @@ export default async function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   const user = await getCurrentAuthUser();
-  console.log("AuthenticatedLayout:: user", user);
+
   if (!user) {
     redirect("/auth/login");
   }
+
   return (
     <div className="min-h-screen bg-theme-background">
       <Header user={user} />

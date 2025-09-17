@@ -22,10 +22,11 @@ export default async function AuthenticatedLayout({
 
   // Fetch user settings and decrypt token server-side
   const userSettings = await UserSettingsActions.getUserSettings();
-  console.log("AuthenticatedLayout:: userSettings", userSettings);
+  
   if (!userSettings) {
     redirect("/auth/login");
   }
+
   let decryptedToken: string | null = null;
 
   if (userSettings?.hass_token) {

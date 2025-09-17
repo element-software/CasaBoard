@@ -5,6 +5,7 @@ import BillingContent from "./BillingContent";
 export default async function BillingPage() {
   const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
   let currentPeriodEnd: string | null = null;
+  let cancelAt: string | null = null;
   if (entitlements.active) {
     try {
       const supabase = await SupabaseServer.createClient();
@@ -18,13 +19,12 @@ export default async function BillingPage() {
         const stripe = StripeService.getStripe();
         const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 1 });
         const sub: any = subs.data[0] as any;
-        console.log("sub", sub);
         const cpe = sub?.current_period_end;
-        console.log("cpe", cpe);
+        const ca = sub?.cancel_at;
         if (typeof cpe === "number") currentPeriodEnd = new Date(cpe * 1000).toISOString();
-        console.log("currentPeriodEnd", currentPeriodEnd);
+        if (typeof ca === "number") cancelAt = new Date(ca * 1000).toISOString();
       }
     } catch {}
   }
-  return <BillingContent entitlements={{ ...entitlements, currentPeriodEnd }} />;
+  return <BillingContent entitlements={entitlements} currentPeriodEnd={currentPeriodEnd} cancelAt={cancelAt} />;
 }
