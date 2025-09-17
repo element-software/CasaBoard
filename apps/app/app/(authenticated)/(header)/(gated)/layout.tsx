@@ -7,6 +7,7 @@ import {
   getCurrentAuthUser,
 } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
+import { redirect } from "next/navigation";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = "force-dynamic";
@@ -21,6 +22,10 @@ export default async function AuthenticatedLayout({
 
   // Fetch user settings and decrypt token server-side
   const userSettings = await UserSettingsActions.getUserSettings();
+  console.log("AuthenticatedLayout:: userSettings", userSettings);
+  if (!userSettings) {
+    redirect("/auth/login");
+  }
   let decryptedToken: string | null = null;
 
   if (userSettings?.hass_token) {
@@ -40,6 +45,8 @@ export default async function AuthenticatedLayout({
           // Legacy plain text token
           decryptedToken = userSettings.hass_token;
         }
+      } else {
+        redirect("/auth/login");
       }
     } catch (error) {
       console.warn("Failed to decrypt HA token:", error);
