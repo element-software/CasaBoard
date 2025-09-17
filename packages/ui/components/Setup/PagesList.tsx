@@ -158,11 +158,11 @@ export const PagesList = ({ initialPages = [], initialError = null, entitlements
               <div className="text-sm text-foreground-500">
                 {entitlements.active ? (
                   <>
-                    Limit reached. <Link href="/billing" className="text-primary">Upgrade to add more</Link>
+                    Limit reached. <Link href="/profile/billing" className="text-primary">Upgrade to add more</Link>
                   </>
                 ) : (
                   <>
-                    Access blocked. <Link href="/billing" className="text-primary">Choose a plan</Link>
+                    Access blocked. <Link href="/profile/billing" className="text-primary">Choose a plan</Link>
                   </>
                 )}
               </div>

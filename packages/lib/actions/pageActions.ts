@@ -127,7 +127,7 @@ export async function getPage(slug: string) {
   try {
     const supabase = await createClient();
     
-    const user = await getCurrentAuthUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -157,7 +157,7 @@ export async function getAllPages() {
   try {
     const supabase = await createClient();
     
-    const user = await getCurrentAuthUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       throw new Error('Unauthorized');
     }
@@ -183,7 +183,7 @@ export async function getPageBySlug(slug: string) {
   try {
     const supabase = await createClient();
     
-    const user = await getCurrentAuthUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
 
     // First, try to get the page

@@ -18,10 +18,13 @@ export default async function BillingPage() {
         const stripe = StripeService.getStripe();
         const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 1 });
         const sub: any = subs.data[0] as any;
+        console.log("sub", sub);
         const cpe = sub?.current_period_end;
+        console.log("cpe", cpe);
         if (typeof cpe === "number") currentPeriodEnd = new Date(cpe * 1000).toISOString();
+        console.log("currentPeriodEnd", currentPeriodEnd);
       }
     } catch {}
   }
-  return <BillingContent entitlements={entitlements} currentPeriodEnd={currentPeriodEnd} />;
+  return <BillingContent entitlements={{ ...entitlements, currentPeriodEnd }} />;
 }

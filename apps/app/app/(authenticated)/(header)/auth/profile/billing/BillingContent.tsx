@@ -1,5 +1,17 @@
 "use client";
-import { Button, Card, CardBody, Chip, cn, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  cn,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiCheck } from "@mdi/js";
@@ -17,13 +29,11 @@ interface Entitlements {
 
 export default function BillingContent({
   entitlements,
-  currentPeriodEnd,
 }: {
   entitlements: Entitlements;
-  currentPeriodEnd?: string | null;
 }) {
   const labelForPlan = (planId: string) => {
-    if (entitlements.active) {
+    if (entitlements.active && entitlements.currentPeriodEnd) {
       return entitlements.planId === planId ? "Current plan" : "Upgrade";
     }
     return "Subscribe";
@@ -106,15 +116,11 @@ export default function BillingContent({
             </p>
           )}
         </div>
-        <Button
-          as={Link}
-          href="/api/billing/portal"
-          variant="bordered"
-          color="primary"
-          className="min-w-[180px]"
-        >
-          Manage Subscription
-        </Button>
+        {entitlements.active && entitlements.currentPeriodEnd && (
+          <Button as={Link} href="/api/billing/portal" variant="bordered" color="primary" className="min-w-[180px]">
+            Manage Subscription
+          </Button>
+        )}
       </div>
 
       <div className="w-full flex flex-col gap-4 justify-center items-center">
@@ -201,13 +207,22 @@ export default function BillingContent({
                     </Button>
                     {isActive && (
                       <div className="mt-8 flex items-center justify-center">
-                        <Button color="danger" variant="bordered" onPress={onOpen}>
+                        <Button
+                          color="danger"
+                          variant="bordered"
+                          onPress={onOpen}
+                        >
                           Cancel at period end
                         </Button>
                       </div>
                     )}
                   </form>
-                  <form ref={cancelFormRef} action="/api/billing/cancel" method="post" className="hidden" />
+                  <form
+                    ref={cancelFormRef}
+                    action="/api/billing/cancel"
+                    method="post"
+                    className="hidden"
+                  />
                 </CardBody>
               </Card>
             );
@@ -229,16 +244,28 @@ export default function BillingContent({
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Cancel subscription?</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">
+                Cancel subscription?
+              </ModalHeader>
               <ModalBody>
                 <p>
-                  You will keep access until the end of your current billing period.
-                  Are you sure you want to cancel at the end of the period?
+                  You will keep access until the end of your current billing
+                  period. Are you sure you want to cancel at the end of the
+                  period?
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>Keep subscription</Button>
-                <Button color="danger" onPress={() => { cancelFormRef.current?.submit(); }}>Yes, cancel</Button>
+                <Button variant="flat" onPress={close}>
+                  Keep subscription
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    cancelFormRef.current?.submit();
+                  }}
+                >
+                  Yes, cancel
+                </Button>
               </ModalFooter>
             </>
           )}

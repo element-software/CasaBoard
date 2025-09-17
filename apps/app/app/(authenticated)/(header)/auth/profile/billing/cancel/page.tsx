@@ -11,15 +11,15 @@ const getData = async (subId: string) => {
   const sub: Stripe.Subscription = subscription as any;
   const supabase = await SupabaseServer.createClient();
   const user = await getCurrentAuthUser();
-  if (!user) return redirect("/billing");
+  if (!user) return redirect("/profile/billing");
   const customerId = (sub.customer as string) ?? undefined;
-  if (!customerId) return redirect("/billing");
+  if (!customerId) return redirect("/profile/billing");
   const { data: map } = await supabase
     .from("billing_customers")
     .select("user_id")
     .eq("stripe_customer_id", customerId)
     .single();
-  if (!map || map.user_id !== user.id) return redirect("/billing");
+  if (!map || map.user_id !== user.id) return redirect("/profile/billing");
 
   console.log("Sub:", sub)
 
@@ -43,7 +43,7 @@ export default async function BillingCancelPage({
 }) {
   const params = await searchParams;
   const subId = typeof params.sub_id === "string" ? params.sub_id : undefined;
-  if (!subId) return redirect("/billing");
+  if (!subId) return redirect("/profile/billing");
 
   const { planLabel, currentPeriodEnd } = await getData(subId);
 

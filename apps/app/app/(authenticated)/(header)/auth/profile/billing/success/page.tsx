@@ -18,7 +18,7 @@ export default async function BillingSuccessPage({
   const sessionId = (await searchParams).session_id?.toString();
 
   if (!sessionId) {
-    return redirect("/billing");
+    return redirect("/profile/billing");
   }
 
   let planLabel: string | null = null;

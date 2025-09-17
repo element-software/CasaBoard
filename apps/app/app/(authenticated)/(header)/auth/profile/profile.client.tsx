@@ -76,7 +76,7 @@ export default function ProfileClient({ profile, entitlements }: { profile: Prof
               <p>HA Instances: {entitlements.maxHAInstances < 0 ? "Unlimited" : entitlements.maxHAInstances}</p>
             </div>
             <div className="pt-2">
-              <Button as="a" href="/billing" color="primary" variant="solid" className="w-full">
+              <Button as="a" href="/profile/billing" color="primary" variant="solid" className="w-full">
                 Manage Billing
               </Button>
             </div>
