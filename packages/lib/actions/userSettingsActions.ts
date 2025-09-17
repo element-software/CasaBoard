@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "../supabase/server";
+import { createClient, getCurrentAuthUser } from "../supabase/server";
 import {
   CreateUserSettingsData,
   UpdateUserSettingsData,
@@ -12,9 +12,7 @@ export async function getUserSettings(): Promise<UserSettings | null> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -45,9 +43,7 @@ export async function createUserSettings(
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -79,9 +75,7 @@ export async function updateUserSettings(
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -142,9 +136,7 @@ export async function deleteUserSettings(): Promise<void> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -169,9 +161,7 @@ export async function deleteUserHassSettings(): Promise<void> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
     if (!user) {
       throw new Error("Unauthorized");
     }

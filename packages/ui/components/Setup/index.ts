@@ -1,3 +1,7 @@
+export * from "./HAConfiguration";
+export * from "./HAInstanceManager";
+export * from "./PagesList";
+export * from "./PagesManagement";
 // New Puck-based components
 export { PuckEditor } from './PuckEditor';
 export { PuckEditorView } from './views/PuckEditor';

@@ -12,19 +12,20 @@
   },
   "dependencies": {
     "@repo/ui": "*",
+    "@tailwindcss/postcss": "^4.1.13",
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@tailwindcss/postcss": "^4.1.13"
+    "stripe": "^18.5.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@repo/tailwind-config": "*",
     "@repo/config": "*",
-    "@repo/types": "*",
+    "@repo/eslint-config": "*",
     "@repo/hooks": "*",
     "@repo/lib": "*",
+    "@repo/tailwind-config": "*",
+    "@repo/types": "*",
+    "@repo/typescript-config": "*",
     "@types/node": "^22.15.3",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",

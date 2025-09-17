@@ -1,11 +1,5 @@
-"use client";
+import { LoginForm } from "@repo/ui/components/Login/LoginForm";
 import { Suspense } from "react";
-import dynamic from 'next/dynamic'
- 
-const LoginForm = dynamic(
-  () => import('@repo/ui/components/Login/LoginForm').then(mod => ({ default: mod.LoginForm })),
-  { ssr: false }
-)
 
 function LoginPageSkeleton() {
   return (

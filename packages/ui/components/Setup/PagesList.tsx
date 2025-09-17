@@ -22,12 +22,18 @@ import {
 } from '@mdi/js';
 import { Button, Card, CardBody, CardHeader, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
 
+interface EntitlementsInput {
+  active: boolean;
+  maxDashboards: number;
+}
+
 interface PagesListProps {
   initialPages?: Page[];
   initialError?: string | null;
+  entitlements?: EntitlementsInput;
 }
 
-export const PagesList = ({ initialPages = [], initialError = null }: PagesListProps) => {
+export const PagesList = ({ initialPages = [], initialError = null, entitlements }: PagesListProps) => {
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
@@ -136,16 +142,32 @@ export const PagesList = ({ initialPages = [], initialError = null }: PagesListP
           <p className="text-theme-text-secondary mb-8 text-lg">
             Create your first dashboard page to get started with CasaBoard
           </p>
-          <Button
-            as={Link}
-            href="/setup/pages/create"
-            color="primary"
-            size="lg"
-            startContent={<Icon path={mdiPlus} className="w-5 h-5" />}
-            className="px-8 py-3"
-          >
-            Create Your First Page
-          </Button>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              as={Link}
+              href="/setup/pages/create"
+              color="primary"
+              size="lg"
+              startContent={<Icon path={mdiPlus} className="w-5 h-5" />}
+              className="px-8 py-3"
+              isDisabled={Boolean(entitlements && (!entitlements.active || (entitlements.maxDashboards >= 0 && pages.length >= entitlements.maxDashboards)))}
+            >
+              Create Your First Page
+            </Button>
+            {entitlements && (!entitlements.active || (entitlements.maxDashboards >= 0 && pages.length >= entitlements.maxDashboards)) && (
+              <div className="text-sm text-foreground-500">
+                {entitlements.active ? (
+                  <>
+                    Limit reached. <Link href="/auth/profile/billing" className="text-primary">Upgrade to add more</Link>
+                  </>
+                ) : (
+                  <>
+                    Access blocked. <Link href="/auth/profile/billing" className="text-primary">Choose a plan</Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -159,14 +181,22 @@ export const PagesList = ({ initialPages = [], initialError = null }: PagesListP
           <h2 className="text-2xl font-bold text-theme-text">Manage Pages</h2>
           <p className="text-theme-text-secondary mt-1">Create, edit, and manage your dashboard pages</p>
         </div>
-        <Button
-          as={Link}
-          href="/setup/pages/create"
-          color="primary"
-          startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-        >
-          New Page
-        </Button>
+        <div className="flex items-center gap-3">
+          {entitlements && entitlements.maxDashboards >= 0 && (
+            <span className="text-sm text-foreground-500">
+              {pages.length}/{entitlements.maxDashboards}
+            </span>
+          )}
+          <Button
+            as={Link}
+            href="/setup/pages/create"
+            color="primary"
+            startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+            isDisabled={Boolean(entitlements && (!entitlements.active || (entitlements.maxDashboards >= 0 && pages.length >= entitlements.maxDashboards)))}
+          >
+            New Page
+          </Button>
+        </div>
       </div>
 
       {/* Pages Grid */}

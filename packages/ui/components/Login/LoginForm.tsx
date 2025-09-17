@@ -1,28 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SupabaseClient } from "@repo/lib";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
 
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/setup";
 
   const supabase = SupabaseClient.createClient();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const handleGoogleSignIn = async () => {
-    if (!isClient) return;
-    
+  const handleGoogleSignIn = async () => {    
     setLoading(true);
     setError(null);
 
@@ -40,27 +32,6 @@ export function LoginForm() {
       setLoading(false);
     }
   };
-
-  // Show loading state during SSR
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded w-32 mx-auto mb-2 animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-48 mx-auto animate-pulse"></div>
-            </div>
-            <div className="space-y-6">
-              <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

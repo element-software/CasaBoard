@@ -2,6 +2,7 @@ import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   title: "CasaBoard — Dashboard",
   description: "CasaBoard Dashboard",
   icons: {
-    icon: "./icon.svg",
+    icon: "/icon.svg",
   },
   manifest: "./manifest.webmanifest",
 };
@@ -21,6 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
       <body className={inter.className}>
         {children}
         <AnalyticsWrapper gaId="G-P2JEHMNT4C" />
