@@ -19,7 +19,7 @@ export function AccessBlocked() {
                 Your free trial has ended or your subscription is inactive. To continue using CasaBoard, please choose a plan or manage your subscription.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button as={Link} href="/profile/billing" color="primary" className="sm:min-w-[160px]">
+                <Button as={Link} href="/auth/profile/billing" color="primary" className="sm:min-w-[160px]">
                   View plans
                 </Button>
                 <Button as={Link} href="/api/billing/portal" variant="flat" className="sm:min-w-[200px]">

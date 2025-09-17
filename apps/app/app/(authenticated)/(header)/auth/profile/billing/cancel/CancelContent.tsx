@@ -34,7 +34,7 @@ export default function CancelContent({
             <Button as={Link} href="/setup" color="primary" className="min-w-[180px]">
               Continue to Dashboard
             </Button>
-            <Button as={Link} href="/profile/billing" variant="flat" className="min-w-[180px]">
+            <Button as={Link} href="/auth/profile/billing" variant="flat" className="min-w-[180px]">
               Back to Billing
             </Button>
             <Button as={Link} href="/api/billing/portal" variant="bordered" className="min-w-[180px]">

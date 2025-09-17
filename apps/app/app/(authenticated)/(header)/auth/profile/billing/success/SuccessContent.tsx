@@ -35,7 +35,7 @@ export default function SuccessContent({
             <Button as={Link} href="/setup" color="primary" className="min-w-[180px]">
               Go to Dashboard
             </Button>
-            <Button as={Link} href="/profile/billing" variant="flat" className="min-w-[180px]">
+            <Button as={Link} href="/auth/profile/billing" variant="flat" className="min-w-[180px]">
               View Billing
             </Button>
             <Button as={Link} href="/api/billing/portal" variant="bordered" className="min-w-[180px]">

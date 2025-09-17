@@ -19,6 +19,10 @@ export default async function ConfigurablePage({ params }: PageProps) {
   try {
     // Use server action to get page with proper access control
     const pageData = await PageActions.getPage(page);
+
+    if (!pageData) {
+      notFound();
+    }
     
     return (
       <ClientPageWrapper 
@@ -26,7 +30,7 @@ export default async function ConfigurablePage({ params }: PageProps) {
         pageData={pageData}
       />
     );
-  } catch (error) {
+  } catch (error) { 
     // If page not found or access denied, return 404
     notFound();
   }

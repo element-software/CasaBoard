@@ -273,7 +273,7 @@ export function HAInstanceManager({
         ) : (
           <p className="text-white text-md w-full text-center">
             You've reached the limit of HA instances for your plan. Please{" "}
-            <Link href="/profile/billing" className="text-primary underline">
+            <Link href="/auth/profile/billing" className="text-primary underline">
               upgrade your plan
             </Link>{" "}
             to add more instances.
