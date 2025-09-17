@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SupabaseClient } from "@repo/lib";
 import { useSearchParams } from "next/navigation";
 import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
