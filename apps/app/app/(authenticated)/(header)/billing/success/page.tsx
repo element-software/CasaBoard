@@ -1,5 +1,10 @@
 import { redirect } from "next/navigation";
-import { StripeService, SupabaseServer, StripeEntitlementsService, getCurrentAuthUser } from "@repo/lib";
+import {
+  StripeService,
+  SupabaseServer,
+  StripeEntitlementsService,
+  getCurrentAuthUser,
+} from "@repo/lib";
 import Stripe from "stripe";
 import SuccessContent from "./SuccessContent";
 
@@ -8,12 +13,10 @@ export const dynamic = "force-dynamic";
 export default async function BillingSuccessPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sessionId =
-    typeof searchParams.session_id === "string"
-      ? searchParams.session_id
-      : undefined;
+  const sessionId = (await searchParams).session_id?.toString();
+
   if (!sessionId) {
     return redirect("/billing");
   }
@@ -40,7 +43,9 @@ export default async function BillingSuccessPage({
     const status = sub.status as string;
     const periodEnd =
       typeof (sub as any).current_period_end === "number"
-        ? new Date(((sub as any).current_period_end as number) * 1000).toISOString()
+        ? new Date(
+            ((sub as any).current_period_end as number) * 1000
+          ).toISOString()
         : null;
     currentPeriodEnd = periodEnd;
     planLabel = (sub.items?.data?.[0]?.price?.product as any)?.name || planId;
@@ -63,5 +68,7 @@ export default async function BillingSuccessPage({
     console.error(err);
   }
 
-  return <SuccessContent planLabel={planLabel} currentPeriodEnd={currentPeriodEnd} />;
+  return (
+    <SuccessContent planLabel={planLabel} currentPeriodEnd={currentPeriodEnd} />
+  );
 }
