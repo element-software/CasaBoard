@@ -20,34 +20,32 @@ export default async function AuthenticatedLayout({
   // Fetch configuration server-side
   const initialConfig = await ConfigService.getServerConfig();
 
+  // Ensure user is authenticated first
+  const authedUser = await getCurrentAuthUser();
+  if (!authedUser) {
+    redirect("/auth/login?redirectTo=/setup");
+  }
+
   // Fetch user settings and decrypt token server-side
   const userSettings = await UserSettingsActions.getUserSettings();
-  
-  if (!userSettings) {
-    redirect("/auth/login");
-  }
 
   let decryptedToken: string | null = null;
 
   if (userSettings?.hass_token) {
     try {
-      const user = await getCurrentAuthUser();
-
-      if (user) {
-        const sessionId = generateSessionId(user.id, user.email);
+      if (authedUser) {
+        const sessionId = generateSessionId(authedUser.id, authedUser.email);
 
         if (Encryption.isEncrypted(userSettings.hass_token)) {
           decryptedToken = await Encryption.decryptToken(
             userSettings.hass_token,
-            user.id,
+            authedUser.id,
             sessionId
           );
         } else {
           // Legacy plain text token
           decryptedToken = userSettings.hass_token;
         }
-      } else {
-        redirect("/auth/login");
       }
     } catch (error) {
       console.warn("Failed to decrypt HA token:", error);
