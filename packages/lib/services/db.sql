@@ -36,6 +36,10 @@ create table if not exists public.ha_instances (
   hass_token text not null,
   created_at timestamptz not null default now()
 );
+-- Optional relation: pages -> ha_instances (each page assigned to an instance)
+alter table if exists public.pages
+  add column if not exists ha_instance_id uuid null references public.ha_instances(id) on delete set null;
+
 create index if not exists ha_instances_user_id_idx on public.ha_instances(user_id);
 
 

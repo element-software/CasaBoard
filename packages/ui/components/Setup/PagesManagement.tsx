@@ -17,6 +17,7 @@ import {
   mdiCheckCircle,
   mdiAlertCircle,
   mdiClock,
+  mdiHomeAssistant,
 } from "@mdi/js";
 import { Button, Card, CardBody, CardHeader, Chip } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -154,66 +155,174 @@ export const PagesManagement = ({
 
   return (
     <div className="space-y-3">
-      {displayPages.map((page) => (
-        <Card
-          key={page.id}
-          className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm"
-        >
-          <CardHeader className="flex items-center justify-between p-4 sm:p-6">
-            <div className="flex items-center min-w-0 flex-1">
-              <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                <Icon path={mdiWeb} className="w-6 h-6 text-white" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-semibold text-theme-text truncate">
-                  Pages Management
-                </h2>
-                <p className="text-xs sm:text-sm text-theme-text-secondary">
-                  Create and manage dashboard pages
-                </p>
-              </div>
+      <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm">
+        <CardHeader className="flex items-center justify-between p-4 sm:p-6">
+          <div className="flex items-center min-w-0 flex-1">
+            <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+              <Icon path={mdiWeb} className="w-6 h-6 text-white" />
             </div>
-          </CardHeader>
-          <CardBody className="p-3 sm:p-4">
-            {/* Mobile Layout */}
-            <div className="block sm:hidden space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-theme-text truncate text-base">
-                    {page.name}
-                  </h4>
-                  <Chip
-                    size="sm"
-                    color={page.published ? "success" : "warning"}
-                    variant="flat"
-                    startContent={
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg sm:text-xl font-semibold text-theme-text truncate">
+                Pages Management
+              </h2>
+              <p className="text-xs sm:text-sm text-theme-text-secondary">
+                Create and manage dashboard pages
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardBody className="p-3 sm:p-4">
+          {displayPages.map((page) => (
+            <div className="mb-3" key={page.id}>
+              {/* Mobile Layout */}
+              <div className="block sm:hidden space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-theme-text truncate text-base">
+                      {page.name}
+                    </h4>
+                    <Chip
+                      size="sm"
+                      color={page.published ? "success" : "warning"}
+                      variant="flat"
+                      startContent={
+                        <Icon
+                          path={
+                            page.published ? mdiCheckCircle : mdiAlertCircle
+                          }
+                          className="w-3 h-3"
+                        />
+                      }
+                      className="mt-1"
+                    >
+                      {page.published ? "Published" : "Draft"}
+                    </Chip>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-sm text-theme-text-secondary">
+                  <div className="flex items-center gap-1">
+                    <Icon path={mdiWeb} className="w-4 h-4 flex-shrink-0" />
+                    <span className="font-mono text-xs">/{page.slug}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Icon path={mdiClock} className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-xs">
+                      Updated {formatDate(page.updated_at)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-theme-border/30">
+                  <div className="flex items-center gap-1">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color={page.published ? "warning" : "success"}
+                      onPress={() =>
+                        handleTogglePublished(page.slug, page.published)
+                      }
+                      title={page.published ? "Unpublish page" : "Publish page"}
+                      isLoading={isPending}
+                      className="min-w-8 h-8"
+                    >
                       <Icon
-                        path={page.published ? mdiCheckCircle : mdiAlertCircle}
-                        className="w-3 h-3"
+                        path={page.published ? mdiEyeOff : mdiPublish}
+                        className="w-4 h-4"
                       />
-                    }
-                    className="mt-1"
-                  >
-                    {page.published ? "Published" : "Draft"}
-                  </Chip>
+                    </Button>
+
+                    <Button
+                      as={Link}
+                      href={`/dashboard/${page.slug}`}
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      title="View page"
+                      className="min-w-8 h-8"
+                    >
+                      <Icon path={mdiEye} className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <Button
+                      as={Link}
+                      href={`/setup/pages/edit/${page.slug}`}
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      title="Edit page"
+                      className="min-w-8 h-8"
+                    >
+                      <Icon path={mdiPencil} className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color="danger"
+                      onPress={() => handleDeletePage(page.slug, page.name)}
+                      title="Delete page"
+                      className="min-w-8 h-8"
+                    >
+                      <Icon path={mdiTrashCan} className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-theme-text-secondary">
-                <div className="flex items-center gap-1">
-                  <Icon path={mdiWeb} className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-mono text-xs">/{page.slug}</span>
+              {/* Desktop Layout */}
+              <div className="hidden sm:flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h4 className="font-semibold text-theme-text truncate">
+                      {page.name}
+                    </h4>
+                    <Chip
+                      size="sm"
+                      color={page.published ? "success" : "warning"}
+                      variant="flat"
+                      startContent={
+                        <Icon
+                          path={
+                            page.published ? mdiCheckCircle : mdiAlertCircle
+                          }
+                          className="w-3 h-3"
+                        />
+                      }
+                    >
+                      {page.published ? "Published" : "Draft"}
+                    </Chip>
+                    <Chip
+                      size="sm"
+                      color="default"
+                      variant="flat"
+                      startContent={
+                        <Icon
+                          path={mdiHomeAssistant}
+                          className="w-3 h-3"
+                        />
+                      }
+                    >
+                      {page.ha_instance_id}
+                    </Chip>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-theme-text-secondary">
+                    <div className="flex items-center gap-1">
+                      <Icon path={mdiWeb} className="w-4 h-4" />
+                      <span className="font-mono">/{page.slug}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Icon path={mdiClock} className="w-4 h-4" />
+                      <span>Updated {formatDate(page.updated_at)}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Icon path={mdiClock} className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-xs">
-                    Updated {formatDate(page.updated_at)}
-                  </span>
-                </div>
-              </div>
 
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-theme-border/30">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 ml-4">
                   <Button
                     isIconOnly
                     size="sm"
@@ -224,7 +333,6 @@ export const PagesManagement = ({
                     }
                     title={page.published ? "Unpublish page" : "Publish page"}
                     isLoading={isPending}
-                    className="min-w-8 h-8"
                   >
                     <Icon
                       path={page.published ? mdiEyeOff : mdiPublish}
@@ -234,18 +342,15 @@ export const PagesManagement = ({
 
                   <Button
                     as={Link}
-                    href={`/${page.slug}`}
+                    href={`/dashboard/${page.slug}`}
                     isIconOnly
                     size="sm"
                     variant="light"
                     title="View page"
-                    className="min-w-8 h-8"
                   >
                     <Icon path={mdiEye} className="w-4 h-4" />
                   </Button>
-                </div>
 
-                <div className="flex items-center gap-1">
                   <Button
                     as={Link}
                     href={`/setup/pages/edit/${page.slug}`}
@@ -253,7 +358,6 @@ export const PagesManagement = ({
                     size="sm"
                     variant="light"
                     title="Edit page"
-                    className="min-w-8 h-8"
                   >
                     <Icon path={mdiPencil} className="w-4 h-4" />
                   </Button>
@@ -265,102 +369,15 @@ export const PagesManagement = ({
                     color="danger"
                     onPress={() => handleDeletePage(page.slug, page.name)}
                     title="Delete page"
-                    className="min-w-8 h-8"
                   >
                     <Icon path={mdiTrashCan} className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             </div>
-
-            {/* Desktop Layout */}
-            <div className="hidden sm:flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <h4 className="font-semibold text-theme-text truncate">
-                    {page.name}
-                  </h4>
-                  <Chip
-                    size="sm"
-                    color={page.published ? "success" : "warning"}
-                    variant="flat"
-                    startContent={
-                      <Icon
-                        path={page.published ? mdiCheckCircle : mdiAlertCircle}
-                        className="w-3 h-3"
-                      />
-                    }
-                  >
-                    {page.published ? "Published" : "Draft"}
-                  </Chip>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-theme-text-secondary">
-                  <div className="flex items-center gap-1">
-                    <Icon path={mdiWeb} className="w-4 h-4" />
-                    <span className="font-mono">/{page.slug}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Icon path={mdiClock} className="w-4 h-4" />
-                    <span>Updated {formatDate(page.updated_at)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 ml-4">
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  color={page.published ? "warning" : "success"}
-                  onPress={() =>
-                    handleTogglePublished(page.slug, page.published)
-                  }
-                  title={page.published ? "Unpublish page" : "Publish page"}
-                  isLoading={isPending}
-                >
-                  <Icon
-                    path={page.published ? mdiEyeOff : mdiPublish}
-                    className="w-4 h-4"
-                  />
-                </Button>
-
-                <Button
-                  as={Link}
-                  href={`/${page.slug}`}
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  title="View page"
-                >
-                  <Icon path={mdiEye} className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  as={Link}
-                  href={`/setup/pages/edit/${page.slug}`}
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  title="Edit page"
-                >
-                  <Icon path={mdiPencil} className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  color="danger"
-                  onPress={() => handleDeletePage(page.slug, page.name)}
-                  title="Delete page"
-                >
-                  <Icon path={mdiTrashCan} className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      ))}
+          ))}
+        </CardBody>
+      </Card>
 
       {!showAllPages && pages.length > maxPages && (
         <div className="pt-3 border-t border-theme-border">

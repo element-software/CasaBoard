@@ -48,6 +48,7 @@ export async function createPage(data: CreatePageData) {
         slug: data.slug,
         puck_data: data.puck_data,
         published: data.published ?? false,
+        ha_instance_id: data.ha_instance_id ?? null,
         user_id: user.id,
       })
       .select()

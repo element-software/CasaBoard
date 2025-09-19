@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       slug: body.slug,
       puck_data: body.puck_data,
       published: body.published ?? false,
+      ha_instance_id: body.ha_instance_id ?? null,
       user_id: user.id,
     })
     .select()

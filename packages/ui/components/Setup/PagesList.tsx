@@ -246,7 +246,7 @@ export const PagesList = ({ initialPages = [], initialError = null, entitlements
                       key="view"
                       startContent={<Icon path={mdiEye} className="w-4 h-4" />}
                       as={Link}
-                      href={`/${page.slug}`}
+                      href={`/dashboard/${page.slug}`}
                     >
                       View Page
                     </DropdownItem>

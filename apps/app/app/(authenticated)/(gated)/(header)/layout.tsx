@@ -8,6 +8,8 @@ import {
 } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
 import { redirect } from "next/navigation";
+import { Header } from "@repo/ui/components/Header/Header";
+import { Footer } from "@repo/ui/components/Footer";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = "force-dynamic";
@@ -59,7 +61,11 @@ export default async function AuthenticatedLayout({
         userSettings={userSettings}
         decryptedToken={decryptedToken}
       >
-        <div className="min-h-screen bg-theme-background">{children}</div>
+        <Header user={authedUser} />
+        <div className="min-h-screen bg-theme-background">
+          <main className="flex-1">{children}</main>
+        </div>
+        <Footer />
       </HassConnectWrapper>
     </ConfigurationProvider>
   );

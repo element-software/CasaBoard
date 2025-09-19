@@ -22,6 +22,7 @@ type PageEditorClientProps = {
   pageId?: string | null;
   userId?: string | null;
   initialPublished?: boolean;
+  haInstances?: { id: string; name: string; hass_url: string }[];
 };
 
 export default function PageEditorClient({
@@ -29,6 +30,7 @@ export default function PageEditorClient({
   pageId,
   userId,
   initialPublished = false,
+  haInstances = [],
 }: PageEditorClientProps) {
   const [data, setData] = useState<Data>(
     initialData || { content: [], root: { props: {} } }
@@ -43,11 +45,13 @@ export default function PageEditorClient({
   const [settings, setSettings] = useState<{
     title: string;
     slug: string;
+    haInstanceId?: string | null;
   }>(() => {
     const props = (initialData?.root?.props as any) || {};
     return {
       title: props.title || "New Page",
       slug: props.slug || "new-page",
+      haInstanceId: props.haInstanceId || null,
     };
   });
   const router = useRouter();
@@ -76,6 +80,7 @@ export default function PageEditorClient({
           slug: (data.root.props as any).slug,
           puck_data: data,
           published: isPublished, // Use current published state
+          ha_instance_id: (data.root.props as any).haInstanceId || null,
         };
 
         console.log("savePage:: pageData", pageData);
@@ -124,6 +129,7 @@ export default function PageEditorClient({
             generateSlug((data.root.props as any).title),
           puck_data: data,
           published: newPublishedState,
+          ha_instance_id: (data.root.props as any).haInstanceId || null,
         };
 
         const isEdit = Boolean(currentPageId);
@@ -176,6 +182,7 @@ export default function PageEditorClient({
           ...(data.root.props as any),
           title: settings.title,
           slug: nextSlug,
+          haInstanceId: settings.haInstanceId || null,
         },
       },
     });
@@ -261,6 +268,28 @@ export default function PageEditorClient({
                       setSettings({ ...settings, slug: e.target.value })
                     }
                   />
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Home Assistant Instance
+                    </label>
+                    <select
+                      className="w-full border rounded-md px-3 py-2 text-foreground"
+                      value={settings.haInstanceId || ""}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          haInstanceId: e.target.value || null,
+                        })
+                      }
+                    >
+                      {haInstances.map((i) => (
+                        <option key={i.id} value={i.id}>
+                          {i.name} ({i.hass_url})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
