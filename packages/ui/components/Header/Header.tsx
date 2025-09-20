@@ -160,12 +160,12 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
   const [menuOpen, setMenuOpen] = useState(false);
   const publicLinks = [
     { href: LinkService.crossAppHref("public", "/about"), label: "About", external: true },
-    { href: "https://app.casaboard.dev", label: "Login", external: true },
-    { href: "https://demo.casaboard.dev", label: "View Demo", external: true },
+    { href: LinkService.crossAppHref("app", "/auth/login"), label: "Login", external: true },
+    { href: LinkService.crossAppHref("demo", "/"), label: "View Demo", external: true },
   ];
   return (
-    <header className="sticky top-0 z-30 bg-theme-background/80 backdrop-blur-md border-b border-r border-l rounded-b-xl border-theme-border/20 max-w-7xl mx-auto">
-      <div className="px-0 mx-auto">
+    <header className="sticky top-0 z-30 max-w-7xl mx-auto">
+      <div className="px-0 mx-auto bg-theme-background/80 backdrop-blur-md border-b border-r border-l rounded-b-xl border-theme-border/20">
         <div className="flex items-center h-14 sm:px-4 px-2 sm:h-16">
           {/* Left side - Mobile Menu and Logo */}
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 w-full justify-between">
@@ -182,7 +182,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
                 <Button
                   as={Link}
                   color="primary"
-                  href="https://app.casaboard.dev"
+                  href={LinkService.crossAppHref("app", "/auth/login")}
                   className="text-white font-medium"
                 >
                   Login
@@ -225,7 +225,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
               <Button
                 as={Link}
                 color="primary"
-                href="https://app.casaboard.dev"
+                href={LinkService.crossAppHref("app", "/auth/login")}
                 className="text-white font-medium"
               >
                 Login
@@ -234,10 +234,10 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
                 as={Link}
                 variant="bordered"
                 color="primary"
-                href={LinkService.crossAppHref("public", "/about")}
+                href={LinkService.crossAppHref("demo", "/")}
                 className="text-theme-text-primary"
               >
-                About
+                View Demo
               </Button>
             </div>
           )}

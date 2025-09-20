@@ -14,6 +14,7 @@ import {
   mdiRocket,
 } from "@mdi/js";
 import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
+import { LinkService } from "@repo/lib";
 
 export function HomePageContent() {
   const featureCards = [
@@ -50,7 +51,7 @@ export function HomePageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-background via-theme-surface to-theme-background">
+    <div className="pt-32">
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
@@ -73,7 +74,7 @@ export function HomePageContent() {
               size="lg"
               className="bg-theme-primary text-black font-semibold px-8 py-3"
               endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
-              href="https://app.casaboard.dev"
+              href={LinkService.crossAppHref("app", "/auth/login")}
               as={Link}
             >
               Get Started
@@ -83,7 +84,7 @@ export function HomePageContent() {
               variant="bordered"
               className="border-theme-primary text-theme-primary font-semibold px-8 py-3"
               startContent={<Icon path={mdiEye} className="w-5 h-5" />}
-              href="https://demo.casaboard.dev"
+              href={LinkService.crossAppHref("demo", "/")}
               as={Link}
             >
               View Demo
@@ -187,7 +188,7 @@ export function HomePageContent() {
                   size="lg"
                   className="bg-theme-primary text-black font-semibold px-8 py-3"
                   endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
-                  href="https://app.casaboard.dev"
+                  href={LinkService.crossAppHref("app", "/auth/login")}
                   as={Link}
                 >
                   Start Building Now
@@ -197,7 +198,7 @@ export function HomePageContent() {
                   variant="bordered"
                   className="border-theme-primary text-theme-primary font-semibold px-8 py-3"
                   startContent={<Icon path={mdiCog} className="w-5 h-5" />}
-                  href="/about"
+                  href={LinkService.crossAppHref("public", "/about")}
                   as={Link}
                 >
                   Learn More

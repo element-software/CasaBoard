@@ -5,7 +5,7 @@ import { HomePageContent } from "./HomePageContent";
 
 function HomePageSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-theme-background via-theme-surface to-theme-background">
+    <div className="pt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Hero Section Skeleton */}
         <div className="text-center mb-16">

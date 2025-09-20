@@ -38,14 +38,17 @@ export default async function PublicLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={cn("bg-gradient-to-b from-primary/10 via-transparent to-transparent",inter.className)}>
+      <body
+        className={cn(
+          "bg-gradient-to-b from-primary/10 via-transparent to-transparent",
+          inter.className
+        )}
+      >
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
         <Providers>
-          <div className="min-h-screen">
-            <Header public={true} />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <Header public={true} />
+          <main className="min-h-screen flex-1 -mt-32">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

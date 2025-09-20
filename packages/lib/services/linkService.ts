@@ -1,4 +1,4 @@
-export type AppTarget = "app" | "public";
+export type AppTarget = "app" | "public" | "demo";
 
 function ensureLeadingSlash(path: string): string {
   if (!path) return "/";
@@ -8,7 +8,8 @@ function ensureLeadingSlash(path: string): string {
 export function getAppOrigin(target: AppTarget): string {
   const app = process.env.NEXT_PUBLIC_APP_ORIGIN || "http://localhost:3000";
   const pub = process.env.NEXT_PUBLIC_PUBLIC_ORIGIN || "http://localhost:3001";
-  return target === "app" ? app : pub;
+  const demo = process.env.NEXT_PUBLIC_DEMO_ORIGIN || "http://localhost:3002";
+  return target === "app" ? app : target === "public" ? pub : demo;
 }
 
 export function crossAppHref(target: AppTarget, path: string): string {
