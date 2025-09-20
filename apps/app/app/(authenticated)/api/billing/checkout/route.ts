@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { StripeService, SubscriptionService, SupabaseServer, getCurrentAuthUser } from "@repo/lib";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SupabaseServer, StripeService, getCurrentAuthUser } from "@repo/lib";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = await SupabaseServer.createClient();

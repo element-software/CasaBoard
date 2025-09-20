@@ -3,6 +3,9 @@ import { StripeService } from "@repo/lib";
 import { SupabaseServer } from "@repo/lib";
 import { getCurrentAuthUser } from "@repo/lib";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await SupabaseServer.createClient();

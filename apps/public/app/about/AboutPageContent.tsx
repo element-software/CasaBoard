@@ -3,16 +3,11 @@
 import { Button, Card, CardBody, CardHeader, Link } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
-  mdiGoogle,
   mdiHomeAssistant,
   mdiGrid,
   mdiCheckCircle,
   mdiInformation,
   mdiLightbulb,
-  mdiDrag,
-  mdiAlertCircle,
-  mdiCog,
-  mdiEye,
 } from "@mdi/js";
 
 export default function AboutPageContent() {

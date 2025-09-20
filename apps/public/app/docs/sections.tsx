@@ -168,7 +168,7 @@ const CreateFirstPage: React.FC = () => (
     </CardHeader>
     <CardBody className="space-y-4">
       <p className="text-theme-text-secondary">
-        Now you're ready to create your first dashboard page:
+        Now you&apos;re ready to create your first dashboard page:
       </p>
       {[
         {
@@ -291,7 +291,7 @@ const Tips: React.FC = () => (
         <h3 className="font-semibold text-theme-text mb-3">Performance</h3>
         <ul className="space-y-2 text-sm text-theme-text-secondary">
           {[
-            "Don't overload pages with too many components",
+            "Don&apos;t overload pages with too many components",
             "Use entity cards for multiple related entities",
             "Test your dashboard on mobile devices",
           ].map((t) => (
