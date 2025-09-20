@@ -45,7 +45,15 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="mt-6 text-xs text-theme-text-secondary text-center">
-          © {year} CasaBoard. All rights reserved.
+          © {year} CasaBoard. All rights reserved. Powered by{" "}
+          <a
+            href="https://element-software.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-theme-primary"
+          >
+            Element Software
+          </a>
         </div>
       </div>
     </footer>

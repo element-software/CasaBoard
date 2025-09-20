@@ -26,11 +26,7 @@ import { LinkService } from "@repo/lib";
 import { mdiMenu } from "@mdi/js";
 
 // User Menu Component
-function UserMenu({
-  user,
-}: {
-  user: any;
-}) {
+function UserMenu({ user }: { user: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
@@ -59,7 +55,7 @@ function UserMenu({
             {user.email?.charAt(0).toUpperCase()}
           </span>
         </div>
-        <span className="font-medium max-w-20 sm:max-w-32 truncate hidden sm:inline">
+        <span className="font-medium max-w-20 sm:max-w-32 truncate">
           {user.email}
         </span>
         <Icon
@@ -154,18 +150,38 @@ interface HeaderProps {
   user?: any;
 }
 
-export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }) => {
+export const Header: React.FC<HeaderProps> = ({
+  public: isPublic = false,
+  user,
+}) => {
   const pathname = usePathname();
   const hideBreadcrumbs = isPublic && pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const publicLinks = [
-    { href: LinkService.crossAppHref("public", "/about"), label: "About", external: true },
-    { href: LinkService.crossAppHref("app", "/auth/login"), label: "Login", external: true },
-    { href: LinkService.crossAppHref("demo", "/"), label: "View Demo", external: true },
+    {
+      href: LinkService.crossAppHref("public", "/docs"),
+      label: "Docs",
+      external: true,
+    },
+    {
+      href: LinkService.crossAppHref("public", "/about"),
+      label: "About",
+      external: true,
+    },
+    {
+      href: LinkService.crossAppHref("app", "/auth/login"),
+      label: "Login",
+      external: true,
+    },
+    {
+      href: LinkService.crossAppHref("demo", "/"),
+      label: "View Demo",
+      external: true,
+    },
   ];
   return (
     <header className="sticky top-0 z-30 max-w-7xl mx-auto">
-      <div className="px-0 mx-auto bg-theme-background/80 backdrop-blur-md border-b border-r border-l rounded-b-xl border-theme-border/20">
+      <div className="px-0 mx-auto bg-theme-background/80 backdrop-blur-md rounded-b-xl border-theme-border/20">
         <div className="flex items-center h-14 sm:px-4 px-2 sm:h-16">
           {/* Left side - Mobile Menu and Logo */}
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 w-full justify-between">
@@ -177,8 +193,8 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
               />
             </div>
             {/* Mobile burger */}
-            {isPublic && (
-              <div className="sm:hidden flex items-center gap-2">
+            {isPublic ? (
+              <div className="flex items-center gap-2">
                 <Button
                   as={Link}
                   color="primary"
@@ -191,56 +207,25 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
                   as={Link}
                   variant="bordered"
                   color="primary"
-                  href="https://demo.casaboard.dev"
+                  href={LinkService.crossAppHref("demo", "/")}
                   className="text-theme-text-primary"
                 >
                   View Demo
                 </Button>
-                <button
-                  className="sm:hidden p-2 ml-1 rounded-md border border-theme-border text-theme-text self-end"
-                  onClick={() => setMenuOpen(true)}
-                  aria-label="Open menu"
-                >
-                  <Icon path={mdiMenu} className="h-5 w-5" />
-                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
+                <UserMenu user={user} />
               </div>
             )}
+            <button
+              className="p-2 ml-1 rounded-md border border-theme-border text-theme-text self-end"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <Icon path={mdiMenu} className="h-5 w-5" />
+            </button>
           </div>
-
-          {/* Right side - User Menu (only show if not public) */}
-          {!isPublic ? (
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
-              <UserMenu user={user} />
-            </div>
-          ) : (
-            <div className="items-center gap-2 flex-shrink-0 ml-auto hidden sm:flex">
-              <Button
-                as={Link}
-                variant="light"
-                href={LinkService.crossAppHref("public", "/about")}
-                className="text-theme-text"
-              >
-                About
-              </Button>
-              <Button
-                as={Link}
-                color="primary"
-                href={LinkService.crossAppHref("app", "/auth/login")}
-                className="text-white font-medium"
-              >
-                Login
-              </Button>
-              <Button
-                as={Link}
-                variant="bordered"
-                color="primary"
-                href={LinkService.crossAppHref("demo", "/")}
-                className="text-theme-text-primary"
-              >
-                View Demo
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Breadcrumbs - hide on public homepage */}
