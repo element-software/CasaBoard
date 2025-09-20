@@ -2,7 +2,7 @@
 
 import { Puck, Data } from "@measured/puck";
 import { PuckConfig } from "./puck.config";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   Button,
   Modal,
@@ -35,11 +35,15 @@ export default function PageEditorClient({
   const [data, setData] = useState<Data>(
     initialData || { content: [], root: { props: {} } }
   );
+  const [lastSavedJson, setLastSavedJson] = useState<string>(
+    JSON.stringify(initialData || { content: [], root: { props: {} } })
+  );
   const [currentPageId, setCurrentPageId] = useState<string | null>(
     pageId || null
   );
   const [isPublished, setIsPublished] = useState<boolean>(initialPublished);
-  const [isPending, startTransition] = useTransition();
+  const [isPublishPending, startPublishTransition] = useTransition();
+  const [isDraftPending, startDraftTransition] = useTransition();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [settings, setSettings] = useState<{
@@ -71,41 +75,19 @@ export default function PageEditorClient({
       .replace(/-+/g, "-")
       .trim();
 
+  const isDirty = useMemo(() => {
+    try {
+      return JSON.stringify(data) !== lastSavedJson;
+    } catch {
+      return true;
+    }
+  }, [data, lastSavedJson]);
+
   const savePage = async () => {
     setError(null);
-    startTransition(async () => {
+    startPublishTransition(async () => {
       try {
-        const pageData = {
-          name: (data.root.props as any).title,
-          slug: (data.root.props as any).slug,
-          puck_data: data,
-          published: isPublished, // Use current published state
-          ha_instance_id: (data.root.props as any).haInstanceId || null,
-        };
-
-        console.log("savePage:: pageData", pageData);
-
-        const isEdit = Boolean(currentPageId);
-        let saved;
-
-        if (isEdit) {
-          saved = await PageActions.updatePage(
-            (data.root.props as any).slug,
-            pageData
-          );
-        } else {
-          saved = await PageActions.createPage(pageData);
-          if (saved?.id) {
-            setCurrentPageId(saved.id as string);
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set("id", saved.id);
-            window.history.replaceState({}, "", newUrl.toString());
-          }
-        }
-
-        console.log(
-          `Page saved as ${isPublished ? "published" : "draft"} successfully`
-        );
+        await saveAs(isPublished);
       } catch (error) {
         console.error("Error saving page:", error);
         setError(
@@ -115,45 +97,76 @@ export default function PageEditorClient({
     });
   };
 
-  const publishPage = async () => {
+  const buildPagePayload = (published: boolean) => {
+    return {
+      name: (data.root.props as any).title,
+      slug:
+        (data.root.props as any).slug ||
+        generateSlug((data.root.props as any).title),
+      puck_data: data,
+      published,
+      ha_instance_id: (data.root.props as any).haInstanceId || null,
+    } as const;
+  };
+
+  const saveAs = async (published: boolean) => {
+    const pageData = buildPagePayload(published);
+    const isEdit = Boolean(currentPageId);
+    let saved;
+
+    if (isEdit) {
+      saved = await PageActions.updatePage(
+        (data.root.props as any).slug,
+        pageData
+      );
+    } else {
+      saved = await PageActions.createPage(pageData);
+      if (saved?.id) {
+        setCurrentPageId(saved.id as string);
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set("id", saved.id);
+        window.history.replaceState({}, "", newUrl.toString());
+      }
+    }
+
+    setIsPublished(published);
+    setLastSavedJson(JSON.stringify(data));
+    return saved;
+  };
+
+  const saveDraft = async () => {
     setError(null);
-    startTransition(async () => {
+    startDraftTransition(async () => {
       try {
-        // Toggle published state
-        const newPublishedState = !isPublished;
-
-        const pageData = {
-          name: (data.root.props as any).title,
-          slug:
-            (data.root.props as any).slug ||
-            generateSlug((data.root.props as any).title),
-          puck_data: data,
-          published: newPublishedState,
-          ha_instance_id: (data.root.props as any).haInstanceId || null,
-        };
-
-        const isEdit = Boolean(currentPageId);
-        let saved;
-
-        if (isEdit) {
-          saved = await PageActions.updatePage(
-            (data.root.props as any).slug,
-            pageData
-          );
-        } else {
-          saved = await PageActions.createPage(pageData);
-          if (saved?.id) {
-            setCurrentPageId(saved.id as string);
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set("id", saved.id);
-            window.history.replaceState({}, "", newUrl.toString());
-          }
-        }
-
-        setIsPublished(newPublishedState);
-        console.log(
-          `Page ${newPublishedState ? "published" : "unpublished"} successfully`
+        await saveAs(false);
+      } catch (error) {
+        console.error("Error saving draft:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to save draft"
         );
+      }
+    });
+  };
+
+  const publish = async () => {
+    setError(null);
+    startPublishTransition(async () => {
+      try {
+        await saveAs(true);
+      } catch (error) {
+        console.error("Error publishing page:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to publish page"
+        );
+      }
+    });
+  };
+
+  const updatePublished = async () => {
+    setError(null);
+    startPublishTransition(async () => {
+      try {
+        await saveAs(true);
       } catch (error) {
         console.error("Error updating page:", error);
         setError(
@@ -161,6 +174,11 @@ export default function PageEditorClient({
         );
       }
     });
+  };
+
+  const unpublish = async () => {
+    // Unpublish also saves changes
+    await saveDraft();
   };
 
   const openSettings = () => {
@@ -206,37 +224,53 @@ export default function PageEditorClient({
         // @ts-ignore TODO: fix this type
         headerPath={data.root.props?.slug}
         overrides={{
-          headerActions: () => (
-            <div className="flex gap-2">
-              <Button
-                variant="flat"
-                color="secondary"
-                onPress={() => router.push("/setup/pages")}
-              >
-                Back to Pages
-              </Button>
-              <Button variant="bordered" color="primary" onPress={openSettings}>
-                Page Settings
-              </Button>
-              <Button
-                color="secondary"
-                variant="bordered"
-                onPress={savePage}
-                isLoading={isPending}
-                isDisabled={isPending}
-              >
-                {isPublished ? "Save Published" : "Save Draft"}
-              </Button>
-              <Button
-                color="primary"
-                onPress={publishPage}
-                isLoading={isPending}
-                isDisabled={isPending}
-              >
-                {isPublished ? "Unpublish" : "Publish"}
-              </Button>
-            </div>
-          ),
+          headerActions: () => {
+            const rightLabel = !isPublished
+              ? "Publish"
+              : isDirty
+                ? "Update"
+                : "Unpublish";
+            const rightHandler = !isPublished
+              ? publish
+              : isDirty
+                ? updatePublished
+                : unpublish;
+            return (
+              <div className="flex gap-2">
+                <Button
+                  variant="flat"
+                  color="secondary"
+                  onPress={() => router.push("/setup/pages")}
+                >
+                  Back to Pages
+                </Button>
+                <Button
+                  variant="bordered"
+                  color="primary"
+                  onPress={openSettings}
+                >
+                  Page Settings
+                </Button>
+                <Button
+                  color="secondary"
+                  variant="bordered"
+                  onPress={saveDraft}
+                  isLoading={isDraftPending}
+                  isDisabled={isPublishPending}
+                >
+                  Save Draft
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={rightHandler}
+                  isLoading={isPublishPending}
+                  isDisabled={isDraftPending}
+                >
+                  {rightLabel}
+                </Button>
+              </div>
+            );
+          },
         }}
       />
 
