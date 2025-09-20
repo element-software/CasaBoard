@@ -158,7 +158,7 @@ export default function AboutPageContent() {
       <Card className="mb-8">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Icon path={mdiHomeAssistant} className="w-6 h-6 text-green-500" />
+            <Icon path={mdiHomeAssistant} className="w-6 h-6 text-cyan-400" />
             <h2 className="text-xl font-semibold text-theme-text">
               2. Home Assistant Connection
             </h2>

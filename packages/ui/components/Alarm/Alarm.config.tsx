@@ -1,17 +1,34 @@
 "use client";
 
 import { Alarm } from ".";
+import EntityField from "../EntityAutocomplete/EntityField";
 
 export const AlarmConfig = {
   label: "Alarm",
   fields: {
     entityId: {
-      type: "text",
-      label: "Entity ID",
+      type: "custom",
+      label: "Switch Entity",
+      description: "Select a switch entity from your Home Assistant",
+      render: ({
+        value,
+        onChange,
+      }: {
+        value?: string;
+        onChange: (value: string | null) => void;
+      }) => (
+        <EntityField
+          value={value}
+          onChange={onChange}
+          domain="switch"
+          label="Switch Entity"
+          description="Select a switch entity from your Home Assistant"
+        />
+      ),
     },
   },
   defaultProps: {
-    entityId: "alarm_control_panel.example",
+    entityId: "",
   },
-  render: (props: any) => <Alarm {...props} />
+  render: (props: any) => <Alarm {...props} />,
 };

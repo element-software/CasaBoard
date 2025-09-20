@@ -1,6 +1,13 @@
-import { redirect } from "next/navigation";
+import { Header } from "@repo/ui/components/Header/Header";
+import Home from "./components/home";
+import { Footer } from "@repo/ui/components/Footer";
 
 export default async function HomePage() {
-  console.log("HomePage:: redirecting to /setup")
-  return redirect("/setup")
+  return (
+    <>
+      <Header public={true} />
+      <Home />
+      <Footer />
+    </>
+  );
 }

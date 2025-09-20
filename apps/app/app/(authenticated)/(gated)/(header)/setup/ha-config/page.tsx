@@ -15,7 +15,7 @@ export default async function HAConfigPage() {
         <div className="mb-8">
           <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
-              <Icon path={mdiHomeAssistant} className="w-8 h-8 text-white" />
+              <Icon path={mdiHomeAssistant} className="w-8 h-8 text-cyan-400" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-theme-text">Home Assistant Configuration</h1>

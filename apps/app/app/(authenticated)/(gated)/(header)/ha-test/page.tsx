@@ -26,7 +26,7 @@ export default async function HATestPage() {
 
   if (error || !settings?.hass_url || !settings?.hass_token) {
     return (
-      <div className="min-h-screen bg-theme-background flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="max-w-md mx-auto text-center p-6">
           <Icon
             path={mdiAlertCircle}

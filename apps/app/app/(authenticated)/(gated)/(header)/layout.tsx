@@ -62,7 +62,7 @@ export default async function AuthenticatedLayout({
         decryptedToken={decryptedToken}
       >
         <Header user={authedUser} />
-        <div className="min-h-screen bg-theme-background">
+        <div className="min-h-screen">
           <main className="flex-1">{children}</main>
         </div>
         <Footer />

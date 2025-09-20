@@ -129,7 +129,7 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
 
   return (
     <>
-      <div className="min-h-screen bg-theme-background">
+      <div className="min-h-screen">
         {/* Mobile header */}
         <MobileHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
 

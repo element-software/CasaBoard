@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@repo/ui/components/Header/Header";
 import { Providers } from "./providers";
+import { cn } from "@heroui/react";
 
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
@@ -37,10 +38,10 @@ export default async function PublicLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
+      <body className={cn("bg-gradient-to-b from-primary/10 via-transparent to-transparent",inter.className)}>
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
         <Providers>
-          <div className="min-h-screen bg-theme-background">
+          <div className="min-h-screen">
             <Header public={true} />
             <main className="flex-1">{children}</main>
             <Footer />
