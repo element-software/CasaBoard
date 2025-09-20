@@ -38,7 +38,11 @@ export default async function ConfigurablePage({ params }: PageProps) {
         if (instance) {
           let token: string | null = instance.hass_token;
           try {
-            token = await Encryption.decryptToken(instance.hass_token, user.id, Encryption.generateSessionId ? (Encryption as any).generateSessionId(user.id, user.email) : user.id);
+            token = await Encryption.decryptToken(
+              instance.hass_token,
+              user.id,
+              Encryption.generateSessionId(user.id, user.email)
+            );
           } catch {}
           preferredHASettings = { hass_url: instance.hass_url, hass_token: token } as any;
         }
