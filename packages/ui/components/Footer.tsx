@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { LinkService } from "@repo/lib";
 import { CasaBoardLogo } from "./Logo";
 
 export const Footer: React.FC = () => {
@@ -14,7 +15,7 @@ export const Footer: React.FC = () => {
           </div>
           <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <Link
-              href="/about"
+              href={LinkService.crossAppHref("public", "/about")}
               className="text-theme-text-secondary hover:text-theme-primary"
             >
               About

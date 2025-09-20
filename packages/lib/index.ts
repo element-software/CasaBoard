@@ -12,4 +12,5 @@ export { StripeEntitlementsService } from './services/stripeEntitlementsService'
 export * as HAInstanceActions from './actions/haInstanceActions';
 export * as Encryption from './encryption';
 export { generateSessionId } from './encryption';
+export * as LinkService from './services/linkService';
 export { getCurrentAuthUser } from './supabase/server';

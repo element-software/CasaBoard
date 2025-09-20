@@ -22,6 +22,7 @@ import {
   DrawerFooter,
 } from "@heroui/react";
 import Link from "next/link";
+import { LinkService } from "@repo/lib";
 import { mdiMenu } from "@mdi/js";
 
 // User Menu Component
@@ -158,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
   const hideBreadcrumbs = isPublic && pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const publicLinks = [
-    { href: "/about", label: "About" },
+    { href: LinkService.crossAppHref("public", "/about"), label: "About", external: true },
     { href: "https://app.casaboard.dev", label: "Login", external: true },
     { href: "https://demo.casaboard.dev", label: "View Demo", external: true },
   ];
@@ -216,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
               <Button
                 as={Link}
                 variant="light"
-                href="/about"
+                href={LinkService.crossAppHref("public", "/about")}
                 className="text-theme-text"
               >
                 About
@@ -233,10 +234,10 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
                 as={Link}
                 variant="bordered"
                 color="primary"
-                href="https://demo.casaboard.dev"
+                href={LinkService.crossAppHref("public", "/about")}
                 className="text-theme-text-primary"
               >
-                View Demo
+                About
               </Button>
             </div>
           )}

@@ -1,5 +1,6 @@
 "use client";
 import { Button, Link, Card, CardBody } from "@heroui/react";
+import { LinkService } from "@repo/lib";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant, mdiShieldCheck, mdiPuzzle, mdiLightningBolt } from "@mdi/js";
 
@@ -23,7 +24,7 @@ export default function Home() {
               <Button as={Link} color="primary" className="px-6 text-base" href="/auth/login">
                 Login
               </Button>
-              <Button as={Link} variant="bordered" href="/about">
+              <Button as={Link} variant="bordered" href={LinkService.crossAppHref("public", "/about")}>
                 Learn more
               </Button>
             </div>
