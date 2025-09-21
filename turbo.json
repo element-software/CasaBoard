@@ -3,6 +3,9 @@
   "globalDependencies": [
     ".env*"
   ],
+  "globalEnv": [
+    "RESEND_API_KEY"
+  ],
   "ui": "tui",
   "tasks": {
     "build": {
