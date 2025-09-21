@@ -79,16 +79,6 @@ export function HomePageContent() {
             >
               Get Started
             </Button>
-            <Button
-              size="lg"
-              variant="bordered"
-              className="border-theme-primary text-theme-primary font-semibold px-8 py-3"
-              startContent={<Icon path={mdiEye} className="w-5 h-5" />}
-              href={LinkService.crossAppHref("demo", "/")}
-              as={Link}
-            >
-              View Demo
-            </Button>
           </div>
         </div>
 
