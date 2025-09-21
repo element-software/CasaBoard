@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const from = "CasaBoard <contact@casaboard.dev>";
+    const from = "CasaBoard <website@casaboard.dev>";
     const to = ["support@casaboard.dev"];
     const emailSubject = subject || `New contact form message from ${name}`;
     const text = `New contact form submission\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject || "(none)"}\n\nMessage:\n${message}`;
