@@ -43,7 +43,6 @@ export default function PageEditorClient({
   );
   const [isPublished, setIsPublished] = useState<boolean>(initialPublished);
   const [isPublishPending, startPublishTransition] = useTransition();
-  const [isDraftPending, startDraftTransition] = useTransition();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [settings, setSettings] = useState<{
@@ -134,20 +133,6 @@ export default function PageEditorClient({
     return saved;
   };
 
-  const saveDraft = async () => {
-    setError(null);
-    startDraftTransition(async () => {
-      try {
-        await saveAs(false);
-      } catch (error) {
-        console.error("Error saving draft:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to save draft"
-        );
-      }
-    });
-  };
-
   const publish = async () => {
     setError(null);
     startPublishTransition(async () => {
@@ -174,11 +159,6 @@ export default function PageEditorClient({
         );
       }
     });
-  };
-
-  const unpublish = async () => {
-    // Unpublish also saves changes
-    await saveDraft();
   };
 
   const openSettings = () => {
@@ -231,10 +211,7 @@ export default function PageEditorClient({
                 ? "Update"
                 : "Unpublish";
             const rightHandler = !isPublished
-              ? publish
-              : isDirty
-                ? updatePublished
-                : unpublish;
+              ? publish : updatePublished
             return (
               <div className="flex gap-2">
                 <Button
@@ -252,19 +229,10 @@ export default function PageEditorClient({
                   Page Settings
                 </Button>
                 <Button
-                  color="secondary"
-                  variant="bordered"
-                  onPress={saveDraft}
-                  isLoading={isDraftPending}
-                  isDisabled={isPublishPending}
-                >
-                  Save Draft
-                </Button>
-                <Button
                   color="primary"
                   onPress={rightHandler}
                   isLoading={isPublishPending}
-                  isDisabled={isDraftPending}
+                  isDisabled={isPublishPending}
                 >
                   {rightLabel}
                 </Button>
@@ -331,7 +299,7 @@ export default function PageEditorClient({
                       <p className="text-sm text-gray-500">
                         {isPublished
                           ? "This page is published and visible to users"
-                          : "This page is a draft and not visible to users"}
+                          : "This page is not published and not visible to users"}
                       </p>
                     </div>
                     <Switch

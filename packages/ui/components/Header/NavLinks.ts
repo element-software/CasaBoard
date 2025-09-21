@@ -9,6 +9,7 @@ export interface NavLink {
 export const getPublicLinks = (): NavLink[] => [
   { href: LinkService.crossAppHref("public", "/about"), label: "About", external: true },
   { href: LinkService.crossAppHref("public", "/docs"), label: "Docs", external: true },
+  { href: LinkService.crossAppHref("public", "/contact"), label: "Contact", external: true },
 ];
 
 export const getPrivateLinks = (): NavLink[] => [

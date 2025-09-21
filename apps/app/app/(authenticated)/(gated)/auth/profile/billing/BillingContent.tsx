@@ -17,6 +17,7 @@ import Icon from "@mdi/react";
 import { mdiCheck } from "@mdi/js";
 import { useRef, useState } from "react";
 import { Plan } from "@repo/types/subscription";
+import { LinkService } from "@repo/lib";
 
 interface Entitlements {
   planId: string;
@@ -249,7 +250,7 @@ export default function BillingContent({
 
       <div className="mt-10 text-center text-sm text-foreground-500">
         Questions about plans?{" "}
-        <Link href="/contact" className="text-primary">
+        <Link href={LinkService.crossAppHref("public", "/contact")} className="text-primary">
           Contact us
         </Link>
       </div>
