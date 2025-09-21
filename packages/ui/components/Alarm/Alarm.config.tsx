@@ -20,9 +20,9 @@ export const AlarmConfig = {
         <EntityField
           value={value}
           onChange={onChange}
-          domain="switch"
-          label="Switch Entity"
-          description="Select a switch entity from your Home Assistant"
+          domain="alarm_control_panel"
+          label="Alarm Entity"
+          description="Select a alarm entity from your Home Assistant"
         />
       ),
     },
