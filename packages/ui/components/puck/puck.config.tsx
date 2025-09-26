@@ -27,8 +27,8 @@ export const PuckConfig: Config<Components> = {
     ),
   },
   components: {
-    Light: NewLightConfig,
-    // Light: LightConfig,
+    //Light: NewLightConfig,
+     Light: LightConfig,
     // Alarm: AlarmConfig,
     // BinarySensor: BinarySensorConfig,
     // EntitiesCard: EntitiesCardConfig,

@@ -41,8 +41,7 @@ export async function connect({
     console.log("connect:: error", err);
     if (err === ERR_INVALID_AUTH) {
       // Tokens invalid: clear stored token and retry auth flow
-      console.log("connect:: tokens invalid: clearing tokens");
-      await clearTokensInDB();
+      console.log("connect:: tokens invalid: retrying auth flow");
       auth = await getAuth({
         hassUrl: homeAssistantUrl,
         saveTokens: saveTokensToDB,
@@ -72,17 +71,13 @@ export async function connect({
     connection = await createConnection({ auth });
   } catch (err) {
     if (err === ERR_INVALID_AUTH) {
-      console.log("connect:: tokens invalid: clearing tokens");
-      await clearTokensInDB();
-      connection = await createConnection({ auth });
+      console.error("connect:: tokens invalid: retrying auth flow");
     } 
     if (err === ERR_CANNOT_CONNECT) {
-      console.log("connect:: cannot connect: clearing tokens");
-      await clearTokensInDB();
-      connection = await createConnection({ auth });
+      console.error("connect:: cannot connect: retrying auth flow");
     }
     
-    console.log("connect:: error", err);
+    console.error("connect:: error", err);
     throw new Error(`create connection failed: ${err}`);
   }
   return { connection, auth };

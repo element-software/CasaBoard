@@ -1,5 +1,4 @@
 "use client";
-import { EntityName, useEntity, useHass } from "@hakit/core";
 import { useCallback, useState, useEffect } from "react";
 import { Card, CardBody, cn } from "@heroui/react";
 import Icon from "@mdi/react";
@@ -7,9 +6,10 @@ import { mdiAlert, mdiLightbulb } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 import { useDebouncedSlider } from "@repo/hooks/useDebounce";
 import { LightUtils } from "@repo/utils";
+import { useEntity } from "@repo/ha";
 
 interface LightProps {
-  entityId: EntityName;
+  entityId: string;
   dimmer?: boolean;
   temperature?: boolean;
   color?: boolean;
@@ -25,112 +25,31 @@ export const Light = ({
 }: LightProps) => {
   console.log("Light:: entityId", entityId);
 
-  // Local state for immediate slider feedback
-  const [localBrightness, setLocalBrightness] = useState<number | null>(null);
-  const [localTemperature, setLocalTemperature] = useState<number | null>(null);
-  const [localColor, setLocalColor] = useState<string | null>(null);
+  // Hook
+  const entity = useEntity(entityId);
 
-  // Track dragging state
+  console.log("Light:: entity", entity);
+
+  // Local drag state
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
 
-  // All hooks must be called before any conditional returns
-  const entity = useEntity(entityId, { returnNullIfNotFound: true });
-  const { callService } = useHass();
+  // Simple actions via the new hook helpers
+  const handleTurnOn = () => entity?.turn_on?.();
+  const handleTurnOff = () => entity?.turn_off?.();
+  const handleToggle = () => entity?.toggle?.();
 
-  // All other hooks must also be called before conditional returns
-  const handleTurnOn = useCallback(
-    (entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "turn_on",
-        target: {
-          entity_id: entityId,
-        },
-      });
-    },
-    [callService]
-  );
+  // Immediate handlers using callService
+  const setBrightnessImmediate = (value: number) => {
+    entity?.callService?.("turn_on", { brightness: value });
+  };
 
-  const handleTurnOff = useCallback(
-    (entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "turn_off",
-        target: {
-          entity_id: entityId,
-        },
-      });
-    },
-    [callService]
-  );
-
-  const handleToggle = useCallback(
-    (entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "toggle",
-        target: {
-          entity_id: entityId,
-        },
-      });
-    },
-    [callService]
-  );
-
-  // Immediate handlers for non-slider actions
-  const setBrightnessImmediate = useCallback(
-    (value: number, entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "turn_on",
-        target: {
-          entity_id: entityId,
-        },
-        serviceData: {
-          brightness: value,
-        },
-      });
-    },
-    [callService]
-  );
-
-  const setTemperatureImmediate = useCallback(
-    (value: number, entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "turn_on",
-        target: {
-          entity_id: entityId,
-        },
-        serviceData: {
-          // @ts-ignore
-          color_temp_kelvin: value,
-        },
-      });
-    },
-    [callService]
-  );
-
-  const setColorImmediate = useCallback(
-    (value: string, entityId: EntityName) => {
-      callService({
-        domain: "light",
-        service: "turn_on",
-        target: {
-          entity_id: entityId,
-        },
-        serviceData: {
-          rgb_color: [
-            parseInt(value.substring(1, 3), 16),
-            parseInt(value.substring(3, 5), 16),
-            parseInt(value.substring(5, 7), 16),
-          ],
-        },
-      });
-    },
-    [callService]
-  );
+  const setTemperatureImmediate = (value: number) => {
+    entity?.callService?.("turn_on", {
+      // @ts-ignore Home Assistant service data key
+      color_temp_kelvin: value,
+    });
+  };
 
   // Debounced handlers for slider actions
   const debouncedSetBrightness = useDebouncedSlider(
@@ -141,50 +60,40 @@ export const Light = ({
     setTemperatureImmediate,
     150
   );
+  const setColorImmediate = (value: string) => {
+    const r = parseInt(value.substring(1, 3), 16);
+    const g = parseInt(value.substring(3, 5), 16);
+    const b = parseInt(value.substring(5, 7), 16);
+    entity?.callService?.("turn_on", { rgb_color: [r, g, b] });
+  };
+
   const debouncedSetColor = useDebouncedSlider(setColorImmediate, 150);
 
   const handleBrightnessChange = useCallback(
     (value: number) => {
-      setLocalBrightness(value);
-      debouncedSetBrightness(value, entityId as EntityName);
+      debouncedSetBrightness(value);
     },
     [debouncedSetBrightness, entityId]
   );
 
   const handleTemperatureChange = useCallback(
     (value: number) => {
-      setLocalTemperature(value);
-      debouncedSetTemperature(value, entityId as EntityName);
+      debouncedSetTemperature(value);
     },
     [debouncedSetTemperature, entityId]
   );
 
   const handleColorChange = useCallback(
     (value: string) => {
-      setLocalColor(value);
-      debouncedSetColor(value, entityId as EntityName);
+      debouncedSetColor(value);
     },
     [debouncedSetColor, entityId]
   );
 
-  // Sync local state with entity state when entity changes
-  useEffect(() => {
-    if (entity) {
-      if (localBrightness === null) {
-        setLocalBrightness(entity.attributes.brightness || 0);
-      }
-      if (localTemperature === null) {
-        setLocalTemperature(entity.attributes.color_temp_kelvin || 0);
-      }
-      if (localColor === null) {
-        setLocalColor(entity.custom.hexColor || "#ffffff");
-      }
-    }
-  }, [entity, localBrightness, localTemperature, localColor]);
 
   // Calculate brightness percentage for background - use entity brightness for initial value
   const entityBrightness = entity?.attributes.brightness || 0;
-  const currentBrightness = localBrightness ?? entityBrightness;
+  const currentBrightness = entityBrightness;
   const brightnessPercentage = Math.round((currentBrightness / 255) * 100);
   const isOn = entity?.state === "on";
 
@@ -211,9 +120,9 @@ export const Light = ({
   // Handle click for toggle (only if not dragging and hasn't dragged)
   const handleCardClick = useCallback(() => {
     if (entity && !isDragging && !hasDragged) {
-      handleToggle(entity.entity_id as EntityName);
+      handleToggle();
     }
-  }, [entity, isDragging, hasDragged, handleToggle]);
+  }, [entity, isDragging, hasDragged]);
 
   // Handle drag for brightness adjustment (only if dimmer is enabled and light is on)
   const handleCardDrag = useCallback(
@@ -300,8 +209,8 @@ export const Light = ({
     );
   }
 
-  // Error state
-  if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
+  // Error state: treat only explicit 'unavailable' as error.
+  if (!entity || entity.state === "unavailable") {
     return (
       <Card className="p-4 border-2 border-dashed">
         <CardBody className="text-center">
@@ -352,7 +261,7 @@ export const Light = ({
           <div className="flex flex-col flex-1 min-w-0">
             {/* Entity Name */}
             <h3 className="text-sm font-semibold capitalize truncate">
-              {entity.attributes.friendly_name}
+              {entity.attributes?.friendly_name || entity.entity_id || entityId}
             </h3>
 
             {/* Brightness Percentage (only show if dimmer is enabled and light is on) */}

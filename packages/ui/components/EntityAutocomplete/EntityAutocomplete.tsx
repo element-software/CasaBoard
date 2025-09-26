@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useEntities } from "@repo/ha";
 import { Autocomplete, AutocompleteItem, Chip, Button } from "@heroui/react";
 import Icon from "@mdi/react";
@@ -111,6 +111,18 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
     return entityArray;
   }, [entitiesList]);
 
+  // Keep the visible input text in sync when value comes from outside (e.g., initial load)
+  useEffect(() => {
+    if (value) {
+      const selected = entityOptions.find((e) => e.id === value);
+      if (selected) {
+        setInputValue(selected.friendly_name);
+      }
+    } else {
+      setInputValue("");
+    }
+  }, [value, entityOptions]);
+
   // Filter entities based on search input
   const filteredEntities = useMemo(() => {
     if (!inputValue.trim()) return entityOptions;
@@ -135,8 +147,12 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
       const entityId = key as string | null;
       onChange(entityId);
       setIsOpen(false);
+      if (entityId) {
+        const selected = entityOptions.find((e) => e.id === entityId);
+        if (selected) setInputValue(selected.friendly_name);
+      }
     },
-    [onChange]
+    [onChange, entityOptions]
   );
 
   const handleClear = useCallback(() => {
@@ -161,7 +177,7 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
         label={label}
         placeholder={placeholder}
         description={description}
-        value={value || ""}
+        selectedKey={value ?? null}
         inputValue={inputValue}
         onInputChange={handleInputChange}
         onSelectionChange={handleSelectionChange}
