@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
 import { Connection, getStates, subscribeEntities, Auth, ERR_INVALID_AUTH } from "home-assistant-js-websocket";
 import { connect } from "../connection"; // Import your connect logic
-import { refreshToken } from "../connection/token";
 
 export interface HAContextType {
   connection: Connection | null;
@@ -41,10 +40,13 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
       setLoading(true);
       setError(null);
       try {
+        console.log("HAProvider:: connecting to Home Assistant at", hassUrl);
         const { connection, auth } = await connect({ homeAssistantUrl: hassUrl });
+        console.log("HAProvider:: connected to Home Assistant", connection);
         activeConnection = connection;
         activeAuth = auth;
         setConnection(activeConnection);
+
 
         // Initial states
         const initial = await getStates(activeConnection);

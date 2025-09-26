@@ -5,8 +5,7 @@ import { SubscriptionService } from "../services/subscriptionService";
 export interface CreateHAInstanceInput {
   name: string;
   hass_url: string;
-  hass_token?: string | null;
-  ha_refresh_token?: string | null;
+    auth?: any | null; // Store full AuthData object
   expires_at?: string | null;
 }
 
@@ -53,8 +52,7 @@ export async function createHAInstance(input: CreateHAInstanceInput) {
       user_id: user.id,
       name: input.name,
       hass_url: input.hass_url,
-      hass_token: input.hass_token ?? null,
-      ha_refresh_token: input.ha_refresh_token ?? null,
+  auth: input.auth ?? null,
       expires_at: input.expires_at ?? null,
     })
     .select()
