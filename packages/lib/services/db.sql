@@ -56,24 +56,22 @@ do $$ begin
   end if;
 end $$;
 
--- Add is_active flag to ha_instances to track the selected instance
+-- Remove is_active flag and related unique index (no longer required)
 do $$ begin
-  if not exists (
+  -- Drop unique index if it exists
+  if exists (
+    select 1 from pg_indexes where schemaname = 'public' and indexname = 'ha_instances_one_active_per_user'
+  ) then
+    drop index if exists public.ha_instances_one_active_per_user;
+  end if;
+  -- Drop is_active column if it exists
+  if exists (
     select 1 from information_schema.columns
     where table_schema = 'public'
       and table_name = 'ha_instances'
       and column_name = 'is_active'
   ) then
-    alter table if exists public.ha_instances add column is_active boolean not null default false;
-  end if;
-end $$;
-
--- Ensure only one active HA instance per user
-do $$ begin
-  if not exists (
-    select 1 from pg_indexes where schemaname = 'public' and indexname = 'ha_instances_one_active_per_user'
-  ) then
-    create unique index ha_instances_one_active_per_user on public.ha_instances(user_id) where is_active IS TRUE;
+    alter table if exists public.ha_instances drop column if exists is_active;
   end if;
 end $$;
 

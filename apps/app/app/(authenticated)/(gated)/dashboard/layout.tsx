@@ -14,8 +14,8 @@ export default async function DashboardLayout({
   // Fetch configuration server-side
   const initialConfig = await ConfigService.getServerConfig();
   
-  // Fetch active instance and decrypt token server-side
-  const haInstance = await HAInstanceActions.getActiveHAInstance();
+  // Fetch first instance (active flag removed)
+  const haInstance = await HAInstanceActions.getFirstHAInstance();
 
 
   return (

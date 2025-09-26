@@ -1,4 +1,4 @@
-import { UserSettingsActions } from "@repo/lib";
+import { UserSettingsActions, HAInstanceActions } from "@repo/lib";
 import { UserSettings } from "@repo/types/userSettings";
 import Icon from "@mdi/react";
 import { mdiAlertCircle } from "@mdi/js";
@@ -14,7 +14,7 @@ export default async function HATestPage() {
   let error: string | null = null;
 
   try {
-    settings = await HAInstanceActions.getActiveHAInstance();
+    settings = await HAInstanceActions.getFirstHAInstance();
 
     if (!settings?.hass_url || !settings?.hass_token) {
       error =

@@ -52,7 +52,6 @@ export async function createHAInstance(input: CreateHAInstanceInput) {
       name: input.name,
       hass_url: input.hass_url,
       hass_token: input.hass_token ?? null,
-      is_active: (count ?? 0) === 0, // first instance becomes active
     })
     .select()
     .single();
@@ -83,30 +82,11 @@ export async function deleteHAInstance(id?: string) {
     if (error) throw new Error(error.message);
   }
 
-  // After deletion, ensure default selection rules
-  const { data: remaining, error: remErr } = await supabase
-    .from("ha_instances")
-    .select("id,hass_url,hass_token")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true });
-  if (remErr) throw new Error(remErr.message);
-
-  if (!remaining || remaining.length === 0) {
-    // nothing else to do
-  } else if (remaining.length === 1) {
-    // If exactly one remains, make it active
-    const only = remaining[0]!;
-    const { error: upErr } = await supabase
-      .from("ha_instances")
-      .update({ is_active: true })
-      .eq("user_id", user.id)
-      .eq("id", only.id);
-    if (upErr) throw new Error(upErr.message);
-  }
+  // After deletion, nothing else to do (active selection removed)
   return { success: true };
 }
 
-export async function getActiveHAInstance() {
+export async function getFirstHAInstance() {
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
@@ -114,7 +94,8 @@ export async function getActiveHAInstance() {
     .from("ha_instances")
     .select("*")
     .eq("user_id", user.id)
-    .eq("is_active", true)
+    .order("created_at", { ascending: true })
+    .limit(1)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
@@ -133,28 +114,6 @@ export async function updateHAInstance(data: UpdateHAInstanceInput) {
     .eq("id", data.id);
   if (error) throw new Error(error.message);
   return data;
-}
-
-export async function setActiveHAInstance(id: string) {
-  const supabase = await createClient();
-  const user = await getCurrentAuthUser();
-  if (!user) throw new Error("Unauthorized");
-
-  // Set active on chosen instance and clear others
-  const { error: clearErr } = await supabase
-    .from("ha_instances")
-    .update({ is_active: false })
-    .eq("user_id", user.id);
-  if (clearErr) throw new Error(clearErr.message);
-
-  const { error: setErr } = await supabase
-    .from("ha_instances")
-    .update({ is_active: true })
-    .eq("user_id", user.id)
-    .eq("id", id);
-  if (setErr) throw new Error(setErr.message);
-
-  return { success: true } as any;
 }
 
 export async function getLongLivedTokenForHAInstance(id: string) {

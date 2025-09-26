@@ -66,12 +66,8 @@ export function HAInstanceManager({
 
   const onSetActive = (id: string) =>
     startTransition(async () => {
+      // Deprecated: no-op now that active flag is removed
       setError(null);
-      try {
-        await HAInstanceActions.setActiveHAInstance(id);
-      } catch (e: any) {
-        setError(e?.message || "Failed to set active instance");
-      }
     });
 
   const renderHeader = () => (
@@ -90,7 +86,6 @@ export function HAInstanceManager({
           key={i.id}
           instance={i}
           compact={compact}
-          onSetActive={onSetActive}
           onDelete={onDelete}
         />
       ))}

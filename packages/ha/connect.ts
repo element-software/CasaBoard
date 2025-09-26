@@ -5,6 +5,7 @@ import {
   createConnection,
   ERR_HASS_HOST_REQUIRED,
   subscribeEntities,
+  createLongLivedTokenAuth,
 } from "home-assistant-js-websocket";
 import type { Auth, AuthData, Connection } from "home-assistant-js-websocket";
 
@@ -18,13 +19,21 @@ export type ConnectResult = {
 };
 
 async function saveTokensToDB(data: AuthData | null): Promise<void> {
-
   if (data) {
-    const activeHAInstance = await HAInstanceActions.getActiveHAInstance();
-    console.log("saveTokensToDB:: Saving token to DB", data);
+    const first = await HAInstanceActions.getFirstHAInstance();
+    if (!first?.id) {
+      console.error("saveTokensToDB:: No first instance found");
+      return;
+    }
+    console.log("saveTokensToDB:: Saving token to DB which expires in", data.expires_in);
+
+    // create a long-lived token
+    const longLivedToken = createLongLivedTokenAuth(data.hassUrl, data.access_token);
+    console.log("saveTokensToDB:: created long-lived token", longLivedToken);
+
     const haInstance = await HAInstanceActions.updateHAInstance({
-      id: activeHAInstance?.id,
-      hass_token: data.access_token,
+      id: first.id,
+      hass_token: longLivedToken.accessToken,
     });
 
     if (haInstance?.hass_token) {
@@ -32,6 +41,8 @@ async function saveTokensToDB(data: AuthData | null): Promise<void> {
         "saveTokensToDB:: Token saved to DB",
         haInstance.hass_token.length
       );
+    } else {
+      console.error("saveTokensToDB:: Failed to save token to DB", haInstance);
     }
   } else {
     console.log("saveTokensToDB:: No token to save");
@@ -39,9 +50,17 @@ async function saveTokensToDB(data: AuthData | null): Promise<void> {
 }
 
 async function loadTokensFromDB(): Promise<AuthData | null> {
-  const active = await HAInstanceActions.getActiveHAInstance();
-  if (active?.hass_token) {
-    return { access_token: active.hass_token, hassUrl: active.hass_url } as AuthData;
+  const first = await HAInstanceActions.getFirstHAInstance();
+  console.log("loadTokensFromDB:: first", first);
+  if (!first?.id) {
+    console.error("loadTokensFromDB:: No first instance found");
+    return null;
+  }
+  if (first?.hass_token) {
+    console.log("loadTokensFromDB:: token found in DB", first.hass_token);
+    return { access_token: first.hass_token, hassUrl: first.hass_url } as AuthData;
+  } else {
+    console.error("loadTokensFromDB:: No token found in DB", first);
   }
   return null;
 }
@@ -53,16 +72,21 @@ export async function connect({
 
   try {
     // Try to pick up authentication after user logs in
+    console.log("connect:: trying to get auth");
     auth = await getAuth({
       hassUrl: homeAssistantUrl,
       saveTokens: saveTokensToDB,
       loadTokens: loadTokensFromDB,
+      redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
     });
   } catch (err) {
     if (err === ERR_HASS_HOST_REQUIRED) {
       // Redirect user to log in on their instance
+      console.log("connect:: redirecting to log in on their instance");
       auth = await getAuth({
         hassUrl: homeAssistantUrl,
+        saveTokens: saveTokensToDB,
+        loadTokens: loadTokensFromDB,
         redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
       });
     } else {

@@ -26,7 +26,7 @@ export default async function AuthenticatedLayout({
     redirect("/auth/login?redirectTo=/setup");
   }
 
-  const haInstance = await HAInstanceActions.getActiveHAInstance();
+  const haInstance = await HAInstanceActions.getFirstHAInstance();
 
   const mainContent = () => (
     <>

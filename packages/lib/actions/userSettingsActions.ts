@@ -151,15 +151,8 @@ export async function deleteUserHassSettings(): Promise<void> {
       throw new Error("Unauthorized");
     }
 
-    const { error } = await supabase
-      .from("ha_instances")
-      .update({ is_active: false })
-      .eq("user_id", user.id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    // With per-page HA instances, we no longer toggle instance active flags here.
+    // This becomes a no-op or could delete user_settings if desired. Keep as no-op for compatibility.
     revalidatePath("/ha-config");
   } catch (error) {
     console.error("Failed to delete user hass settings:", error);
