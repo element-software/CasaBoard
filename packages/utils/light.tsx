@@ -13,7 +13,8 @@ const STATE_BG_CLASSES = {
   unavailable: "bg-theme-error",
 } as const;
 
-export const stateClassNameBg = (entity: HassEntityWithService<"light">) => {
+export const stateClassNameBg = (entity: any) => {
+  console.log("stateClassNameBg", entity, STATE_BG_CLASSES);
   return (
     STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] ||
     STATE_BG_CLASSES.unavailable
