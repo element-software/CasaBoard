@@ -1,19 +1,15 @@
 import { QuickActions } from "@repo/ui/components/Setup/QuickActions";
-import { PageActions, SubscriptionService } from "@repo/lib";
-import { Setup } from "./setup";
+import { HAInstanceActions, PageActions, SubscriptionService } from "@repo/lib";
+import { PagesManagement } from "@repo/ui/components/Setup/PagesManagement";
+import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanceManager";
 
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
-  let pages = [];
-  let error = null;
-  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
-
-  try {
-    pages = await PageActions.getAllPages();
-  } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load pages";
-  }
+  const entitlements =
+    await SubscriptionService.getEntitlementsForCurrentUser();
+  const haInstances = await HAInstanceActions.listHAInstances();
+   const pages = await PageActions.getAllPages();
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -23,11 +19,14 @@ export default async function SetupPage() {
           Manage your dashboard pages and Home Assistant configuration
         </p>
       </div>
-      <Setup
-        pages={pages}
-        error={error || undefined}
-        entitlements={entitlements}
-      />
+      <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
+        <PagesManagement initialPages={pages} initialError={null} />
+        <HAInstanceManager
+          entitlements={entitlements}
+          compact
+          haInstances={haInstances}
+        />
+      </div>
       {/* Quick Actions */}
       <div className="mt-8">
         <QuickActions />

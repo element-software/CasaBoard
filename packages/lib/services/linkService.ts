@@ -1,3 +1,4 @@
+"use client";
 export type AppTarget = "app" | "public";
 
 function ensureLeadingSlash(path: string): string {

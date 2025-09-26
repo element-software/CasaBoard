@@ -1,6 +1,6 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
-import { UserSettingsActions, SupabaseServer, Encryption, ConfigService, getCurrentAuthUser } from "@repo/lib";
+import { HAInstanceActions, SupabaseServer, Encryption, ConfigService, getCurrentAuthUser } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
 
 // Force dynamic rendering for this layout since it uses cookies
@@ -14,36 +14,14 @@ export default async function DashboardLayout({
   // Fetch configuration server-side
   const initialConfig = await ConfigService.getServerConfig();
   
-  // Fetch user settings and decrypt token server-side
-  const userSettings = await UserSettingsActions.getUserSettings();
-  let decryptedToken: string | null = null;
-  
-  if (userSettings?.hass_token) {
-    try {
-      const supabase = await SupabaseServer.createClient();
-      const user = await getCurrentAuthUser();
-      
-      if (user) {
-        const sessionId = generateSessionId(user.id, user.email);
-        
-        if (Encryption.isEncrypted(userSettings.hass_token)) {
-          decryptedToken = await Encryption.decryptToken(userSettings.hass_token, user.id, sessionId);
-        } else {
-          // Legacy plain text token
-          decryptedToken = userSettings.hass_token;
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to decrypt HA token:', error);
-      decryptedToken = null;
-    }
-  }
+  // Fetch active instance and decrypt token server-side
+  const haInstance = await HAInstanceActions.getActiveHAInstance();
+
 
   return (
       <ConfigurationProvider initialConfig={initialConfig}>
         <HassConnectWrapper 
-          userSettings={userSettings}
-          decryptedToken={decryptedToken}
+          haInstance={haInstance}
         >
           <div className="min-h-screen">
             <main className="flex-1">

@@ -1,7 +1,7 @@
 "use client";
 import React, { useTransition, useState } from "react";
 import { Button, Card, CardBody } from "@heroui/react";
-import { UserSettingsActions } from "@repo/lib";
+import { HAInstanceActions, UserSettingsActions } from "@repo/lib";
 import { useRouter } from "next/navigation";
 
 export default function HassErrorFallback({ error }: { error: unknown }) {
@@ -12,7 +12,7 @@ export default function HassErrorFallback({ error }: { error: unknown }) {
   const handleReset = async () => {
     startTransition(async () => {
       try {
-        await UserSettingsActions.deleteUserHassSettings();
+        await HAInstanceActions.deleteHAInstance();
         router.replace("/setup/ha-config");
       } catch (e: any) {
         setLocalError(e?.message || "Failed to delete settings");

@@ -33,7 +33,7 @@ create table if not exists public.ha_instances (
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
   hass_url text not null,
-  hass_token text not null,
+  hass_token text null,
   created_at timestamptz not null default now()
 );
 -- Optional relation: pages -> ha_instances (each page assigned to an instance)
@@ -41,6 +41,61 @@ alter table if exists public.pages
   add column if not exists ha_instance_id uuid null references public.ha_instances(id) on delete set null;
 
 create index if not exists ha_instances_user_id_idx on public.ha_instances(user_id);
+
+-- Ensure hass_token is nullable for OAuth-based flows
+do $$ begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'ha_instances'
+      and column_name = 'hass_token'
+      and is_nullable = 'NO'
+  ) then
+    alter table if exists public.ha_instances alter column hass_token drop not null;
+  end if;
+end $$;
+
+-- Add is_active flag to ha_instances to track the selected instance
+do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'ha_instances'
+      and column_name = 'is_active'
+  ) then
+    alter table if exists public.ha_instances add column is_active boolean not null default false;
+  end if;
+end $$;
+
+-- Ensure only one active HA instance per user
+do $$ begin
+  if not exists (
+    select 1 from pg_indexes where schemaname = 'public' and indexname = 'ha_instances_one_active_per_user'
+  ) then
+    create unique index ha_instances_one_active_per_user on public.ha_instances(user_id) where is_active IS TRUE;
+  end if;
+end $$;
+
+-- Drop hass_url and hass_token from user_settings if they exist
+do $$ begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'user_settings'
+      and column_name = 'hass_url'
+  ) then
+    alter table if exists public.user_settings drop column if exists hass_url;
+  end if;
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'user_settings'
+      and column_name = 'hass_token'
+  ) then
+    alter table if exists public.user_settings drop column if exists hass_token;
+  end if;
+end $$;
 
 
 -- RLS policies for ha_instances

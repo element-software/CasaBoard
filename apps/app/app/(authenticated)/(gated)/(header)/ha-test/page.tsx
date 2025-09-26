@@ -14,7 +14,7 @@ export default async function HATestPage() {
   let error: string | null = null;
 
   try {
-    settings = await UserSettingsActions.getUserSettings();
+    settings = await HAInstanceActions.getActiveHAInstance();
 
     if (!settings?.hass_url || !settings?.hass_token) {
       error =
