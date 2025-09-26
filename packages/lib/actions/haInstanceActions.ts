@@ -6,6 +6,8 @@ export interface CreateHAInstanceInput {
   name: string;
   hass_url: string;
   hass_token?: string | null;
+  ha_refresh_token?: string | null;
+  expires_at?: string | null;
 }
 
 export type UpdateHAInstanceInput = Partial<CreateHAInstanceInput> & {
@@ -52,6 +54,8 @@ export async function createHAInstance(input: CreateHAInstanceInput) {
       name: input.name,
       hass_url: input.hass_url,
       hass_token: input.hass_token ?? null,
+      ha_refresh_token: input.ha_refresh_token ?? null,
+      expires_at: input.expires_at ?? null,
     })
     .select()
     .single();

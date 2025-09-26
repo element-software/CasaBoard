@@ -1,13 +1,13 @@
-"use client";
-import { HAInstanceActions, LinkService } from "@repo/lib";
+import { loadTokensFromDB, saveTokensToDB, clearTokensInDB } from './token';
+import { LinkService } from "@repo/lib";
 import {
   getAuth,
   createConnection,
   ERR_HASS_HOST_REQUIRED,
-  subscribeEntities,
-  createLongLivedTokenAuth,
+  ERR_INVALID_AUTH,
+  ERR_CANNOT_CONNECT,
 } from "home-assistant-js-websocket";
-import type { Auth, AuthData, Connection } from "home-assistant-js-websocket";
+import type { Auth, Connection } from "home-assistant-js-websocket";
 
 export interface HassConnectProps {
   homeAssistantUrl: string;
@@ -18,57 +18,13 @@ export type ConnectResult = {
   auth: Auth;
 };
 
-async function saveTokensToDB(data: AuthData | null): Promise<void> {
-  if (data) {
-    const first = await HAInstanceActions.getFirstHAInstance();
-    if (!first?.id) {
-      console.error("saveTokensToDB:: No first instance found");
-      return;
-    }
-    console.log("saveTokensToDB:: Saving token to DB which expires in", data.expires_in);
-
-    // create a long-lived token
-    const longLivedToken = createLongLivedTokenAuth(data.hassUrl, data.access_token);
-    console.log("saveTokensToDB:: created long-lived token", longLivedToken);
-
-    const haInstance = await HAInstanceActions.updateHAInstance({
-      id: first.id,
-      hass_token: longLivedToken.accessToken,
-    });
-
-    if (haInstance?.hass_token) {
-      console.log(
-        "saveTokensToDB:: Token saved to DB",
-        haInstance.hass_token.length
-      );
-    } else {
-      console.error("saveTokensToDB:: Failed to save token to DB", haInstance);
-    }
-  } else {
-    console.log("saveTokensToDB:: No token to save");
-  }
-}
-
-async function loadTokensFromDB(): Promise<AuthData | null> {
-  const first = await HAInstanceActions.getFirstHAInstance();
-  console.log("loadTokensFromDB:: first", first);
-  if (!first?.id) {
-    console.error("loadTokensFromDB:: No first instance found");
-    return null;
-  }
-  if (first?.hass_token) {
-    console.log("loadTokensFromDB:: token found in DB", first.hass_token);
-    return { access_token: first.hass_token, hassUrl: first.hass_url } as AuthData;
-  } else {
-    console.error("loadTokensFromDB:: No token found in DB", first);
-  }
-  return null;
-}
 
 export async function connect({
   homeAssistantUrl,
 }: HassConnectProps): Promise<ConnectResult> {
+
   let auth: Auth;
+  let connection: Connection;
 
   try {
     // Try to pick up authentication after user logs in
@@ -79,8 +35,21 @@ export async function connect({
       loadTokens: loadTokensFromDB,
       redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
     });
+
+    console.log("connect:: trying auth success", auth);
   } catch (err) {
-    if (err === ERR_HASS_HOST_REQUIRED) {
+    console.log("connect:: error", err);
+    if (err === ERR_INVALID_AUTH) {
+      // Tokens invalid: clear stored token and retry auth flow
+      console.log("connect:: tokens invalid: clearing tokens");
+      await clearTokensInDB();
+      auth = await getAuth({
+        hassUrl: homeAssistantUrl,
+        saveTokens: saveTokensToDB,
+        loadTokens: loadTokensFromDB,
+        redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
+      });
+    } else if (err === ERR_HASS_HOST_REQUIRED) {
       // Redirect user to log in on their instance
       console.log("connect:: redirecting to log in on their instance");
       auth = await getAuth({
@@ -89,11 +58,33 @@ export async function connect({
         loadTokens: loadTokensFromDB,
         redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
       });
+      console.log("connect:: auth after redirect", auth);
     } else {
       throw new Error(`Home Assistant auth failed: ${err}`);
     }
   }
-  const connection = await createConnection({ auth });
+  // Optional: add basic connection event logging
+  // connection.addEventListener("ready", () => console.log("HA connection ready"));
+  // connection.addEventListener("disconnected", () => console.log("HA connection disconnected"));
+  // connection.addEventListener("reconnect-error", () => console.warn("HA connection reconnect error"));
+
+  try {
+    connection = await createConnection({ auth });
+  } catch (err) {
+    if (err === ERR_INVALID_AUTH) {
+      console.log("connect:: tokens invalid: clearing tokens");
+      await clearTokensInDB();
+      connection = await createConnection({ auth });
+    } 
+    if (err === ERR_CANNOT_CONNECT) {
+      console.log("connect:: cannot connect: clearing tokens");
+      await clearTokensInDB();
+      connection = await createConnection({ auth });
+    }
+    
+    console.log("connect:: error", err);
+    throw new Error(`create connection failed: ${err}`);
+  }
   return { connection, auth };
 }
 

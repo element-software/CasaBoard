@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useCallback } from "react";
-import { useHass } from "@hakit/core";
+import { useEntities } from "@repo/ha";
 import { Autocomplete, AutocompleteItem, Chip, Button } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
@@ -90,34 +90,26 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
   showEntityState = true,
   showEntityIcon = true,
 }) => {
-  const { useStore } = useHass();
-  const entities = useStore((state) => state.entities);
+  const entitiesList = useEntities(domain);
   const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   // Get all entities and filter by domain if specified
   const entityOptions = useMemo(() => {
-    if (!entities) return [];
+    if (!entitiesList) return [];
 
-    const entityArray = Object.entries(entities).map(([entityId, entity]) => ({
-      id: entityId,
-      friendly_name: entity.attributes?.friendly_name || entityId,
-      domain: entityId.split(".")[0],
+    const entityArray = entitiesList.map(({ id, domain, entity }) => ({
+      id,
+      friendly_name: entity.attributes?.friendly_name || id,
+      domain,
       state: entity.state,
       icon:
-        entity.attributes?.icon ||
-        DOMAIN_ICONS[entityId.split(".")[0]] ||
-        DOMAIN_ICONS.default,
+        entity.attributes?.icon || DOMAIN_ICONS[domain] || DOMAIN_ICONS.default,
       entity,
     }));
 
-    // Filter by domain if specified
-    if (domain) {
-      return entityArray.filter((entity) => entity.domain === domain);
-    }
-
     return entityArray;
-  }, [entities, domain]);
+  }, [entitiesList]);
 
   // Filter entities based on search input
   const filteredEntities = useMemo(() => {

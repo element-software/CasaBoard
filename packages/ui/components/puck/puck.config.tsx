@@ -7,15 +7,16 @@ import { GraphCardConfig } from "@repo/ui/components/GraphCard/GraphCard.config"
 import { ClockConfig } from "@repo/ui/components/Clock/Clock.config";
 import { Config } from "@measured/puck";
 import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
+import { NewLightConfig } from "@repo/ui/components/Light/newLight.config";
 
 type Components = {
   Light: {},
-  Alarm: {},
-  BinarySensor: {},
-  EntitiesCard: {},
-  GraphCard: {},
-  Clock: {},
-  Grid: {},
+  // Alarm: {},
+  // BinarySensor: {},
+  // EntitiesCard: {},
+  // GraphCard: {},
+  // Clock: {},
+  // Grid: {},
 }
 
 // Puck component configuration
@@ -26,22 +27,25 @@ export const PuckConfig: Config<Components> = {
     ),
   },
   components: {
-    Light: LightConfig,
-    Alarm: AlarmConfig,
-    BinarySensor: BinarySensorConfig,
-    EntitiesCard: EntitiesCardConfig,
-    GraphCard: GraphCardConfig,
-    Clock: ClockConfig,
-    Grid: GridConfig,
+    Light: NewLightConfig,
+    // Light: LightConfig,
+    // Alarm: AlarmConfig,
+    // BinarySensor: BinarySensorConfig,
+    // EntitiesCard: EntitiesCardConfig,
+    // GraphCard: GraphCardConfig,
+    // Clock: ClockConfig,
+    // Grid: GridConfig,
   },
   categories: {
-    layout: {
-      title: "Layout",
-      components: ["Grid"],
-    },
+    // layout: {
+    //   title: "Layout",
+    //   components: ["Grid"],
+    // },
     entities: {
       title: "Entities",
-      components: ["Light", "Clock", "BinarySensor", "EntitiesCard", "GraphCard"],
+      components: ["Light"
+        // , "Clock", "BinarySensor", "EntitiesCard", "GraphCard"
+      ],
     },
   },
 };

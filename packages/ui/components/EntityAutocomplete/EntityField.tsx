@@ -1,12 +1,25 @@
 "use client";
 import React from 'react';
 import { EntityAutocomplete } from './EntityAutocomplete';
-import { DefinedPropertiesByDomain } from '@hakit/core';
+type DefinedDomain =
+  | "light"
+  | "switch"
+  | "sensor"
+  | "binary_sensor"
+  | "alarm_control_panel"
+  | "climate"
+  | "fan"
+  | "camera"
+  | "lock"
+  | "cover"
+  | "window"
+  | "water_heater"
+  | "media_player";
 
 interface EntityFieldProps {
   value?: string;
   onChange: (value: string | null) => void;
-  domain?: keyof DefinedPropertiesByDomain | "binary_sensor";
+  domain?: DefinedDomain | "binary_sensor";
   label?: string;
   description?: string;
   disabled?: boolean;

@@ -34,6 +34,8 @@ create table if not exists public.ha_instances (
   name text not null,
   hass_url text not null,
   hass_token text null,
+  ha_refresh_token text null,
+  expires_at timestamptz null,
   created_at timestamptz not null default now()
 );
 -- Optional relation: pages -> ha_instances (each page assigned to an instance)
@@ -53,6 +55,30 @@ do $$ begin
       and is_nullable = 'NO'
   ) then
     alter table if exists public.ha_instances alter column hass_token drop not null;
+  end if;
+end $$;
+
+-- Add ha_refresh_token if missing
+do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'ha_instances'
+      and column_name = 'ha_refresh_token'
+  ) then
+    alter table if exists public.ha_instances add column ha_refresh_token text null;
+  end if;
+end $$;
+
+-- Add expires_at if missing
+do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'ha_instances'
+      and column_name = 'expires_at'
+  ) then
+    alter table if exists public.ha_instances add column expires_at timestamptz null;
   end if;
 end $$;
 

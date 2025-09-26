@@ -1,7 +1,7 @@
 "use client";
 import { useEntity } from "@repo/ha";
 
-function SwitchTile({ entityId }: { entityId: string }) {
+export function NewLight({ entityId }: { entityId: string }) {
   const entity = useEntity(entityId);
 
   if (!entity) return <div>Loading...</div>;

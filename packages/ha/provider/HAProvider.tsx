@@ -1,11 +1,8 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import {
-  Connection,
-  getStates,
-  subscribeEntities,
-} from "home-assistant-js-websocket";
-import { connect } from "../connect"; // Import your connect logic
+import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
+import { Connection, getStates, subscribeEntities, Auth, ERR_INVALID_AUTH } from "home-assistant-js-websocket";
+import { connect } from "../connection"; // Import your connect logic
+import { refreshToken } from "../connection/token";
 
 export interface HAContextType {
   connection: Connection | null;
@@ -36,29 +33,29 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    let active = true;
     let unsubscribe: (() => void) | undefined;
+    let activeConnection: Connection | null = null;
+    let activeAuth: Auth | null = null;
 
     const run = async () => {
       setLoading(true);
       setError(null);
       try {
-        let { connection } = await connect({ homeAssistantUrl: hassUrl });
-        if (!active) return;
-        setConnection(connection);
+        const { connection, auth } = await connect({ homeAssistantUrl: hassUrl });
+        activeConnection = connection;
+        activeAuth = auth;
+        setConnection(activeConnection);
 
-        // Initial entity states
-        const initial = await getStates(connection);
-        if (!active) return;
+        // Initial states
+        const initial = await getStates(activeConnection);
         const initialMap = initial.reduce((acc: any, s: any) => {
           acc[s.entity_id] = s;
           return acc;
         }, {} as Record<string, any>);
         setEntities(initialMap);
 
-        // Subscribe to live updates
-        unsubscribe = subscribeEntities(connection, (ents) => {
-          if (!active) return;
+        // Live updates
+        unsubscribe = subscribeEntities(activeConnection, (ents) => {
           setEntities(ents as any);
         });
 
@@ -68,12 +65,12 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
         setConnection(null);
         setEntities({});
         setLoading(false);
+        console.log("HAProvider:: error", e);
       }
     };
 
     run();
     return () => {
-      active = false;
       if (unsubscribe) unsubscribe();
       setConnection(null);
       setEntities({});
@@ -83,6 +80,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
   const getEntityById = (entityId: string) => entities[entityId];
   const getAllEntities = () => Object.values(entities);
 
+  console.log("HAProvider:: error", error);
   if (error) return <>{fallback}</>;
 
   return (
