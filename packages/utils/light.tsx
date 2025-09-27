@@ -11,7 +11,7 @@ const STATE_BG_CLASSES = {
 } as const;
 
 export const stateClassNameBg = (entity: any) => {
-  console.log("stateClassNameBg", entity, STATE_BG_CLASSES);
+  // Removed debugging log statement
   return (
     STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] ||
     STATE_BG_CLASSES.unavailable
