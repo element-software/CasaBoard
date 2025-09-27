@@ -17,7 +17,7 @@ import EntitiesCard from "./EntitiesCard";
 import EntityCard from "./EntitiesCard/EntityCard";
 import classNames from "classnames";
 import ClientOnly from "./ClientOnly";
-import { clientLogger } from "../../lib/logger";
+import { clientLogger } from "@repo/lib";
 
 interface ComponentRendererProps {
   config: ComponentConfig;
