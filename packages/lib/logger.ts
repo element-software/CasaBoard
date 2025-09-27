@@ -35,16 +35,16 @@ function format(scope: 'SERVER' | 'CLIENT', fn: string, msg: any, args: any[]) {
 export function createLogger(scope: 'SERVER' | 'CLIENT') {
   return {
     info(fn: string, msg: any, ...args: any[]) {
-      baseLogger.info(...(format(scope, fn, msg, args) as [any]));
+      baseLogger.info(...format(scope, fn, msg, args));
     },
     warn(fn: string, msg: any, ...args: any[]) {
-      baseLogger.warn(...(format(scope, fn, msg, args) as [any]));
+      baseLogger.warn(...format(scope, fn, msg, args));
     },
     error(fn: string, msg: any, ...args: any[]) {
-      baseLogger.error(...(format(scope, fn, msg, args) as [any]));
+      baseLogger.error(...format(scope, fn, msg, args));
     },
     debug(fn: string, msg: any, ...args: any[]) {
-      baseLogger.debug(...(format(scope, fn, msg, args) as [any]));
+      baseLogger.debug(...format(scope, fn, msg, args));
     },
   };
 }
