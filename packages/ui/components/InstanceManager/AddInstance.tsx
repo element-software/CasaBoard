@@ -48,7 +48,7 @@ export const AddInstance = ({
       <div className="flex justify-end">
         <Button
           color="primary"
-					onPress={handleOpenConfirm}
+          onPress={handleOpenConfirm}
           isDisabled={!canCreate() || !form.hass_url}
           isLoading={isPending}
         >
