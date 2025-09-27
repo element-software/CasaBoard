@@ -56,24 +56,24 @@ export const AddInstance = ({
         </Button>
       </div>
 
-			<Modal isOpen={isConfirmOpen} onOpenChange={setIsConfirmOpen} backdrop="blur">
-				<ModalContent className="bg-theme-background text-theme-text border border-theme-border">
-					<ModalHeader className="flex flex-col gap-1">Confirm add instance</ModalHeader>
-					<ModalBody>
-						<p>
-							You will be redirected through the Home Assistant authentication flow to authorize access.
-						</p>
-					</ModalBody>
-					<ModalFooter className="justify-between">
-						<Button variant="light" onPress={() => setIsConfirmOpen(false)}>
-							Cancel
-						</Button>
-						<Button color="primary" onPress={handleConfirm} isLoading={isPending}>
-							OK
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+      <Modal isOpen={isConfirmOpen} onOpenChange={setIsConfirmOpen} backdrop="blur">
+        <ModalContent className="bg-theme-background text-theme-text border border-theme-border">
+          <ModalHeader className="flex flex-col gap-1">Confirm add instance</ModalHeader>
+          <ModalBody>
+            <p>
+              You will be redirected through the Home Assistant authentication flow to authorize access.
+            </p>
+          </ModalBody>
+          <ModalFooter className="justify-between">
+            <Button variant="light" onPress={() => setIsConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="primary" onPress={handleConfirm} isLoading={isPending}>
+              OK
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
