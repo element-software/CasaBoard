@@ -4,7 +4,7 @@ import { PuckConfig as puckConfig } from "@repo/ui/components/puck/puck.config";
 import { useState, useEffect } from "react";
 import { usePages } from "@repo/hooks/usePages";
 import { Page } from "@repo/types/page";
-import { clientLogger } from "../../../../lib/logger";
+import { clientLogger } from "@repo/lib";
 
 interface PuckEditorViewProps {
   currentPage: string;
