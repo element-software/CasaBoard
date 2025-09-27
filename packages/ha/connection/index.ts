@@ -1,4 +1,5 @@
 import { ConnectResult, EntityDomain, EntityId } from "../types/index";
+import { serverLogger } from "@repo/lib";
 import { loadTokensFromDB, saveTokensToDB } from "./token";
 import { LinkService } from "@repo/lib";
 import {
@@ -63,15 +64,15 @@ export async function connect({
   // Try to get auth, retry if invalid or host required
   try {
     auth = await getAuth(getAuthOptions);
-    console.log("connect:: got auth", auth);
+    serverLogger.info('connect', 'got auth', auth);
   } catch (err) {
-    console.warn("connect:: getAuth error", err);
+    serverLogger.warn('connect', 'getAuth error', err);
     if (err === ERR_INVALID_AUTH || err === ERR_HASS_HOST_REQUIRED) {
       try {
         auth = await getAuth(getAuthOptions);
-        console.log("connect:: retried getAuth", auth);
+        serverLogger.info('connect', 'retried getAuth', auth);
       } catch (err2) {
-        console.error("connect:: getAuth failed after retry", err2);
+        serverLogger.error('connect', 'getAuth failed after retry', err2);
         throw new Error(`Home Assistant auth failed: ${err2}`);
       }
     } else {
@@ -84,11 +85,11 @@ export async function connect({
     if (!auth) throw new Error("No auth available for connection");
     connection = await createConnection({ auth });
     // Optionally add connection event logging
-    // connection.addEventListener("ready", () => console.log("HA connection ready"));
-    // connection.addEventListener("disconnected", () => console.log("HA connection disconnected"));
-    // connection.addEventListener("reconnect-error", () => console.warn("HA connection reconnect error"));
+    // connection.addEventListener("ready", () => serverLogger.info('connect', 'HA connection ready'));
+    // connection.addEventListener("disconnected", () => serverLogger.info('connect', 'HA connection disconnected'));
+    // connection.addEventListener("reconnect-error", () => serverLogger.warn('connect', 'HA connection reconnect error'));
   } catch (err) {
-    console.error("connect:: createConnection error", err);
+    serverLogger.error('connect', 'createConnection error', err);
     throw new Error(`Home Assistant connection failed: ${err}`);
   }
 

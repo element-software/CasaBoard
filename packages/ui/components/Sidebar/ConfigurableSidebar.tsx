@@ -10,6 +10,7 @@ import { useConfiguration } from "@repo/ui/components/ConfigurationProvider";
 import { SupabaseClient } from "@repo/lib";
 import { useRouter } from "next/navigation";
 import { SidebarConfig } from "@repo/config";
+import { clientLogger } from "@repo/lib";
 
 interface ConfigurableSidebarProps {
   children: React.ReactNode;
@@ -79,7 +80,7 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
       await supabase.auth.signOut();
       router.push('/auth/login');
     } catch (error) {
-      console.error('Error signing out:', error);
+      clientLogger.error('ConfigurableSidebar', 'Error signing out', error);
     }
   };
 

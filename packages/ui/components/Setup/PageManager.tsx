@@ -7,6 +7,7 @@ import {
   mdiTrashCan, 
   mdiFileDocument
 } from '@mdi/js';
+import { clientLogger } from "@repo/lib";
 
 interface PageManagerProps {
   currentPage: string;
@@ -28,7 +29,7 @@ export const PageManager = ({ currentPage, setCurrentPage }: PageManagerProps) =
       setCurrentPage(newPage.slug);
       setNewPageName('');
     } catch (error) {
-      console.error('Error creating page:', error);
+      clientLogger.error('PageManager', 'Error creating page', error);
     } finally {
       setIsCreating(false);
     }
@@ -44,7 +45,7 @@ export const PageManager = ({ currentPage, setCurrentPage }: PageManagerProps) =
         setCurrentPage(remainingPages.length > 0 ? remainingPages[0].slug : '');
       }
     } catch (error) {
-      console.error('Error deleting page:', error);
+      clientLogger.error('PageManager', 'Error deleting page', error);
     }
   };
 

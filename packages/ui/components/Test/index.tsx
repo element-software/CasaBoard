@@ -1,9 +1,10 @@
 "use client";
 import EntityField from "../EntityAutocomplete/EntityField";
+import { clientLogger } from "@repo/lib";
 
 export const Test = () => {
   const onChange = (value: string | null) => {
-    console.log(value);
+    clientLogger.info('Test', 'value', value);
   };
   return (
     <div className="grid grid-cols-2 gap-4">

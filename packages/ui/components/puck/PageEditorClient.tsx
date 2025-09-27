@@ -15,7 +15,7 @@ import {
 } from "@heroui/react";
 import "@measured/puck/puck.css";
 import { useRouter } from "next/navigation";
-import { LinkService, PageActions } from "@repo/lib";
+import { LinkService, PageActions, clientLogger } from "@repo/lib";
 
 type PageEditorClientProps = {
   initialData?: Data;
@@ -88,7 +88,7 @@ export default function PageEditorClient({
       try {
         await saveAs(isPublished);
       } catch (error) {
-        console.error("Error saving page:", error);
+        clientLogger.error('PageEditorClient', 'Error saving page', error);
         setError(
           error instanceof Error ? error.message : "Failed to save page"
         );
@@ -139,7 +139,7 @@ export default function PageEditorClient({
       try {
         await saveAs(true);
       } catch (error) {
-        console.error("Error publishing page:", error);
+        clientLogger.error('PageEditorClient', 'Error publishing page', error);
         setError(
           error instanceof Error ? error.message : "Failed to publish page"
         );
@@ -153,7 +153,7 @@ export default function PageEditorClient({
       try {
         await saveAs(true);
       } catch (error) {
-        console.error("Error updating page:", error);
+        clientLogger.error('PageEditorClient', 'Error updating page', error);
         setError(
           error instanceof Error ? error.message : "Failed to update page"
         );

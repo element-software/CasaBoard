@@ -1,5 +1,5 @@
 import { SubscriptionService } from "@repo/lib";
-import { StripeService, SupabaseServer } from "@repo/lib";
+import { StripeService, SupabaseServer, serverLogger } from "@repo/lib";
 import BillingContent from "./BillingContent";
 
 export default async function BillingPage() {
@@ -27,6 +27,6 @@ export default async function BillingPage() {
     } catch {}
   }
 
-  console.log("Billing:: entitlements", entitlements, "currentPeriodEnd", currentPeriodEnd, "cancelAt", cancelAt);
+  serverLogger.info('billing:page', 'entitlements', entitlements, 'currentPeriodEnd', currentPeriodEnd, 'cancelAt', cancelAt);
   return <BillingContent entitlements={entitlements} currentPeriodEnd={currentPeriodEnd} cancelAt={cancelAt} />;
 }

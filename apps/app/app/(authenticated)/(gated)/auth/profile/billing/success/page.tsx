@@ -4,6 +4,7 @@ import {
   SupabaseServer,
   StripeEntitlementsService,
   getCurrentAuthUser,
+  serverLogger,
 } from "@repo/lib";
 import Stripe from "stripe";
 import SuccessContent from "./SuccessContent";
@@ -64,8 +65,8 @@ export default async function BillingSuccessPage({
     }
   } catch (err) {
     // ignore and continue to billing
-    console.error("Cancel subscription failed ");
-    console.error(err);
+    serverLogger.error('billing:success', 'Cancel subscription failed');
+    serverLogger.error('billing:success', 'Error', err);
   }
 
   return (

@@ -1,9 +1,10 @@
 "use client";
 import { Puck, Data } from "@measured/puck";
-import { PuckConfig as puckConfig } from '@repo/ui/components/puck/puck.config';
-import { useState, useEffect } from 'react';
-import { usePages } from '@repo/hooks/usePages';
-import { Page } from '@repo/types/page';
+import { PuckConfig as puckConfig } from "@repo/ui/components/puck/puck.config";
+import { useState, useEffect } from "react";
+import { usePages } from "@repo/hooks/usePages";
+import { Page } from "@repo/types/page";
+import { clientLogger } from "@repo/lib";
 
 interface PuckEditorViewProps {
   currentPage: string;
@@ -11,7 +12,10 @@ interface PuckEditorViewProps {
 
 export const PuckEditorView = ({ currentPage }: PuckEditorViewProps) => {
   const { updatePageData, getPage } = usePages();
-  const [pageData, setPageData] = useState<Data>({ content: [], root: { props: {} } });
+  const [pageData, setPageData] = useState<Data>({
+    content: [],
+    root: { props: {} },
+  });
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,10 +32,17 @@ export const PuckEditorView = ({ currentPage }: PuckEditorViewProps) => {
         const fetchedPage = await getPage(currentPage);
         if (fetchedPage) {
           setPage(fetchedPage);
-          setPageData(fetchedPage.puck_data || { content: [], root: { props: {} } });
+          setPageData(
+            fetchedPage.puck_data || { content: [], root: { props: {} } }
+          );
         }
       } catch (error) {
-        console.error('Error loading page data:', error);
+        // Browser-only dev log
+        clientLogger.error(
+          "CLIENT PuckEditor:",
+          "Error loading page data",
+          error
+        );
         setPageData({ content: [], root: { props: {} } });
       } finally {
         setLoading(false);
@@ -47,9 +58,9 @@ export const PuckEditorView = ({ currentPage }: PuckEditorViewProps) => {
     try {
       await updatePageData(currentPage, data);
       setPageData(data);
-      console.log("Page data saved successfully");
+      clientLogger.info("CLIENT PuckEditor:", "Page data saved successfully");
     } catch (error) {
-      console.error("Error saving page data:", error);
+      clientLogger.error("CLIENT PuckEditor:", "Error saving page data", error);
     }
   };
 

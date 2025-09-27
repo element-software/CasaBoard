@@ -1,4 +1,4 @@
-import { HAInstanceActions, Encryption, generateSessionId, getCurrentAuthUser } from "@repo/lib";
+import { HAInstanceActions, Encryption, generateSessionId, getCurrentAuthUser, serverLogger } from "@repo/lib";
 import {
   Auth,
   AuthData,
@@ -8,13 +8,13 @@ import {
 
 export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
   if (!data) {
-    console.error("saveTokensToDB:: No data to save");
+    serverLogger.error('saveTokensToDB', 'No data to save');
     return;
   }
 
   const first = await HAInstanceActions.getFirstHAInstance();
   if (!first?.id) {
-    console.error("saveTokensToDB:: No first instance found");
+    serverLogger.error('saveTokensToDB', 'No first instance found');
     return;
   }
   try {
@@ -49,12 +49,12 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
     });
 
     if (haInstance?.auth) {
-      console.log("saveTokensToDB:: Encrypted auth saved to DB");
+      serverLogger.info('saveTokensToDB', 'Encrypted auth saved to DB');
     } else {
-      console.error("saveTokensToDB:: Failed to save encrypted auth to DB", haInstance);
+      serverLogger.error('saveTokensToDB', 'Failed to save encrypted auth to DB', haInstance);
     }
   } catch (e) {
-    console.error("saveTokensToDB:: encryption failed, falling back to plain save", e);
+    serverLogger.error('saveTokensToDB', 'encryption failed, falling back to plain save', e);
     try {
       await HAInstanceActions.updateHAInstance({
         id: first.id,
@@ -64,22 +64,22 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
           : null,
       });
     } catch (e2) {
-      console.error("saveTokensToDB:: fallback save failed", e2);
+      serverLogger.error('saveTokensToDB', 'fallback save failed', e2);
     }
   }
 };
 
 export const loadTokensFromDB: LoadTokensFunc = async () => {
   const first = await HAInstanceActions.getFirstHAInstance();
-  console.log("loadTokensFromDB:: first", first);
+  serverLogger.info('loadTokensFromDB', 'first', first);
   if (!first?.id) {
-    console.error("loadTokensFromDB:: No first instance found");
+    serverLogger.error('loadTokensFromDB', 'No first instance found');
     return null;
   }
   try {
     const stored: any = first?.auth;
     if (!stored) {
-      console.error("loadTokensFromDB:: No token found in DB", first);
+      serverLogger.error('loadTokensFromDB', 'No token found in DB', first);
       return null;
     }
 
@@ -96,12 +96,12 @@ export const loadTokensFromDB: LoadTokensFunc = async () => {
     // Legacy formats: return as-is
     if (typeof stored === "string") {
       // If someone stored a raw token string erroneously, we cannot reconstruct AuthData
-      console.warn("loadTokensFromDB:: Unexpected string auth format; returning null");
+      serverLogger.warn('loadTokensFromDB', 'Unexpected string auth format; returning null');
       return null;
     }
     return stored as AuthData;
   } catch (e) {
-    console.error("loadTokensFromDB:: decryption failed", e);
+    serverLogger.error('loadTokensFromDB', 'decryption failed', e);
     return null;
   }
 };
