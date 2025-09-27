@@ -82,7 +82,6 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
   const getEntityById = (entityId: string) => entities[entityId];
   const getAllEntities = () => Object.values(entities);
 
-  console.log("HAProvider:: error", error);
   if (error) return <>{fallback}</>;
 
   return (
