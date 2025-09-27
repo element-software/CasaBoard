@@ -68,7 +68,7 @@ Shared Tailwind + PostCSS lives in `packages/tailwind-config`. Each app:
 
 ## Home Assistant Integration
 
-- Client components rely on `@hakit/core`. To avoid `window is not defined` during SSR we dynamically import client‑only modules (e.g., `HassConnectWrapper`).
+- Uses the home-assistant-websocket-js library.
 
 ## Puck Editor
 

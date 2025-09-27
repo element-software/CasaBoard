@@ -1,5 +1,5 @@
 "use client";
-import { EntityName, HassEntityWithService, useEntity } from "@hakit/core";
+import { useEntity } from "@repo/ha";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
@@ -7,14 +7,12 @@ import { AlarmUtils } from "@repo/utils";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 
 export interface AlarmProps {
-  entityId: EntityName;
+  entityId: string;
 }
 
 export const Alarm = ({ entityId }: AlarmProps) => {
   // Always call the hook, but handle errors in the component logic
-  const entity = useEntity(entityId, {
-    returnNullIfNotFound: true,
-  });
+  const entity = useEntity(entityId);
 
   if (!entityId)
     return (
@@ -44,7 +42,7 @@ export const Alarm = ({ entityId }: AlarmProps) => {
       key={entity.entity_id}
       className={classNames(
         "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface",
-        AlarmUtils.stateClassNameBg(entity as HassEntityWithService<"alarmControlPanel">)
+        AlarmUtils.stateClassNameBg(entity as any)
       )}
     >
       <EntityIcon entity={entity} />

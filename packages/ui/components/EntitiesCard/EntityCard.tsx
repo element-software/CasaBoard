@@ -1,13 +1,13 @@
-import { DomainService, EntityName, useEntity, useHass } from "@hakit/core";
 import { useCallback } from "react";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import Icon from "@mdi/react";
 import { mdiShieldAlert, mdiAlert } from "@mdi/js";
 import classNames from "classnames";
+import { useEntity, useHA } from "@repo/ha";
 
 interface EntityCardProps {
-  entityId: EntityName;
+  entityId: string;
   icon: string;
   showTitle?: boolean;
   showState?: boolean;
@@ -24,23 +24,23 @@ const EntityCard = ({
   showLastChanged = false,
 }: EntityCardProps) => {
 
-    const { callService } = useHass();
+    const { connection } = useHA();
     
     // Always call the hook, but handle errors in the component logic
     const entity = useEntity(entityId);
 
     const toggleLighting = useCallback(
-      (action: DomainService<"light">, entities: EntityName) => {
-        if (disableClick) return;
-        callService({
+      async (entities: string) => {
+        if (disableClick || !connection) return;
+        const service = entity?.state === "on" ? "turn_off" : "turn_on";
+        await connection.sendMessagePromise({
+          type: "call_service",
           domain: "light",
-          service: action,
-          target: {
-            entity_id: entities,
-          },
+          service,
+          service_data: { entity_id: entities },
         });
       },
-      [callService, disableClick]
+      [connection, disableClick, entity?.state]
     );
   
     if (!entity || entity.state === 'unavailable' || entity.state === 'unknown')
@@ -63,7 +63,7 @@ const EntityCard = ({
 
   return (
     <div
-      onClick={() => toggleLighting("toggle", entityId)}
+      onClick={() => toggleLighting(entityId)}
       className="flex flex-col items-center gap-2 text-center"
     >
       <EntityIcon entity={entity} size="h-8 w-8" />

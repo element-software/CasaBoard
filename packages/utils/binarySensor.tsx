@@ -1,4 +1,3 @@
-import { HassEntityWithService } from "@hakit/core";
 import {
   mdiDoorClosed,
   mdiDoorOpen,
@@ -53,18 +52,18 @@ const DEVICE_CLASS_CONFIG = {
 } as const;
 
 export const stateClassNameBg = (
-  entity: HassEntityWithService<"binarySensor">
+  entity: any
 ) => {
   return STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] || "";
 };
 
 export const stateClassNameIcon = (
-  entity: HassEntityWithService<"binarySensor">
+  entity: any
 ) => {
   return STATE_ICON_CLASSES[entity.state as keyof typeof STATE_ICON_CLASSES] || STATE_ICON_CLASSES.on;
 };
 
-export const renderState = (entity: HassEntityWithService<"binarySensor">) => {
+export const renderState = (entity: any) => {
   const deviceClass = entity.attributes.device_class as keyof typeof DEVICE_CLASS_CONFIG;
   const config = DEVICE_CLASS_CONFIG[deviceClass]?.states;
   

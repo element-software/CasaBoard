@@ -1,8 +1,7 @@
-import { EntityName } from "@hakit/core";
 import { Data } from "@measured/puck";
 
 export interface EntityConfig {
-  id: EntityName;
+  id: string;
   icon: string;
   name?: string;
 }
@@ -55,7 +54,7 @@ export interface CustomGridConfig {
   className?: string;
   gridCols?: number;
   entities: Array<{
-    id: EntityName;
+    id: string;
     icon: string;
     showState?: boolean;
     showTitle?: boolean;
@@ -92,8 +91,8 @@ export interface PageConfig {
 }
 
 export interface SidebarConfig {
-  thermostat?: EntityName;
-  weather?: EntityName;
+  thermostat?: string;
+  weather?: string;
   showClock?: boolean;
   showWeather?: boolean;
   showThermostat?: boolean;

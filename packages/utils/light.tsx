@@ -1,6 +1,3 @@
-import { HassEntityWithService } from "@hakit/core";
-
-// State class mappings for consistency
 const STATE_CLASSES = {
   on: "text-white",
   off: "text-secondary",
@@ -21,7 +18,7 @@ export const stateClassNameBg = (entity: any) => {
   );
 };
 
-export const stateClassNameIcon = (entity: HassEntityWithService<"light">) => {
+export const stateClassNameIcon = (entity: any) => {
   return STATE_CLASSES[entity.state as keyof typeof STATE_CLASSES] || STATE_CLASSES.unavailable;
 };
 
@@ -34,7 +31,7 @@ const BRIGHTNESS_LEVELS = [
 ] as const;
 
 export const sliderBrightnessClassnames = (
-  entity: HassEntityWithService<"light">
+  entity: any
 ) => {
   const brightness = entity.attributes.brightness;
 
@@ -60,7 +57,7 @@ const TEMPERATURE_LEVELS = [
 ] as const;
 
 export const sliderTemperatureClassnames = (
-  entity: HassEntityWithService<"light">,
+  entity: any,
   min: number,
   max: number,
   value: number
