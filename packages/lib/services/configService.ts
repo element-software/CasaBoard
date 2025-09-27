@@ -2,6 +2,7 @@ import { getCurrentAuthUser } from '../supabase/server';
 import { type DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
 import { getAllPages } from '../actions/pageActions';
+import { serverLogger } from "@repo/lib";
 
 export async function getServerConfig(): Promise<DashboardConfig> {
   try {
@@ -27,11 +28,11 @@ export async function getServerConfig(): Promise<DashboardConfig> {
       };
       return supabaseConfig;
     } catch (error) {
-      console.warn('Failed to load configuration from Supabase, using default:', error);
+      serverLogger.warn('configService.load', 'Failed to load configuration from Supabase, using default', error);
       return defaultConfig;
     }
   } catch (error) {
-    console.warn('Failed to load configuration:', error);
+    serverLogger.warn('configService.load', 'Failed to load configuration', error);
     return defaultConfig;
   }
 }

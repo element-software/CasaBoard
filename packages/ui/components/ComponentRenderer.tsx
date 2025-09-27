@@ -17,6 +17,7 @@ import EntitiesCard from "./EntitiesCard";
 import EntityCard from "./EntitiesCard/EntityCard";
 import classNames from "classnames";
 import ClientOnly from "./ClientOnly";
+import { clientLogger } from "../../lib/logger";
 
 interface ComponentRendererProps {
   config: ComponentConfig;
@@ -108,7 +109,11 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
       );
 
     default:
-      console.warn(`Unknown component type: ${(config as any).type}`);
+      clientLogger.warn(
+        "ComponentRenderer",
+        "Unknown component type",
+        (config as any).type
+      );
       return null;
   }
 };

@@ -1,5 +1,6 @@
 import { StripeEntitlementsService } from "@repo/lib";
 import { AccessBlocked } from "@repo/ui/components/AccessBlocked";
+import { serverLogger } from "@repo/lib";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,7 @@ export default async function SetupTemplate({ children }: { children: React.Reac
     'pro-access',
   ]);
 
-  console.log("SetupTemplate:: hasAccess:", hasAccess);
+  serverLogger.info('SetupTemplate', 'hasAccess', hasAccess);
   if (!hasAccess) {
     return <AccessBlocked />;
   }

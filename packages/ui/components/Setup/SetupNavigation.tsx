@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from './Breadcrumbs';
+import { clientLogger } from "@repo/lib";
 
 interface SetupNavigationProps {
   currentPage?: string;
@@ -46,7 +47,7 @@ export const SetupNavigation = ({ currentPage = '', setCurrentPage }: SetupNavig
       await supabase.auth.signOut();
       router.push('/auth/login');
     } catch (error) {
-      console.error('Error logging out:', error);
+      clientLogger.error('SetupNavigation', 'Error logging out', error);
     } finally {
       setIsLoggingOut(false);
     }

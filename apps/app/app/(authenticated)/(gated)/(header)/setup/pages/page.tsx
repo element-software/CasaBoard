@@ -1,5 +1,5 @@
 import { PagesList } from '@repo/ui/components/Setup/PagesList';
-import { PageActions, SubscriptionService } from '@repo/lib';
+import { PageActions, SubscriptionService, serverLogger } from '@repo/lib';
 import Link from 'next/link';
 
 // Enable dynamic params for unknown routes
@@ -17,7 +17,7 @@ export default async function PagesListPage() {
     error = err instanceof Error ? err.message : 'Failed to load pages';
   }
 
-  console.log("Pages:: pages:", pages, "error:", error)
+  serverLogger.info('SetupPages', 'pages', pages, 'error', error)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
-import { getCurrentAuthUser, PageService } from '@repo/lib';
+import { getCurrentAuthUser, PageService, clientLogger } from '@repo/lib';
 import { SupabaseClient } from '@repo/lib';
 
 interface ConfigurationContextType {
@@ -51,12 +51,12 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({
               puck_data: pageConfig.puckData
             });
           } catch (error) {
-            console.warn(`Failed to update page ${slug}:`, error);
+            clientLogger.warn('ConfigurationProvider', `Failed to update page ${slug}`, error);
           }
         }
       }
     } catch (error) {
-      console.warn('Failed to save configuration to Supabase:', error);
+      clientLogger.warn('ConfigurationProvider', 'Failed to save configuration to Supabase', error);
     }
   };
 
@@ -82,7 +82,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({
       localStorage.setItem('dashboardConfig', JSON.stringify(newConfig));
       return true;
     } catch (error) {
-      console.error('Failed to import configuration:', error);
+      clientLogger.error('ConfigurationProvider', 'Failed to import configuration', error);
       return false;
     }
   };

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { StripeService, SupabaseServer, getCurrentAuthUser } from "@repo/lib";
+import { StripeService, SupabaseServer, getCurrentAuthUser, serverLogger } from "@repo/lib";
 import Stripe from "stripe";
 import CancelContent from "./CancelContent";
 
@@ -21,7 +21,7 @@ const getData = async (subId: string) => {
     .single();
   if (!map || map.user_id !== user.id) return redirect("/auth/profile/billing");
 
-  console.log("Sub:", sub)
+  serverLogger.info('billing:cancel', 'Sub', sub)
 
   const product = await stripe.products.retrieve(sub.items.data[0].price.product as string);
   const planLabel =

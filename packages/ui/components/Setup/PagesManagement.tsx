@@ -21,6 +21,7 @@ import {
 } from "@mdi/js";
 import { Button, Card, CardBody, CardHeader, Chip } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { clientLogger } from "@repo/lib";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
@@ -93,7 +94,7 @@ export const PagesManagement = ({
 
   const displayPages = showAllPages ? pages : pages.slice(0, maxPages);
 
-  console.log("PagesManagement:: displayPages:", displayPages, "error:", error);
+  clientLogger.info('PagesManagement', 'displayPages', displayPages, 'error', error);
 
   if (loading) {
     return (

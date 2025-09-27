@@ -3,6 +3,7 @@
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { UserSettings } from "@repo/types/userSettings";
 import { revalidatePath } from "next/cache";
+import { serverLogger } from "@repo/lib";
 
 export async function getUserSettings(): Promise<UserSettings | null> {
   try {
@@ -28,7 +29,7 @@ export async function getUserSettings(): Promise<UserSettings | null> {
 
     return settings;
   } catch (error) {
-    console.warn("Failed to get user settings:", error);
+    serverLogger.warn('userSettingsActions.get', 'Failed to get user settings', error);
     return null;
   }
 }
@@ -59,7 +60,7 @@ export async function createUserSettings(
     revalidatePath("/setup");
     return settings;
   } catch (error) {
-    console.error("Failed to create user settings:", error);
+    serverLogger.error('userSettingsActions.create', 'Failed to create user settings', error);
     throw error;
   }
 }
@@ -112,7 +113,7 @@ export async function updateUserSettings(data: any): Promise<UserSettings> {
     revalidatePath("/setup");
     return settings;
   } catch (error) {
-    console.error("Failed to update user settings:", error);
+    serverLogger.error('userSettingsActions.update', 'Failed to update user settings', error);
     throw error;
   }
 }
@@ -137,7 +138,7 @@ export async function deleteUserSettings(): Promise<void> {
 
     revalidatePath("/setup");
   } catch (error) {
-    console.error("Failed to delete user settings:", error);
+    serverLogger.error('userSettingsActions.delete', 'Failed to delete user settings', error);
     throw error;
   }
 }
@@ -155,7 +156,7 @@ export async function deleteUserHassSettings(): Promise<void> {
     // This becomes a no-op or could delete user_settings if desired. Keep as no-op for compatibility.
     revalidatePath("/ha-config");
   } catch (error) {
-    console.error("Failed to delete user hass settings:", error);
+    serverLogger.error('userSettingsActions.deleteHass', 'Failed to delete user hass settings', error);
     throw error;
   }
 }
