@@ -10,11 +10,11 @@ import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
 
 type Components = {
   Light: {};
-  Alarm: {},
-  BinarySensor: {},
-  EntitiesCard: {},
-  GraphCard: {},
-  Clock: {},
+  Alarm: {};
+  BinarySensor: {};
+  EntitiesCard: {};
+  GraphCard: {};
+  Clock: {};
   Grid: {};
 };
 
