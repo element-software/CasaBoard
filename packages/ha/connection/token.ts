@@ -24,7 +24,7 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
       auth: data,
     expires_at: data.expires_in
       ? new Date(Date.now() + data.expires_in * 1000).toISOString()
-      : null as any,
+      : null,
   });
 
     if (haInstance?.auth) {
