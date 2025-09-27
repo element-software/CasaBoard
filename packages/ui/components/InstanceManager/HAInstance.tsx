@@ -1,5 +1,5 @@
 "use client";
-import { Chip, Button, cn, Skeleton } from "@heroui/react";
+import { Chip, Button, cn, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiCheckCircle } from "@mdi/js";
 import { useState } from "react";
@@ -25,6 +25,7 @@ export const HAInstance = ({
 }: HAInstanceProps) => {
   const { id, name, hass_url } = instance;
   const [isDeletePending, startDelete] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const { connected, entities } = useHA();
   const entityCount = Object.keys(entities ?? {}).length;
 
@@ -75,7 +76,7 @@ export const HAInstance = ({
             <Button
               size="sm"
               color="danger"
-              onPress={handleDelete}
+              onPress={() => setIsConfirmOpen(true)}
               isLoading={isDeletePending}
             >
               Delete
@@ -83,6 +84,24 @@ export const HAInstance = ({
           </div>
         )}
       </div>
+      <Modal isOpen={isConfirmOpen} onOpenChange={setIsConfirmOpen} backdrop="blur">
+        <ModalContent className="bg-theme-background text-theme-text border border-theme-border">
+          <ModalHeader className="flex flex-col gap-1">Confirm deletion</ModalHeader>
+          <ModalBody>
+            <p>
+              This will remove the Home Assistant instance "{name}" from your account. You can add it again later.
+            </p>
+          </ModalBody>
+          <ModalFooter className="justify-between">
+            <Button variant="light" onPress={() => setIsConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button color="danger" onPress={() => { setIsConfirmOpen(false); handleDelete(); }} isLoading={isDeletePending}>
+              OK
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Skeleton>
   );
 };

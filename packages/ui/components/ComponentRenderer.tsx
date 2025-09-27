@@ -66,9 +66,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
           {entitiesCardConfig.children && (
             <div className="grid grid-cols-2 gap-2">
               {entitiesCardConfig.children.map((childConfig, index) => (
-                <ClientOnly>
-                  <ComponentRenderer key={index} config={childConfig} />
-                </ClientOnly>
+                <ComponentRenderer key={index} config={childConfig} />
               ))}
             </div>
           )}
