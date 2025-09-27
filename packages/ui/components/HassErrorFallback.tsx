@@ -12,7 +12,6 @@ export default function HassErrorFallback({ error }: { error: unknown }) {
   const handleReset = async () => {
     startTransition(async () => {
       try {
-        await HAInstanceActions.deleteFirstHAInstance();
         router.replace("/setup/ha-config");
       } catch (e: any) {
         setLocalError(e?.message || "Failed to delete settings");
