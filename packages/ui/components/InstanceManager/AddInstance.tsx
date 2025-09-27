@@ -1,4 +1,6 @@
-import { Input, Button } from "@heroui/react";
+"use client";
+import { useState } from "react";
+import { Input, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 
 export interface AddInstanceProps {
   form: { name: string; hass_url: string };
@@ -15,6 +17,18 @@ export const AddInstance = ({
   canCreate,
   isPending,
 }: AddInstanceProps) => {
+	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+	const handleOpenConfirm = () => {
+		if (!canCreate() || !form.hass_url) return;
+		setIsConfirmOpen(true);
+	};
+
+	const handleConfirm = () => {
+		setIsConfirmOpen(false);
+		onCreate();
+	};
+
   return (
     <>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -34,13 +48,32 @@ export const AddInstance = ({
       <div className="flex justify-end">
         <Button
           color="primary"
-          onPress={onCreate}
+					onPress={handleOpenConfirm}
           isDisabled={!canCreate() || !form.hass_url}
           isLoading={isPending}
         >
           Add instance
         </Button>
       </div>
+
+			<Modal isOpen={isConfirmOpen} onOpenChange={setIsConfirmOpen} backdrop="blur">
+				<ModalContent className="bg-theme-background text-theme-text border border-theme-border">
+					<ModalHeader className="flex flex-col gap-1">Confirm add instance</ModalHeader>
+					<ModalBody>
+						<p>
+							You will be redirected through the Home Assistant authentication flow to authorize access.
+						</p>
+					</ModalBody>
+					<ModalFooter className="justify-between">
+						<Button variant="light" onPress={() => setIsConfirmOpen(false)}>
+							Cancel
+						</Button>
+						<Button color="primary" onPress={handleConfirm} isLoading={isPending}>
+							OK
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
     </>
   );
 };
