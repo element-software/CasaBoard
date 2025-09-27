@@ -1,13 +1,13 @@
 "use client";
 import Icon from '@mdi/react';
-import { mdiEye, mdiChevronDown, mdiChevronRight, mdiAccount, mdiLogout } from '@mdi/js';
+import { mdiEye, mdiAccount, mdiLogout } from '@mdi/js';
 import Link from 'next/link';
 import { useConfiguration } from '../ConfigurationProvider';
 import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from './Breadcrumbs';
 import { clientLogger } from "@repo/lib";
+import { SupabaseClient } from '@repo/lib';
 
 interface SetupNavigationProps {
   currentPage?: string;
@@ -20,7 +20,7 @@ export const SetupNavigation = ({ currentPage = '', setCurrentPage }: SetupNavig
   const [user, setUser] = useState<any>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
+  const supabase = SupabaseClient.createClient();
   const router = useRouter();
 
   const availablePages = Object.keys(config.pages);

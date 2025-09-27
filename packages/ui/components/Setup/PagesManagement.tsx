@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { PageService } from "@repo/lib";
 import { Page } from "@repo/types/page";
 import Link from "next/link";
@@ -9,7 +9,6 @@ import {
   mdiPencil,
   mdiTrashCan,
   mdiEye,
-  mdiLoading,
   mdiRefresh,
   mdiWeb,
   mdiPublish,

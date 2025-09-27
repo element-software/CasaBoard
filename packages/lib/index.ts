@@ -14,4 +14,4 @@ export * as Encryption from './encryption';
 export { generateSessionId } from './encryption';
 export * as LinkService from './services/linkService';
 export { getCurrentAuthUser } from './supabase/server';
-export { serverLogger, clientLogger, createLogger } from './logger';
+export { createLogger, serverLogger, clientLogger } from './logger';

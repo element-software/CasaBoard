@@ -3,7 +3,7 @@
  * Uses Web Crypto API for secure encryption/decryption
  */
 
-import { serverLogger } from "@repo/lib";
+import { clientLogger } from "@repo/lib";
 
 // Secret salt for key derivation (should be in environment variables in production)
 const ENCRYPTION_SALT = process.env.NEXT_PUBLIC_ENCRYPTION_SALT || 'casa-board-encryption-salt-2024';
@@ -84,7 +84,7 @@ export async function encryptToken(
     // Convert to base64 for storage
     return btoa(String.fromCharCode.apply(null, Array.from(combined)));
   } catch (error) {
-    serverLogger.error('encryption.encrypt', 'Encryption failed', error);
+    clientLogger.error('encryption.encrypt', 'Encryption failed', error);
     throw new Error('Failed to encrypt token');
   }
 }
@@ -123,7 +123,7 @@ export async function decryptToken(
     // Convert back to string
     return new TextDecoder().decode(decrypted);
   } catch (error) {
-    serverLogger.error('encryption.decrypt', 'Decryption failed', error);
+    clientLogger.error('encryption.decrypt', 'Decryption failed', error);
     throw new Error('Failed to decrypt token');
   }
 }

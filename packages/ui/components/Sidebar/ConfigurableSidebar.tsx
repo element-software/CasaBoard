@@ -4,7 +4,6 @@ import Clock from "@repo/ui/components/Clock/index";
 import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";
 import { MobileHeader } from "@repo/ui/components/Header/MobileHeader";
-import { ThemeSwitch } from "@repo/ui/components/ThemeSwitch/index";
 import { useState, useEffect } from "react";
 import { useConfiguration } from "@repo/ui/components/ConfigurationProvider";
 import { SupabaseClient } from "@repo/lib";
@@ -114,7 +113,6 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
       
       {/* Theme switch and logout for desktop */}
       <div className="mt-auto pt-4 border-t border-theme-border space-y-3">
-        <ThemeSwitch />
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center px-3 py-2 text-sm font-medium text-theme-text hover:bg-theme-secondary rounded-md transition-colors"

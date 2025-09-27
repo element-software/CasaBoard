@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
           .eq("stripe_customer_id", sub.customer as string)
           .single();
         userId = map?.user_id ?? null;
-        serverLogger.info('stripe:webhook', 'Found user ID', userId);
+          serverLogger.info('stripe:webhook', 'Found user ID', userId);
       }
       if (userId) {
         serverLogger.info(
