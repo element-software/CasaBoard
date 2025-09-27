@@ -1,6 +1,4 @@
-import { HassEntityWithService } from "@hakit/core";
-
-export const stateClassNameIcon = (entity: HassEntityWithService<any>) => {
+export const stateClassNameIcon = (entity: any) => {
   switch (entity.state) {
     case "on":
       return "text-theme-primary";

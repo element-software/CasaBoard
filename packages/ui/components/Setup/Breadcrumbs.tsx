@@ -74,10 +74,6 @@ export const Breadcrumbs = ({ items = [], showHome = true }: BreadcrumbsProps) =
           label: 'HA Configuration'
         });
       }
-    } else if (pathname.startsWith('/ha-test')) {
-      breadcrumbs.push({
-        label: 'HA Test'
-      });
     } else if (pathname.startsWith('/auth/')) {
       if (pathname === '/auth/login') {
         breadcrumbs.push({

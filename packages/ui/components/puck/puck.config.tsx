@@ -9,14 +9,14 @@ import { Config } from "@measured/puck";
 import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
 
 type Components = {
-  Light: {},
-  Alarm: {},
-  BinarySensor: {},
-  EntitiesCard: {},
-  GraphCard: {},
-  Clock: {},
-  Grid: {},
-}
+  Light: {};
+  Alarm: {};
+  BinarySensor: {};
+  EntitiesCard: {};
+  GraphCard: {};
+  Clock: {};
+  Grid: {};
+};
 
 // Puck component configuration
 export const PuckConfig: Config<Components> = {
@@ -41,7 +41,13 @@ export const PuckConfig: Config<Components> = {
     },
     entities: {
       title: "Entities",
-      components: ["Light", "Clock", "BinarySensor", "EntitiesCard", "GraphCard"],
+      components: [
+        "Light",
+        "Clock",
+        "BinarySensor",
+        "EntitiesCard",
+        "GraphCard",
+      ],
     },
   },
 };

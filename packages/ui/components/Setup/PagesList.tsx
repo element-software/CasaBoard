@@ -301,7 +301,7 @@ export const PagesList = ({ initialPages = [], initialError = null, entitlements
               <div className="flex gap-2">
                 <Button
                   as={Link}
-                  href={`/${page.slug}`}
+                  href={`/dashboard/${page.slug}`}
                   variant="bordered"
                   size="sm"
                   startContent={<Icon path={mdiEye} className="w-4 h-4" />}

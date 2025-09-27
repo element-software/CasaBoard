@@ -1,12 +1,11 @@
 export * from "./HAConfiguration";
-export * from "./HAInstanceManager";
+export * from "../InstanceManager/HAInstanceManager";
 export * from "./PagesList";
 export * from "./PagesManagement";
 // New Puck-based components
 export { PuckEditor } from './PuckEditor';
 export { PuckEditorView } from './views/PuckEditor';
 export { PagesView } from './views/Pages';
-export { config } from '@/lib';
 
 // Core setup components
 export { PageManager } from './PageManager';

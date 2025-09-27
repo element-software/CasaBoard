@@ -1,6 +1,4 @@
-import { EntityName } from "@hakit/core";
-
 export interface Entity {
-  id: EntityName;
+  id: string;
   icon: string;
 }

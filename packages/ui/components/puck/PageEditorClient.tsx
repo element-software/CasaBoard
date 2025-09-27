@@ -15,7 +15,7 @@ import {
 } from "@heroui/react";
 import "@measured/puck/puck.css";
 import { useRouter } from "next/navigation";
-import { PageActions } from "@repo/lib";
+import { LinkService, PageActions } from "@repo/lib";
 
 type PageEditorClientProps = {
   initialData?: Data;
@@ -214,6 +214,18 @@ export default function PageEditorClient({
               ? publish : updatePublished
             return (
               <div className="flex gap-2">
+                                <Button
+                  variant="flat"
+                  color="secondary"
+                  onPress={() => {
+                    if (currentPageId && (data.root.props as any).slug) {
+                      const viewUrl = LinkService.crossAppHrefClient("app", `/dashboard/${(data.root.props as any).slug}`);
+                      router.push(viewUrl);
+                    }
+                  }}
+                >
+                  View Page
+                </Button>
                 <Button
                   variant="flat"
                   color="secondary"

@@ -1,18 +1,15 @@
-import { EntityName, useEntity, useHistory } from "@hakit/core";
+import { useEntity } from "@repo/ha";
 import Graph from "./Graph";
 import Icon from "@mdi/react";
 import { mdiAlert } from "@mdi/js";
 
 interface GraphCardProps {
-  entityId: EntityName;
+  entityId: string;
 }
 
 const GraphCard = ({ entityId }: GraphCardProps) => {
   const entity = useEntity(entityId);
-  const history = useHistory(entityId, { 
-    minimalResponse: true,
-    hoursToShow: 24,
-  });
+  const history: any[] = [];
 
   if (!entity || entity.state === 'unavailable' || entity.state === 'unknown') {
     return (

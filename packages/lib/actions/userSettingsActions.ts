@@ -1,11 +1,7 @@
 "use server";
 
 import { createClient, getCurrentAuthUser } from "../supabase/server";
-import {
-  CreateUserSettingsData,
-  UpdateUserSettingsData,
-  UserSettings,
-} from "@repo/types/userSettings";
+import { UserSettings } from "@repo/types/userSettings";
 import { revalidatePath } from "next/cache";
 
 export async function getUserSettings(): Promise<UserSettings | null> {
@@ -38,7 +34,7 @@ export async function getUserSettings(): Promise<UserSettings | null> {
 }
 
 export async function createUserSettings(
-  data: CreateUserSettingsData
+  data: any
 ): Promise<UserSettings> {
   try {
     const supabase = await createClient();
@@ -52,7 +48,6 @@ export async function createUserSettings(
       .from("user_settings")
       .insert({
         user_id: user.id,
-        hass_url: data.hass_url,
       })
       .select()
       .single();
@@ -69,9 +64,7 @@ export async function createUserSettings(
   }
 }
 
-export async function updateUserSettings(
-  data: UpdateUserSettingsData
-): Promise<UserSettings> {
+export async function updateUserSettings(data: any): Promise<UserSettings> {
   try {
     const supabase = await createClient();
 
@@ -93,11 +86,7 @@ export async function updateUserSettings(
       // Update existing settings
       const result = await supabase
         .from("user_settings")
-        .update({
-          hass_url: data.hass_url,
-          hass_token: data.hass_token,
-          updated_at: new Date().toISOString(),
-        })
+        .update({ updated_at: new Date().toISOString() })
         .eq("user_id", user.id)
         .select()
         .single();
@@ -108,11 +97,7 @@ export async function updateUserSettings(
       // Create new settings
       const result = await supabase
         .from("user_settings")
-        .insert({
-          user_id: user.id,
-          hass_url: data.hass_url,
-          hass_token: data.hass_token,
-        })
+        .insert({ user_id: user.id })
         .select()
         .single();
 
@@ -166,18 +151,8 @@ export async function deleteUserHassSettings(): Promise<void> {
       throw new Error("Unauthorized");
     }
 
-    const { error } = await supabase
-      .from("user_settings")
-      .update({
-        hass_url: null,
-        hass_token: null,
-      })
-      .eq("user_id", user.id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    // With per-page HA instances, we no longer toggle instance active flags here.
+    // This becomes a no-op or could delete user_settings if desired. Keep as no-op for compatibility.
     revalidatePath("/ha-config");
   } catch (error) {
     console.error("Failed to delete user hass settings:", error);

@@ -1,9 +1,8 @@
-import { EntityName } from "@hakit/core";
-import Clock from "@repo/ui/Clock";
-import Thermostat from "@repo/ui/Thermostat";
+import Clock from "@repo/ui/components/Clock/index";
+import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";
 
-export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, thermostat: EntityName }) => {
+export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, thermostat: string }) => {
   return (
     <>
       <div>
@@ -15,7 +14,7 @@ export const Sidebar = ({ children, thermostat }: { children: React.ReactNode, t
               <Clock />
             </div>
             <div className="flex flex-1 flex-col w-full">
-              <Thermostat entityId={thermostat as EntityName}/>
+              <Thermostat entityId={thermostat}/>
             </div>
             <div className="flex flex-1 flex-row w-full text-center items-center justify-center gap-2 text-theme-text text-xs">
               Powered by 

@@ -1,6 +1,6 @@
 "use client";
 import { Puck, Data } from "@measured/puck";
-import { config as puckConfig } from '../../../lib/puck/puck.config';
+import { PuckConfig as puckConfig } from '@repo/ui/components/puck/puck.config';
 import { useState, useEffect } from 'react';
 import { usePages } from '@repo/hooks/usePages';
 import { Page } from '@repo/types/page';

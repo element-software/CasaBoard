@@ -1,5 +1,5 @@
 "use client";
-import { EntityName, useEntity } from "@hakit/core";
+import { useEntity } from "@repo/ha";
 import Clock from "@repo/ui/components/Clock/index";
 import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";
@@ -36,14 +36,14 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
 
   // Thermostat component with optional rendering
   const ThermostatComponent = ({ entityId }: { entityId: string }) => {
-    const thermostatEntity = useEntity(entityId as EntityName);
+    const thermostatEntity = useEntity(entityId as string);
     
     // Don't render if no entityId provided or if entity doesn't exist or is unavailable
     if (!entityId || typeof entityId !== 'string' || !thermostatEntity || thermostatEntity.state === 'unavailable' || thermostatEntity.state === 'unknown') {
       return null;
     }
 
-    return <Thermostat entityId={entityId as EntityName} />;
+    return <Thermostat entityId={entityId as string} />;
   };
 
   // Close mobile menu when screen size changes to desktop

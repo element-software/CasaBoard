@@ -1,5 +1,4 @@
 "use client";
-import { EntityName, useHass } from "@hakit/core";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiOpenInNew, mdiPower } from "@mdi/js";
@@ -7,6 +6,7 @@ import { useCallback, useState } from "react";
 import Popup from "../Popup";
 import { Entity } from "@repo/types/shared";
 import EntityCard from "./EntityCard";
+import { useHA } from "@repo/ha";
 
 interface EntitiesCardProps {
   title: string;
@@ -36,20 +36,20 @@ const EntitiesCard = ({
   const [allOn, setAllOn] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const { callService } = useHass();
+  const { connection } = useHA();
 
   const toggleLighting = useCallback(
-    (entities: EntityName[]) => {
-      callService({
+    async (entities: string[]) => {
+      if (!connection) return;
+      await connection.sendMessagePromise({
+        type: "call_service",
         domain: "light",
         service: allOn ? "turn_off" : "turn_on",
-        target: {
-          entity_id: entities,
-        },
+        service_data: { entity_id: entities },
       });
       setAllOn(!allOn);
     },
-    [allOn, callService]
+    [allOn, connection]
   );
 
   const normalizedCols = columns < 1 || columns > 10 ? 4 : columns;
@@ -96,7 +96,7 @@ const EntitiesCard = ({
               disableClick
                 ? undefined
                 : () =>
-                    toggleLighting((entities || []).map((entity) => entity.id))
+                    toggleLighting((entities || []).map((entity) => entity.id as string))
             }
             className={classNames({
               block: showAllOn,

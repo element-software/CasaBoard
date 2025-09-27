@@ -191,7 +191,6 @@ The component automatically adapts to the current theme and provides:
 
 ## Dependencies
 
-- `@hakit/core` - Home Assistant integration
 - `@heroui/react` - UI components
 - `@mdi/react` - Icons
 - Custom theme system

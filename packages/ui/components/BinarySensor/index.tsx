@@ -1,19 +1,19 @@
 "use client";
-import { EntityName, useEntity } from "@hakit/core";
 import { Card, CardBody, Chip, cn } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiMotionSensor, mdiAlert } from "@mdi/js";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
+import { useEntity } from "@repo/ha";
 
 interface BinarySensorProps {
-  entityId: EntityName;
+  entityId: string;
   [key: string]: any;
 }
 
 export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
   // All hooks must be called before any conditional returns
-  const entity = useEntity(entityId, { returnNullIfNotFound: true });
+  const entity = useEntity(entityId);
 
   if (!entityId) {
     return (

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useMemo, useCallback } from "react";
-import { useHass } from "@hakit/core";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
+import { useEntities } from "@repo/ha";
 import { Autocomplete, AutocompleteItem, Chip, Button } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
@@ -90,34 +90,38 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
   showEntityState = true,
   showEntityIcon = true,
 }) => {
-  const { useStore } = useHass();
-  const entities = useStore((state) => state.entities);
+  const entitiesList = useEntities(domain);
   const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   // Get all entities and filter by domain if specified
   const entityOptions = useMemo(() => {
-    if (!entities) return [];
+    if (!entitiesList) return [];
 
-    const entityArray = Object.entries(entities).map(([entityId, entity]) => ({
-      id: entityId,
-      friendly_name: entity.attributes?.friendly_name || entityId,
-      domain: entityId.split(".")[0],
+    const entityArray = entitiesList.map(({ id, domain, entity }) => ({
+      id,
+      friendly_name: entity.attributes?.friendly_name || id,
+      domain,
       state: entity.state,
       icon:
-        entity.attributes?.icon ||
-        DOMAIN_ICONS[entityId.split(".")[0]] ||
-        DOMAIN_ICONS.default,
+        entity.attributes?.icon || DOMAIN_ICONS[domain] || DOMAIN_ICONS.default,
       entity,
     }));
 
-    // Filter by domain if specified
-    if (domain) {
-      return entityArray.filter((entity) => entity.domain === domain);
-    }
-
     return entityArray;
-  }, [entities, domain]);
+  }, [entitiesList]);
+
+  // Keep the visible input text in sync when value comes from outside (e.g., initial load)
+  useEffect(() => {
+    if (value) {
+      const selected = entityOptions.find((e) => e.id === value);
+      if (selected) {
+        setInputValue(selected.friendly_name);
+      }
+    } else {
+      setInputValue("");
+    }
+  }, [value, entityOptions]);
 
   // Filter entities based on search input
   const filteredEntities = useMemo(() => {
@@ -143,8 +147,12 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
       const entityId = key as string | null;
       onChange(entityId);
       setIsOpen(false);
+      if (entityId) {
+        const selected = entityOptions.find((e) => e.id === entityId);
+        if (selected) setInputValue(selected.friendly_name);
+      }
     },
-    [onChange]
+    [onChange, entityOptions]
   );
 
   const handleClear = useCallback(() => {
@@ -169,7 +177,7 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
         label={label}
         placeholder={placeholder}
         description={description}
-        value={value || ""}
+        selectedKey={value ?? null}
         inputValue={inputValue}
         onInputChange={handleInputChange}
         onSelectionChange={handleSelectionChange}

@@ -1,12 +1,10 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
 import {
-  UserSettingsActions,
-  Encryption,
+  HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
 } from "@repo/lib";
-import { generateSessionId } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
 import { Footer } from "@repo/ui/components/Footer";
@@ -28,44 +26,30 @@ export default async function AuthenticatedLayout({
     redirect("/auth/login?redirectTo=/setup");
   }
 
-  // Fetch user settings and decrypt token server-side
-  const userSettings = await UserSettingsActions.getUserSettings();
+  const haInstance = await HAInstanceActions.getFirstHAInstance();
 
-  let decryptedToken: string | null = null;
+  const mainContent = () => (
+    <>
+      <Header user={authedUser} />
+      <div className="min-h-screen">
+        <main className="flex-1">{children}</main>
+      </div>
+      <Footer />
+    </>
+  );
 
-  if (userSettings?.hass_token) {
-    try {
-      if (authedUser) {
-        const sessionId = generateSessionId(authedUser.id, authedUser.email);
-
-        if (Encryption.isEncrypted(userSettings.hass_token)) {
-          decryptedToken = await Encryption.decryptToken(
-            userSettings.hass_token,
-            authedUser.id,
-            sessionId
-          );
-        } else {
-          // Legacy plain text token
-          decryptedToken = userSettings.hass_token;
-        }
-      }
-    } catch (error) {
-      console.warn("Failed to decrypt HA token:", error);
-      decryptedToken = null;
-    }
+  if (!haInstance) {
+    return (
+      <ConfigurationProvider initialConfig={initialConfig}>
+        {mainContent()}
+      </ConfigurationProvider>
+    );
   }
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <HassConnectWrapper
-        userSettings={userSettings}
-        decryptedToken={decryptedToken}
-      >
-        <Header user={authedUser} />
-        <div className="min-h-screen">
-          <main className="flex-1">{children}</main>
-        </div>
-        <Footer />
+      <HassConnectWrapper haInstance={haInstance}>
+        {mainContent()}
       </HassConnectWrapper>
     </ConfigurationProvider>
   );

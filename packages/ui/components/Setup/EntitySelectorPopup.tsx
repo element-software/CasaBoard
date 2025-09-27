@@ -1,36 +1,59 @@
 "use client";
-import { useState, useMemo } from 'react';
-import { useHass } from '@hakit/core';
-import Icon from '@mdi/react';
-import { mdiClose, mdiPlus, mdiDelete, mdiLightbulb, mdiGauge, mdiMotionSensor, mdiShieldHome, mdiThermostat, mdiMagnify } from '@mdi/js';
-import { getEntityIconName } from '../../utils/entityIcons';
+import { useState, useMemo } from "react";
+import Icon from "@mdi/react";
+import {
+  mdiClose,
+  mdiPlus,
+  mdiDelete,
+  mdiLightbulb,
+  mdiGauge,
+  mdiMotionSensor,
+  mdiShieldHome,
+  mdiThermostat,
+  mdiMagnify,
+} from "@mdi/js";
+import { getEntityIconName } from "../../../utils/entityIcons";
+import { useHA } from "@repo/ha";
 
 interface EntitySelectorPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedEntities: Array<{ id: string; icon: string; showState?: boolean; showTitle?: boolean; showLastChanged?: boolean; }>;
-  onEntitiesChange: (entities: Array<{ id: string; icon: string; showState?: boolean; showTitle?: boolean; showLastChanged?: boolean; }>) => void;
+  selectedEntities: Array<{
+    id: string;
+    icon: string;
+    showState?: boolean;
+    showTitle?: boolean;
+    showLastChanged?: boolean;
+  }>;
+  onEntitiesChange: (
+    entities: Array<{
+      id: string;
+      icon: string;
+      showState?: boolean;
+      showTitle?: boolean;
+      showLastChanged?: boolean;
+    }>
+  ) => void;
   title?: string;
 }
 
-export const EntitySelectorPopup = ({ 
-  isOpen, 
-  onClose, 
-  selectedEntities, 
+export const EntitySelectorPopup = ({
+  isOpen,
+  onClose,
+  selectedEntities,
   onEntitiesChange,
-  title = "Configure Entities"
+  title = "Configure Entities",
 }: EntitySelectorPopupProps) => {
-  const { useStore } = useHass();
-  const entities = useStore(state => state.entities);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<string>('all');
+  const { entities } = useHA();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("all");
 
   const ENTITY_TYPES = {
-    light: { icon: mdiLightbulb, label: 'Lights' },
-    sensor: { icon: mdiGauge, label: 'Sensors' },
-    binary_sensor: { icon: mdiMotionSensor, label: 'Binary Sensors' },
-    alarm_control_panel: { icon: mdiShieldHome, label: 'Alarms' },
-    climate: { icon: mdiThermostat, label: 'Climate' },
+    light: { icon: mdiLightbulb, label: "Lights" },
+    sensor: { icon: mdiGauge, label: "Sensors" },
+    binary_sensor: { icon: mdiMotionSensor, label: "Binary Sensors" },
+    alarm_control_panel: { icon: mdiShieldHome, label: "Alarms" },
+    climate: { icon: mdiThermostat, label: "Climate" },
   } as const;
 
   const filteredEntities = useMemo(() => {
@@ -41,25 +64,29 @@ export const EntitySelectorPopup = ({
       ...entity,
     }));
 
-    return entityArray.filter(entity => {
-      const matchesSearch = entity.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           entity.attributes?.friendly_name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesType = selectedType === 'all' || entity.id.startsWith(`${selectedType}.`);
-      
+    return entityArray.filter((entity) => {
+      const matchesSearch =
+        entity.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entity.attributes?.friendly_name
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      const matchesType =
+        selectedType === "all" || entity.id.startsWith(`${selectedType}.`);
+
       return matchesSearch && matchesType;
     });
   }, [entities, searchTerm, selectedType]);
 
   const handleAddEntity = (entityId: string) => {
-    if (selectedEntities.find(e => e.id === entityId)) return;
-    
+    if (selectedEntities.find((e) => e.id === entityId)) return;
+
     // Find the full entity object from the entities store
     const entityObj = entities ? entities[entityId] : null;
-    
+
     // Prioritize the entity's actual icon from Home Assistant
-    let iconName = 'mdiGauge'; // fallback
-    
+    let iconName = "mdiGauge"; // fallback
+
     if (entityObj) {
       if (entityObj.attributes?.icon) {
         // Use the actual icon from Home Assistant if available
@@ -69,7 +96,7 @@ export const EntitySelectorPopup = ({
         iconName = getEntityIconName(entityObj);
       }
     }
-    
+
     const newEntity = {
       id: entityId,
       icon: iconName,
@@ -77,20 +104,28 @@ export const EntitySelectorPopup = ({
       showTitle: true,
       showLastChanged: false,
     };
-    
+
     onEntitiesChange([...selectedEntities, newEntity]);
   };
 
   const handleRemoveEntity = (entityId: string) => {
-    onEntitiesChange(selectedEntities.filter(e => e.id !== entityId));
+    onEntitiesChange(selectedEntities.filter((e) => e.id !== entityId));
   };
 
-  const handleUpdateEntity = (entityId: string, updates: Partial<{ icon: string; showState: boolean; showTitle: boolean; showLastChanged: boolean; }>) => {
-    onEntitiesChange(selectedEntities.map(entity => 
-      entity.id === entityId 
-        ? { ...entity, ...updates }
-        : entity
-    ));
+  const handleUpdateEntity = (
+    entityId: string,
+    updates: Partial<{
+      icon: string;
+      showState: boolean;
+      showTitle: boolean;
+      showLastChanged: boolean;
+    }>
+  ) => {
+    onEntitiesChange(
+      selectedEntities.map((entity) =>
+        entity.id === entityId ? { ...entity, ...updates } : entity
+      )
+    );
   };
 
   if (!isOpen) return null;
@@ -116,14 +151,19 @@ export const EntitySelectorPopup = ({
             <h4 className="text-md font-medium text-theme-text mb-3">
               Selected Entities ({selectedEntities.length})
             </h4>
-            
+
             <div className="flex-1 overflow-y-auto space-y-3">
               {selectedEntities.length > 0 ? (
                 selectedEntities.map((entity) => (
-                  <div key={entity.id} className="p-3 bg-theme-secondary rounded-lg border border-theme-border">
+                  <div
+                    key={entity.id}
+                    className="p-3 bg-theme-secondary rounded-lg border border-theme-border"
+                  >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-theme-text truncate">{entity.id}</p>
+                        <p className="text-sm font-medium text-theme-text truncate">
+                          {entity.id}
+                        </p>
                       </div>
                       <button
                         onClick={() => handleRemoveEntity(entity.id)}
@@ -132,7 +172,7 @@ export const EntitySelectorPopup = ({
                         <Icon path={mdiDelete} className="h-4 w-4" />
                       </button>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <label className="block text-xs font-medium text-theme-text-secondary mb-1">
@@ -141,18 +181,26 @@ export const EntitySelectorPopup = ({
                         <input
                           type="text"
                           value={entity.icon}
-                          onChange={(e) => handleUpdateEntity(entity.id, { icon: e.target.value })}
+                          onChange={(e) =>
+                            handleUpdateEntity(entity.id, {
+                              icon: e.target.value,
+                            })
+                          }
                           placeholder="mdiLightbulb"
                           className="w-full text-xs px-2 py-1 bg-theme-background border border-theme-border rounded"
                         />
                       </div>
-                      
+
                       <div className="flex flex-wrap gap-3">
                         <label className="flex items-center text-xs text-theme-text">
                           <input
                             type="checkbox"
                             checked={entity.showState || false}
-                            onChange={(e) => handleUpdateEntity(entity.id, { showState: e.target.checked })}
+                            onChange={(e) =>
+                              handleUpdateEntity(entity.id, {
+                                showState: e.target.checked,
+                              })
+                            }
                             className="mr-1"
                           />
                           Show State
@@ -161,7 +209,11 @@ export const EntitySelectorPopup = ({
                           <input
                             type="checkbox"
                             checked={entity.showTitle || false}
-                            onChange={(e) => handleUpdateEntity(entity.id, { showTitle: e.target.checked })}
+                            onChange={(e) =>
+                              handleUpdateEntity(entity.id, {
+                                showTitle: e.target.checked,
+                              })
+                            }
                             className="mr-1"
                           />
                           Show Title
@@ -170,7 +222,11 @@ export const EntitySelectorPopup = ({
                           <input
                             type="checkbox"
                             checked={entity.showLastChanged || false}
-                            onChange={(e) => handleUpdateEntity(entity.id, { showLastChanged: e.target.checked })}
+                            onChange={(e) =>
+                              handleUpdateEntity(entity.id, {
+                                showLastChanged: e.target.checked,
+                              })
+                            }
                             className="mr-1"
                           />
                           Last Changed
@@ -189,11 +245,16 @@ export const EntitySelectorPopup = ({
 
           {/* Right Panel - Add Entities */}
           <div className="w-1/2 p-4 flex flex-col">
-            <h4 className="text-md font-medium text-theme-text mb-3">Add Entities</h4>
-            
+            <h4 className="text-md font-medium text-theme-text mb-3">
+              Add Entities
+            </h4>
+
             {/* Search */}
             <div className="relative mb-3">
-              <Icon path={mdiMagnify} className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-theme-text-secondary" />
+              <Icon
+                path={mdiMagnify}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-theme-text-secondary"
+              />
               <input
                 type="text"
                 placeholder="Search entities..."
@@ -222,17 +283,23 @@ export const EntitySelectorPopup = ({
             {/* Entity List */}
             <div className="flex-1 overflow-y-auto border border-theme-border rounded-lg">
               {filteredEntities.length > 0 ? (
-                filteredEntities.map(entity => {
-                  const isSelected = selectedEntities.find(e => e.id === entity.id);
+                filteredEntities.map((entity) => {
+                  const isSelected = selectedEntities.find(
+                    (e) => e.id === entity.id
+                  );
                   return (
                     <div
                       key={entity.id}
                       className={`flex items-center justify-between p-3 border-b border-theme-border last:border-b-0 ${
-                        isSelected ? 'bg-theme-accent/10' : 'hover:bg-theme-secondary'
+                        isSelected
+                          ? "bg-theme-accent/10"
+                          : "hover:bg-theme-secondary"
                       }`}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-theme-text truncate">{entity.id}</p>
+                        <p className="text-sm font-medium text-theme-text truncate">
+                          {entity.id}
+                        </p>
                         <p className="text-xs text-theme-text-secondary truncate">
                           {entity.attributes?.friendly_name || entity.id}
                         </p>
@@ -241,9 +308,9 @@ export const EntitySelectorPopup = ({
                         onClick={() => handleAddEntity(entity.id)}
                         disabled={!!isSelected}
                         className={`ml-2 p-2 rounded ${
-                          isSelected 
-                            ? 'text-theme-text-secondary cursor-not-allowed' 
-                            : 'text-theme-accent hover:bg-theme-accent/10'
+                          isSelected
+                            ? "text-theme-text-secondary cursor-not-allowed"
+                            : "text-theme-accent hover:bg-theme-accent/10"
                         }`}
                       >
                         <Icon path={mdiPlus} className="h-4 w-4" />

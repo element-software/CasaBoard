@@ -16,7 +16,6 @@
     "@emotion/serialize": "^1.3.3",
     "@emotion/styled": "^11.14.1",
     "@emotion/utils": "^1.4.2",
-    "@hakit/core": "^5.1.5",
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.8.3",
     "@iconify/react": "^6.0.1",

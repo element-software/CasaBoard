@@ -1,5 +1,5 @@
 "use client";
-import { EntityName, useEntity, useHass } from "@hakit/core";
+import { useEntity, useHA } from "@repo/ha";
 import { Card, CardBody, Switch as HeroSwitch, Chip } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiPower, mdiAlert } from "@mdi/js";
@@ -7,7 +7,7 @@ import { useCallback } from "react";
 import EntityIcon from "@repo/ui/components/EntityIcon";
 
 interface SwitchProps {
-  entityId: EntityName;
+  entityId: string;
   [key: string]: any;
 }
 
@@ -17,28 +17,27 @@ export const Switch = ({
 }: SwitchProps) => {
   
   // All hooks must be called before any conditional returns
-  const entity = useEntity(entityId, { returnNullIfNotFound: true });
-  const { callService } = useHass();
+  const entity = useEntity(entityId);
+  const { connection } = useHA();
 
   const handleToggle = useCallback(
-    (entityId: EntityName) => {
-      if (!entity) return;
-      
+    async (entityId: string) => {
+      if (!entity || !connection) return;
+      const domain = entityId.split('.')[0];
       const service = entity.state === "on" ? "turn_off" : "turn_on";
-      callService({
-        domain: entityId.split('.')[0] as any,
+      await connection.sendMessagePromise({
+        type: "call_service",
+        domain,
         service,
-        target: {
-          entity_id: entityId,
-        },
+        service_data: { entity_id: entityId },
       });
     },
-    [callService, entity]
+    [connection, entity]
   );
 
   const handleCardClick = useCallback(() => {
     if (entity) {
-      handleToggle(entity.entity_id as EntityName);
+      handleToggle(entity.entity_id as string);
     }
   }, [entity, handleToggle]);
 

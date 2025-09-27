@@ -1,17 +1,17 @@
 "use client";
-import { EntityName, useEntity, useService } from "@hakit/core";
+import { useEntity, useHA } from "@repo/ha";
 import { mdiPlus, mdiMinus, mdiPower, mdiAlert } from "@mdi/js";
 import Icon from "@mdi/react";
 import classNames from "classnames";
 import { useCallback, useMemo, useState } from "react";
 
 interface ThermostatProps {
-  entityId: EntityName;
+  entityId: string;
 }
 
 export const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
-  const controls = useService("climate");
+  const { connection } = useHA();
   const [targetTemp, setTargetTemp] = useState<number>(
     entity.attributes.temperature
   );
@@ -43,30 +43,32 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
   const increaseTemp = useCallback(() => {
     setTargetTemp((prev) => {
       const newTemp = prev + 0.5;
-      controls.setTemperature({
-        target: { entity_id: entityId },
-        serviceData: {
-          temperature: newTemp,
-          hvac_mode: "heat",
-        },
-      });
+      if (connection) {
+        connection.sendMessagePromise({
+          type: "call_service",
+          domain: "climate",
+          service: "set_temperature",
+          service_data: { entity_id: entityId, temperature: newTemp, hvac_mode: "heat" },
+        });
+      }
       return newTemp;
     });
-  }, [entityId, controls]);
+  }, [entityId, connection]);
 
   const decreaseTemp = useCallback(() => {
     setTargetTemp((prev) => {
       const newTemp = prev - 0.5;
-      controls.setTemperature({
-        target: { entity_id: entityId },
-        serviceData: {
-          temperature: newTemp,
-          hvac_mode: "heat",
-        },
-      });
+      if (connection) {
+        connection.sendMessagePromise({
+          type: "call_service",
+          domain: "climate",
+          service: "set_temperature",
+          service_data: { entity_id: entityId, temperature: newTemp, hvac_mode: "heat" },
+        });
+      }
       return newTemp;
     });
-  }, [entityId, controls]);
+  }, [entityId, connection]);
 
   if (!entity || entity.state === 'unavailable' || entity.state === 'unknown') {
     return (

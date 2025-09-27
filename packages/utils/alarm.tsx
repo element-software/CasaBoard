@@ -1,4 +1,3 @@
-import { HassEntityWithService } from "@hakit/core";
 import { mdiShieldLock, mdiShieldLockOpen, mdiShieldAlert } from "@mdi/js";
 
 // State class mappings for consistency
@@ -21,7 +20,7 @@ const ALARM_STATE_CONFIG = {
 } as const;
 
 export const stateClassNameBg = (
-  entity: HassEntityWithService<"alarmControlPanel">
+  entity: any
 ) => {
   return STATE_BG_CLASSES[entity.state as keyof typeof STATE_BG_CLASSES] || "";
 };
