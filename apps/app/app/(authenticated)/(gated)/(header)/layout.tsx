@@ -4,6 +4,7 @@ import {
   HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
+  serverLogger,
 } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
@@ -25,6 +26,14 @@ export default async function AuthenticatedLayout({
   const authedUser = await getCurrentAuthUser();
   if (!authedUser) {
     redirect("/auth/login?redirectTo=/setup");
+  }
+
+  // On first login, ensure a 14-day mid plan trial exists
+  try {
+    const { SubscriptionService } = await import("@repo/lib");
+    await SubscriptionService.ensureTrialOnFirstLogin();
+  } catch {
+    serverLogger.error("Layout::", "Failed to ensure trial on first login");
   }
 
   const haInstance = await HAInstanceActions.getFirstHAInstance();
