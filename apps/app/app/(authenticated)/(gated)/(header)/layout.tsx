@@ -33,7 +33,7 @@ export default async function AuthenticatedLayout({
     const { SubscriptionService } = await import("@repo/lib");
     await SubscriptionService.ensureTrialOnFirstLogin();
   } catch {
-    serverLogger.error("Layout::", "Failed to ensure trial on first login");
+    serverLogger.error("Layout (gated)::", "Failed to ensure trial on first login");
   }
 
   const haInstance = await HAInstanceActions.getFirstHAInstance();

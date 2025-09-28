@@ -7,9 +7,11 @@ import {
   Encryption,
   ConfigService,
   getCurrentAuthUser,
+  serverLogger,
 } from "@repo/lib";
 import { generateSessionId } from "@repo/lib";
 import { Footer } from "@repo/ui/components/Footer";
+import { redirect } from "next/navigation";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = "force-dynamic";
@@ -21,6 +23,20 @@ export default async function AuthenticatedLayout({
 }) {
   // Fetch configuration server-side
   const initialConfig = await ConfigService.getServerConfig();
+
+  // Ensure user is authenticated first
+  const authedUser = await getCurrentAuthUser();
+  if (!authedUser) {
+    redirect("/auth/login?redirectTo=/");
+  }
+
+  // On first login, ensure a 14-day mid plan trial exists
+  try {
+    const { SubscriptionService } = await import("@repo/lib");
+    await SubscriptionService.ensureTrialOnFirstLogin();
+  } catch {
+    serverLogger.error("Layout (immersive)::", "Failed to ensure trial on first login");
+  }
 
   // Fetch first instance (pages are tied per-instance; active flag removed)
   const haInstance = await HAInstanceActions.getFirstHAInstance();
