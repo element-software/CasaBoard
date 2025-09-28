@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useConfiguration } from '../ConfigurationProvider';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumbs } from './Breadcrumbs';
 import { clientLogger } from "@repo/lib";
 import { SupabaseClient } from '@repo/lib';
 
@@ -55,9 +54,6 @@ export const SetupNavigation = ({ currentPage = '', setCurrentPage }: SetupNavig
 
   return (
     <div className="flex items-center justify-between bg-theme-secondary border-b border-theme-border px-6 py-3">
-      <div className="flex items-center gap-4">
-        <Breadcrumbs />
-      </div>
       
       <div className="flex items-center gap-2">
         {user ? (

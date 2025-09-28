@@ -11,7 +11,7 @@ export { PagesView } from './views/Pages';
 export { PageManager } from './PageManager';
 export { SidebarConfigPanel } from './SidebarConfigPanel';
 export { SetupNavigation } from './SetupNavigation';
-export { Breadcrumbs } from './Breadcrumbs';
+export { Breadcrumbs } from '../Breadcrumbs';
 
 // Dashboard components
 export { PagesManagement } from './PagesManagement';

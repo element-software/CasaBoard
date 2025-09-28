@@ -13,7 +13,10 @@ export const getPublicLinks = (): NavLink[] => [
 ];
 
 export const getPrivateLinks = (): NavLink[] => [
-  { href: "/setup", label: "Setup" },
+  { href: LinkService.crossAppHref("app", "/setup"), label: "Setup" },
+  { href: LinkService.crossAppHref("app", "/auth/profile"), label: "Profile" },
+  { href: LinkService.crossAppHref("app", "/auth/profile/billing"), label: "Billing" },
+
 ];
 
 
