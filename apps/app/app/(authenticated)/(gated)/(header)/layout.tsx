@@ -4,7 +4,6 @@ import {
   HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
-  serverLogger,
 } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
