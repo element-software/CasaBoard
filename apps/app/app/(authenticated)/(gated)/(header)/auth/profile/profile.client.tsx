@@ -10,7 +10,14 @@ type Profile = {
   lastSignIn: string | null;
 };
 
-export default function ProfileClient({ profile, entitlements }: { profile: Profile; entitlements: Entitlements }) {
+type SubscriptionSummary = {
+  status: string;
+  planId: string;
+  trialEndsAt: string | null;
+  hasPaymentMethod: boolean | null;
+};
+
+export default function ProfileClient({ profile, entitlements, subscription }: { profile: Profile; entitlements: Entitlements; subscription: SubscriptionSummary }) {
   const router = useRouter();
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
@@ -63,17 +70,20 @@ export default function ProfileClient({ profile, entitlements }: { profile: Prof
           <CardBody className="p-6 space-y-3">
             <h2 className="text-lg font-semibold">Subscription</h2>
             <div className="flex items-center flex-wrap gap-2">
-              <Chip color={entitlements.active ? "success" : "warning"} variant="flat">
-                {entitlements.active ? "Active" : "Inactive"}
+              <Chip color={/active|trialing/.test(subscription.status) ? "success" : "warning"} variant="flat">
+                {subscription.status}
               </Chip>
-              <Chip variant="flat">Plan: {entitlements.planId}</Chip>
-              {entitlements.trialEndsAt && (
-                <Chip variant="flat">Trial ends: {new Date(entitlements.trialEndsAt).toLocaleDateString()}</Chip>
+              <Chip variant="flat">Plan: {subscription.planId}</Chip>
+              {subscription.trialEndsAt && (
+                <Chip color="warning" variant="flat">TRIAL • ends {new Date(subscription.trialEndsAt).toLocaleDateString()}</Chip>
               )}
             </div>
             <div className="text-sm text-theme-text-secondary">
               <p>Dashboards: {entitlements.maxDashboards < 0 ? "Unlimited" : entitlements.maxDashboards}</p>
               <p>HA Instances: {entitlements.maxHAInstances < 0 ? "Unlimited" : entitlements.maxHAInstances}</p>
+              {subscription.hasPaymentMethod === false && (
+                <p className="text-warning">No payment method on file</p>
+              )}
             </div>
             <div className="pt-2">
               <Button as="a" href="/auth/profile/billing" color="primary" variant="solid" className="w-full">

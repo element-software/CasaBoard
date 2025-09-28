@@ -33,3 +33,9 @@ export interface SubscriptionRecord {
 }
 
 
+export interface SubscriptionSummary {
+  status: string;
+  planId: PlanId | 'unknown';
+  trialEndsAt: string | null;
+  hasPaymentMethod: boolean | null;
+}

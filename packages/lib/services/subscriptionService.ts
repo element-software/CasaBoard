@@ -1,4 +1,4 @@
-import { Entitlements, PlanId } from "@repo/types/subscription";
+import { Entitlements, PlanId, SubscriptionSummary } from "@repo/types/subscription";
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { resolveEntitlements } from "./billingService";
 import { StripeEntitlementsService } from "./stripeEntitlementsService";
@@ -60,6 +60,50 @@ export class SubscriptionService {
     return resolveEntitlements("free-trial", trialEndsAt, false);
   }
 
+  static async getCurrentSubscriptionSummary(): Promise<SubscriptionSummary> {
+    const supabase = await createClient();
+    const user = await getCurrentAuthUser();
+    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null };
+
+    const { data: map } = await supabase
+      .from('billing_customers')
+      .select('stripe_customer_id')
+      .eq('user_id', user.id)
+      .single();
+    const customerId = map?.stripe_customer_id as string | undefined;
+    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false };
+
+    const stripe = StripeService.getStripe();
+
+    const subs = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 10 });
+    const pick = subs.data
+      .slice()
+      .sort((a, b) => (b.created || 0) - (a.created || 0))
+      .find((s) => ['active', 'trialing', 'past_due', 'unpaid', 'incomplete', 'incomplete_expired'].includes(String(s.status)));
+
+    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false };
+
+    // Derive plan id
+    const metaPlan = (pick.metadata?.plan_id || '').toLowerCase();
+    const nickname = (pick.items?.data?.[0]?.price?.nickname || '').toLowerCase();
+    const planString = (metaPlan || nickname) as string;
+    const allowed: PlanId[] = ['free-trial','starter','mid','pro','super_25','super_40','super_60'];
+    const derivedPlan = (allowed as string[]).includes(planString) ? (planString as PlanId) : ('unknown' as const);
+
+    // Trial end
+    const trialEndsAt = pick.trial_end ? new Date(pick.trial_end * 1000).toISOString() : null;
+
+    // Payment methods present
+    let hasPaymentMethod: boolean | null = null;
+    try {
+      const pms = await stripe.paymentMethods.list({ customer: customerId, type: 'card' });
+      hasPaymentMethod = (pms?.data?.length || 0) > 0;
+    } catch {
+      hasPaymentMethod = null;
+    }
+
+    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod };
+  }
   /**
    * Ensure a Stripe 14‑day mid plan trial exists for the current user.
    * - Creates Stripe customer record and local mapping if missing
