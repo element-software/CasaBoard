@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
-import { Breadcrumbs } from "@repo/ui/components/Setup/Breadcrumbs";
 import Icon from "@mdi/react";
 import { mdiMenu } from "@mdi/js";
 import { CasaBoardLogo } from "../Logo";
@@ -14,8 +12,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }) => {
-  const pathname = usePathname();
-  const hideBreadcrumbs = isPublic && pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -35,12 +31,6 @@ export const Header: React.FC<HeaderProps> = ({ public: isPublic = false, user }
             </button>
           </div>
         </div>
-
-        {!hideBreadcrumbs && (
-          <div className="border-t border-theme-border/50 px-2 py-2">
-            <Breadcrumbs showHome={!isPublic} />
-          </div>
-        )}
       </div>
 
       <HeaderDrawer isOpen={menuOpen} onOpenChange={setMenuOpen} isPublic={isPublic} user={user} />

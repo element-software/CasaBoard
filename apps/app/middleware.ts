@@ -1,59 +1,25 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { SupabaseMiddleware} from '@repo/lib'
+import { NextRequest } from 'next/server';
+import { SupabaseMiddleware } from '@repo/lib';
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  
-  // Skip middleware for static files and certain paths
-  if (
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/auth/') ||
-    pathname.startsWith('/(public)/') ||
-    pathname.includes('.') ||
-    pathname === '/' ||
-    pathname === '/about' ||
-    pathname === '/instructions' ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname === '/favicon.ico'
-  ) {
-    return NextResponse.next();
-  }
 
+  // Create Supabase client for auth state
   const { supabase, response } = SupabaseMiddleware.createClient(request);
-
-  // Refresh session if expired - required for Server Components
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect API routes that require authentication
-  if (pathname.startsWith('/api/') && !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Protect all authenticated routes (everything under /(authenticated))
-  // These are the actual paths that need protection
+  // Require auth on explicit sections or top-level non-auth routes
   const protectedPaths = ['/setup', '/config', '/api/pages'];
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
-  
-  // Also protect dynamic routes that are not auth-related
-  // Exclude common static files and system files
-  const staticFilePatterns = [
-    /\.(txt|xml|ico|png|jpg|jpeg|gif|svg|css|js|woff|woff2|ttf|eot)$/i,
-    /^\/robots\.txt$/,
-    /^\/sitemap\.xml$/,
-    /^\/favicon\.ico$/,
-    /^\/manifest\.json$/
-  ];
-  
-  const isStaticFile = staticFilePatterns.some(pattern => pattern.test(pathname));
-  const isDynamicRoute = pathname.match(/^\/[^\/]+$/) && !isStaticFile; // matches /something but not /something/else
-  const isNotAuthRoute = !pathname.startsWith('/auth/');
-  
-  if ((isProtectedPath || (isDynamicRoute && isNotAuthRoute)) && !user) {
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
+  const segments = pathname.split('/').filter(Boolean);
+  const isTopLevel = segments.length === 1;
+  const isAuthRoute = pathname.startsWith('/auth/');
+  const requireAuth = isProtected || (isTopLevel && !isAuthRoute);
+
+  if (requireAuth && !user) {
     const loginUrl = new URL('/auth/login', request.url);
     loginUrl.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(loginUrl);
