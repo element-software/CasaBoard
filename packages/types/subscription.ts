@@ -39,4 +39,5 @@ export interface SubscriptionSummary {
   trialEndsAt: string | null;
   hasPaymentMethod: boolean | null;
   planLabel?: string | null;
+  currentPeriodEnd?: string | null;
 }

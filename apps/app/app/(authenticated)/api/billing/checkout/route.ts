@@ -39,6 +39,54 @@ export async function POST(req: NextRequest) {
       serverLogger.info('stripe:checkout', 'Inserted new customer ID into billing_customers');
     }
 
+    // Check if user has an existing trial subscription that we should update instead of creating new
+    const existingSubs = await stripe.subscriptions.list({ 
+      customer: existingCustomerId, 
+      status: 'all', 
+      limit: 5 
+    });
+    const trialSub = existingSubs.data.find(s => 
+      s.status === 'trialing' && 
+      s.metadata?.origin === 'auto-free-trial'
+    );
+
+    if (trialSub) {
+      // Update existing trial subscription to paid
+      serverLogger.info('stripe:checkout', 'Updating existing trial subscription', trialSub.id);
+      
+      // Update subscription items to new price
+      await stripe.subscriptions.update(trialSub.id, {
+        items: [{
+          id: trialSub.items.data[0].id,
+          price: price,
+        }],
+        metadata: { 
+          user_id: user.id, 
+          plan_id: plan, 
+          interval,
+          origin: 'upgraded-from-trial'
+        },
+        // Remove trial settings to make it paid immediately
+        trial_settings: undefined,
+      });
+
+      // Clean up any local entitlements cache since we're now using Stripe-only
+      try {
+        await supabase
+          .from("user_entitlements")
+          .delete()
+          .eq("user_id", user.id);
+        serverLogger.info('stripe:checkout', 'Cleaned up local entitlements cache');
+      } catch (err) {
+        serverLogger.warn('stripe:checkout', 'Failed to clean up local entitlements', err);
+      }
+
+      serverLogger.info('stripe:checkout', 'Successfully updated trial subscription to paid');
+      const origin = req.headers.get("origin") || new URL(req.url).origin;
+      return NextResponse.redirect(`${origin}/auth/profile/billing/success?upgraded=true`, { status: 303 });
+    }
+
+    // No existing trial subscription, create new checkout session
     const origin = req.headers.get("origin") || new URL(req.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

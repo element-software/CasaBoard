@@ -79,7 +79,7 @@ export class SubscriptionService {
   static async getCurrentSubscriptionSummary(): Promise<SubscriptionSummary> {
     const supabase = await createClient();
     const user = await getCurrentAuthUser();
-    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null, planLabel: null };
+    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null, planLabel: null, currentPeriodEnd: null };
 
     const { data: map } = await supabase
       .from('billing_customers')
@@ -87,7 +87,7 @@ export class SubscriptionService {
       .eq('user_id', user.id)
       .single();
     const customerId = map?.stripe_customer_id as string | undefined;
-    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null };
+    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null, currentPeriodEnd: null };
 
     const stripe = StripeService.getStripe();
 
@@ -97,7 +97,7 @@ export class SubscriptionService {
       .sort((a, b) => (b.created || 0) - (a.created || 0))
       .find((s) => ['active', 'trialing', 'past_due', 'unpaid', 'incomplete', 'incomplete_expired'].includes(String(s.status)));
 
-    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null };
+    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null, currentPeriodEnd: null };
 
     // Derive plan id
     const metaPlan = (pick.metadata?.plan_id || '').toLowerCase();
@@ -134,7 +134,10 @@ export class SubscriptionService {
       }
     }
 
-    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod, planLabel };
+    // Current period end
+    const currentPeriodEnd = (pick as any).current_period_end ? new Date((pick as any).current_period_end * 1000).toISOString() : null;
+
+    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod, planLabel, currentPeriodEnd };
   }
   /**
    * Ensure a Stripe 14‑day mid plan trial exists for the current user.
@@ -187,18 +190,7 @@ export class SubscriptionService {
       metadata: { plan_id: "mid", origin: "auto-free-trial" },
     });
 
-    // Grant local entitlements immediately during trial window
-    await supabase.from("user_entitlements").upsert(
-      [
-        {
-          user_id: user.id,
-          feature_key: "mid-access",
-          active: true,
-          updated_at: new Date().toISOString(),
-        },
-      ],
-      { onConflict: "user_id,feature_key" }
-    );
+    // Note: No local entitlements cache needed - using Stripe-only entitlements
 
     redirect(LinkService.crossAppHref("app", "/setup"));
   }
