@@ -1,11 +1,5 @@
 import { redirect } from "next/navigation";
-import {
-  StripeService,
-  SupabaseServer,
-  StripeEntitlementsService,
-  getCurrentAuthUser,
-  serverLogger,
-} from "@repo/lib";
+import { StripeService, serverLogger } from "@repo/lib";
 import Stripe from "stripe";
 import SuccessContent from "./SuccessContent";
 
@@ -51,21 +45,9 @@ export default async function BillingSuccessPage({
     currentPeriodEnd = periodEnd;
     planLabel = (sub.items?.data?.[0]?.price?.product as any)?.name || planId;
 
-    const supabase = await SupabaseServer.createClient();
-    const user = await getCurrentAuthUser();
-    if (user) {
-      await supabase.from("subscriptions").insert({
-        user_id: user.id,
-        plan_id: planId,
-        status,
-        current_period_end: periodEnd,
-      });
-      // After successful checkout, sync user's entitlements cache so gating unlocks immediately
-      await StripeEntitlementsService.syncCurrentUserEntitlements();
-    }
+    // No database writes here; data is read directly from Stripe
   } catch (err) {
     // ignore and continue to billing
-    serverLogger.error('billing:success', 'Cancel subscription failed');
     serverLogger.error('billing:success', 'Error', err);
   }
 

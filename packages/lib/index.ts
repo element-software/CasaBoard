@@ -8,7 +8,6 @@ export { PageService } from './services/pageService';
 export * as BillingService from './services/billingService';
 export { SubscriptionService } from './services/subscriptionService';
 export { StripeService } from './services/stripeService';
-export { StripeEntitlementsService } from './services/stripeEntitlementsService';
 export * as HAInstanceActions from './actions/haInstanceActions';
 export * as Encryption from './encryption';
 export { generateSessionId } from './encryption';

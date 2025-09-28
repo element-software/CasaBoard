@@ -1,7 +1,6 @@
 import { Entitlements, PlanId, SubscriptionSummary } from "@repo/types/subscription";
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { resolveEntitlements } from "./billingService";
-import { StripeEntitlementsService } from "./stripeEntitlementsService";
 import { StripeService } from "./stripeService";
 import { redirect } from "next/navigation";
 import { LinkService } from "..";
@@ -12,49 +11,66 @@ export class SubscriptionService {
     const user = await getCurrentAuthUser();
 
     if (!user) {
-      return {
-        planId: "free-trial",
-        maxDashboards: 0,
-        maxHAInstances: 0,
-        trialEndsAt: null,
-        active: false,
-      };
+      throw new Error("User not found");
     }
 
-    // 1) Try local feature cache (synced via webhook or on-demand)
-    const { data: features } = await supabase
-      .from("user_entitlements")
-      .select("feature_key")
-      .eq("user_id", user.id);
+    // Stripe‑only: derive current plan/features directly from Stripe
+    const { data: map } = await supabase
+      .from("billing_customers")
+      .select("stripe_customer_id")
+      .eq("user_id", user.id)
+      .single();
+    const customerId = map?.stripe_customer_id as string | undefined;
+    if (!customerId) {
+      return resolveEntitlements("free-trial", null, false);
+    }
 
-    const featureKeys = new Set((features || []).map((r: any) => r.feature_key as string));
+    const stripe = StripeService.getStripe();
+    // Determine subscription status + trial
+    const subsAll = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 5 });
+    const sub = subsAll.data
+      .slice()
+      .sort((a, b) => (b.created || 0) - (a.created || 0))
+      .find((s) => ["active", "trialing", "past_due", "unpaid"].includes(String(s.status)));
+    const trialEndsAt = sub?.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null;
 
-    const planFromFeatures = this.getPlanFromFeatureKeys(featureKeys);
+    // Get active features directly from Stripe Entitlements (if enabled)
+    let activeKeys: string[] = [];
+    try {
+      const entSummary: any = await (stripe.customers as any)?.retrieveEntitlements?.(customerId, { limit: 100, active: true });
+      if (entSummary && Array.isArray(entSummary.data)) {
+        activeKeys = entSummary.data
+          .filter((e: any) => e?.active === true || e?.status === "active")
+          .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
+          .filter(Boolean);
+      }
+    } catch {}
+    if (activeKeys.length === 0) {
+      try {
+        const entitlements: any = await (stripe as any).entitlements?.list?.({ customer: customerId, limit: 100 });
+        if (entitlements && Array.isArray(entitlements.data)) {
+          activeKeys = entitlements.data
+            .filter((e: any) => e?.active === true || e?.status === "active")
+            .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
+            .filter(Boolean);
+        }
+      } catch {}
+    }
+
+    // Map features -> plan id
+    const planFromFeatures = this.getPlanFromFeatureKeys(new Set(activeKeys));
     if (planFromFeatures) {
-      return resolveEntitlements(planFromFeatures, null, true);
+      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
+      return resolveEntitlements(planFromFeatures, trialEndsAt, isActive);
     }
 
-    // 2) Fallback: one-time sync from Stripe then re-check
-    await StripeEntitlementsService.syncCurrentUserEntitlements();
-    const { data: featuresAfter } = await supabase
-      .from("user_entitlements")
-      .select("feature_key")
-      .eq("user_id", user.id);
-    const featureKeysAfter = new Set((featuresAfter || []).map((r: any) => r.feature_key as string));
-    const planAfter = this.getPlanFromFeatureKeys(featureKeysAfter);
-    if (planAfter) {
-      return resolveEntitlements(planAfter, null, true);
-    }
-
-    // 3) Trial fallback by created_at
-    const createdAt = user.created_at ? new Date(user.created_at) : null;
-    const trialDays = process.env.TRIAL_DAYS ? parseInt(process.env.TRIAL_DAYS) : 14;
-    const trialEndsAt = createdAt
-      ? new Date(createdAt.getTime() + trialDays * 24 * 60 * 60 * 1000).toISOString()
-      : null;
-    const isWithinTrial = trialEndsAt ? new Date(trialEndsAt) > new Date() : false;
-    if (isWithinTrial) {
-      return resolveEntitlements("free-trial", trialEndsAt, true);
+    // Fallback to plan from subscription metadata/nickname
+    const metaPlan = (sub?.metadata?.plan_id || "").toLowerCase();
+    const nickname = (sub?.items?.data?.[0]?.price?.nickname || "").toLowerCase();
+    const planGuess = (metaPlan || nickname) as PlanId | "";
+    if (planGuess && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(planGuess)) {
+      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
+      return resolveEntitlements(planGuess as PlanId, trialEndsAt, isActive);
     }
 
     return resolveEntitlements("free-trial", trialEndsAt, false);
@@ -63,7 +79,7 @@ export class SubscriptionService {
   static async getCurrentSubscriptionSummary(): Promise<SubscriptionSummary> {
     const supabase = await createClient();
     const user = await getCurrentAuthUser();
-    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null };
+    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null, planLabel: null };
 
     const { data: map } = await supabase
       .from('billing_customers')
@@ -71,7 +87,7 @@ export class SubscriptionService {
       .eq('user_id', user.id)
       .single();
     const customerId = map?.stripe_customer_id as string | undefined;
-    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false };
+    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null };
 
     const stripe = StripeService.getStripe();
 
@@ -81,7 +97,7 @@ export class SubscriptionService {
       .sort((a, b) => (b.created || 0) - (a.created || 0))
       .find((s) => ['active', 'trialing', 'past_due', 'unpaid', 'incomplete', 'incomplete_expired'].includes(String(s.status)));
 
-    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false };
+    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null };
 
     // Derive plan id
     const metaPlan = (pick.metadata?.plan_id || '').toLowerCase();
@@ -102,7 +118,23 @@ export class SubscriptionService {
       hasPaymentMethod = null;
     }
 
-    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod };
+    // Human-friendly plan label from product or price nickname
+    let planLabel: string | null = null;
+    const price: any = pick.items?.data?.[0]?.price || null;
+    if (price) {
+      if (typeof price.product === 'string') {
+        try {
+          const prod = await stripe.products.retrieve(price.product);
+          planLabel = prod?.name || price?.nickname || planString || null;
+        } catch {
+          planLabel = price?.nickname || planString || null;
+        }
+      } else {
+        planLabel = (price?.product as any)?.name || price?.nickname || planString || null;
+      }
+    }
+
+    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod, planLabel };
   }
   /**
    * Ensure a Stripe 14‑day mid plan trial exists for the current user.

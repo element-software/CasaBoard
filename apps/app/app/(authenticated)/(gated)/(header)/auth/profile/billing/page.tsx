@@ -1,9 +1,9 @@
-import { SubscriptionService } from "@repo/lib";
-import { StripeService, SupabaseServer, serverLogger } from "@repo/lib";
+import { SubscriptionService, StripeService, SupabaseServer, serverLogger } from "@repo/lib";
 import BillingContent from "./BillingContent";
 
 export default async function BillingPage() {
   const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+  const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
   let currentPeriodEnd: string | null = null;
   let cancelAt: string | null = null;
   if (entitlements.active) {
@@ -17,16 +17,37 @@ export default async function BillingPage() {
       const customerId = userRow?.stripe_customer_id as string | undefined;
       if (customerId) {
         const stripe = StripeService.getStripe();
-        const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 1 });
+        const subs = await stripe.subscriptions.list({
+          customer: customerId,
+          status: "all",
+          limit: 1,
+        });
         const sub: any = subs.data[0] as any;
         const cpe = sub?.current_period_end;
         const ca = sub?.cancel_at;
-        if (typeof cpe === "number") currentPeriodEnd = new Date(cpe * 1000).toISOString();
-        if (typeof ca === "number") cancelAt = new Date(ca * 1000).toISOString();
+        if (typeof cpe === "number")
+          currentPeriodEnd = new Date(cpe * 1000).toISOString();
+        if (typeof ca === "number")
+          cancelAt = new Date(ca * 1000).toISOString();
       }
     } catch {}
   }
 
-  serverLogger.info('billing:page', 'entitlements', entitlements, 'currentPeriodEnd', currentPeriodEnd, 'cancelAt', cancelAt);
-  return <BillingContent entitlements={entitlements} currentPeriodEnd={currentPeriodEnd} cancelAt={cancelAt} />;
+  serverLogger.info(
+    "billing:page",
+    "subscription",
+    subscription,
+    "currentPeriodEnd",
+    currentPeriodEnd,
+    "cancelAt",
+    cancelAt
+  );
+  return (
+    <BillingContent
+      entitlements={entitlements}
+      currentPeriodEnd={currentPeriodEnd}
+      cancelAt={cancelAt}
+      planLabel={subscription.planLabel ?? null}
+    />
+  );
 }

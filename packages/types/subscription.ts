@@ -38,4 +38,5 @@ export interface SubscriptionSummary {
   planId: PlanId | 'unknown';
   trialEndsAt: string | null;
   hasPaymentMethod: boolean | null;
+  planLabel?: string | null;
 }

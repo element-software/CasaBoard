@@ -31,10 +31,12 @@ export default function BillingContent({
   entitlements,
   currentPeriodEnd,
   cancelAt,
+  planLabel,
 }: {
   entitlements: Entitlements;
   currentPeriodEnd?: string | null;
   cancelAt?: string | null;
+  planLabel?: string | null;
 }) {
   const labelForPlan = (planId: string) => {
     if (entitlements.active && (currentPeriodEnd || cancelAt)) {
@@ -83,27 +85,36 @@ export default function BillingContent({
       ],
     },
   ] as const;
-
+  const isCurrentPaid =
+    entitlements.planId === entitlements.planId &&
+    entitlements.active &&
+    !entitlements.trialEndsAt;
   return (
     <div className="max-w-7xl w-full mx-auto py-10 px-4">
       <div className="mb-8 flex flex-row items-center justify-between">
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-semibold">Subscription</h1>
-          <p className="text-foreground-500 mt-1">
-            Pick a plan that suits you.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex flex-row items-start w-full">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-semibold">Subscription</h1>
+            <p className="text-foreground-500 mt-1">
+              Pick a plan that suits you.
+            </p>
+          </div>
+          <div className="flex grow flex-wrap items-center gap-3 justify-end self-center">
             <Chip
               color={entitlements.active ? "success" : "warning"}
               variant="flat"
             >
               {entitlements.active ? "Active" : "Inactive"}
             </Chip>
-            <Chip variant="flat">Plan: {entitlements.planId}</Chip>
+            <Chip variant="flat" color="primary">
+              Plan: <strong>{planLabel ?? entitlements.planId}</strong>
+            </Chip>
             {entitlements.trialEndsAt && (
-              <Chip variant="flat" color="warning">
+              <Chip variant="flat" color="danger">
                 Trial ends:{" "}
-                {new Date(entitlements.trialEndsAt).toLocaleDateString()}
+                <strong>
+                  {new Date(entitlements.trialEndsAt).toLocaleDateString()}
+                </strong>
               </Chip>
             )}
             {!entitlements.active && (
@@ -112,31 +123,30 @@ export default function BillingContent({
               </Chip>
             )}
             {cancelAt && (
-                  <Chip color="warning" variant="flat">
-                    Cancellation is scheduled for{" "}
-                    {new Date(cancelAt).toLocaleDateString()}.
-                  </Chip>
-                )}
-                {currentPeriodEnd && (
-                  <Chip color="success" variant="flat">
-                    Current period ends on{" "}
-                    {new Date(currentPeriodEnd).toLocaleDateString()}.
-                  </Chip>
-                )}
+              <Chip color="warning" variant="flat">
+                Cancellation is scheduled for{" "}
+                {new Date(cancelAt).toLocaleDateString()}.
+              </Chip>
+            )}
+            {currentPeriodEnd && (
+              <Chip color="success" variant="flat">
+                Current period ends on{" "}
+                {new Date(currentPeriodEnd).toLocaleDateString()}.
+              </Chip>
+            )}
           </div>
         </div>
-        {entitlements.active &&
-          (currentPeriodEnd || cancelAt) && (
-            <Button
-              as={Link}
-              href="/api/billing/portal"
-              variant="bordered"
-              color="primary"
-              className="min-w-[180px]"
-            >
-              Manage Subscription
-            </Button>
-          )}
+        {isCurrentPaid && (
+          <Button
+            as={Link}
+            href="/api/billing/portal"
+            variant="bordered"
+            color="primary"
+            className="min-w-[180px]"
+          >
+            Manage Subscription
+          </Button>
+        )}
       </div>
 
       <div className="w-full flex flex-col gap-4 justify-center items-center">
@@ -165,8 +175,11 @@ export default function BillingContent({
 
         <div className="w-full grid gap-6 md:grid-cols-3">
           {plans.map((p, idx) => {
-            const isActive =
-              entitlements.planId === p.id && entitlements.active;
+            // Disable subscribe only when this is the current paid (non‑trial) plan
+            const isCurrentPaid =
+              entitlements.planId === p.id &&
+              entitlements.active &&
+              !entitlements.trialEndsAt;
             const isPopular = p.popular === true;
             const price = billing === "monthly" ? p.monthly : p.yearly;
             const monthlyTotal = p.monthly * 12;
@@ -217,11 +230,12 @@ export default function BillingContent({
                       color="primary"
                       type="submit"
                       className="w-full"
-                      isDisabled={isActive}
+                      isDisabled={isCurrentPaid}
                     >
                       {labelForPlan(p.id)}
                     </Button>
-                    {isActive && (
+                    {/* Hide cancel button if in trial (ongoing or ended) */}
+                    {isCurrentPaid && !entitlements.trialEndsAt && (
                       <div className="mt-8 flex items-center justify-center">
                         <Button
                           color="danger"
@@ -250,7 +264,10 @@ export default function BillingContent({
 
       <div className="mt-10 text-center text-sm text-foreground-500">
         Questions about plans?{" "}
-        <Link href={LinkService.crossAppHref("public", "/contact")} className="text-primary">
+        <Link
+          href={LinkService.crossAppHref("public", "/contact")}
+          className="text-primary"
+        >
           Contact us
         </Link>
       </div>
