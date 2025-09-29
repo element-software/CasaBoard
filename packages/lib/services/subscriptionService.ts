@@ -206,7 +206,7 @@ export class SubscriptionService {
   /**
    * Check if customer has payment methods
    */
-  private static async checkPaymentMethod(customerId: string): Promise<boolean | null> {
+  private static async checkPaymentMethod(customerId: string): Promise<boolean> {
     try {
       const stripe = StripeService.getStripe();
       const paymentMethods = await stripe.paymentMethods.list({ 
@@ -219,7 +219,7 @@ export class SubscriptionService {
         customerId,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
-      return null;
+      return false;
     }
   }
 
