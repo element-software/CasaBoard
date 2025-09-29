@@ -1,21 +1,9 @@
 "use client";
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  cn,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@heroui/react";
+import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiCancel, mdiCheck } from "@mdi/js";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { LinkService } from "@repo/lib";
 import Stripe from "stripe";
 
@@ -65,8 +53,6 @@ export default function BillingContent({
   };
 
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const cancelFormRef = useRef<HTMLFormElement | null>(null);
 
   // Filter and group plans by interval
   const monthlyPlans = stripePlans.filter(
@@ -235,7 +221,12 @@ export default function BillingContent({
                       /{interval === "month" ? "mo" : "yr"}
                     </span>
                     {billing === "yearly" && discount > 0 && (
-                      <Chip color="success" variant="flat" size="sm" className="ml-2">
+                      <Chip
+                        color="success"
+                        variant="flat"
+                        size="sm"
+                        className="ml-2"
+                      >
                         Save £{discount.toFixed(0)}
                       </Chip>
                     )}
@@ -260,44 +251,16 @@ export default function BillingContent({
                       </li>
                     ))}
                   </ul>
-                  {!isCurrentPaid(plan.id) && (
-                    <form
-                      action={`/api/billing/checkout?plan=${plan.id}&interval=${billing}`}
-                      method="post"
-                      className=""
+                    <Button
+                      as={Link}
+                      color="primary"
+                      type="button"
+                      href="/api/billing/portal"
+                      className="w-full py-3 px-4 rounded-sm"
+                      isDisabled={isCurrentPaid(plan.id)}
                     >
-                      <Button
-                        color="primary"
-                        type="submit"
-                        className="w-full"
-                        isDisabled={isCurrentPaid(plan.id)}
-                      >
-                        {labelForPlan(plan.id)}
-                      </Button>
-                    </form>
-                  )}
-                  {/* Hide cancel button if in trial (ongoing or ended) */}
-                  {isCurrentPaid(plan.id) &&
-                    !entitlements.trialEndsAt &&
-                    !cancelAt && (
-                      <div className="w-full mt-4 flex items-center justify-center">
-                        <Button
-                          color="danger"
-                          variant="bordered"
-                          onPress={onOpen}
-                          className="w-full"
-                        >
-                          <Icon path={mdiCancel} className="w-4 h-4" /> Cancel
-                          at period end
-                        </Button>
-                      </div>
-                    )}
-                  <form
-                    ref={cancelFormRef}
-                    action="/api/billing/cancel"
-                    method="post"
-                    className="hidden"
-                  />
+                      {labelForPlan(plan.id)}
+                    </Button>
                 </CardBody>
               </Card>
             );
@@ -316,39 +279,6 @@ export default function BillingContent({
           Contact us
         </Link>
       </div>
-
-      {/* Cancel modal */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
-        <ModalContent>
-          {(close) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Cancel subscription?
-              </ModalHeader>
-              <ModalBody>
-                <p>
-                  You will keep access until the end of your current billing
-                  period. Are you sure you want to cancel at the end of the
-                  period?
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="flat" onPress={close}>
-                  Keep subscription
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={() => {
-                    cancelFormRef.current?.submit();
-                  }}
-                >
-                  Yes, cancel
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 }
