@@ -19,28 +19,49 @@ export class SubscriptionService {
     try {
       const stripe = StripeService.getStripe();
       
-      // Get active subscription from Stripe
+      // Get all subscriptions from Stripe
       const subscriptions = await stripe.subscriptions.list({
         customer: customerId,
         status: 'all',
-        limit: 1
+        limit: 10 // Get more to find the right one
       });
 
-      const subscription = subscriptions.data[0];
-      if (!subscription) return null;
+      if (subscriptions.data.length === 0) return null;
 
-      // Get product details
-      const price = subscription.items.data[0].price;
+      // Priority order: Active trials > Active subscriptions > Other
+      let selectedSubscription: any = null;
+      
+      // 1. Look for active trials first
+      const activeTrial = subscriptions.data.find(sub => 
+        sub.status === 'trialing' && sub.trial_end
+      );
+      
+      // 2. Look for active subscriptions (non-trial)
+      const activeSubscription = subscriptions.data.find(sub => 
+        sub.status === 'active' && !sub.trial_end
+      );
+      
+      // 3. Look for any active subscription (including past trials)
+      const anyActiveSubscription = subscriptions.data.find(sub => 
+        ['active', 'trialing'].includes(sub.status)
+      );
+
+      selectedSubscription = activeTrial || activeSubscription || anyActiveSubscription;
+
+      if (!selectedSubscription) return null;
+
+      // Get product details from the selected subscription
+      const price = selectedSubscription.items.data[0].price;
       const product = await stripe.products.retrieve(price.product as string);
 
       return {
-        subscription,
+        subscription: selectedSubscription,
         product,
         price,
         customerId,
-        isActive: ['active', 'trialing'].includes(subscription.status),
-        isTrial: !!subscription.trial_end,
-        trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null
+        isActive: ['active', 'trialing'].includes(selectedSubscription.status),
+        isTrial: !!selectedSubscription.trial_end,
+        trialEndsAt: selectedSubscription.trial_end ? new Date(selectedSubscription.trial_end * 1000).toISOString() : null
       };
     } catch (error: any) {
       // Handle case where customer doesn't exist in Stripe
@@ -64,15 +85,16 @@ export class SubscriptionService {
   }
 
   /**
-   * Simplified entitlements - uses Stripe product data directly
+   * Get entitlements from Stripe product metadata
+   * Prioritizes active trials over other subscriptions
    */
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
     const data = await this.getCurrentSubscription();
     if (!data) {
       // Return default entitlements for users without subscriptions
       return {
-        planId: "no-subscription", // Use a descriptive ID instead of hardcoded plan
-        maxDashboards: 3,
+        planId: "no-subscription",
+        maxDashboards: 1, // Minimal free tier
         maxHAInstances: 1,
         trialEndsAt: null,
         active: false
@@ -80,8 +102,24 @@ export class SubscriptionService {
     }
 
     // Get entitlements from Stripe product metadata
-    const maxDashboards = parseInt(data.product.metadata?.max_dashboards || "1");
-    const maxHAInstances = parseInt(data.product.metadata?.max_ha_instances || "1");
+    // Use -1 for unlimited, fallback to 1 for missing metadata
+    const maxDashboards = data.product.metadata?.max_dashboards 
+      ? (data.product.metadata.max_dashboards === "-1" ? -1 : parseInt(data.product.metadata.max_dashboards))
+      : 1;
+    
+    const maxHAInstances = data.product.metadata?.max_ha_instances 
+      ? (data.product.metadata.max_ha_instances === "-1" ? -1 : parseInt(data.product.metadata.max_ha_instances))
+      : 1;
+
+    serverLogger.info('subscriptionService', 'Retrieved entitlements from Stripe product metadata', {
+      productId: data.product.id,
+      productName: data.product.name,
+      maxDashboards,
+      maxHAInstances,
+      isTrial: data.isTrial,
+      trialEndsAt: data.trialEndsAt,
+      subscriptionStatus: data.subscription.status
+    });
 
     return {
       planId: data.product.id, // Use Stripe product ID

@@ -2,6 +2,7 @@
 import { useState, useTransition } from "react";
 import { PageService } from "@repo/lib";
 import { Page } from "@repo/types/page";
+import { useEntitlementCheck } from "@repo/hooks/useEntitlements";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import {
@@ -18,19 +19,17 @@ import {
   mdiClock,
   mdiHomeAssistant,
 } from "@mdi/js";
-import { Button, Card, CardBody, CardHeader, Chip } from "@heroui/react";
+import { Button, Card, CardBody, CardHeader, Chip, Skeleton, Spinner } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
-  maxPages?: number;
   initialPages?: Page[];
   initialError?: string | null;
 }
 
 export const PagesManagement = ({
   showAllPages = false,
-  maxPages = 3,
   initialPages = [],
   initialError = null,
 }: PagesManagementProps) => {
@@ -39,6 +38,15 @@ export const PagesManagement = ({
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  
+  // Get entitlements for conditional rendering
+  const { 
+    entitlements, 
+    loading: entitlementsLoading, 
+    error: entitlementsError,
+    canCreateDashboard,
+    getRemainingDashboards 
+  } = useEntitlementCheck();
 
   const handleDeletePage = async (slug: string, pageName: string) => {
     if (
@@ -90,13 +98,46 @@ export const PagesManagement = ({
     });
   };
 
-  const displayPages = showAllPages ? pages : pages.slice(0, maxPages);
+  // Determine how many pages to show based on entitlements
+  const maxDisplayPages = entitlements?.maxDashboards === -1 ? pages.length : (entitlements?.maxDashboards || 3);
+  const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
+
+  // Show loading state for entitlements
+  if (entitlementsLoading) {
+    return (
+      <Skeleton className="w-full h-full rounded-lg" />
+    );
+  }
+
+  // Show error state for entitlements
+  if (entitlementsError) {
+    return (
+      <div className="text-center py-8">
+        <div className="w-16 h-16 mx-auto mb-4 bg-danger-100 rounded-2xl flex items-center justify-center">
+          <Icon path={mdiAlertCircle} className="w-8 h-8 text-danger" />
+        </div>
+        <h3 className="text-lg font-semibold text-theme-text mb-2">
+          Error Loading Entitlements
+        </h3>
+        <p className="text-theme-text-secondary mb-4">
+          {entitlementsError}
+        </p>
+        <Button
+          color="primary"
+          variant="flat"
+          onPress={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-theme-border border-t-theme-primary rounded-full animate-spin"></div>
+          <Spinner size="sm" />
           <span className="text-theme-text-secondary">Loading pages...</span>
         </div>
       </div>
@@ -143,6 +184,7 @@ export const PagesManagement = ({
           href="/setup/pages/create"
           color="primary"
           startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+          isDisabled={!canCreateDashboard(pages.length)}
         >
           Create First Page
         </Button>
@@ -376,11 +418,32 @@ export const PagesManagement = ({
         </CardBody>
       </Card>
 
-      {!showAllPages && pages.length > maxPages && (
+      {!showAllPages && pages.length > maxDisplayPages && (
         <div className="pt-3 border-t border-theme-border">
           <p className="text-sm text-theme-text-secondary text-center">
-            And {pages.length - maxPages} more pages
+            And {pages.length - maxDisplayPages} more pages
           </p>
+        </div>
+      )}
+
+      {/* Show remaining pages info */}
+      {entitlements && entitlements.maxDashboards !== -1 && (
+        <div className="pt-3 border-t border-theme-border">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-theme-text-secondary">
+              Pages used: {pages.length} / {entitlements.maxDashboards}
+            </span>
+            {getRemainingDashboards(pages.length) === 0 && (
+              <Chip size="sm" color="warning" variant="flat">
+                Limit reached
+              </Chip>
+            )}
+            {getRemainingDashboards(pages.length) > 0 && getRemainingDashboards(pages.length) <= 2 && (
+              <Chip size="sm" color="warning" variant="flat">
+                {getRemainingDashboards(pages.length)} remaining
+              </Chip>
+            )}
+          </div>
         </div>
       )}
 
@@ -402,6 +465,7 @@ export const PagesManagement = ({
             color="primary"
             className="order-1 sm:order-2"
             startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+            isDisabled={!canCreateDashboard(pages.length)}
           >
             New Page
           </Button>

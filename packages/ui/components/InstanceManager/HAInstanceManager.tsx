@@ -1,29 +1,23 @@
 "use client";
 import { useState, useTransition } from "react";
 import { HAInstanceActions, LinkService } from "@repo/lib";
-import { Card, CardBody, Link, Button } from "@heroui/react";
+import { Card, CardBody, Link, Button, Spinner, Skeleton } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
 import { useHA } from "@repo/ha";
+import { useEntitlementCheck } from "@repo/hooks/useEntitlements";
 import Icon from "@mdi/react";
-import { mdiHomeAssistant, mdiPlus, mdiArrowRight } from "@mdi/js";
+import { mdiHomeAssistant, mdiPlus, mdiArrowRight, mdiAlertCircle } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
 import { AddInstance } from "./AddInstance";
 
 interface HAInstanceManagerProps {
-  entitlements: EntitlementsInput;
   compact?: boolean;
   haInstances: HAInstance[];
 }
 
-interface EntitlementsInput {
-  maxHAInstances: number;
-  active: boolean;
-}
-
 export function HAInstanceManager({
-  entitlements,
   compact = false,
   haInstances,
 }: HAInstanceManagerProps) {
@@ -34,10 +28,17 @@ export function HAInstanceManager({
   const [form, setForm] = useState({ name: "", hass_url: "" });
   const router = useRouter();
 
+  // Get entitlements for conditional rendering
+  const { 
+    entitlements, 
+    loading: entitlementsLoading, 
+    error: entitlementsError,
+    canCreateHAInstance,
+    getRemainingHAInstances 
+  } = useEntitlementCheck();
+
   const canCreate = () => {
-    if (!entitlements || !entitlements.active) return false;
-    if (entitlements.maxHAInstances < 0) return true;
-    return haInstances.length < entitlements.maxHAInstances;
+    return canCreateHAInstance(haInstances.length);
   };
 
   const onCreate = () =>
@@ -148,6 +149,39 @@ export function HAInstanceManager({
     );
   };
 
+  // Show loading state for entitlements
+  if (entitlementsLoading) {
+    return (
+      <Skeleton className="w-full h-full rounded-lg" />
+    );
+  }
+
+  // Show error state for entitlements
+  if (entitlementsError) {
+    return (
+      <Card className="w-full">
+        <CardBody className="text-center py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-danger-100 rounded-2xl flex items-center justify-center">
+            <Icon path={mdiAlertCircle} className="w-8 h-8 text-danger" />
+          </div>
+          <h3 className="text-lg font-semibold text-theme-text mb-2">
+            Error Loading Entitlements
+          </h3>
+          <p className="text-theme-text-secondary mb-4">
+            {entitlementsError}
+          </p>
+          <Button
+            color="primary"
+            variant="flat"
+            onPress={() => window.location.reload()}
+          >
+            Retry
+          </Button>
+        </CardBody>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       {renderHeader()}
@@ -165,7 +199,7 @@ export function HAInstanceManager({
         }
 
         {!compact && (
-          canCreate() && entitlements ? (
+          canCreate() ? (
             <div data-create-form>
               {renderCreateForm()}
             </div>
