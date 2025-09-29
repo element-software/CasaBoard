@@ -16,8 +16,8 @@ import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiCancel, mdiCheck } from "@mdi/js";
 import { useRef, useState } from "react";
-import { Plan } from "@repo/types/subscription";
 import { LinkService } from "@repo/lib";
+import Stripe from "stripe";
 
 interface Entitlements {
   planId: string;
@@ -32,24 +32,27 @@ export default function BillingContent({
   currentPeriodEnd,
   cancelAt,
   planLabel,
+  stripePlans = [],
 }: {
   entitlements: Entitlements;
   currentPeriodEnd?: string | null;
   cancelAt?: string | null;
   planLabel?: string | null;
+  stripePlans?: Array<Stripe.Price & { product: Stripe.Product }>;
 }) {
-  const labelForPlan = (planId: string) => {
-    if (entitlements.active && entitlements.planId === planId) {
+  const labelForPlan = (priceId: string) => {
+    if (entitlements.active && entitlements.planId === priceId) {
       return "Current plan";
     }
-    if (entitlements.active && entitlements.planId !== planId) {
-      // Define plan tier order (lower to higher)
-      const planTiers = ['starter', 'mid', 'pro'];
-      const currentTierIndex = planTiers.indexOf(entitlements.planId);
-      const targetTierIndex = planTiers.indexOf(planId);
+    if (entitlements.active && entitlements.planId !== priceId) {
+      // Find current and target plans in Stripe data
+      const currentPlan = stripePlans.find(p => p.id === entitlements.planId);
+      const targetPlan = stripePlans.find(p => p.id === priceId);
       
-      if (currentTierIndex !== -1 && targetTierIndex !== -1) {
-        return targetTierIndex > currentTierIndex ? "Upgrade" : "Downgrade";
+      if (currentPlan && targetPlan) {
+        const currentAmount = currentPlan.unit_amount || 0;
+        const targetAmount = targetPlan.unit_amount || 0;
+        return targetAmount > currentAmount ? "Upgrade" : "Downgrade";
       }
       return "Upgrade";
     }
@@ -60,42 +63,12 @@ export default function BillingContent({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const cancelFormRef = useRef<HTMLFormElement | null>(null);
 
-  const plans: Plan[] = [
-    {
-      id: "starter",
-      name: "Starter",
-      monthly: 5,
-      yearly: 50,
-      dashboards: 1,
-      ha: 1,
-      popular: false,
-      features: ["1 dashboard", "1 Home Assistant instance", "Online support"],
-    },
-    {
-      id: "mid",
-      name: "Mid",
-      monthly: 8,
-      yearly: 80,
-      dashboards: 3,
-      ha: 1,
-      popular: true,
-      features: ["3 dashboards", "1 Home Assistant instance", "Online support"],
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      monthly: 10,
-      yearly: 100,
-      dashboards: 6,
-      ha: 2,
-      popular: false,
-      features: [
-        "6 dashboards",
-        "2 Home Assistant instances",
-        "Online support",
-      ],
-    },
-  ] as const;
+  // Filter and group plans by interval
+  const monthlyPlans = stripePlans.filter(p => p.recurring?.interval === 'month');
+  const yearlyPlans = stripePlans.filter(p => p.recurring?.interval === 'year');
+  
+  // Get plans for current billing cycle
+  const currentPlans = billing === "monthly" ? monthlyPlans : yearlyPlans;
   const isCurrentPaid = (planId: string): boolean => {
     return entitlements.planId === planId &&
       entitlements.active &&
@@ -187,15 +160,25 @@ export default function BillingContent({
         </div>
 
         <div className="w-full grid gap-6 md:grid-cols-3">
-          {plans.map((p, idx) => {
-            const isPopular = p.popular === true;
-            const price = billing === "monthly" ? p.monthly : p.yearly;
-            const monthlyTotal = p.monthly * 12;
-            const yearlyPrice = p.yearly;
-            const discount = Math.max(0, monthlyTotal - yearlyPrice);
+          {currentPlans.map((plan, idx) => {
+            const isPopular = idx === 1; // Make middle plan popular
+            const price = (plan.unit_amount || 0) / 100; // Convert from cents
+            const interval = plan.recurring?.interval || 'month';
+            
+            // Calculate yearly discount if applicable
+            let discount = 0;
+            if (billing === "yearly" && interval === "year") {
+              const monthlyEquivalent = monthlyPlans.find(p => p.product.id === plan.product.id);
+              if (monthlyEquivalent) {
+                const monthlyPrice = (monthlyEquivalent.unit_amount || 0) / 100;
+                const yearlyEquivalent = monthlyPrice * 12;
+                discount = Math.max(0, yearlyEquivalent - price);
+              }
+            }
+            
             return (
               <Card
-                key={p.id}
+                key={plan.id}
                 className={cn(
                   "border-default-200",
                   isPopular ? "bg-primary/10 border-primary/40" : ""
@@ -204,7 +187,7 @@ export default function BillingContent({
                 <CardBody className="p-6 space-y-4 relative">
                   {billing === "yearly" && discount > 0 && (
                     <span className="absolute top-3 right-3 text-xs bg-success text-white px-2 py-0.5 rounded-full shadow-sm">
-                      Save £{discount}
+                      Save £{discount.toFixed(0)}
                     </span>
                   )}
                   <div className="space-y-1">
@@ -212,46 +195,53 @@ export default function BillingContent({
                       <div className="text-sm text-foreground-500 font-medium">
                         {billing === "monthly" ? "Monthly" : "Yearly"}
                       </div>
-                      {isCurrentPaid(p.id) && (
+                      {isCurrentPaid(plan.id) && (
                         <Chip color="success" variant="flat" size="sm">
                           ACTIVE
                         </Chip>
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold">{p.name}</h3>
+                    <h3 className="text-lg font-semibold">{plan.product.name}</h3>
                   </div>
                   <div className="text-4xl font-semibold">
-                    £{price}
+                    £{price.toFixed(0)}
                     <span className="text-base font-normal text-foreground-500">
-                      /{billing === "monthly" ? "mo" : "yr"}
+                      /{interval === "month" ? "mo" : "yr"}
                     </span>
                   </div>
                   <ul className="text-sm text-foreground-500 space-y-1">
-                    {p.features.map((feature, idx) => (
-                      <li className="flex items-center gap-2" key={idx}>
+                    {plan.product.description && (
+                      <li className="flex items-center gap-2">
                         <Icon
                           path={mdiCheck}
                           className="w-4 h-4 text-success"
                         />{" "}
-                        {feature}
+                        {plan.product.description}
                       </li>
-                    ))}
+                    )}
+                    <li className="flex items-center gap-2">
+                      <Icon
+                        path={mdiCheck}
+                        className="w-4 h-4 text-success"
+                      />{" "}
+                      Online support
+                    </li>
                   </ul>
                   <form
-                    action={`/api/billing/checkout?plan=${p.id}&interval=${billing}`}
+                    action={`/api/billing/checkout?plan=${plan.id}&interval=${billing}`}
                     method="post"
                   >
                     <Button
                       color="primary"
                       type="submit"
                       className="w-full"
-                      isDisabled={isCurrentPaid(p.id)}
+                      isDisabled={isCurrentPaid(plan.id)}
                     >
-                      {labelForPlan(p.id)}
+                      {labelForPlan(plan.id)}
                     </Button>
                   </form>
                   {/* Hide cancel button if in trial (ongoing or ended) */}
-                  {isCurrentPaid(p.id) &&
+                  {isCurrentPaid(plan.id) &&
                     !entitlements.trialEndsAt &&
                     !cancelAt && (
                       <div className="w-full mt-4 flex items-center justify-center">

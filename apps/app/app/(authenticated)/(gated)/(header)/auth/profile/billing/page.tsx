@@ -1,5 +1,6 @@
 import { SubscriptionService, StripeService, SupabaseServer, serverLogger } from "@repo/lib";
 import BillingContent from "./BillingContent";
+import Stripe from "stripe";
 
 export default async function BillingPage() {
   const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
@@ -29,6 +30,24 @@ export default async function BillingPage() {
     }
   } catch {}
 
+  // Fetch plans from Stripe
+  let stripePlans: Array<Stripe.Price & { product: Stripe.Product }> = [];
+  try {
+    stripePlans = await StripeService.getAllPlans();
+    
+    serverLogger.info("billing:page", "Fetched Stripe plans", {
+      count: stripePlans.length,
+      plans: stripePlans.map(p => ({
+        id: p.id,
+        productName: p.product.name,
+        amount: p.unit_amount,
+        interval: p.recurring?.interval
+      }))
+    });
+  } catch (error) {
+    serverLogger.error("billing:page", "Failed to fetch Stripe plans", error);
+  }
+
   serverLogger.info(
     "billing:page",
     "subscription",
@@ -42,6 +61,7 @@ export default async function BillingPage() {
       currentPeriodEnd={subscription.currentPeriodEnd ?? null}
       cancelAt={cancelAt}
       planLabel={subscription.planLabel ?? null}
+      stripePlans={stripePlans}
     />
   );
 }
