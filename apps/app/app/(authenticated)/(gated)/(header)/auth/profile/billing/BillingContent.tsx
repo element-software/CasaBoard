@@ -189,27 +189,38 @@ export default function BillingContent({
             return (
               <Card
                 key={plan.id}
-                className={cn(
-                  "border-default-200",
-                  isPopular ? "bg-primary/10 border-primary/40" : ""
-                )}
+                className={cn("border-default-200", {
+                  "bg-primary/10 border-primary/40":
+                    isPopular && !isCurrentPaid(plan.id),
+                  "bg-green-400/10 border-green-400/40": isCurrentPaid(plan.id),
+                })}
               >
                 <CardBody className="p-6 space-y-4 relative">
-                  {billing === "yearly" && discount > 0 && (
-                    <span className="absolute top-3 right-3 text-xs bg-success text-white px-2 py-0.5 rounded-full shadow-sm">
-                      Save £{discount.toFixed(0)}
-                    </span>
+                  {isPopular && !isCurrentPaid(plan.id) && (
+                    <Chip
+                      color="primary"
+                      variant="flat"
+                      size="sm"
+                      className="absolute top-4 right-4"
+                    >
+                      POPULAR
+                    </Chip>
+                  )}
+                  {isCurrentPaid(plan.id) && (
+                    <Chip
+                      color="success"
+                      variant="flat"
+                      size="sm"
+                      className="absolute top-4 right-4"
+                    >
+                      ACTIVE
+                    </Chip>
                   )}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-foreground-500 font-medium">
                         {billing === "monthly" ? "Monthly" : "Yearly"}
                       </div>
-                      {isCurrentPaid(plan.id) && (
-                        <Chip color="success" variant="flat" size="sm">
-                          ACTIVE
-                        </Chip>
-                      )}
                     </div>
                     <h3 className="text-lg font-semibold">
                       {plan.product.name}
@@ -220,6 +231,11 @@ export default function BillingContent({
                     <span className="text-base font-normal text-foreground-500">
                       /{interval === "month" ? "mo" : "yr"}
                     </span>
+                    {billing === "yearly" && discount > 0 && (
+                      <Chip color="success" variant="flat" size="sm" className="ml-2">
+                        Save £{discount.toFixed(0)}
+                      </Chip>
+                    )}
                   </div>
                   {plan.product.description && (
                     <p className="flex items-center gap-2">
@@ -241,20 +257,22 @@ export default function BillingContent({
                       </li>
                     ))}
                   </ul>
-                  {!isCurrentPaid(plan.id) && <form
-                    action={`/api/billing/checkout?plan=${plan.id}&interval=${billing}`}
-                    method="post"
-                    className=""
-                  >
-                    <Button
-                      color="primary"
-                      type="submit"
-                      className="w-full"
-                      isDisabled={isCurrentPaid(plan.id)}
+                  {!isCurrentPaid(plan.id) && (
+                    <form
+                      action={`/api/billing/checkout?plan=${plan.id}&interval=${billing}`}
+                      method="post"
+                      className=""
                     >
-                      {labelForPlan(plan.id)}
-                    </Button>
-                  </form>}
+                      <Button
+                        color="primary"
+                        type="submit"
+                        className="w-full"
+                        isDisabled={isCurrentPaid(plan.id)}
+                      >
+                        {labelForPlan(plan.id)}
+                      </Button>
+                    </form>
+                  )}
                   {/* Hide cancel button if in trial (ongoing or ended) */}
                   {isCurrentPaid(plan.id) &&
                     !entitlements.trialEndsAt &&

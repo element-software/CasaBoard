@@ -2,8 +2,6 @@ import { Entitlements, PlanId, SubscriptionSummary } from "@repo/types/subscript
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { resolveEntitlements } from "./billingService";
 import { StripeService } from "./stripeService";
-import { redirect } from "next/navigation";
-import { LinkService } from "..";
 
 export class SubscriptionService {
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
@@ -34,46 +32,37 @@ export class SubscriptionService {
       .find((s) => ["active", "trialing", "past_due", "unpaid"].includes(String(s.status)));
     const trialEndsAt = sub?.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null;
 
-    // Get active features directly from Stripe Entitlements (if enabled)
-    let activeKeys: string[] = [];
+    if (!sub) {
+      return resolveEntitlements("free-trial", trialEndsAt, false);
+    }
+
+    // Get the current price ID from the subscription
+    const currentPriceId = sub.items?.data?.[0]?.price?.id;
+    if (!currentPriceId) {
+      return resolveEntitlements("free-trial", trialEndsAt, false);
+    }
+
+    // Get the product information to determine the plan
     try {
-      const entSummary: any = await (stripe.customers as any)?.retrieveEntitlements?.(customerId, { limit: 100, active: true });
-      if (entSummary && Array.isArray(entSummary.data)) {
-        activeKeys = entSummary.data
-          .filter((e: any) => e?.active === true || e?.status === "active")
-          .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
-          .filter(Boolean);
+      const price = await stripe.prices.retrieve(currentPriceId);
+      const product = await stripe.products.retrieve(price.product as string);
+      
+      // Map product name to plan ID using StripeService logic
+      const planId = this.getPlanIdFromProduct(product);
+      
+      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
+      return resolveEntitlements(planId, trialEndsAt, isActive);
+    } catch (error) {
+      // Fallback to metadata if product lookup fails
+      const metaPlan = (sub?.metadata?.plan_id || "").toLowerCase();
+      const planGuess = metaPlan as PlanId | "";
+      if (planGuess && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(planGuess)) {
+        const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
+        return resolveEntitlements(planGuess as PlanId, trialEndsAt, isActive);
       }
-    } catch {}
-    if (activeKeys.length === 0) {
-      try {
-        const entitlements: any = await (stripe as any).entitlements?.list?.({ customer: customerId, limit: 100 });
-        if (entitlements && Array.isArray(entitlements.data)) {
-          activeKeys = entitlements.data
-            .filter((e: any) => e?.active === true || e?.status === "active")
-            .map((e: any) => e?.feature?.lookup_key || e?.feature_lookup_key)
-            .filter(Boolean);
-        }
-      } catch {}
+      
+      return resolveEntitlements("free-trial", trialEndsAt, false);
     }
-
-    // Map features -> plan id
-    const planFromFeatures = this.getPlanFromFeatureKeys(new Set(activeKeys));
-    if (planFromFeatures) {
-      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
-      return resolveEntitlements(planFromFeatures, trialEndsAt, isActive);
-    }
-
-    // Fallback to plan from subscription metadata/nickname
-    const metaPlan = (sub?.metadata?.plan_id || "").toLowerCase();
-    const nickname = (sub?.items?.data?.[0]?.price?.nickname || "").toLowerCase();
-    const planGuess = (metaPlan || nickname) as PlanId | "";
-    if (planGuess && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(planGuess)) {
-      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
-      return resolveEntitlements(planGuess as PlanId, trialEndsAt, isActive);
-    }
-
-    return resolveEntitlements("free-trial", trialEndsAt, false);
   }
 
   static async getCurrentSubscriptionSummary(): Promise<SubscriptionSummary> {
@@ -206,6 +195,29 @@ export class SubscriptionService {
       .eq("user_id", user.id)
       .single();
     return data?.stripe_customer_id ?? null;
+  }
+
+  private static getPlanIdFromProduct(product: any): PlanId {
+    // Map Stripe product to plan ID using similar logic to StripeService
+    const productName = (product.name || "").toLowerCase();
+    const byMeta = (product.metadata?.plan_id || product.metadata?.lookup_key || "").toLowerCase();
+    
+    // Check metadata first
+    if (byMeta && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(byMeta)) {
+      return byMeta as PlanId;
+    }
+    
+    // Check product name patterns
+    if (productName.includes("mid") || productName.includes("standard")) return "mid";
+    if (productName.includes("pro") || productName.includes("professional")) return "pro";
+    if (productName.includes("starter")) return "starter";
+    if (productName.includes("super") && productName.includes("25")) return "super_25";
+    if (productName.includes("super") && productName.includes("40")) return "super_40";
+    if (productName.includes("super") && productName.includes("60")) return "super_60";
+    if (productName.includes("trial") || productName.includes("free")) return "free-trial";
+    
+    // Default fallback
+    return "free-trial";
   }
 
   private static getPlanFromFeatureKeys(keys: Set<string>): PlanId | null {

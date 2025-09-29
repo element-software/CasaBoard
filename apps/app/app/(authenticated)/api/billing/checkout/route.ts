@@ -18,7 +18,30 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const stripe = StripeService.getStripe();
-    const price = await StripeService.getCheckoutPriceForPlan(plan as any, interval);
+    
+    // Validate that the price ID exists and get the price object
+    let price;
+    let product;
+    try {
+      const priceResponse = await stripe.prices.retrieve(plan);
+      price = priceResponse;
+      const productResponse = await stripe.products.retrieve(price.product as string);
+      product = productResponse;
+      serverLogger.info('stripe:checkout', 'Retrieved price and product', {
+        priceId: plan,
+        amount: price.unit_amount,
+        interval: price.recurring?.interval,
+        productId: price.product,
+        productName: product.name
+      });
+    } catch (error) {
+      serverLogger.error('stripe:checkout', 'Invalid price ID', { plan, error });
+      return NextResponse.json({ error: "Invalid price ID" }, { status: 400 });
+    }
+    
+    // Derive plan name from product for metadata
+    const planName = product.name?.toLowerCase().replace(/\s+/g, '_') || 'unknown';
+    
     let existingCustomerId = await SubscriptionService.getStripeCustomerIdForCurrentUser();
 
     // Ensure Stripe customer exists and map into billing_customers via user-scoped insert (RLS allowed)
@@ -76,7 +99,7 @@ export async function POST(req: NextRequest) {
       // end the trial
       const updatedTrialSub = await stripe.subscriptions.update(trialSub.id, {
         trial_end: 'now',
-        items: [{ price, quantity: 1 }],
+        items: [{ price: plan, quantity: 1 }],
         proration_behavior: 'none',
       });
 
@@ -87,13 +110,14 @@ export async function POST(req: NextRequest) {
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         customer: existingCustomerId,
-        line_items: [{ price, quantity: 1 }],
+        line_items: [{ price: plan, quantity: 1 }],
         success_url: `${origin}/auth/profile/billing/success?session_id={CHECKOUT_SESSION_ID}&upgraded=true`,
         cancel_url: `${origin}/auth/profile/billing?canceled=true`,
         client_reference_id: user.id,
         metadata: { 
           user_id: user.id, 
-          plan_id: plan, 
+          plan_id: planName, 
+          price_id: plan,
           interval, 
           origin: 'trial-upgrade',
           existing_subscription_id: trialSub.id
@@ -101,7 +125,8 @@ export async function POST(req: NextRequest) {
         subscription_data: {
           metadata: { 
             user_id: user.id, 
-            plan_id: plan, 
+            plan_id: planName, 
+            price_id: plan,
             interval, 
             origin: 'trial-upgrade',
             existing_subscription_id: trialSub.id,
@@ -119,14 +144,14 @@ export async function POST(req: NextRequest) {
       // Prefer binding to an existing customer for reliable webhooks → user mapping
       customer: existingCustomerId ?? undefined,
       customer_email: existingCustomerId ? undefined : (user.email ?? undefined),
-      line_items: [{ price, quantity: 1 }],
+      line_items: [{ price: plan, quantity: 1 }],
       success_url: `${origin}/auth/profile/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/auth/profile/billing?canceled=true`,
       // Attach metadata to the Checkout Session AND the Subscription that will be created
       client_reference_id: user.id,
-      metadata: { user_id: user.id, plan_id: plan, interval, origin: 'auto-free-trial' },
+      metadata: { user_id: user.id, plan_id: planName, price_id: plan, interval, origin: 'auto-free-trial' },
       subscription_data: {
-        metadata: { user_id: user.id, plan_id: plan, interval, origin: 'auto-free-trial' },
+        metadata: { user_id: user.id, plan_id: planName, price_id: plan, interval, origin: 'auto-free-trial' },
       },
     });
     return NextResponse.redirect(session.url!, { status: 303 });
