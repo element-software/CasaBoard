@@ -14,7 +14,7 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCheck } from "@mdi/js";
+import { mdiCancel, mdiCheck } from "@mdi/js";
 import { useRef, useState } from "react";
 import { Plan } from "@repo/types/subscription";
 import { LinkService } from "@repo/lib";
@@ -43,6 +43,14 @@ export default function BillingContent({
       return "Current plan";
     }
     if (entitlements.active && entitlements.planId !== planId) {
+      // Define plan tier order (lower to higher)
+      const planTiers = ['starter', 'mid', 'pro'];
+      const currentTierIndex = planTiers.indexOf(entitlements.planId);
+      const targetTierIndex = planTiers.indexOf(planId);
+      
+      if (currentTierIndex !== -1 && targetTierIndex !== -1) {
+        return targetTierIndex > currentTierIndex ? "Upgrade" : "Downgrade";
+      }
       return "Upgrade";
     }
     return "Subscribe";
@@ -246,13 +254,14 @@ export default function BillingContent({
                   {isCurrentPaid(p.id) &&
                     !entitlements.trialEndsAt &&
                     !cancelAt && (
-                      <div className="mt-8 flex items-center justify-center">
+                      <div className="w-full mt-4 flex items-center justify-center">
                         <Button
                           color="danger"
                           variant="bordered"
                           onPress={onOpen}
+                          className="w-full"
                         >
-                          Cancel at period end
+                          <Icon path={mdiCancel} className="w-4 h-4" /> Cancel at period end
                         </Button>
                       </div>
                     )}
