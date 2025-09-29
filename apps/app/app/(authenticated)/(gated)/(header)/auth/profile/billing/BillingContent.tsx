@@ -43,6 +43,9 @@ export default function BillingContent({
   currentPriceId?: string | null;
 }) {
   const labelForPlan = (priceId: string) => {
+    if (entitlements.trialEndsAt) {
+      return "Subscribe";
+    }
     if (entitlements.active && currentPriceId === priceId) {
       return "Current plan";
     }
