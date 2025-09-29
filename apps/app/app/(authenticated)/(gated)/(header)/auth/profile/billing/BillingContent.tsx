@@ -48,9 +48,9 @@ export default function BillingContent({
     }
     if (entitlements.active && currentPriceId !== priceId) {
       // Find current and target plans in Stripe data
-      const currentPlan = stripePlans.find(p => p.id === currentPriceId);
-      const targetPlan = stripePlans.find(p => p.id === priceId);
-      
+      const currentPlan = stripePlans.find((p) => p.id === currentPriceId);
+      const targetPlan = stripePlans.find((p) => p.id === priceId);
+
       if (currentPlan && targetPlan) {
         const currentAmount = currentPlan.unit_amount || 0;
         const targetAmount = targetPlan.unit_amount || 0;
@@ -66,15 +66,21 @@ export default function BillingContent({
   const cancelFormRef = useRef<HTMLFormElement | null>(null);
 
   // Filter and group plans by interval
-  const monthlyPlans = stripePlans.filter(p => p.recurring?.interval === 'month');
-  const yearlyPlans = stripePlans.filter(p => p.recurring?.interval === 'year');
-  
+  const monthlyPlans = stripePlans.filter(
+    (p) => p.recurring?.interval === "month"
+  );
+  const yearlyPlans = stripePlans.filter(
+    (p) => p.recurring?.interval === "year"
+  );
+
   // Get plans for current billing cycle
   const currentPlans = billing === "monthly" ? monthlyPlans : yearlyPlans;
   const isCurrentPaid = (priceId: string): boolean => {
-    return currentPriceId === priceId &&
+    return (
+      currentPriceId === priceId &&
       entitlements.active &&
-      !entitlements.trialEndsAt;
+      !entitlements.trialEndsAt
+    );
   };
 
   return (
@@ -165,19 +171,21 @@ export default function BillingContent({
           {currentPlans.map((plan, idx) => {
             const isPopular = idx === 1; // Make middle plan popular
             const price = (plan.unit_amount || 0) / 100; // Convert from cents
-            const interval = plan.recurring?.interval || 'month';
-            
+            const interval = plan.recurring?.interval || "month";
+
             // Calculate yearly discount if applicable
             let discount = 0;
             if (billing === "yearly" && interval === "year") {
-              const monthlyEquivalent = monthlyPlans.find(p => p.product.id === plan.product.id);
+              const monthlyEquivalent = monthlyPlans.find(
+                (p) => p.product.id === plan.product.id
+              );
               if (monthlyEquivalent) {
                 const monthlyPrice = (monthlyEquivalent.unit_amount || 0) / 100;
                 const yearlyEquivalent = monthlyPrice * 12;
                 discount = Math.max(0, yearlyEquivalent - price);
               }
             }
-            
+
             return (
               <Card
                 key={plan.id}
@@ -203,7 +211,9 @@ export default function BillingContent({
                         </Chip>
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold">{plan.product.name}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {plan.product.name}
+                    </h3>
                   </div>
                   <div className="text-4xl font-semibold">
                     £{price.toFixed(0)}
@@ -211,27 +221,30 @@ export default function BillingContent({
                       /{interval === "month" ? "mo" : "yr"}
                     </span>
                   </div>
-                  <ul className="text-sm text-foreground-500 space-y-1">
-                    {plan.product.description && (
-                      <li className="flex items-center gap-2">
+                  {plan.product.description && (
+                    <p className="flex items-center gap-2">
+                      <Icon path={mdiCheck} className="w-4 h-4 text-success" />{" "}
+                      {plan.product.description}
+                    </p>
+                  )}
+                  <ul className="text-sm text-foreground-500 space-y-1 h-full grow">
+                    {plan.product.marketing_features.map((feature) => (
+                      <li
+                        className="flex items-center gap-2"
+                        key={feature.name}
+                      >
                         <Icon
                           path={mdiCheck}
                           className="w-4 h-4 text-success"
                         />{" "}
-                        {plan.product.description}
+                        {feature.name}
                       </li>
-                    )}
-                    <li className="flex items-center gap-2">
-                      <Icon
-                        path={mdiCheck}
-                        className="w-4 h-4 text-success"
-                      />{" "}
-                      Online support
-                    </li>
+                    ))}
                   </ul>
-                  <form
+                  {!isCurrentPaid(plan.id) && <form
                     action={`/api/billing/checkout?plan=${plan.id}&interval=${billing}`}
                     method="post"
+                    className=""
                   >
                     <Button
                       color="primary"
@@ -241,7 +254,7 @@ export default function BillingContent({
                     >
                       {labelForPlan(plan.id)}
                     </Button>
-                  </form>
+                  </form>}
                   {/* Hide cancel button if in trial (ongoing or ended) */}
                   {isCurrentPaid(plan.id) &&
                     !entitlements.trialEndsAt &&
@@ -253,7 +266,8 @@ export default function BillingContent({
                           onPress={onOpen}
                           className="w-full"
                         >
-                          <Icon path={mdiCancel} className="w-4 h-4" /> Cancel at period end
+                          <Icon path={mdiCancel} className="w-4 h-4" /> Cancel
+                          at period end
                         </Button>
                       </div>
                     )}
