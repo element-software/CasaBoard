@@ -73,4 +73,5 @@ export default function TrialSetupWrapper({
   if (isLoading) {
     return <TrialSetupLoader message={loadingMessage} />;
   }
+  return null;
 }
