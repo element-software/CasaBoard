@@ -87,13 +87,14 @@ export default function ProfileClient({
                     ? "success"
                     : "warning"
                 }
+                className="capitalize"
                 variant="flat"
               >
                 {subscription.status}
               </Chip>
-              <Chip variant="flat">Plan: {subscription.planLabel ?? subscription.planId}</Chip>
+              <Chip variant="flat" color="primary">Plan: {subscription.planLabel ?? subscription.planId}</Chip>
               {subscription.trialEndsAt && (
-                <Chip color="warning" variant="flat">
+                <Chip color="danger" variant="flat">
                   TRIAL • ends{" "}
                   {new Date(subscription.trialEndsAt).toLocaleDateString()}
                 </Chip>

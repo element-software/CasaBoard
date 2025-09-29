@@ -1,11 +1,12 @@
 "use client";
-import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
+import { Button, Card, CardBody, Chip, Modal, ModalContent, Spinner, useDisclosure, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCancel, mdiCheck } from "@mdi/js";
-import { useState } from "react";
+import { mdiCancel, mdiCheck, mdiRocket } from "@mdi/js";
+import { useState, useRef } from "react";
 import { LinkService } from "@repo/lib";
 import Stripe from "stripe";
+import { useRouter } from "next/navigation";
 
 interface Entitlements {
   planId: string;
@@ -30,6 +31,7 @@ export default function BillingContent({
   stripePlans?: Array<Stripe.Price & { product: Stripe.Product }>;
   currentPriceId?: string | null;
 }) {
+  const router = useRouter();
   const labelForPlan = (priceId: string) => {
     if (entitlements.trialEndsAt) {
       return "Subscribe";
@@ -53,6 +55,17 @@ export default function BillingContent({
   };
 
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
+  
+  // Loading state for portal buttons
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
+  const [portalError, setPortalError] = useState<string | null>(null);
+
+  // Handle portal button click
+  const handlePortalClick = async () => {
+    setIsPortalLoading(true);
+    setPortalError(null);
+    router.push("/api/billing/portal");
+  };
 
   // Filter and group plans by interval
   const monthlyPlans = stripePlans.filter(
@@ -121,11 +134,12 @@ export default function BillingContent({
         </div>
         {entitlements.active && !entitlements.trialEndsAt && (
           <Button
-            as={Link}
-            href="/api/billing/portal"
+            onPress={handlePortalClick}
             variant="bordered"
             color="primary"
             className="p-2 px-4 min-w-[230px] ml-4"
+            isLoading={isPortalLoading}
+            isDisabled={isPortalLoading}
           >
             Manage Subscription in Stripe
           </Button>
@@ -252,12 +266,11 @@ export default function BillingContent({
                     ))}
                   </ul>
                     <Button
-                      as={Link}
+                      onPress={handlePortalClick}
                       color="primary"
                       type="button"
-                      href="/api/billing/portal"
                       className="w-full py-3 px-4 rounded-sm"
-                      isDisabled={isCurrentPaid(plan.id)}
+                      isDisabled={isCurrentPaid(plan.id) || isPortalLoading}
                     >
                       {labelForPlan(plan.id)}
                     </Button>
@@ -279,6 +292,59 @@ export default function BillingContent({
           Contact us
         </Link>
       </div>
+
+      {/* Loading Modal for Portal */}
+      <Modal 
+        isOpen={isPortalLoading} 
+        isDismissable={false}
+        hideCloseButton
+        className="backdrop-blur-sm"
+      >
+        <ModalContent className="p-8">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="relative">
+              <Icon
+                path={mdiRocket}
+                className="w-12 h-12 text-primary"
+              />
+              <Spinner 
+                size="lg"
+                className="absolute -top-4 -right-4" 
+                classNames={{
+                  wrapper: "w-20 h-20",
+                }}
+                color="primary"
+              />
+            </div>
+            <div className="text-center mt-4">
+              <h3 className="text-lg font-semibold text-foreground">
+                Loading Stripe Portal
+              </h3>
+              <p className="text-sm text-foreground-500 mt-1">
+                Please wait while we prepare your billing portal...
+              </p>
+            </div>
+            {portalError && (
+              <div className="text-center">
+                <p className="text-sm text-danger mb-2">
+                  {portalError}
+                </p>
+                <Button
+                  size="sm"
+                  color="primary"
+                  variant="flat"
+                  onPress={() => {
+                    setPortalError(null);
+                    setIsPortalLoading(false);
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+            )}
+          </div>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

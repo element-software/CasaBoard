@@ -1,132 +1,131 @@
-import { Entitlements, PlanId, SubscriptionSummary } from "@repo/types/subscription";
+import { Entitlements, SubscriptionData, SubscriptionSummary } from "@repo/types/subscription";
 import { createClient, getCurrentAuthUser } from "../supabase/server";
-import { resolveEntitlements } from "./billingService";
 import { StripeService } from "./stripeService";
+import { serverLogger } from "../logger";
 
 export class SubscriptionService {
-  static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
-    const supabase = await createClient();
+  /**
+   * Single method to get all subscription data from Stripe
+   * Handles errors gracefully and cleans up invalid customer mappings
+   */
+  static async getCurrentSubscription(): Promise<SubscriptionData | null> {
     const user = await getCurrentAuthUser();
+    if (!user) return null;
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    // Get customer ID from database (fast lookup)
+    const customerId = await this.getStripeCustomerIdForCurrentUser();
+    if (!customerId) return null;
 
-    // Stripe‑only: derive current plan/features directly from Stripe
-    const { data: map } = await supabase
-      .from("billing_customers")
-      .select("stripe_customer_id")
-      .eq("user_id", user.id)
-      .single();
-    const customerId = map?.stripe_customer_id as string | undefined;
-    if (!customerId) {
-      return resolveEntitlements("free-trial", null, false);
-    }
-
-    const stripe = StripeService.getStripe();
-    // Determine subscription status + trial
-    const subsAll = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 5 });
-    const sub = subsAll.data
-      .slice()
-      .sort((a, b) => (b.created || 0) - (a.created || 0))
-      .find((s) => ["active", "trialing", "past_due", "unpaid"].includes(String(s.status)));
-    const trialEndsAt = sub?.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null;
-
-    if (!sub) {
-      return resolveEntitlements("free-trial", trialEndsAt, false);
-    }
-
-    // Get the current price ID from the subscription
-    const currentPriceId = sub.items?.data?.[0]?.price?.id;
-    if (!currentPriceId) {
-      return resolveEntitlements("free-trial", trialEndsAt, false);
-    }
-
-    // Get the product information to determine the plan
     try {
-      const price = await stripe.prices.retrieve(currentPriceId);
+      const stripe = StripeService.getStripe();
+      
+      // Get active subscription from Stripe
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'all',
+        limit: 1
+      });
+
+      const subscription = subscriptions.data[0];
+      if (!subscription) return null;
+
+      // Get product details
+      const price = subscription.items.data[0].price;
       const product = await stripe.products.retrieve(price.product as string);
-      
-      // Map product name to plan ID using StripeService logic
-      const planId = this.getPlanIdFromProduct(product);
-      
-      const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
-      return resolveEntitlements(planId, trialEndsAt, isActive);
-    } catch (error) {
-      // Fallback to metadata if product lookup fails
-      const metaPlan = (sub?.metadata?.plan_id || "").toLowerCase();
-      const planGuess = metaPlan as PlanId | "";
-      if (planGuess && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(planGuess)) {
-        const isActive = Boolean(sub && ["active", "trialing"].includes(String(sub.status)));
-        return resolveEntitlements(planGuess as PlanId, trialEndsAt, isActive);
+
+      return {
+        subscription,
+        product,
+        price,
+        customerId,
+        isActive: ['active', 'trialing'].includes(subscription.status),
+        isTrial: !!subscription.trial_end,
+        trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null
+      };
+    } catch (error: any) {
+      // Handle case where customer doesn't exist in Stripe
+      if (error.code === 'resource_missing') {
+        serverLogger.warn('subscriptionService', 'Customer not found in Stripe, cleaning up', {
+          customerId,
+          userId: user.id,
+          error: error.message
+        });
+        // Clean up invalid customer ID
+        await this.cleanupInvalidCustomer(user.id, customerId);
+        return null;
       }
-      
-      return resolveEntitlements("free-trial", trialEndsAt, false);
+      serverLogger.error('subscriptionService', 'Failed to get subscription data', {
+        customerId,
+        userId: user.id,
+        error: error.message
+      });
+      throw error;
     }
   }
 
+  /**
+   * Simplified entitlements - uses Stripe product data directly
+   */
+  static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
+    const data = await this.getCurrentSubscription();
+    if (!data) {
+      // Return default entitlements for users without subscriptions
+      return {
+        planId: "no-subscription", // Use a descriptive ID instead of hardcoded plan
+        maxDashboards: 1,
+        maxHAInstances: 1,
+        trialEndsAt: null,
+        active: false
+      };
+    }
+
+    // Get entitlements from Stripe product metadata
+    const maxDashboards = parseInt(data.product.metadata?.max_dashboards || "1");
+    const maxHAInstances = parseInt(data.product.metadata?.max_ha_instances || "1");
+
+    return {
+      planId: data.product.id, // Use Stripe product ID
+      maxDashboards,
+      maxHAInstances,
+      trialEndsAt: data.trialEndsAt,
+      active: data.isActive
+    };
+  }
+
+  /**
+   * Convert SubscriptionData to public SubscriptionSummary format
+   */
+  private static async toSubscriptionSummary(data: SubscriptionData | null): Promise<SubscriptionSummary> {
+    if (!data) {
+      return { 
+        status: 'none', 
+        planId: 'unknown', 
+        trialEndsAt: null, 
+        hasPaymentMethod: null, 
+        planLabel: null, 
+        currentPeriodEnd: null 
+      };
+    }
+
+    const hasPaymentMethod = await this.checkPaymentMethod(data.customerId);
+
+    return {
+      status: data.subscription.status,
+      planId: data.product.id,
+      trialEndsAt: data.trialEndsAt,
+      hasPaymentMethod,
+      planLabel: data.product.name,
+      currentPeriodEnd: data.subscription.current_period_end ? 
+        new Date(data.subscription.current_period_end * 1000).toISOString() : null
+    };
+  }
+
+  /**
+   * Simplified subscription summary - uses single subscription data source
+   */
   static async getCurrentSubscriptionSummary(): Promise<SubscriptionSummary> {
-    const supabase = await createClient();
-    const user = await getCurrentAuthUser();
-    if (!user) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: null, planLabel: null, currentPeriodEnd: null };
-
-    const { data: map } = await supabase
-      .from('billing_customers')
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .single();
-    const customerId = map?.stripe_customer_id as string | undefined;
-    if (!customerId) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null, currentPeriodEnd: null };
-
-    const stripe = StripeService.getStripe();
-
-    const subs = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 10 });
-    const pick = subs.data
-      .slice()
-      .sort((a, b) => (b.created || 0) - (a.created || 0))
-      .find((s) => ['active', 'trialing', 'past_due', 'unpaid', 'incomplete', 'incomplete_expired'].includes(String(s.status)));
-
-    if (!pick) return { status: 'none', planId: 'unknown', trialEndsAt: null, hasPaymentMethod: false, planLabel: null, currentPeriodEnd: null };
-
-    // Derive plan id
-    const metaPlan = (pick.metadata?.plan_id || '').toLowerCase();
-    const nickname = (pick.items?.data?.[0]?.price?.nickname || '').toLowerCase();
-    const planString = (metaPlan || nickname) as string;
-    const allowed: PlanId[] = ['free-trial','starter','mid','pro','super_25','super_40','super_60'];
-    const derivedPlan = (allowed as string[]).includes(planString) ? (planString as PlanId) : ('unknown' as const);
-
-    // Trial end
-    const trialEndsAt = pick.trial_end ? new Date(pick.trial_end * 1000).toISOString() : null;
-
-    // Payment methods present
-    let hasPaymentMethod: boolean | null = null;
-    try {
-      const pms = await stripe.paymentMethods.list({ customer: customerId, type: 'card' });
-      hasPaymentMethod = (pms?.data?.length || 0) > 0;
-    } catch {
-      hasPaymentMethod = null;
-    }
-
-    // Human-friendly plan label from product or price nickname
-    let planLabel: string | null = null;
-    const price: any = pick.items?.data?.[0]?.price || null;
-    if (price) {
-      if (typeof price.product === 'string') {
-        try {
-          const prod = await stripe.products.retrieve(price.product);
-          planLabel = prod?.name || price?.nickname || planString || null;
-        } catch {
-          planLabel = price?.nickname || planString || null;
-        }
-      } else {
-        planLabel = (price?.product as any)?.name || price?.nickname || planString || null;
-      }
-    }
-
-    // Current period end
-    const currentPeriodEnd = (pick as any).current_period_end ? new Date((pick as any).current_period_end * 1000).toISOString() : null;
-
-    return { status: String(pick.status), planId: derivedPlan, trialEndsAt, hasPaymentMethod, planLabel, currentPeriodEnd };
+    const data = await this.getCurrentSubscription();
+    return this.toSubscriptionSummary(data);
   }
   /**
    * Ensure a Stripe 14‑day mid plan trial exists for the current user.
@@ -136,52 +135,58 @@ export class SubscriptionService {
    * - Returns true if a trial was created, false if user already has a subscription
    */
   static async ensureTrialOnFirstLogin(): Promise<boolean> {
-    const supabase = await createClient();
     const user = await getCurrentAuthUser();
     if (!user) return false;
 
-    // Resolve Stripe customer id mapping
-    let customerId = await this.getStripeCustomerIdForCurrentUser();
-    const stripe = StripeService.getStripe();
+    // Check if user already has subscription
+    const existing = await this.getCurrentSubscription();
+    if (existing) return false;
 
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email || undefined,
-        metadata: { user_id: user.id },
+    try {
+      const stripe = StripeService.getStripe();
+      
+      // Create customer if needed
+      let customerId = await this.getStripeCustomerIdForCurrentUser();
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: { user_id: user.id },
+        });
+        
+        const supabase = await createClient();
+        await supabase
+          .from("billing_customers")
+          .insert({ user_id: user.id, stripe_customer_id: customer.id })
+          .select()
+          .single();
+        customerId = customer.id;
+      }
+
+      // Create mid plan trial subscription
+      const priceId = await StripeService.getCheckoutPriceForPlan("mid", "monthly");
+      await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        trial_period_days: 14,
+        collection_method: "charge_automatically",
+        trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
+        metadata: { plan_id: "mid", origin: "auto-free-trial" },
       });
-      await supabase
-        .from("billing_customers")
-        .insert({ user_id: user.id, stripe_customer_id: customer.id })
-        .select()
-        .single();
-      customerId = customer.id;
+
+      serverLogger.info('subscriptionService', 'Created trial subscription', {
+        userId: user.id,
+        customerId,
+        priceId
+      });
+
+      return true;
+    } catch (error: any) {
+      serverLogger.error('subscriptionService', 'Failed to create trial subscription', {
+        userId: user.id,
+        error: error.message
+      });
+      throw error;
     }
-
-    // If any existing sub (active/trialing/past_due/unpaid), bail out
-    const subs = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "all",
-      limit: 5,
-    });
-    const hasAny = subs.data?.some((s) =>
-      ["active", "trialing", "past_due", "unpaid"].includes(String(s.status))
-    );
-    if (hasAny) return false;
-
-    // Create mid plan trial subscription
-    const priceId = await StripeService.getCheckoutPriceForPlan("mid", "monthly");
-    await stripe.subscriptions.create({
-      customer: customerId,
-      items: [{ price: priceId }],
-      trial_period_days: 14,
-      collection_method: "charge_automatically",
-      trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
-      metadata: { plan_id: "mid", origin: "auto-free-trial" },
-    });
-
-    // Note: No local entitlements cache needed - using Stripe-only entitlements
-    // Return true to indicate trial was created
-    return true;
   }
 
   static async getStripeCustomerIdForCurrentUser(): Promise<string | null> {
@@ -197,38 +202,50 @@ export class SubscriptionService {
     return data?.stripe_customer_id ?? null;
   }
 
-  private static getPlanIdFromProduct(product: any): PlanId {
-    // Map Stripe product to plan ID using similar logic to StripeService
-    const productName = (product.name || "").toLowerCase();
-    const byMeta = (product.metadata?.plan_id || product.metadata?.lookup_key || "").toLowerCase();
-    
-    // Check metadata first
-    if (byMeta && ["free-trial","starter","mid","pro","super_25","super_40","super_60"].includes(byMeta)) {
-      return byMeta as PlanId;
+
+  /**
+   * Check if customer has payment methods
+   */
+  private static async checkPaymentMethod(customerId: string): Promise<boolean | null> {
+    try {
+      const stripe = StripeService.getStripe();
+      const paymentMethods = await stripe.paymentMethods.list({ 
+        customer: customerId, 
+        type: 'card' 
+      });
+      return (paymentMethods?.data?.length || 0) > 0;
+    } catch (error) {
+      serverLogger.warn('subscriptionService', 'Failed to check payment methods', {
+        customerId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return null;
     }
-    
-    // Check product name patterns
-    if (productName.includes("mid") || productName.includes("standard")) return "mid";
-    if (productName.includes("pro") || productName.includes("professional")) return "pro";
-    if (productName.includes("starter")) return "starter";
-    if (productName.includes("super") && productName.includes("25")) return "super_25";
-    if (productName.includes("super") && productName.includes("40")) return "super_40";
-    if (productName.includes("super") && productName.includes("60")) return "super_60";
-    if (productName.includes("trial") || productName.includes("free")) return "free-trial";
-    
-    // Default fallback
-    return "free-trial";
   }
 
-  private static getPlanFromFeatureKeys(keys: Set<string>): PlanId | null {
-    // Map your feature lookup keys -> plan ids
-    if (keys.has("pro-access")) return "pro";
-    if (keys.has("mid-access")) return "mid";
-    if (keys.has("starter-access")) return "starter";
-    if (keys.has("super_60-access")) return "super_60";
-    if (keys.has("super_40-access")) return "super_40";
-    if (keys.has("super_25-access")) return "super_25";
-    return null;
+  /**
+   * Clean up invalid customer ID from database
+   */
+  private static async cleanupInvalidCustomer(userId: string, customerId: string): Promise<void> {
+    try {
+      const supabase = await createClient();
+      await supabase
+        .from('billing_customers')
+        .delete()
+        .eq('user_id', userId)
+        .eq('stripe_customer_id', customerId);
+      
+      serverLogger.info('subscriptionService', 'Cleaned up invalid customer mapping', {
+        userId,
+        customerId
+      });
+    } catch (error) {
+      serverLogger.error('subscriptionService', 'Failed to cleanup invalid customer', {
+        userId,
+        customerId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   }
 }
 

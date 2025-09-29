@@ -1,14 +1,8 @@
-export type PlanId =
-  | "free-trial"
-  | "starter"
-  | "mid"
-  | "pro"
-  | "super_25"
-  | "super_40"
-  | "super_60";
+// Use Stripe product IDs instead of local plan IDs
+export type PlanId = string; // Stripe product ID
 
 export interface Entitlements {
-  planId: PlanId;
+  planId: PlanId; // Stripe product ID
   maxDashboards: number; // -1 for unlimited
   maxHAInstances: number; // -1 for unlimited
   trialEndsAt: string | null; // ISO when trial ends
@@ -29,10 +23,28 @@ export interface Plan {
 export interface SubscriptionRecord {
   plan_id: PlanId;
   current_period_end: string; // ISO
-  status: "trialing" | "active" | "past_due" | "canceled" | "incomplete" | "unpaid" | "incomplete_expired";
+  status:
+    | "trialing"
+    | "active"
+    | "past_due"
+    | "canceled"
+    | "incomplete"
+    | "unpaid"
+    | "incomplete_expired";
 }
 
+// Types for simplified subscription data
+export interface SubscriptionData {
+  subscription: any;
+  product: any;
+  price: any;
+  customerId: string;
+  isActive: boolean;
+  isTrial: boolean;
+  trialEndsAt: string | null;
+}
 
+// Public API type derived from SubscriptionData
 export interface SubscriptionSummary {
   status: string;
   planId: PlanId | 'unknown';
