@@ -33,20 +33,22 @@ export default function BillingContent({
   cancelAt,
   planLabel,
   stripePlans = [],
+  currentPriceId = null,
 }: {
   entitlements: Entitlements;
   currentPeriodEnd?: string | null;
   cancelAt?: string | null;
   planLabel?: string | null;
   stripePlans?: Array<Stripe.Price & { product: Stripe.Product }>;
+  currentPriceId?: string | null;
 }) {
   const labelForPlan = (priceId: string) => {
-    if (entitlements.active && entitlements.planId === priceId) {
+    if (entitlements.active && currentPriceId === priceId) {
       return "Current plan";
     }
-    if (entitlements.active && entitlements.planId !== priceId) {
+    if (entitlements.active && currentPriceId !== priceId) {
       // Find current and target plans in Stripe data
-      const currentPlan = stripePlans.find(p => p.id === entitlements.planId);
+      const currentPlan = stripePlans.find(p => p.id === currentPriceId);
       const targetPlan = stripePlans.find(p => p.id === priceId);
       
       if (currentPlan && targetPlan) {
@@ -69,8 +71,8 @@ export default function BillingContent({
   
   // Get plans for current billing cycle
   const currentPlans = billing === "monthly" ? monthlyPlans : yearlyPlans;
-  const isCurrentPaid = (planId: string): boolean => {
-    return entitlements.planId === planId &&
+  const isCurrentPaid = (priceId: string): boolean => {
+    return currentPriceId === priceId &&
       entitlements.active &&
       !entitlements.trialEndsAt;
   };

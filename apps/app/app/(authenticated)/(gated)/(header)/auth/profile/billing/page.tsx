@@ -1,4 +1,4 @@
-import { SubscriptionService, StripeService, SupabaseServer, serverLogger } from "@repo/lib";
+import { SubscriptionService, StripeService, SupabaseServer, serverLogger, getCurrentAuthUser } from "@repo/lib";
 import BillingContent from "./BillingContent";
 import Stripe from "stripe";
 
@@ -32,11 +32,44 @@ export default async function BillingPage() {
 
   // Fetch plans from Stripe
   let stripePlans: Array<Stripe.Price & { product: Stripe.Product }> = [];
+  let currentPriceId: string | null = null;
+  
   try {
     stripePlans = await StripeService.getAllPlans();
     
+    // Get current subscription's price ID
+    if (entitlements.active) {
+      const user = await getCurrentAuthUser();
+      if (user) {
+        const supabase = await SupabaseServer.createClient();
+        const { data: map } = await supabase
+          .from("billing_customers")
+          .select("stripe_customer_id")
+          .eq("user_id", user.id)
+          .single();
+        
+        if (map?.stripe_customer_id) {
+          const stripe = StripeService.getStripe();
+          const subs = await stripe.subscriptions.list({ 
+            customer: map.stripe_customer_id, 
+            status: "all", 
+            limit: 1 
+          });
+          
+          const currentSub = subs.data.find(s => 
+            ["active", "trialing", "past_due", "unpaid"].includes(s.status)
+          );
+          
+          if (currentSub?.items?.data?.[0]?.price?.id) {
+            currentPriceId = currentSub.items.data[0].price.id;
+          }
+        }
+      }
+    }
+    
     serverLogger.info("billing:page", "Fetched Stripe plans", {
       count: stripePlans.length,
+      currentPriceId,
       plans: stripePlans.map(p => ({
         id: p.id,
         productName: p.product.name,
@@ -62,6 +95,7 @@ export default async function BillingPage() {
       cancelAt={cancelAt}
       planLabel={subscription.planLabel ?? null}
       stripePlans={stripePlans}
+      currentPriceId={currentPriceId}
     />
   );
 }
