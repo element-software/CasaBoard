@@ -37,19 +37,25 @@ export const AddInstance = ({
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           description="The name for this instance"
+          required
         />
         <Input
           label="HA URL"
           value={form.hass_url}
           onChange={(e) => setForm({ ...form, hass_url: e.target.value })}
-          description="Home Assistant URL (e.g., http://homeassistant.local:8123)"
+          description="Home Assistant URL (e.g., your-domain.com) - do not include the protocol (https://) or the port (8123)"
+          placeholder="your-domain.com"
+          startContent={
+            <span className="text-primary-400 text-sm">https://</span>
+          }
+          required
         />
       </div>
       <div className="flex justify-end">
         <Button
           color="primary"
           onPress={handleOpenConfirm}
-          isDisabled={!canCreate() || !form.hass_url}
+          isDisabled={!canCreate() || !form.hass_url || !form.name}
           isLoading={isPending}
         >
           Add instance

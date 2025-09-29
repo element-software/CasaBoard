@@ -72,7 +72,7 @@ export class SubscriptionService {
       // Return default entitlements for users without subscriptions
       return {
         planId: "no-subscription", // Use a descriptive ID instead of hardcoded plan
-        maxDashboards: 1,
+        maxDashboards: 3,
         maxHAInstances: 1,
         trialEndsAt: null,
         active: false

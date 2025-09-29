@@ -20,7 +20,7 @@ export default async function SetupPage() {
         </p>
       </div>
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
-        <PagesManagement initialPages={pages} initialError={null} />
+        <PagesManagement initialPages={pages} maxPages={entitlements.maxDashboards} initialError={null} />
         <HAInstanceManager
           entitlements={entitlements}
           compact

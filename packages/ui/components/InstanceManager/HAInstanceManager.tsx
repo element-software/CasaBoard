@@ -43,12 +43,13 @@ export function HAInstanceManager({
   const onCreate = () =>
     startTransition(async () => {
       setError(null);
+      const formattedUrl = `https://${form.hass_url}`;
       try {
         await HAInstanceActions.createHAInstance({
           name: form.name || `Instance ${haInstances.length + 1}`,
-          hass_url: form.hass_url,
+          hass_url: formattedUrl,
         });
-        await connect({ homeAssistantUrl: form.hass_url });
+        await connect({ homeAssistantUrl: formattedUrl });
       } catch (e: any) {
         setError(e?.message || "Failed to create instance");
       }
@@ -59,17 +60,11 @@ export function HAInstanceManager({
       setError(null);
       try {
         await HAInstanceActions.deleteHAInstance(id);
-        await connection?.close();
+        connection?.close();
         router.push("/setup/ha-config");
       } catch (e: any) {
         setError(e?.message || "Failed to delete instance");
       }
-    });
-
-  const onSetActive = (id: string) =>
-    startTransition(async () => {
-      // Deprecated: no-op now that active flag is removed
-      setError(null);
     });
 
   const renderHeader = () => (
