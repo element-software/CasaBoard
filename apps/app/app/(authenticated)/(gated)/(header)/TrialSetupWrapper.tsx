@@ -77,4 +77,5 @@ export default function TrialSetupWrapper({
     );
   }
 
+  return null;
 }
