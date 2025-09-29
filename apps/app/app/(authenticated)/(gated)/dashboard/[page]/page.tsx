@@ -1,6 +1,5 @@
 import { ClientPageWrapper } from "./ClientPageWrapper";
 import { PageActions, SupabaseServer, Encryption, getCurrentAuthUser } from '@repo/lib';
-import { UserSettings } from '@repo/types/userSettings';
 import { notFound } from 'next/navigation';
 
 // Enable dynamic params for unknown routes
@@ -25,7 +24,6 @@ export default async function ConfigurablePage({ params }: PageProps) {
       notFound();
     }
     // Resolve per-page HA instance on the server
-    let preferredHASettings: Partial<UserSettings> | null = null;
     if ((pageData as any)?.ha_instance_id) {
       const supabase = await SupabaseServer.createClient();
       const user = await getCurrentAuthUser();
@@ -44,7 +42,6 @@ export default async function ConfigurablePage({ params }: PageProps) {
               Encryption.generateSessionId(user.id, user.email)
             );
           } catch {}
-          preferredHASettings = { hass_url: instance.hass_url, hass_token: token } as any;
         }
       }
     }
@@ -53,7 +50,6 @@ export default async function ConfigurablePage({ params }: PageProps) {
       <ClientPageWrapper 
         pageName={page}
         pageData={pageData}
-        preferredHASettings={preferredHASettings as any}
       />
     );
   } catch (error) { 

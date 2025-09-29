@@ -1,7 +1,6 @@
 "use client";
 import React, { useTransition, useState } from "react";
 import { Button, Card, CardBody } from "@heroui/react";
-import { HAInstanceActions, UserSettingsActions } from "@repo/lib";
 import { useRouter } from "next/navigation";
 
 export default function HassErrorFallback({ error }: { error: unknown }) {

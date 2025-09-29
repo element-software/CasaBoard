@@ -1,5 +1,4 @@
 export * as PageActions from './actions/pageActions';
-export * as UserSettingsActions from './actions/userSettingsActions';
 export * as SupabaseServer from './supabase/server';
 export * as SupabaseMiddleware from './supabase/middleware';
 export * as SupabaseClient from './supabase/client';
@@ -8,7 +7,6 @@ export { PageService } from './services/pageService';
 export * as BillingService from './services/billingService';
 export { SubscriptionService } from './services/subscriptionService';
 export { StripeService } from './services/stripeService';
-export { StripeEntitlementsService } from './services/stripeEntitlementsService';
 export * as HAInstanceActions from './actions/haInstanceActions';
 export * as Encryption from './encryption';
 export { generateSessionId } from './encryption';

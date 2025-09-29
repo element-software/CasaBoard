@@ -76,5 +76,45 @@ export class StripeService {
     }
     throw new Error(`No active ${interval} price found for plan ${planId}`);
   }
+
+  static async getAllPlans(): Promise<Array<Stripe.Price & { product: Stripe.Product }>> {
+    const stripe = this.getStripe();
+    
+    try {
+      // Fetch all active products
+      const products = await stripe.products.list({
+        active: true,
+        limit: 100,
+      });
+
+      // Get all prices for these products
+      const allPrices = await Promise.all(
+        products.data.map(async (product) => {
+          const prices = await stripe.prices.list({
+            product: product.id,
+            active: true,
+            limit: 100,
+          });
+          return prices.data.map(price => ({
+            ...price,
+            product: product,
+          }));
+        })
+      );
+
+      // Flatten and filter for subscription prices
+      const plans = allPrices
+        .flat()
+        .filter(price => price.type === 'recurring')
+        .sort((a, b) => {
+          // Sort by amount (price)
+          return (a.unit_amount || 0) - (b.unit_amount || 0);
+        });
+
+      return plans;
+    } catch (error) {
+      throw new Error(`Failed to fetch Stripe plans: ${error}`);
+    }
+  }
 }
 

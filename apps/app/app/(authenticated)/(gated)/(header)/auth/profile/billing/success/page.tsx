@@ -1,12 +1,5 @@
 import { redirect } from "next/navigation";
-import {
-  StripeService,
-  SupabaseServer,
-  StripeEntitlementsService,
-  getCurrentAuthUser,
-  serverLogger,
-} from "@repo/lib";
-import Stripe from "stripe";
+import { SubscriptionService, StripeService, SupabaseServer, serverLogger } from "@repo/lib";
 import SuccessContent from "./SuccessContent";
 
 export const dynamic = "force-dynamic";
@@ -16,60 +9,64 @@ export default async function BillingSuccessPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const sessionId = (await searchParams).session_id?.toString();
+  const params = await searchParams;
+  const sessionId = params.session_id?.toString();
+  const upgraded = params.upgraded?.toString() === "true";
 
-  if (!sessionId) {
+  if (!sessionId && !upgraded) {
     return redirect("/auth/profile/billing");
   }
 
-  let planLabel: string | null = null;
-  let currentPeriodEnd: string | null = null;
+  // Fetch current subscription details
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+  const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
+  let cancelAt: string | null = null;
+
+  // Fetch cancellation date if needed
   try {
-    const stripe = StripeService.getStripe();
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    const subscriptionId =
-      typeof session.subscription === "string"
-        ? session.subscription
-        : undefined;
-    if (!subscriptionId) {
-      return redirect("/auth/profile/billing?success=1");
-    }
-
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    const sub: Stripe.Subscription = subscription as any;
-    const planId =
-      (sub.metadata?.plan_id as string | undefined) ||
-      (sub.items?.data?.[0]?.price?.nickname as string | undefined) ||
-      "starter";
-    const status = sub.status as string;
-    const periodEnd =
-      typeof (sub as any).current_period_end === "number"
-        ? new Date(
-            ((sub as any).current_period_end as number) * 1000
-          ).toISOString()
-        : null;
-    currentPeriodEnd = periodEnd;
-    planLabel = (sub.items?.data?.[0]?.price?.product as any)?.name || planId;
-
     const supabase = await SupabaseServer.createClient();
-    const user = await getCurrentAuthUser();
-    if (user) {
-      await supabase.from("subscriptions").insert({
-        user_id: user.id,
-        plan_id: planId,
-        status,
-        current_period_end: periodEnd,
+    const { data: userRow } = await supabase
+      .from("billing_customers")
+      .select("stripe_customer_id")
+      .limit(1)
+      .single();
+    const customerId = userRow?.stripe_customer_id as string | undefined;
+    if (customerId) {
+      const stripe = StripeService.getStripe();
+      const subs = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "all",
+        limit: 1,
       });
-      // After successful checkout, sync user's entitlements cache so gating unlocks immediately
-      await StripeEntitlementsService.syncCurrentUserEntitlements();
+      const sub: any = subs.data[0] as any;
+      const ca = sub?.cancel_at;
+      if (typeof ca === "number")
+        cancelAt = new Date(ca * 1000).toISOString();
     }
   } catch (err) {
-    // ignore and continue to billing
-    serverLogger.error('billing:success', 'Cancel subscription failed');
-    serverLogger.error('billing:success', 'Error', err);
+    serverLogger.error('billing:success', 'Error fetching cancellation details', err);
   }
 
+  serverLogger.info(
+    "billing:success",
+    "subscription",
+    subscription,
+    "cancelAt",
+    cancelAt,
+    "isUpgrade",
+    upgraded,
+    "entitlements",
+    entitlements
+  );
+
   return (
-    <SuccessContent planLabel={planLabel} currentPeriodEnd={currentPeriodEnd} />
+    <SuccessContent 
+      planLabel={subscription.planLabel ?? null} 
+      currentPeriodEnd={subscription.currentPeriodEnd ?? null} 
+      cancelAt={cancelAt}
+      isUpgrade={upgraded}
+      subscription={subscription}
+      entitlements={entitlements}
+    />
   );
 }

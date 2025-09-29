@@ -4,6 +4,8 @@ import {
   HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
+  serverLogger,
+  SubscriptionService,
 } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
@@ -24,34 +26,30 @@ export default async function AuthenticatedLayout({
   // Ensure user is authenticated first
   const authedUser = await getCurrentAuthUser();
   if (!authedUser) {
-    redirect("/auth/login?redirectTo=/setup");
+    redirect("/auth/login?redirectTo=/auth/setup");
+  }
+
+  // Check if user needs trial setup
+  const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
+  const isTrial = subscription.status === 'trialing';
+  
+  // If user has no active subscription, redirect to trial setup
+  if (!isTrial && subscription.status !== 'active') {
+    redirect("/auth/setup");
   }
 
   const haInstance = await HAInstanceActions.getFirstHAInstance();
-
-  const mainContent = () => (
-    <>
-      <Header user={authedUser} />
-      <Breadcrumbs />
-      <div className="min-h-screen">
-        <main className="flex-1">{children}</main>
-      </div>
-      <Footer />
-    </>
-  );
-
-  if (!haInstance) {
-    return (
-      <ConfigurationProvider initialConfig={initialConfig}>
-        {mainContent()}
-      </ConfigurationProvider>
-    );
-  }
+  serverLogger.info("Layout (gated)::", "subscription status", subscription.status, "isTrial", isTrial);
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
       <HassConnectWrapper haInstance={haInstance}>
-        {mainContent()}
+          <Header user={authedUser} isTrial={isTrial} />
+          <Breadcrumbs />
+          <div className="min-h-screen">
+            <main className="flex-1">{children}</main>
+          </div>
+          <Footer />
       </HassConnectWrapper>
     </ConfigurationProvider>
   );

@@ -77,7 +77,7 @@ export function HomePageContent() {
               href={LinkService.crossAppHref("app", "/auth/login")}
               as={Link}
             >
-              Get Started
+              Start 14-Day Free Trial
             </Button>
           </div>
         </div>
@@ -109,7 +109,7 @@ export function HomePageContent() {
           <CardHeader className="text-center flex flex-col pb-4">
             <h2 className="text-3xl font-bold text-theme-text">How It Works</h2>
             <p className="text-theme-text-secondary text-lg">
-              Get started with CasaBoard in just a few simple steps
+              Get a 14-day free trial with CasaBoard in just a few simple steps
             </p>
           </CardHeader>
           <CardBody>
@@ -119,10 +119,10 @@ export function HomePageContent() {
                   1
                 </div>
                 <h3 className="text-lg font-semibold text-theme-text mb-2">
-                  Sign In
+                  Sign Up
                 </h3>
                 <p className="text-theme-text-secondary text-sm">
-                  Connect with your Google account for secure authentication
+                  Create an account with your Google account for secure authentication
                 </p>
               </div>
               <div className="text-center">
