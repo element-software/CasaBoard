@@ -13,6 +13,10 @@ export const HassConnectWrapper = ({
   children,
   haInstance,
 }: HassConnectWrapperProps) => {
+  if (!haInstance) {
+    return children;
+  }
+  
   return (
     <HAProvider
       hassUrl={haInstance.hass_url}

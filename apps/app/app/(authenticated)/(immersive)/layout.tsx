@@ -1,15 +1,12 @@
 import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
 import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
-import { Header } from "@repo/ui/components/Header/Header";
 import {
   HAInstanceActions,
-  SupabaseServer,
-  Encryption,
   ConfigService,
   getCurrentAuthUser,
   serverLogger,
+  SubscriptionService,
 } from "@repo/lib";
-import { generateSessionId } from "@repo/lib";
 import { Footer } from "@repo/ui/components/Footer";
 import { redirect } from "next/navigation";
 
@@ -30,12 +27,13 @@ export default async function AuthenticatedLayout({
     redirect("/auth/login?redirectTo=/");
   }
 
-  // On first login, ensure a 14-day mid plan trial exists
-  try {
-    const { SubscriptionService } = await import("@repo/lib");
-    await SubscriptionService.ensureTrialOnFirstLogin();
-  } catch {
-    serverLogger.error("Layout (immersive)::", "Failed to ensure trial on first login");
+  // Check if user needs trial setup
+  const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
+  const isTrial = subscription.status === 'trialing';
+  
+  // If user has no active subscription, redirect to trial setup
+  if (!isTrial && subscription.status !== 'active') {
+    redirect("/auth/setup");
   }
 
   // Fetch first instance (pages are tied per-instance; active flag removed)

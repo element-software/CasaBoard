@@ -70,34 +70,55 @@ export async function POST(req: NextRequest) {
       }
       break;
     }
-    case "customer.subscription.updated":
-    case "customer.subscription.created":
-    case "customer.subscription.deleted": {
-      serverLogger.info(
-        "stripe:webhook",
-        "event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted"
-      );
+    case "customer.subscription.created": {
+      serverLogger.info("stripe:webhook", "event.type: customer.subscription.created");
       const sub: any = event.data.object;
       let userId: string | null = sub?.metadata?.user_id || null;
-      serverLogger.info('stripe:webhook', 'userId', userId, "customer", sub?.customer);
+      
       if (!userId && sub?.customer) {
-        serverLogger.info(
-          "stripe:webhook",
-          "No user ID found, looking up by stripe customer ID"
-        );
+        serverLogger.info("stripe:webhook", "No user ID found, looking up by stripe customer ID");
         const { data: map } = await supabase
           .from("billing_customers")
           .select("user_id")
           .eq("stripe_customer_id", sub.customer as string)
           .single();
         userId = map?.user_id ?? null;
-          serverLogger.info('stripe:webhook', 'Found user ID', userId);
+        serverLogger.info('stripe:webhook', 'Found user ID', userId);
       }
+      
       if (userId) {
-        serverLogger.info(
-          "stripe:webhook",
-          "event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted, Updating subscription"
-        );
+        // Check if this is a new paid subscription (not a trial)
+        const isPaidSubscription = sub.status === 'active' && !sub.trial_end;
+        const isFromTrialUpgrade = sub.metadata?.origin === 'auto-free-trial';
+        
+        serverLogger.info('stripe:webhook', 'New subscription created', {
+          subscriptionId: sub.id,
+          status: sub.status,
+          isPaidSubscription,
+          isFromTrialUpgrade,
+          trialEnd: sub.trial_end
+        });
+        
+        // Handle trial upgrade - cancel the old trial subscription
+        if (isPaidSubscription && sub.metadata?.origin === 'trial-upgrade') {
+          const existingSubId = sub.metadata?.existing_subscription_id;
+          serverLogger.info('stripe:webhook', 'New paid subscription created from trial upgrade', {
+            subscriptionId: sub.id,
+            planId: sub.metadata?.plan_id,
+            existingSubId
+          });
+          
+          if (existingSubId) {
+            try {
+              await stripe.subscriptions.cancel(existingSubId);
+              serverLogger.info('stripe:webhook', 'Cancelled old trial subscription', existingSubId);
+            } catch (err) {
+              serverLogger.warn('stripe:webhook', 'Failed to cancel old trial subscription', existingSubId, err);
+            }
+          }
+        }
+        
+        // Update subscription record
         const periodEndIso =
           typeof sub?.current_period_end === "number"
             ? new Date(sub.current_period_end * 1000).toISOString()
@@ -111,12 +132,58 @@ export async function POST(req: NextRequest) {
           status: sub.status,
           current_period_end: periodEndIso,
         });
-        // No local user_entitlements cache anymore
       } else {
-        serverLogger.info(
-          "stripe:webhook",
-          "event.type: customer.subscription.updated, customer.subscription.created, customer.subscription.deleted, No user ID found when updating subscription"
-        );
+        serverLogger.info("stripe:webhook", "No user ID found when creating subscription");
+      }
+      break;
+    }
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted": {
+      serverLogger.info(
+        "stripe:webhook",
+        "event.type: customer.subscription.updated, customer.subscription.deleted"
+      );
+      const sub: any = event.data.object;
+      let userId: string | null = sub?.metadata?.user_id || null;
+      
+      if (!userId && sub?.customer) {
+        serverLogger.info("stripe:webhook", "No user ID found, looking up by stripe customer ID");
+        const { data: map } = await supabase
+          .from("billing_customers")
+          .select("user_id")
+          .eq("stripe_customer_id", sub.customer as string)
+          .single();
+        userId = map?.user_id ?? null;
+        serverLogger.info('stripe:webhook', 'Found user ID', userId);
+      }
+      
+      if (userId) {
+        serverLogger.info("stripe:webhook", "Updating subscription", {
+          subscriptionId: sub.id,
+          status: sub.status,
+          planId: sub.metadata?.plan_id,
+          origin: sub.metadata?.origin
+        });
+        
+        const periodEndIso =
+          typeof sub?.current_period_end === "number"
+            ? new Date(sub.current_period_end * 1000).toISOString()
+            : null;
+        
+        // Use upsert to handle both new subscriptions and updates
+        await supabase.from("subscriptions").upsert({
+          user_id: userId,
+          plan_id:
+            sub.items?.data?.[0]?.price?.nickname ??
+            sub.metadata?.plan_id ??
+            "starter",
+          status: sub.status,
+          current_period_end: periodEndIso,
+        }, {
+          onConflict: 'user_id'
+        });
+      } else {
+        serverLogger.info("stripe:webhook", "No user ID found when updating subscription");
       }
       break;
     }

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customer.id,
-      return_url: `${origin}/billing`,
+      return_url: `${origin}/auth/profile/billing`,
     });
     return NextResponse.redirect(session.url, { status: 303 });
   } catch (error) {

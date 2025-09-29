@@ -43,47 +43,73 @@ export async function POST(req: NextRequest) {
     const existingSubs = await stripe.subscriptions.list({ 
       customer: existingCustomerId, 
       status: 'all', 
-      limit: 5 
+      limit: 10 
     });
+    
+    // Look for trial subscription with auto-free-trial origin, regardless of current status
     const trialSub = existingSubs.data.find(s => 
-      s.status === 'trialing' && 
-      s.metadata?.origin === 'auto-free-trial'
+      s.metadata?.origin === 'auto-free-trial' &&
+      ['trialing', 'active', 'past_due', 'unpaid'].includes(s.status)
     );
+    
+    serverLogger.info('stripe:checkout', 'Found existing subscriptions', {
+      count: existingSubs.data.length,
+      subs: existingSubs.data.map(s => ({
+        id: s.id,
+        status: s.status,
+        origin: s.metadata?.origin,
+        trial_end: s.trial_end
+      })),
+      trialSub: trialSub ? { id: trialSub.id, status: trialSub.status } : null
+    });
 
     if (trialSub) {
-      // Update existing trial subscription to paid
-      serverLogger.info('stripe:checkout', 'Updating existing trial subscription', trialSub.id);
+      // For trial users, create a checkout session that will update the existing subscription
+      serverLogger.info('stripe:checkout', 'Creating checkout session for trial upgrade', {
+        trialSubId: trialSub.id,
+        status: trialSub.status,
+        requestedPlan: plan
+      });
       
-      // Update subscription items to new price
-      await stripe.subscriptions.update(trialSub.id, {
-        items: [{
-          id: trialSub.items.data[0].id,
-          price: price,
-        }],
+      const origin = req.headers.get("origin") || new URL(req.url).origin;
+
+      // end the trial
+      const updatedTrialSub = await stripe.subscriptions.update(trialSub.id, {
+        trial_end: 'now',
+        items: [{ price, quantity: 1 }],
+        proration_behavior: 'none',
+      });
+
+      // get the latest invoice ID
+      const latestInvoice = updatedTrialSub.latest_invoice
+
+      // create the checkout session
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer: existingCustomerId,
+        line_items: [{ price, quantity: 1 }],
+        success_url: `${origin}/auth/profile/billing/success?session_id={CHECKOUT_SESSION_ID}&upgraded=true`,
+        cancel_url: `${origin}/auth/profile/billing?canceled=true`,
+        client_reference_id: user.id,
         metadata: { 
           user_id: user.id, 
           plan_id: plan, 
-          interval,
-          origin: 'upgraded-from-trial'
+          interval, 
+          origin: 'trial-upgrade',
+          existing_subscription_id: trialSub.id
         },
-        // Remove trial settings to make it paid immediately
-        trial_settings: undefined,
+        subscription_data: {
+          metadata: { 
+            user_id: user.id, 
+            plan_id: plan, 
+            interval, 
+            origin: 'trial-upgrade',
+            existing_subscription_id: trialSub.id,
+          },
+        },
       });
-
-      // Clean up any local entitlements cache since we're now using Stripe-only
-      try {
-        await supabase
-          .from("user_entitlements")
-          .delete()
-          .eq("user_id", user.id);
-        serverLogger.info('stripe:checkout', 'Cleaned up local entitlements cache');
-      } catch (err) {
-        serverLogger.warn('stripe:checkout', 'Failed to clean up local entitlements', err);
-      }
-
-      serverLogger.info('stripe:checkout', 'Successfully updated trial subscription to paid');
-      const origin = req.headers.get("origin") || new URL(req.url).origin;
-      return NextResponse.redirect(`${origin}/auth/profile/billing/success?upgraded=true`, { status: 303 });
+      
+      return NextResponse.redirect(session.url!, { status: 303 });
     }
 
     // No existing trial subscription, create new checkout session
@@ -94,18 +120,18 @@ export async function POST(req: NextRequest) {
       customer: existingCustomerId ?? undefined,
       customer_email: existingCustomerId ? undefined : (user.email ?? undefined),
       line_items: [{ price, quantity: 1 }],
-      success_url: `${origin}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/billing?canceled=true`,
+      success_url: `${origin}/auth/profile/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/auth/profile/billing?canceled=true`,
       // Attach metadata to the Checkout Session AND the Subscription that will be created
       client_reference_id: user.id,
-      metadata: { user_id: user.id, plan_id: plan, interval },
+      metadata: { user_id: user.id, plan_id: plan, interval, origin: 'auto-free-trial' },
       subscription_data: {
-        metadata: { user_id: user.id, plan_id: plan, interval },
+        metadata: { user_id: user.id, plan_id: plan, interval, origin: 'auto-free-trial' },
       },
     });
     return NextResponse.redirect(session.url!, { status: 303 });
   } catch (error) {
     serverLogger.error('stripe:checkout', 'Checkout init failed', error);
-    return NextResponse.json({ error: "Checkout init failed" }, { status: 500 });
+    return NextResponse.json({ error: "Checkout init failed", details: error }, { status: 500 });
   }
 }

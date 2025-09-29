@@ -144,12 +144,12 @@ export class SubscriptionService {
    * - Creates Stripe customer record and local mapping if missing
    * - Creates a subscription with trial_period_days=14 (no payment method required)
    * - Cancels automatically at trial end if no payment method added
-   * - Grants local 'mid-access' entitlement immediately so the app is usable
+   * - Returns true if a trial was created, false if user already has a subscription
    */
-  static async ensureTrialOnFirstLogin(): Promise<void> {
+  static async ensureTrialOnFirstLogin(): Promise<boolean> {
     const supabase = await createClient();
     const user = await getCurrentAuthUser();
-    if (!user) return;
+    if (!user) return false;
 
     // Resolve Stripe customer id mapping
     let customerId = await this.getStripeCustomerIdForCurrentUser();
@@ -177,7 +177,7 @@ export class SubscriptionService {
     const hasAny = subs.data?.some((s) =>
       ["active", "trialing", "past_due", "unpaid"].includes(String(s.status))
     );
-    if (hasAny) return;
+    if (hasAny) return false;
 
     // Create mid plan trial subscription
     const priceId = await StripeService.getCheckoutPriceForPlan("mid", "monthly");
@@ -191,8 +191,8 @@ export class SubscriptionService {
     });
 
     // Note: No local entitlements cache needed - using Stripe-only entitlements
-
-    redirect(LinkService.crossAppHref("app", "/setup"));
+    // Return true to indicate trial was created
+    return true;
   }
 
   static async getStripeCustomerIdForCurrentUser(): Promise<string | null> {

@@ -89,6 +89,7 @@ export default function BillingContent({
     entitlements.planId === entitlements.planId &&
     entitlements.active &&
     !entitlements.trialEndsAt;
+
   return (
     <div className="max-w-7xl w-full mx-auto py-10 px-4">
       <div className="mb-8 flex flex-row items-center justify-between">
@@ -142,9 +143,9 @@ export default function BillingContent({
             href="/api/billing/portal"
             variant="bordered"
             color="primary"
-            className="min-w-[180px]"
+            className="p-2 px-4 min-w-[230px] ml-4"
           >
-            Manage Subscription
+            Manage Subscription in Stripe
           </Button>
         )}
       </div>
@@ -234,8 +235,11 @@ export default function BillingContent({
                     >
                       {labelForPlan(p.id)}
                     </Button>
-                    {/* Hide cancel button if in trial (ongoing or ended) */}
-                    {isCurrentPaid && !entitlements.trialEndsAt && (
+                  </form>
+                  {/* Hide cancel button if in trial (ongoing or ended) */}
+                  {isCurrentPaid &&
+                    !entitlements.trialEndsAt &&
+                    !cancelAt && (
                       <div className="mt-8 flex items-center justify-center">
                         <Button
                           color="danger"
@@ -246,7 +250,6 @@ export default function BillingContent({
                         </Button>
                       </div>
                     )}
-                  </form>
                   <form
                     ref={cancelFormRef}
                     action="/api/billing/cancel"
