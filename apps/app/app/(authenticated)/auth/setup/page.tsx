@@ -15,7 +15,7 @@ export default async function AuthSetupPage() {
   const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
   if (subscription.status === 'trialing' || subscription.status === 'active') {
     // User already has a subscription, redirect to main setup
-    redirect(LinkService.crossAppHref("app", "/setup"));
+    redirect("/setup");
   }
 
   // Create trial subscription for first-time user
