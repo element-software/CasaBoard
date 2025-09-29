@@ -39,8 +39,11 @@ export default function BillingContent({
   planLabel?: string | null;
 }) {
   const labelForPlan = (planId: string) => {
-    if (entitlements.active && (currentPeriodEnd || cancelAt)) {
-      return entitlements.planId === planId ? "Current plan" : "Upgrade";
+    if (entitlements.active && entitlements.planId === planId) {
+      return "Current plan";
+    }
+    if (entitlements.active && entitlements.planId !== planId) {
+      return "Upgrade";
     }
     return "Subscribe";
   };
@@ -85,10 +88,11 @@ export default function BillingContent({
       ],
     },
   ] as const;
-  const isCurrentPaid =
-    entitlements.planId === entitlements.planId &&
-    entitlements.active &&
-    !entitlements.trialEndsAt;
+  const isCurrentPaid = (planId: string): boolean => {
+    return entitlements.planId === planId &&
+      entitlements.active &&
+      !entitlements.trialEndsAt;
+  };
 
   return (
     <div className="max-w-7xl w-full mx-auto py-10 px-4">
@@ -137,7 +141,7 @@ export default function BillingContent({
             )}
           </div>
         </div>
-        {isCurrentPaid && (
+        {entitlements.active && !entitlements.trialEndsAt && (
           <Button
             as={Link}
             href="/api/billing/portal"
@@ -176,11 +180,6 @@ export default function BillingContent({
 
         <div className="w-full grid gap-6 md:grid-cols-3">
           {plans.map((p, idx) => {
-            // Disable subscribe only when this is the current paid (non‑trial) plan
-            const isCurrentPaid =
-              entitlements.planId === p.id &&
-              entitlements.active &&
-              !entitlements.trialEndsAt;
             const isPopular = p.popular === true;
             const price = billing === "monthly" ? p.monthly : p.yearly;
             const monthlyTotal = p.monthly * 12;
@@ -201,8 +200,15 @@ export default function BillingContent({
                     </span>
                   )}
                   <div className="space-y-1">
-                    <div className="text-sm text-foreground-500 font-medium">
-                      {billing === "monthly" ? "Monthly" : "Yearly"}
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-foreground-500 font-medium">
+                        {billing === "monthly" ? "Monthly" : "Yearly"}
+                      </div>
+                      {isCurrentPaid(p.id) && (
+                        <Chip color="success" variant="flat" size="sm">
+                          ACTIVE
+                        </Chip>
+                      )}
                     </div>
                     <h3 className="text-lg font-semibold">{p.name}</h3>
                   </div>
@@ -231,13 +237,13 @@ export default function BillingContent({
                       color="primary"
                       type="submit"
                       className="w-full"
-                      isDisabled={isCurrentPaid}
+                      isDisabled={isCurrentPaid(p.id)}
                     >
                       {labelForPlan(p.id)}
                     </Button>
                   </form>
                   {/* Hide cancel button if in trial (ongoing or ended) */}
-                  {isCurrentPaid &&
+                  {isCurrentPaid(p.id) &&
                     !entitlements.trialEndsAt &&
                     !cancelAt && (
                       <div className="mt-8 flex items-center justify-center">
