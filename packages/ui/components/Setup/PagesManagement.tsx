@@ -105,7 +105,7 @@ export const PagesManagement = ({
   // Show loading state for entitlements
   if (entitlementsLoading) {
     return (
-      <Skeleton className="w-full h-full rounded-lg" />
+      <Skeleton className="w-full h-full min-h-72 rounded-lg" />
     );
   }
 
