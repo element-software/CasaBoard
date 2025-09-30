@@ -1,7 +1,6 @@
-import { PagesList } from "@repo/ui/components/Setup/PagesList";
 import { PageActions, SubscriptionService, serverLogger } from "@repo/lib";
 import Link from "next/link";
-import { PagesManagement } from "@repo/ui/components/Setup/PagesManagement";
+import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
 
 // Enable dynamic params for unknown routes
 export const dynamicParams = true;

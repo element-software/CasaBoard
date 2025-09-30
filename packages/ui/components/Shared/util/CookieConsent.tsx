@@ -10,7 +10,7 @@ import {
   Checkbox,
   Link as UiLink,
 } from "@heroui/react";
-import { CasaBoardLogo } from "./Logo";
+import { CasaBoardLogo } from "../../Logo";
 
 type CookieConsentProps = {
   onAccept?: () => void;

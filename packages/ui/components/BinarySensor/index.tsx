@@ -2,7 +2,7 @@
 import { Card, CardBody, Chip, cn } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiMotionSensor, mdiAlert } from "@mdi/js";
-import EntityIcon from "@repo/ui/components/EntityIcon";
+import EntityIcon from "@/components/Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import { useEntity } from "@repo/ha";
 

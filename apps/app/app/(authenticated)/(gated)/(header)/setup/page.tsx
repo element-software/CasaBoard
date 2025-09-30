@@ -1,6 +1,6 @@
-import { QuickActions } from "@repo/ui/components/Setup/QuickActions";
+import { QuickActions } from "@repo/ui/components/QuickActions/index";
 import { HAInstanceActions, PageActions, SubscriptionService } from "@repo/lib";
-import { PagesManagement } from "@repo/ui/components/Setup/PagesManagement";
+import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
 import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanceManager";
 
 export const dynamic = "force-dynamic";

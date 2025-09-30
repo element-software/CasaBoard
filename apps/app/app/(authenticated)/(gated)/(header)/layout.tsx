@@ -1,5 +1,5 @@
-import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
-import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
+import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
+import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import {
   HAInstanceActions,
   ConfigService,
@@ -9,7 +9,7 @@ import {
 } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
-import { Footer } from "@repo/ui/components/Footer";
+import { Footer } from "@repo/ui/components/Shared/Footer/index";
 import { Breadcrumbs } from "@repo/ui/components/Breadcrumbs/index";
 
 // Force dynamic rendering for this layout since it uses cookies

@@ -2,7 +2,7 @@
 import React from "react";
 import HassErrorFallback from "./HassErrorFallback";
 import { HAProvider } from "@repo/ha";
-import { HAInstance } from "./InstanceManager/HAInstance";
+import { HAInstance } from "../../InstanceManager/HAInstance";
 
 interface HassConnectWrapperProps {
   children: React.ReactNode;

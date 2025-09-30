@@ -1,5 +1,5 @@
 import { SubscriptionService } from "@repo/lib";
-import { AccessBlocked } from "@repo/ui/components/AccessBlocked";
+import { AccessBlocked } from "@repo/ui/components/Shared/util/AccessBlocked";
 
 export const dynamic = 'force-dynamic';
 

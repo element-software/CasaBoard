@@ -1,4 +1,4 @@
-import { AnalyticsWrapper } from "@repo/ui/components/AnalyticsWrapper";
+import { AnalyticsWrapper } from "@repo/ui/components/Shared/util/AnalyticsWrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";

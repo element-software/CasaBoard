@@ -4,7 +4,7 @@ import { Card, CardBody, Switch as HeroSwitch, Chip } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiPower, mdiAlert } from "@mdi/js";
 import { useCallback } from "react";
-import EntityIcon from "@repo/ui/components/EntityIcon";
+import EntityIcon from "@/components/Shared/util/EntityIcon";
 
 interface SwitchProps {
   entityId: string;

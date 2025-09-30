@@ -9,14 +9,13 @@ import {
   EntitiesCardConfig,
   CustomGridConfig,
 } from "@repo/config";
-import { Light } from "./Light";
-import { Alarm } from "./Alarm";
-import { BinarySensor } from "./BinarySensor";
-import GraphCard from "./GraphCard";
-import EntitiesCard from "./EntitiesCard";
-import EntityCard from "./EntitiesCard/EntityCard";
+import { Light } from "../Light";
+import { Alarm } from "../Alarm";
+import { BinarySensor } from "../BinarySensor";
+import GraphCard from "../GraphCard";
+import EntitiesCard from "../EntitiesCard";
+import EntityCard from "../EntitiesCard/EntityCard";
 import classNames from "classnames";
-import ClientOnly from "./ClientOnly";
 import { clientLogger } from "@repo/lib";
 
 interface ComponentRendererProps {
@@ -101,9 +100,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
             />
           ))}
           {(customGridConfig.children || []).map((childConfig, index) => (
-            <ClientOnly>
-              <ComponentRenderer key={`child-${index}`} config={childConfig} />
-            </ClientOnly>
+            <ComponentRenderer key={`child-${index}`} config={childConfig} />
           ))}
         </div>
       );

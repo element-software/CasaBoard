@@ -1,5 +1,5 @@
 "use client";
-import { PuckRenderer } from "@repo/ui/components/PuckRenderer";
+import { PuckRenderer } from "@repo/ui/components/puck/PuckRenderer";
 import { Page } from "@repo/types/page";
 
 interface ClientPageWrapperProps {
