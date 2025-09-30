@@ -1,5 +1,5 @@
 import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanceManager";
-import { HAInstanceActions, SubscriptionService } from "@repo/lib";
+import { HAInstanceActions } from "@repo/lib";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant } from "@mdi/js";
 import { CleanAuthUrl } from "./clean-auth-url";
@@ -8,7 +8,6 @@ import { CleanAuthUrl } from "./clean-auth-url";
 export const dynamic = "force-dynamic";
 
 export default async function HAConfigPage() {
-  const ent = await SubscriptionService.getEntitlementsForCurrentUser();
   const haInstances = await HAInstanceActions.listHAInstances();
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -30,10 +29,6 @@ export default async function HAConfigPage() {
       </div>
 
       <HAInstanceManager
-        entitlements={{
-          maxHAInstances: ent.maxHAInstances,
-          active: ent.active,
-        }}
         haInstances={haInstances}
       />
     </div>
