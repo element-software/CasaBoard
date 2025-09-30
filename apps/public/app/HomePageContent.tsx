@@ -5,7 +5,6 @@ import Icon from "@mdi/react";
 import {
   mdiArrowRight,
   mdiCog,
-  mdiEye,
   mdiDrag,
   mdiShield,
   mdiCloud,

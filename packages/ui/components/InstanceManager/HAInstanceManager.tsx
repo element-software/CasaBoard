@@ -1,31 +1,27 @@
 "use client";
 import { useState, useTransition } from "react";
 import { HAInstanceActions, LinkService } from "@repo/lib";
-import { Card, CardBody, Link, Button } from "@heroui/react";
+import { Card, CardBody, Link, Button, Spinner, Skeleton } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
 import { useHA } from "@repo/ha";
+import { Entitlements } from "@repo/types/subscription";
 import Icon from "@mdi/react";
-import { mdiHomeAssistant, mdiPlus, mdiArrowRight } from "@mdi/js";
+import { mdiHomeAssistant, mdiPlus, mdiArrowRight, mdiAlertCircle } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
 import { AddInstance } from "./AddInstance";
 
 interface HAInstanceManagerProps {
-  entitlements: EntitlementsInput;
   compact?: boolean;
   haInstances: HAInstance[];
-}
-
-interface EntitlementsInput {
-  maxHAInstances: number;
-  active: boolean;
+  entitlements: Entitlements;
 }
 
 export function HAInstanceManager({
-  entitlements,
   compact = false,
   haInstances,
+  entitlements,
 }: HAInstanceManagerProps) {
   const { connection } = useHA();
 
@@ -34,10 +30,14 @@ export function HAInstanceManager({
   const [form, setForm] = useState({ name: "", hass_url: "" });
   const router = useRouter();
 
+  // Helper functions for entitlements
+  const canCreateHAInstance = (currentCount: number) => {
+    if (!entitlements?.active) return false;
+    return entitlements.maxHAInstances === -1 || currentCount < entitlements.maxHAInstances;
+  };
+
   const canCreate = () => {
-    if (!entitlements || !entitlements.active) return false;
-    if (entitlements.maxHAInstances < 0) return true;
-    return haInstances.length < entitlements.maxHAInstances;
+    return canCreateHAInstance(haInstances.length);
   };
 
   const onCreate = () =>
@@ -148,6 +148,7 @@ export function HAInstanceManager({
     );
   };
 
+
   return (
     <Card className="w-full">
       {renderHeader()}
@@ -165,7 +166,7 @@ export function HAInstanceManager({
         }
 
         {!compact && (
-          canCreate() && entitlements ? (
+          canCreate() ? (
             <div data-create-form>
               {renderCreateForm()}
             </div>
