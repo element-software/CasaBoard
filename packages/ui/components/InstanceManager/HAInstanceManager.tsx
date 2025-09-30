@@ -5,7 +5,7 @@ import { Card, CardBody, Link, Button, Spinner, Skeleton } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
 import { useHA } from "@repo/ha";
-import { useEntitlementCheck } from "@repo/hooks/useEntitlements";
+import { Entitlements } from "@repo/types/subscription";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant, mdiPlus, mdiArrowRight, mdiAlertCircle } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
@@ -15,11 +15,13 @@ import { AddInstance } from "./AddInstance";
 interface HAInstanceManagerProps {
   compact?: boolean;
   haInstances: HAInstance[];
+  entitlements: Entitlements;
 }
 
 export function HAInstanceManager({
   compact = false,
   haInstances,
+  entitlements,
 }: HAInstanceManagerProps) {
   const { connection } = useHA();
 
@@ -28,14 +30,11 @@ export function HAInstanceManager({
   const [form, setForm] = useState({ name: "", hass_url: "" });
   const router = useRouter();
 
-  // Get entitlements for conditional rendering
-  const { 
-    entitlements, 
-    loading: entitlementsLoading, 
-    error: entitlementsError,
-    canCreateHAInstance,
-    getRemainingHAInstances 
-  } = useEntitlementCheck();
+  // Helper functions for entitlements
+  const canCreateHAInstance = (currentCount: number) => {
+    if (!entitlements?.active) return false;
+    return entitlements.maxHAInstances === -1 || currentCount < entitlements.maxHAInstances;
+  };
 
   const canCreate = () => {
     return canCreateHAInstance(haInstances.length);
@@ -149,38 +148,6 @@ export function HAInstanceManager({
     );
   };
 
-  // Show loading state for entitlements
-  if (entitlementsLoading) {
-    return (
-      <Skeleton className="w-full h-full min-h-72 rounded-lg" />
-    );
-  }
-
-  // Show error state for entitlements
-  if (entitlementsError) {
-    return (
-      <Card className="w-full">
-        <CardBody className="text-center py-8">
-          <div className="w-16 h-16 mx-auto mb-4 bg-danger-100 rounded-2xl flex items-center justify-center">
-            <Icon path={mdiAlertCircle} className="w-8 h-8 text-danger" />
-          </div>
-          <h3 className="text-lg font-semibold text-theme-text mb-2">
-            Error Loading Entitlements
-          </h3>
-          <p className="text-theme-text-secondary mb-4">
-            {entitlementsError}
-          </p>
-          <Button
-            color="primary"
-            variant="flat"
-            onPress={() => window.location.reload()}
-          >
-            Retry
-          </Button>
-        </CardBody>
-      </Card>
-    );
-  }
 
   return (
     <Card className="w-full">

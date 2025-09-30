@@ -1,11 +1,12 @@
 import { QuickActions } from "@repo/ui/components/Setup/QuickActions";
-import { HAInstanceActions, PageActions } from "@repo/lib";
+import { HAInstanceActions, PageActions, SubscriptionService } from "@repo/lib";
 import { PagesManagement } from "@repo/ui/components/Setup/PagesManagement";
 import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanceManager";
 
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
   const haInstances = await HAInstanceActions.listHAInstances();
   const pages = await PageActions.getAllPages();
   return (
@@ -18,10 +19,16 @@ export default async function SetupPage() {
         </p>
       </div>
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
-        <PagesManagement initialPages={pages} initialError={null} />
+        <PagesManagement 
+          initialPages={pages} 
+          initialError={null} 
+          compact 
+          entitlements={entitlements}
+        />
         <HAInstanceManager
           compact
           haInstances={haInstances}
+          entitlements={entitlements}
         />
       </div>
       {/* Quick Actions */}

@@ -2,7 +2,7 @@
 import { useState, useTransition } from "react";
 import { PageService } from "@repo/lib";
 import { Page } from "@repo/types/page";
-import { useEntitlementCheck } from "@repo/hooks/useEntitlements";
+import { Entitlements } from "@repo/types/subscription";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import {
@@ -10,7 +10,6 @@ import {
   mdiPencil,
   mdiTrashCan,
   mdiEye,
-  mdiRefresh,
   mdiWeb,
   mdiPublish,
   mdiEyeOff,
@@ -18,35 +17,56 @@ import {
   mdiAlertCircle,
   mdiClock,
   mdiHomeAssistant,
+  mdiDotsVertical,
 } from "@mdi/js";
-import { Button, Card, CardBody, CardHeader, Chip, Skeleton, Spinner } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Skeleton,
+  Spinner,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  cn,
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
   initialPages?: Page[];
   initialError?: string | null;
+  compact?: boolean;
+  entitlements: Entitlements;
 }
 
 export const PagesManagement = ({
   showAllPages = false,
   initialPages = [],
   initialError = null,
+  compact = false,
+  entitlements,
 }: PagesManagementProps) => {
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  
-  // Get entitlements for conditional rendering
-  const { 
-    entitlements, 
-    loading: entitlementsLoading, 
-    error: entitlementsError,
-    canCreateDashboard,
-    getRemainingDashboards 
-  } = useEntitlementCheck();
+
+  // Helper functions for entitlements
+  const canCreateDashboard = (currentCount: number) => {
+    if (!entitlements?.active) return false;
+    return entitlements.maxDashboards === -1 || currentCount < entitlements.maxDashboards;
+  };
+
+  const getRemainingDashboards = (currentCount: number) => {
+    if (!entitlements?.active) return 0;
+    if (entitlements.maxDashboards === -1) return Infinity;
+    return Math.max(0, entitlements.maxDashboards - currentCount);
+  };
 
   const handleDeletePage = async (slug: string, pageName: string) => {
     if (
@@ -99,48 +119,22 @@ export const PagesManagement = ({
   };
 
   // Determine how many pages to show based on entitlements
-  const maxDisplayPages = entitlements?.maxDashboards === -1 ? pages.length : (entitlements?.maxDashboards || 3);
+  const maxDisplayPages =
+    entitlements?.maxDashboards === -1
+      ? pages.length
+      : entitlements?.maxDashboards || 3;
   const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
-
-  // Show loading state for entitlements
-  if (entitlementsLoading) {
-    return (
-      <Skeleton className="w-full h-full min-h-72 rounded-lg" />
-    );
-  }
-
-  // Show error state for entitlements
-  if (entitlementsError) {
-    return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 mx-auto mb-4 bg-danger-100 rounded-2xl flex items-center justify-center">
-          <Icon path={mdiAlertCircle} className="w-8 h-8 text-danger" />
-        </div>
-        <h3 className="text-lg font-semibold text-theme-text mb-2">
-          Error Loading Entitlements
-        </h3>
-        <p className="text-theme-text-secondary mb-4">
-          {entitlementsError}
-        </p>
-        <Button
-          color="primary"
-          variant="flat"
-          onPress={() => window.location.reload()}
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="flex items-center gap-3">
-          <Spinner size="sm" />
-          <span className="text-theme-text-secondary">Loading pages...</span>
-        </div>
-      </div>
+      <Card className="w-full">
+        <CardBody className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <Spinner size="sm" />
+            <span className="text-theme-text-secondary">Loading pages...</span>
+          </div>
+        </CardBody>
+      </Card>
     );
   }
 
@@ -148,19 +142,19 @@ export const PagesManagement = ({
     return (
       <Card className="border-red-200 bg-red-50">
         <CardBody className="text-center py-6">
-          <Icon
-            path={mdiAlertCircle}
-            className="w-8 h-8 text-red-500 mx-auto mb-3"
-          />
-          <p className="text-red-600 mb-3">{error}</p>
+          <div className="w-12 h-12 mx-auto mb-3 bg-red-100 rounded-full flex items-center justify-center">
+            <Icon path={mdiAlertCircle} className="w-6 h-6 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-red-800 mb-2">
+            Error Loading Pages
+          </h3>
+          <p className="text-red-600 mb-4">{error}</p>
           <Button
-            color="danger"
-            variant="bordered"
-            size="sm"
-            onPress={() => router.refresh()}
-            startContent={<Icon path={mdiRefresh} className="w-4 h-4" />}
+            color="primary"
+            variant="flat"
+            onPress={() => window.location.reload()}
           >
-            Try Again
+            Retry
           </Button>
         </CardBody>
       </Card>
@@ -169,216 +163,156 @@ export const PagesManagement = ({
 
   if (pages.length === 0) {
     return (
-      <div className="text-center py-8">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-theme-primary/10 to-theme-accent/10 rounded-2xl flex items-center justify-center">
-          <Icon path={mdiWeb} className="w-8 h-8 text-theme-primary" />
-        </div>
-        <h3 className="text-lg font-semibold text-theme-text mb-2">
-          No pages yet
-        </h3>
-        <p className="text-theme-text-secondary mb-4">
-          Get started by creating your first dashboard page.
-        </p>
-        <Button
-          as={Link}
-          href="/setup/pages/create"
-          color="primary"
-          startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-          isDisabled={!canCreateDashboard(pages.length)}
-        >
-          Create First Page
-        </Button>
-      </div>
+      <Card className="w-full">
+        <CardBody className="text-center py-12">
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-theme-primary/10 to-theme-accent/10 rounded-3xl flex items-center justify-center">
+            <Icon path={mdiWeb} className="w-10 h-10 text-theme-primary" />
+          </div>
+          <h3 className="text-xl font-semibold text-theme-text mb-3">
+            No pages yet
+          </h3>
+          <p className="text-theme-text-secondary mb-6 max-w-sm mx-auto">
+            Get started by creating your first dashboard page to organize your
+            Home Assistant controls.
+          </p>
+          <Button
+            as={Link}
+            href="/setup/pages/create"
+            color="primary"
+            size="lg"
+            startContent={<Icon path={mdiPlus} className="w-5 h-5" />}
+            isDisabled={!canCreateDashboard(pages.length)}
+          >
+            Create First Page
+          </Button>
+        </CardBody>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <Card className="group hover:shadow-lg transition-all duration-200 border-0 shadow-sm">
-        <CardHeader className="flex items-center justify-between p-4 sm:p-6">
-          <div className="flex items-center min-w-0 flex-1">
-            <div className="w-10 h-10 bg-theme-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-              <Icon path={mdiWeb} className="w-6 h-6 text-white" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-lg sm:text-xl font-semibold text-theme-text truncate">
-                Pages Management
-              </h2>
-              <p className="text-xs sm:text-sm text-theme-text-secondary">
-                Create and manage dashboard pages
-              </p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="p-3 sm:p-4">
-          {displayPages.map((page) => (
-            <div className="mb-3" key={page.id}>
-              {/* Mobile Layout */}
-              <div className="block sm:hidden space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-theme-text truncate text-base">
-                      {page.name}
-                    </h4>
-                    <Chip
-                      size="sm"
-                      color={page.published ? "success" : "warning"}
-                      variant="flat"
-                      startContent={
-                        <Icon
-                          path={
-                            page.published ? mdiCheckCircle : mdiAlertCircle
-                          }
-                          className="w-3 h-3"
-                        />
-                      }
-                      className="mt-1"
-                    >
-                      {page.published ? "Published" : "Draft"}
-                    </Chip>
-                  </div>
-                </div>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2
+            className={cn("font-semibold text-theme-text", {
+              "text-lg": compact,
+              "text-xl": !compact,
+            })}
+          >
+            Dashboard Pages
+          </h2>
+          {!compact && (
+            <p className="text-sm text-theme-text-secondary">
+              {pages.length} page{pages.length !== 1 ? "s" : ""} total
+            </p>
+          )}
+        </div>
+        {!showAllPages && (
+          <Button
+            as={Link}
+            href="/setup/pages/create"
+            color="primary"
+            size={compact ? "sm" : "sm"}
+            startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+            isDisabled={!canCreateDashboard(pages.length)}
+          >
+            {compact ? "New" : "New Page"}
+          </Button>
+        )}
+      </div>
 
-                <div className="space-y-2 text-sm text-theme-text-secondary">
-                  <div className="flex items-center gap-1">
-                    <Icon path={mdiWeb} className="w-4 h-4 flex-shrink-0" />
-                    <span className="font-mono text-xs">/{page.slug}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Icon path={mdiClock} className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-xs">
-                      Updated {formatDate(page.updated_at)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-theme-border/30">
-                  <div className="flex items-center gap-1">
-                    <Button
-                      isIconOnly
-                      size="sm"
-                      variant="light"
-                      color={page.published ? "warning" : "success"}
-                      onPress={() =>
-                        handleTogglePublished(page.slug, page.published)
-                      }
-                      title={page.published ? "Unpublish page" : "Publish page"}
-                      isLoading={isPending}
-                      className="min-w-8 h-8"
-                    >
-                      <Icon
-                        path={page.published ? mdiEyeOff : mdiPublish}
-                        className="w-4 h-4"
-                      />
-                    </Button>
-
-                    <Button
-                      as={Link}
-                      href={`/dashboard/${page.slug}`}
-                      isIconOnly
-                      size="sm"
-                      variant="light"
-                      title="View page"
-                      className="min-w-8 h-8"
-                    >
-                      <Icon path={mdiEye} className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <Button
-                      as={Link}
-                      href={`/setup/pages/edit/${page.slug}`}
-                      isIconOnly
-                      size="sm"
-                      variant="light"
-                      title="Edit page"
-                      className="min-w-8 h-8"
-                    >
-                      <Icon path={mdiPencil} className="w-4 h-4" />
-                    </Button>
-
-                    <Button
-                      isIconOnly
-                      size="sm"
-                      variant="light"
-                      color="danger"
-                      onPress={() => handleDeletePage(page.slug, page.name)}
-                      title="Delete page"
-                      className="min-w-8 h-8"
-                    >
-                      <Icon path={mdiTrashCan} className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Desktop Layout */}
-              <div className="hidden sm:flex items-center justify-between">
+      {/* Pages List */}
+      <div
+        className={cn(
+          compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 space-y-3"
+        )}
+      >
+        {displayPages.map((page) => (
+          <Card key={page.id} className="hover:shadow-md transition-shadow">
+            <CardBody className={cn(compact ? "p-3" : "p-4")}>
+              <div
+                className={cn(
+                  "flex justify-between",
+                  compact ? "items-center gap-3" : "items-start gap-4"
+                )}
+              >
+                {/* Page Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className="font-semibold text-theme-text truncate">
+                  <div
+                    className={cn(
+                      "flex items-center gap-2",
+                      !compact && "mb-2"
+                    )}
+                  >
+                    <h3
+                      className={cn(
+                        "text-theme-text truncate",
+                        compact ? "font-medium text-sm" : "font-semibold"
+                      )}
+                    >
                       {page.name}
-                    </h4>
+                    </h3>
                     <Chip
                       size="sm"
                       color={page.published ? "success" : "warning"}
                       variant="flat"
+                      className={compact ? "text-xs" : ""}
                       startContent={
-                        <Icon
-                          path={
-                            page.published ? mdiCheckCircle : mdiAlertCircle
-                          }
-                          className="w-3 h-3"
-                        />
+                        !compact && (
+                          <Icon
+                            path={
+                              page.published ? mdiCheckCircle : mdiAlertCircle
+                            }
+                            className="w-3 h-3"
+                          />
+                        )
                       }
                     >
-                      {page.published ? "Published" : "Draft"}
+                      {page.published
+                        ? compact
+                          ? "Live"
+                          : "Published"
+                        : "Draft"}
                     </Chip>
-                    <Chip
-                      size="sm"
-                      color="default"
-                      variant="flat"
-                      startContent={
+                  </div>
+
+                  {/* Metadata */}
+                  {compact ? (
+                    <div className="flex items-center gap-3 mt-1 text-xs text-theme-text-secondary">
+                      <span className="font-mono">/{page.slug}</span>
+                      <span>•</span>
+                      <span>{formatDate(page.updated_at)}</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 text-sm text-theme-text-secondary">
+                      <div className="flex items-center gap-2">
+                        <Icon path={mdiWeb} className="w-4 h-4 flex-shrink-0" />
+                        <span className="font-mono text-xs">/{page.slug}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Icon
+                          path={mdiClock}
+                          className="w-4 h-4 flex-shrink-0"
+                        />
+                        <span className="text-xs">
+                          Updated {formatDate(page.updated_at)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <Icon
                           path={mdiHomeAssistant}
-                          className="w-3 h-3"
+                          className="w-4 h-4 flex-shrink-0"
                         />
-                      }
-                    >
-                      {page.ha_instance_id}
-                    </Chip>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-theme-text-secondary">
-                    <div className="flex items-center gap-1">
-                      <Icon path={mdiWeb} className="w-4 h-4" />
-                      <span className="font-mono">/{page.slug}</span>
+                        <span className="text-xs">{page.ha_instance_id}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Icon path={mdiClock} className="w-4 h-4" />
-                      <span>Updated {formatDate(page.updated_at)}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-1 ml-4">
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    color={page.published ? "warning" : "success"}
-                    onPress={() =>
-                      handleTogglePublished(page.slug, page.published)
-                    }
-                    title={page.published ? "Unpublish page" : "Publish page"}
-                    isLoading={isPending}
-                  >
-                    <Icon
-                      path={page.published ? mdiEyeOff : mdiPublish}
-                      className="w-4 h-4"
-                    />
-                  </Button>
-
+                {/* Actions */}
+                <div className="flex items-center gap-1">
                   <Button
                     as={Link}
                     href={`/dashboard/${page.slug}`}
@@ -401,73 +335,115 @@ export const PagesManagement = ({
                     <Icon path={mdiPencil} className="w-4 h-4" />
                   </Button>
 
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    color="danger"
-                    onPress={() => handleDeletePage(page.slug, page.name)}
-                    title="Delete page"
-                  >
-                    <Icon path={mdiTrashCan} className="w-4 h-4" />
-                  </Button>
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        title="More actions"
+                      >
+                        <Icon path={mdiDotsVertical} className="w-4 h-4" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Page actions">
+                      <DropdownItem
+                        key="toggle-publish"
+                        startContent={
+                          <Icon
+                            path={page.published ? mdiEyeOff : mdiPublish}
+                            className="w-4 h-4"
+                          />
+                        }
+                        onPress={() =>
+                          handleTogglePublished(page.slug, page.published)
+                        }
+                      >
+                        {page.published ? "Unpublish" : "Publish"}
+                      </DropdownItem>
+                      <DropdownItem
+                        key="delete"
+                        className="text-danger"
+                        color="danger"
+                        startContent={
+                          <Icon path={mdiTrashCan} className="w-4 h-4" />
+                        }
+                        onPress={() => handleDeletePage(page.slug, page.name)}
+                      >
+                        Delete
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </div>
               </div>
-            </div>
-          ))}
-        </CardBody>
-      </Card>
+            </CardBody>
+          </Card>
+        ))}
+      </div>
 
+      {/* Footer Info */}
       {!showAllPages && pages.length > maxDisplayPages && (
-        <div className="pt-3 border-t border-theme-border">
-          <p className="text-sm text-theme-text-secondary text-center">
+        <div className={cn("text-center", compact ? "py-2" : "py-3")}>
+          <p
+            className={cn(
+              "text-theme-text-secondary",
+              compact ? "text-xs" : "text-sm"
+            )}
+          >
             And {pages.length - maxDisplayPages} more pages
           </p>
         </div>
       )}
 
-      {/* Show remaining pages info */}
+      {/* Usage Info */}
       {entitlements && entitlements.maxDashboards !== -1 && (
-        <div className="pt-3 border-t border-theme-border">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-theme-text-secondary">
-              Pages used: {pages.length} / {entitlements.maxDashboards}
+        <div
+          className={cn(
+            compact
+              ? "text-center"
+              : "bg-theme-background-secondary rounded-lg p-4"
+          )}
+        >
+          {compact ? (
+            <span className="text-xs text-theme-text-secondary">
+              {pages.length}/{entitlements.maxDashboards} pages
+              {getRemainingDashboards(pages.length) === 0 && " • Limit reached"}
+              {getRemainingDashboards(pages.length) > 0 &&
+                getRemainingDashboards(pages.length) <= 2 &&
+                ` • ${getRemainingDashboards(pages.length)} remaining`}
             </span>
-            {getRemainingDashboards(pages.length) === 0 && (
-              <Chip size="sm" color="warning" variant="flat">
-                Limit reached
-              </Chip>
-            )}
-            {getRemainingDashboards(pages.length) > 0 && getRemainingDashboards(pages.length) <= 2 && (
-              <Chip size="sm" color="warning" variant="flat">
-                {getRemainingDashboards(pages.length)} remaining
-              </Chip>
-            )}
-          </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-theme-text-secondary">
+                Pages used: {pages.length} / {entitlements.maxDashboards}
+              </span>
+              {getRemainingDashboards(pages.length) === 0 && (
+                <Chip size="sm" color="warning" variant="flat">
+                  Limit reached
+                </Chip>
+              )}
+              {getRemainingDashboards(pages.length) > 0 &&
+                getRemainingDashboards(pages.length) <= 2 && (
+                  <Chip size="sm" color="warning" variant="flat">
+                    {getRemainingDashboards(pages.length)} remaining
+                  </Chip>
+                )}
+            </div>
+          )}
         </div>
       )}
 
+      {/* Action Buttons */}
       {!showAllPages && (
-        <div className="flex flex-col sm:flex-row gap-3 pt-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             as={Link}
             href="/setup/pages"
             variant="bordered"
-            className="flex-1 order-2 sm:order-1"
+            className="flex-1"
             startContent={<Icon path={mdiWeb} className="w-4 h-4" />}
           >
-            <span className="hidden sm:inline">Manage All Pages</span>
-            <span className="sm:hidden">Manage Pages</span>
-          </Button>
-          <Button
-            as={Link}
-            href="/setup/pages/create"
-            color="primary"
-            className="order-1 sm:order-2"
-            startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-            isDisabled={!canCreateDashboard(pages.length)}
-          >
-            New Page
+            Manage All Pages
           </Button>
         </div>
       )}
