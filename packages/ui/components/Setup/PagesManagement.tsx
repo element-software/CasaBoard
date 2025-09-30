@@ -226,7 +226,7 @@ export const PagesManagement = ({
       {/* Pages List */}
       <div
         className={cn(
-          compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 space-y-3"
+          compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 gap-3"
         )}
       >
         {displayPages.map((page) => (
