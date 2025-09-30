@@ -11,7 +11,7 @@ import {
   mdiTrashCan,
   mdiEye,
   mdiWeb,
-  mdiPublish,
+  mdiEyeOutline,
   mdiEyeOff,
   mdiCheckCircle,
   mdiAlertCircle,
@@ -23,9 +23,7 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
-  Skeleton,
   Spinner,
   Dropdown,
   DropdownTrigger,
@@ -33,7 +31,6 @@ import {
   DropdownItem,
   cn,
 } from "@heroui/react";
-import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
@@ -51,15 +48,16 @@ export const PagesManagement = ({
   entitlements,
 }: PagesManagementProps) => {
   const [pages, setPages] = useState<Page[]>(initialPages);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   // Helper functions for entitlements
   const canCreateDashboard = (currentCount: number) => {
     if (!entitlements?.active) return false;
-    return entitlements.maxDashboards === -1 || currentCount < entitlements.maxDashboards;
+    return (
+      entitlements.maxDashboards === -1 ||
+      currentCount < entitlements.maxDashboards
+    );
   };
 
   const getRemainingDashboards = (currentCount: number) => {
@@ -124,19 +122,6 @@ export const PagesManagement = ({
       ? pages.length
       : entitlements?.maxDashboards || 3;
   const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
-
-  if (loading) {
-    return (
-      <Card className="w-full">
-        <CardBody className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <Spinner size="sm" />
-            <span className="text-theme-text-secondary">Loading pages...</span>
-          </div>
-        </CardBody>
-      </Card>
-    );
-  }
 
   if (error) {
     return (
@@ -305,7 +290,7 @@ export const PagesManagement = ({
                           path={mdiHomeAssistant}
                           className="w-4 h-4 flex-shrink-0"
                         />
-                        <span className="text-xs">{page.ha_instance_id}</span>
+                        <span className="text-xs">{page.ha_instance_id || "No instance"}</span>
                       </div>
                     </div>
                   )}
@@ -347,30 +332,41 @@ export const PagesManagement = ({
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Page actions">
-                      <DropdownItem
-                        key="toggle-publish"
-                        startContent={
-                          <Icon
-                            path={page.published ? mdiEyeOff : mdiPublish}
-                            className="w-4 h-4"
-                          />
-                        }
-                        onPress={() =>
-                          handleTogglePublished(page.slug, page.published)
-                        }
-                      >
-                        {page.published ? "Unpublish" : "Publish"}
+                      <DropdownItem key="toggle-publish" className="p-0">
+                        <Button
+                          color="primary"
+                          variant="flat"
+                          size="sm"
+                          title="Toggle publish"
+                          className="w-full"
+                          startContent={
+                            <Icon
+                              path={page.published ? mdiEyeOff : mdiEyeOutline}
+                              className="w-4 h-4"
+                            />
+                          }
+                          onPress={() =>
+                            handleTogglePublished(page.slug, page.published)
+                          }
+                        >
+                          {page.published ? "Unpublish" : "Publish"}
+                        </Button>
                       </DropdownItem>
-                      <DropdownItem
-                        key="delete"
-                        className="text-danger"
-                        color="danger"
-                        startContent={
-                          <Icon path={mdiTrashCan} className="w-4 h-4" />
-                        }
-                        onPress={() => handleDeletePage(page.slug, page.name)}
-                      >
-                        Delete
+                      <DropdownItem key="delete" className="p-0">
+                        <Button
+                          color="danger"
+                          variant="flat"
+                          size="sm"
+                          title="Delete page"
+                          className="w-full"
+                          onPress={() => handleDeletePage(page.slug, page.name)}
+                          startContent={
+                            <Icon path={mdiTrashCan} className="w-4 h-4" />
+                          }
+                          isLoading={isPending}
+                        >
+                          Delete
+                        </Button>
                       </DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
