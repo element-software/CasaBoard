@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function PagesListPage() {
   let pages = [];
   let error = null;
-
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
   try {
     pages = await PageActions.getAllPages();
   } catch (err) {
@@ -22,7 +22,7 @@ export default async function PagesListPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <PagesManagement initialPages={pages} initialError={error} />
+      <PagesManagement initialPages={pages} initialError={error} entitlements={entitlements} />
 
       <div className="mt-8 pt-6 border-t border-theme-border">
         <Link
