@@ -6,15 +6,21 @@ import {
   SaveTokensFunc,
 } from "home-assistant-js-websocket";
 
-export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
+export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null, instanceId?: string) => {
   if (!data) {
     serverLogger.error('saveTokensToDB', 'No data to save');
     return;
   }
 
-  const first = await HAInstanceActions.getFirstHAInstance();
-  if (!first?.id) {
-    serverLogger.error('saveTokensToDB', 'No first instance found');
+  let instance;
+  if (instanceId) {
+    instance = await HAInstanceActions.getHAInstance(instanceId);
+  } else {
+    instance = await HAInstanceActions.getFirstHAInstance();
+  }
+  
+  if (!instance?.id) {
+    serverLogger.error('saveTokensToDB', 'No instance found');
     return;
   }
   try {
@@ -24,7 +30,7 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
 
     // Re-use existing session_id if present to ensure stable decryption key
     let existingSessionId: string | undefined;
-    const prevAuth: any = first?.auth;
+    const prevAuth: any = instance?.auth;
     if (prevAuth && typeof prevAuth === "object" && prevAuth.encrypted && prevAuth.session_id) {
       existingSessionId = String(prevAuth.session_id);
     }
@@ -41,7 +47,7 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
     };
 
     const haInstance = await HAInstanceActions.updateHAInstance({
-      id: first.id,
+      id: instance.id,
       auth: payload,
       expires_at: data.expires_in
         ? new Date(Date.now() + data.expires_in * 1000).toISOString()
@@ -57,7 +63,7 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
     serverLogger.error('saveTokensToDB', 'encryption failed, falling back to plain save', e);
     try {
       await HAInstanceActions.updateHAInstance({
-        id: first.id,
+        id: instance.id,
         auth: data,
         expires_at: data.expires_in
           ? new Date(Date.now() + data.expires_in * 1000).toISOString()
@@ -69,17 +75,23 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
   }
 };
 
-export const loadTokensFromDB: LoadTokensFunc = async () => {
-  const first = await HAInstanceActions.getFirstHAInstance();
-  serverLogger.info('loadTokensFromDB', 'first', first);
-  if (!first?.id) {
-    serverLogger.error('loadTokensFromDB', 'No first instance found');
+export const loadTokensFromDB: LoadTokensFunc = async (instanceId?: string) => {
+  let instance;
+  if (instanceId) {
+    instance = await HAInstanceActions.getHAInstance(instanceId);
+  } else {
+    instance = await HAInstanceActions.getFirstHAInstance();
+  }
+  
+  serverLogger.info('loadTokensFromDB', 'instance', instance);
+  if (!instance?.id) {
+    serverLogger.error('loadTokensFromDB', 'No instance found');
     return null;
   }
   try {
-    const stored: any = first?.auth;
+    const stored: any = instance?.auth;
     if (!stored) {
-      serverLogger.error('loadTokensFromDB', 'No token found in DB', first);
+      serverLogger.error('loadTokensFromDB', 'No token found in DB', instance);
       return null;
     }
 

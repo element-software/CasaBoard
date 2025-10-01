@@ -1,7 +1,5 @@
 import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
-import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import {
-  HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
   SubscriptionService,
@@ -35,17 +33,12 @@ export default async function AuthenticatedLayout({
     redirect("/auth/setup");
   }
 
-  // Fetch first instance (pages are tied per-instance; active flag removed)
-  const haInstance = await HAInstanceActions.getFirstHAInstance();
-
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <HassConnectWrapper haInstance={haInstance}>
-        <div className="min-h-screen">
-          <main className="flex-1 h-full">{children}</main>
-          <Footer />
-        </div>
-      </HassConnectWrapper>
+      <div className="min-h-screen">
+        <main className="flex-1 h-full">{children}</main>
+        <Footer />
+      </div>
     </ConfigurationProvider>
   );
 }

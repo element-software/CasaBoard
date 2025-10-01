@@ -2,7 +2,7 @@
 import { Card, CardBody, cn, Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiAlert, mdiLightbulb } from "@mdi/js";
-import EntityIcon from "@/components/Shared/util/EntityIcon";
+import EntityIcon from "../Shared/util/EntityIcon";
 import { useEntity } from "@repo/ha";
 import { useLightLoading, useLightController } from "./useLight";
 

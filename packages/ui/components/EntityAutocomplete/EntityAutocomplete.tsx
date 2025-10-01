@@ -27,7 +27,7 @@ import {
   mdiCog,
   mdiAlert,
 } from "@mdi/js";
-import EntityIcon from "@/components/Shared/util/EntityIcon";
+import EntityIcon from "../Shared/util/EntityIcon";
 
 export interface EntityOption {
   id: string;

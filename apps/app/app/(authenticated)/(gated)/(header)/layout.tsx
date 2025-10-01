@@ -1,7 +1,5 @@
 import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
-import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import {
-  HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
   serverLogger,
@@ -38,19 +36,16 @@ export default async function AuthenticatedLayout({
     redirect("/auth/setup");
   }
 
-  const haInstance = await HAInstanceActions.getFirstHAInstance();
   serverLogger.info("Layout (gated)::", "subscription status", subscription.status, "isTrial", isTrial);
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <HassConnectWrapper haInstance={haInstance}>
-          <Header user={authedUser} isTrial={isTrial} />
-          <Breadcrumbs />
-          <div className="min-h-screen">
-            <main className="flex-1">{children}</main>
-          </div>
-          <Footer />
-      </HassConnectWrapper>
+      <Header user={authedUser} isTrial={isTrial} />
+      <Breadcrumbs />
+      <div className="min-h-screen">
+        <main className="flex-1">{children}</main>
+      </div>
+      <Footer />
     </ConfigurationProvider>
   );
 }

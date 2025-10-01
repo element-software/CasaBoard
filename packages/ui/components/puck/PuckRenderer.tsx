@@ -3,7 +3,7 @@ import { Render } from "@measured/puck";
 import { useState, useEffect } from 'react';
 import { usePages } from '@repo/hooks/usePages';
 import { Page } from '@repo/types/page'
-import { PuckConfig } from './puck/puck.config';
+import { PuckConfig } from './puck.config';
 interface PuckRendererProps {
   pageId: string;
   pageData?: Page;

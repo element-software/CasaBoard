@@ -1,5 +1,6 @@
 import { getCurrentAuthUser, SupabaseServer } from "@repo/lib";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
+import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import { notFound } from "next/navigation";
 
 // Enable dynamic params for unknown routes
@@ -35,11 +36,13 @@ export default async function PageEdit({ params }: PageProps) {
   }
 
   return (
-    <PageEditorClient
-      initialData={page.puck_data}
-      pageId={page.id}
-      initialPublished={page.published}
-      haInstances={instances}
-    />
+    <HassConnectWrapper instanceId={page.ha_instance_id}>
+      <PageEditorClient
+        initialData={page.puck_data}
+        pageId={page.id}
+        initialPublished={page.published}
+        haInstances={instances}
+      />
+    </HassConnectWrapper>
   );
 }

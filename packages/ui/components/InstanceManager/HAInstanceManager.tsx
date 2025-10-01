@@ -7,10 +7,16 @@ import { useRouter } from "next/navigation";
 import { useHA } from "@repo/ha";
 import { Entitlements } from "@repo/types/subscription";
 import Icon from "@mdi/react";
-import { mdiHomeAssistant, mdiPlus, mdiArrowRight, mdiAlertCircle } from "@mdi/js";
+import {
+  mdiHomeAssistant,
+  mdiPlus,
+  mdiArrowRight,
+  mdiAlertCircle,
+} from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
 import { AddInstance } from "./AddInstance";
+import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 
 interface HAInstanceManagerProps {
   compact?: boolean;
@@ -33,7 +39,10 @@ export function HAInstanceManager({
   // Helper functions for entitlements
   const canCreateHAInstance = (currentCount: number) => {
     if (!entitlements?.active) return false;
-    return entitlements.maxHAInstances === -1 || currentCount < entitlements.maxHAInstances;
+    return (
+      entitlements.maxHAInstances === -1 ||
+      currentCount < entitlements.maxHAInstances
+    );
   };
 
   const canCreate = () => {
@@ -79,12 +88,14 @@ export function HAInstanceManager({
   const renderInstancesList = () => (
     <div className="space-y-3">
       {haInstances.map((i) => (
-        <HAInstance
-          key={i.id}
-          instance={i}
-          compact={compact}
-          onDelete={onDelete}
-        />
+        <HassConnectWrapper key={i.id} instanceId={i.id}>
+          <HAInstance
+            key={i.id}
+            instance={i}
+            compact={compact}
+            onDelete={onDelete}
+          />
+        </HassConnectWrapper>
       ))}
     </div>
   );
@@ -104,9 +115,9 @@ export function HAInstanceManager({
       return (
         <div className="flex items-center justify-center py-4">
           <div className="text-center">
-            <Icon 
-              path={mdiHomeAssistant} 
-              className="w-8 h-8 text-foreground-400 mx-auto mb-2" 
+            <Icon
+              path={mdiHomeAssistant}
+              className="w-8 h-8 text-foreground-400 mx-auto mb-2"
             />
             <p className="text-foreground-500 text-sm">No instances yet</p>
           </div>
@@ -117,16 +128,14 @@ export function HAInstanceManager({
     return (
       <div className="flex flex-col items-center justify-center py-8 px-4">
         <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-          <Icon 
-            path={mdiHomeAssistant} 
-            className="w-8 h-8 text-primary-600" 
-          />
+          <Icon path={mdiHomeAssistant} className="w-8 h-8 text-primary-600" />
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">
           No Home Assistant instances yet
         </h3>
         <p className="text-foreground-500 text-center mb-6 max-w-sm">
-          Connect your Home Assistant instance to start managing your smart home devices and creating beautiful dashboards.
+          Connect your Home Assistant instance to start managing your smart home
+          devices and creating beautiful dashboards.
         </p>
         {!canCreate() && !entitlements && (
           <div className="text-center">
@@ -148,7 +157,6 @@ export function HAInstanceManager({
     );
   };
 
-
   return (
     <Card className="w-full">
       {renderHeader()}
@@ -159,17 +167,11 @@ export function HAInstanceManager({
           </div>
         )}
 
-        {haInstances.length === 0 ? (
-          renderEmptyState()
-        ) : (
-          renderInstancesList())
-        }
+        {haInstances.length === 0 ? renderEmptyState() : renderInstancesList()}
 
-        {!compact && (
-          canCreate() ? (
-            <div data-create-form>
-              {renderCreateForm()}
-            </div>
+        {!compact &&
+          (canCreate() ? (
+            <div data-create-form>{renderCreateForm()}</div>
           ) : (
             <p className="text-white text-md w-full text-center">
               You've reached the limit of HA instances for your plan. Please{" "}
@@ -181,8 +183,7 @@ export function HAInstanceManager({
               </Link>{" "}
               to add more instances.
             </p>
-          )
-        )}
+          ))}
       </CardBody>
     </Card>
   );
