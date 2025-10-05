@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useMe
 import { clientLogger } from "@repo/lib";
 import { Connection, getStates, subscribeEntities, Auth, ERR_INVALID_AUTH } from "home-assistant-js-websocket";
 import { connect } from "../connection"; // Import your connect logic
+import { HAInstance } from "@/components/InstanceManager/HAInstance";
 
 export interface HAContextType {
   connection: Connection | null;
@@ -21,12 +22,12 @@ const HAContext = createContext<HAContextType>({
 });
 
 export interface HAProviderProps {
-  hassUrl: string;
+  haInstance: HAInstance;
   children: ReactNode;
   fallback?: ReactNode;
 }
 
-export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallback = null }) => {
+export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fallback = null }) => {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [entities, setEntities] = useState<{ [entityId: string]: any }>({});
   const [loading, setLoading] = useState(true);
@@ -41,8 +42,8 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
       setLoading(true);
       setError(null);
       try {
-        clientLogger.info('HAProvider', `connecting to Home Assistant at ${hassUrl}`);
-        const { connection, auth } = await connect({ homeAssistantUrl: hassUrl });
+        clientLogger.info('HAProvider', `connecting to Home Assistant at ${haInstance.hass_url}`);
+        const { connection, auth } = await connect({ haInstance });
         clientLogger.info('HAProvider', 'connected to Home Assistant', connection);
         activeConnection = connection;
         activeAuth = auth;
@@ -78,12 +79,11 @@ export const HAProvider: React.FC<HAProviderProps> = ({ hassUrl, children, fallb
       setConnection(null);
       setEntities({});
     };
-  }, [hassUrl]);
+  }, [haInstance.hass_url]);
 
   const getEntityById = (entityId: string) => entities[entityId];
   const getAllEntities = () => Object.values(entities);
 
-  if (error) return <>{fallback}</>;
 
   return (
     <HAContext.Provider

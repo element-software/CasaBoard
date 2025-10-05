@@ -58,7 +58,15 @@ export function HAInstanceManager({
           name: form.name || `Instance ${haInstances.length + 1}`,
           hass_url: formattedUrl,
         });
-        await connect({ homeAssistantUrl: formattedUrl });
+        await connect({
+          haInstance: { 
+            hass_url: formattedUrl,
+            name: form.name || `Instance ${haInstances.length + 1}`,
+            id: "",
+            hass_token: "",
+            created_at: "",
+          }
+        });
       } catch (e: any) {
         setError(e?.message || "Failed to create instance");
       }
@@ -88,7 +96,7 @@ export function HAInstanceManager({
   const renderInstancesList = () => (
     <div className="space-y-3">
       {haInstances.map((i) => (
-        <HassConnectWrapper key={i.id} instanceId={i.id}>
+        <HassConnectWrapper key={i.id} haInstance={i}>
           <HAInstance
             key={i.id}
             instance={i}

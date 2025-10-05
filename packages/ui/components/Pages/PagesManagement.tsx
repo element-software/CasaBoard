@@ -300,7 +300,7 @@ export const PagesManagement = ({
                 <div className="flex items-center gap-1">
                   <Button
                     as={Link}
-                    href={`/dashboard/${page.slug}`}
+                    href={`/dashboard/${page.ha_instance_id}/${page.slug}`}
                     isIconOnly
                     size="sm"
                     variant="light"

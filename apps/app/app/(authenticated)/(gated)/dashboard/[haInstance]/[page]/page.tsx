@@ -9,12 +9,13 @@ export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{
+    haInstance: string;
     page: string;
   }>;
 }
 
 export default async function ConfigurablePage({ params }: PageProps) {
-  const { page } = await params;
+  const { haInstance, page } = await params;
 
   try {
     // Use server action to get page with proper access control
@@ -24,11 +25,15 @@ export default async function ConfigurablePage({ params }: PageProps) {
       notFound();
     }
     
+    // Verify that the page belongs to the specified HA instance
+    if ((pageData as any)?.ha_instance_id !== haInstance) {
+      notFound();
+    }
+    
     return (
       <ClientPageWrapper 
         pageName={page}
         pageData={pageData}
-        instanceId={(pageData as any)?.ha_instance_id}
       />
     );
   } catch (error) { 

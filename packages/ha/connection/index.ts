@@ -9,10 +9,16 @@ import {
   ERR_INVALID_AUTH,
   ERR_CANNOT_CONNECT,
 } from "home-assistant-js-websocket";
-import type { Auth, Connection } from "home-assistant-js-websocket";
+import type {
+  Auth,
+  AuthData,
+  Connection,
+  LoadTokensFunc,
+} from "home-assistant-js-websocket";
+import { HAInstance } from "@/components/InstanceManager/HAInstance";
 
 export interface HAConnectProps {
-  homeAssistantUrl: string;
+  haInstance: HAInstance;
 }
 
 function normalizeNameToSlug(name: string): string {
@@ -49,30 +55,35 @@ export async function getEntity(
 }
 
 export async function connect({
-  homeAssistantUrl,
+  haInstance,
 }: HAConnectProps): Promise<ConnectResult> {
   let auth: Auth | undefined;
   let connection: Connection | undefined;
-  
+
+  const loadTokens = async () => {
+    serverLogger.info("loadTokens wrapper", "haInstance", haInstance);
+    return loadTokensFromDB(haInstance.id) as unknown as AuthData;
+  };
+
   const getAuthOptions = {
-    hassUrl: homeAssistantUrl,
+    hassUrl: haInstance.hass_url,
     saveTokens: saveTokensToDB,
-    loadTokens: loadTokensFromDB,
+    loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
 
-  // Try to get auth, retry if invalid or host required
+  // Try to get auth, retry if invalid or host requiredS
   try {
     auth = await getAuth(getAuthOptions);
-    serverLogger.info('connect', 'got auth', auth);
+    serverLogger.info("connect", "got auth", auth);
   } catch (err) {
-    serverLogger.warn('connect', 'getAuth error', err);
+    serverLogger.warn("connect", "getAuth error", err);
     if (err === ERR_INVALID_AUTH || err === ERR_HASS_HOST_REQUIRED) {
       try {
         auth = await getAuth(getAuthOptions);
-        serverLogger.info('connect', 'retried getAuth', auth);
+        serverLogger.info("connect", "retried getAuth", auth);
       } catch (err2) {
-        serverLogger.error('connect', 'getAuth failed after retry', err2);
+        serverLogger.error("connect", "getAuth failed after retry", err2);
         throw new Error(`Home Assistant auth failed: ${err2}`);
       }
     } else {
@@ -89,7 +100,7 @@ export async function connect({
     // connection.addEventListener("disconnected", () => serverLogger.info('connect', 'HA connection disconnected'));
     // connection.addEventListener("reconnect-error", () => serverLogger.warn('connect', 'HA connection reconnect error'));
   } catch (err) {
-    serverLogger.error('connect', 'createConnection error', err);
+    serverLogger.error("connect", "createConnection error", err);
     throw new Error(`Home Assistant connection failed: ${err}`);
   }
 

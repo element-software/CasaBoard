@@ -60,29 +60,41 @@ export const HAInstance = ({
       >
         <div className="min-w-0">
           <div className="font-medium truncate">{name}</div>
-          <div className="flex items-center gap-2 text-sm text-foreground-500 truncate">
-            <span>{hass_url}</span>
-            <Chip
-              size="sm"
-              color="default"
-              variant="flat"
-              startContent={<Icon path={mdiCheckCircle} className="w-3 h-3" />}
-            >
-              {entityCount} entities
-            </Chip>
-            <Chip
-              size="sm"
-              color="default"
-              variant="flat"
-              startContent={
-                <Icon
-                  path={connected ? mdiCheckCircle : mdiAlertCircle}
-                  className="w-3 h-3"
-                />
+          <div
+            className={cn(
+              "flex gap-2 text-sm text-foreground-500",
+              {
+                "flex-col items-start": compact,
+                "items-center": !compact,
               }
-            >
-              {connected ? "Connected" : "Disconnected"}
-            </Chip>
+            )}
+          >
+            <span>{hass_url}</span>
+            <div className="flex items-center gap-2">
+              <Chip
+                size="sm"
+                color="default"
+                variant="flat"
+                startContent={
+                  <Icon path={mdiCheckCircle} className="w-3 h-3" />
+                }
+              >
+                {entityCount} entities
+              </Chip>
+              <Chip
+                size="sm"
+                color="default"
+                variant="flat"
+                startContent={
+                  <Icon
+                    path={connected ? mdiCheckCircle : mdiAlertCircle}
+                    className="w-3 h-3"
+                  />
+                }
+              >
+                {connected ? "Connected" : "Disconnected"}
+              </Chip>
+            </div>
           </div>
         </div>
 
