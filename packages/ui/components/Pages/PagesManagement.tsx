@@ -1,6 +1,6 @@
 "use client";
 import { useState, useTransition } from "react";
-import { PageService } from "@repo/lib";
+import { PageActions } from "@repo/lib";
 import { Page } from "@repo/types/page";
 import { Entitlements } from "@repo/types/subscription";
 import Link from "next/link";
@@ -77,7 +77,7 @@ export const PagesManagement = ({
 
     startTransition(async () => {
       try {
-        await PageService.deletePage(slug);
+        await PageActions.deletePage(slug);
         setPages(pages.filter((page) => page.slug !== slug));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to delete page");
@@ -91,7 +91,7 @@ export const PagesManagement = ({
   ) => {
     startTransition(async () => {
       try {
-        await PageService.updatePage(slug, { published: !currentPublished });
+        await PageActions.updatePage(slug, { published: !currentPublished });
         setPages(
           pages.map((page) =>
             page.slug === slug
@@ -290,7 +290,7 @@ export const PagesManagement = ({
                           path={mdiHomeAssistant}
                           className="w-4 h-4 flex-shrink-0"
                         />
-                        <span className="text-xs">{page.ha_instance_id || "No instance"}</span>
+                        <span className="text-xs">{page.ha_instance?.name || page.ha_instance_id || "No instance"}</span>
                       </div>
                     </div>
                   )}
@@ -300,7 +300,7 @@ export const PagesManagement = ({
                 <div className="flex items-center gap-1">
                   <Button
                     as={Link}
-                    href={`/dashboard/${page.ha_instance_id}/${page.slug}`}
+                    href={`/dashboard/${page.slug}`}
                     isIconOnly
                     size="sm"
                     variant="light"

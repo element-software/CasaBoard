@@ -1,7 +1,6 @@
 "use server";
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { SubscriptionService } from "../services/subscriptionService";
-import { serverLogger } from "../logger";
 
 export interface CreateHAInstanceInput {
   name: string;
@@ -121,7 +120,7 @@ export async function getHAInstanceByHassUrl(hassUrl: string) {
 }
 
 export async function getHAInstance(id: string) {
-  serverLogger.info("getHAInstance", "id", id);
+  console.info("getHAInstance", "id", id);
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
@@ -131,7 +130,7 @@ export async function getHAInstance(id: string) {
     .eq("user_id", user.id)
     .eq("id", id)
     .single();
-
+  console.info("getHAInstance", "data", data, "error", error);
   if (error) throw new Error(error.message);
   return data;
 }

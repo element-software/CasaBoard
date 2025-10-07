@@ -1,5 +1,5 @@
 import { ClientPageWrapper } from "./ClientPageWrapper";
-import { PageActions } from '@repo/lib';
+import { PageActions, PageActions } from '@repo/lib';
 import { notFound } from 'next/navigation';
 
 // Enable dynamic params for unknown routes

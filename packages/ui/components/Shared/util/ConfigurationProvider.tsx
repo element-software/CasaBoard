@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
-import { getCurrentAuthUser, PageService, clientLogger } from '@repo/lib';
+import { getCurrentAuthUser, PageActions, clientLogger } from '@repo/lib';
 import { SupabaseClient } from '@repo/lib';
 
 interface ConfigurationContextType {
@@ -46,7 +46,7 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({
         // Update pages in Supabase
         for (const [slug, pageConfig] of Object.entries(newConfig.pages)) {
           try {
-            await PageService.updatePage(slug, {
+            await PageActions.updatePage(slug, {
               name: pageConfig.title?.value || slug,
               puck_data: pageConfig.puckData
             });

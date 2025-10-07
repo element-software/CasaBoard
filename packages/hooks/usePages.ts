@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Data } from "@measured/puck";
 import { Page } from '@repo/types/page';
-import { PageService } from '@repo/lib';
+import { PageActions } from '@repo/lib';
 
 export function usePages() {
   const [pages, setPages] = useState<Page[]>([]);
@@ -13,7 +13,7 @@ export function usePages() {
     try {
       setLoading(true);
       setError(null);
-      const fetchedPages = await PageService.getAllPages();
+      const fetchedPages = await PageActions.getAllPages();
       setPages(fetchedPages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load pages');
@@ -24,8 +24,8 @@ export function usePages() {
 
   const createPage = async (name: string, puckData: Data = { content: [], root: { props: {} } }) => {
     try {
-      const slug = PageService.generateSlug(name);
-      const newPage = await PageService.createPage({
+      const slug = PageActions.generateSlug(name);
+      const newPage = await PageActions.createPage({
         name,
         slug,
         puck_data: puckData,
@@ -40,7 +40,7 @@ export function usePages() {
 
   const updatePageData = async (slug: string, puckData: Data) => {
     try {
-      const updatedPage = await PageService.updatePageData(slug, puckData);
+      const updatedPage = await PageActions.updatePageData(slug, puckData);
       setPages(prev => 
         prev.map(page => 
           page.slug === slug ? updatedPage : page
@@ -55,7 +55,7 @@ export function usePages() {
 
   const deletePage = async (slug: string) => {
     try {
-      await PageService.deletePage(slug);
+      await PageActions.deletePage(slug);
       setPages(prev => prev.filter(page => page.slug !== slug));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete page');
@@ -65,7 +65,7 @@ export function usePages() {
 
   const getPage = async (slug: string): Promise<Page | null> => {
     try {
-      return await PageService.getPage(slug);
+      return await PageActions.getPage(slug);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to get page');
       return null;

@@ -1,6 +1,5 @@
-import { getCurrentAuthUser, SupabaseServer } from "@repo/lib";
-import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
-import { HAInstanceActions } from "@repo/lib";
+import { PageActions, SupabaseServer } from "@repo/lib";
+import PageEditorClient from "@repo/ui/components/puck/PageEditorClient"
 import { notFound } from "next/navigation";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 
@@ -11,37 +10,36 @@ export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{
-    haInstance: string;
     slug: string;
   }>;
 }
 
 export default async function PageEdit({ params }: PageProps) {
-  const { haInstance, slug } = await params;
+  const { slug } = await params;
   const supabase = await SupabaseServer.createClient();
 
   // Get the page data
-  const { data: page, error } = await supabase
-    .from("pages")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  if (error || !page) {
+  const page = await PageActions.getPage(slug);
+  console.log("edit page", "page", page);
+  if (!page) {
     notFound();
   }
 
-  // // Verify that the page belongs to the specified HA instance
-  // if (page.ha_instance_id !== haInstance) {
-  //   console.error("Page does not belong to the specified HA instance", page.ha_instance_id, haInstance);
-  //   notFound();
-  // }
-
-  // Get the HA instance data
-  const instance = await HAInstanceActions.getHAInstance(haInstance);
-  console.log("edit page Instance found", instance);
-  if (!instance) {
-    console.error("HA instance not found", haInstance);
+  // Get the HA instance data - if not populated by the join, fetch it separately
+  let haInstance = page.ha_instance;
+  if (!haInstance && page.ha_instance_id) {
+    const { data: instanceData } = await supabase
+      .from("ha_instances")
+      .select("id, name, hass_url, created_at, updated_at")
+      .eq("id", page.ha_instance_id)
+      .single();
+    
+    haInstance = instanceData;
+  }
+  
+  console.log("edit page Instance found", haInstance);
+  if (!haInstance) {
+    console.error("HA instance not found", page.ha_instance_id);
     notFound();
   }
 
@@ -57,7 +55,7 @@ export default async function PageEdit({ params }: PageProps) {
   }
 
   return (
-    <HassConnectWrapper haInstance={instance}>
+    <HassConnectWrapper haInstance={haInstance}>
       <PageEditorClient
         initialData={page.puck_data}
         pageId={page.id}

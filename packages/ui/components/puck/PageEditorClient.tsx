@@ -48,13 +48,13 @@ export default function PageEditorClient({
   const [settings, setSettings] = useState<{
     title: string;
     slug: string;
-    haInstanceId?: string | null;
+    haInstanceId?: string | null | undefined;
   }>(() => {
     const props = (initialData?.root?.props as any) || {};
     return {
       title: props.title || "New Page",
       slug: props.slug || "new-page",
-      haInstanceId: props.haInstanceId || null,
+      haInstanceId: props.haInstanceId || haInstances[0].id || undefined,
     };
   });
   const router = useRouter();
@@ -104,8 +104,8 @@ export default function PageEditorClient({
         generateSlug((data.root.props as any).title),
       puck_data: data,
       published,
-      ha_instance_id: (data.root.props as any).haInstanceId || null,
-    } as const;
+      ha_instance_id: (data.root.props as any).haInstanceId || haInstances[0].id || null,
+    } as any;
   };
 
   const saveAs = async (published: boolean) => {
@@ -166,6 +166,7 @@ export default function PageEditorClient({
     setSettings({
       title: props.title || "New Page",
       slug: props.slug || "new-page",
+      haInstanceId: props.haInstanceId || haInstances[0].id || undefined,
     });
     setIsSettingsOpen(true);
   };
@@ -180,7 +181,7 @@ export default function PageEditorClient({
           ...(data.root.props as any),
           title: settings.title,
           slug: nextSlug,
-          haInstanceId: settings.haInstanceId || null,
+          haInstanceId: settings.haInstanceId || haInstances[0].id || undefined,
         },
       },
     });
@@ -293,7 +294,7 @@ export default function PageEditorClient({
                       onChange={(e) =>
                         setSettings({
                           ...settings,
-                          haInstanceId: e.target.value || null,
+                          haInstanceId: e.target.value || undefined,
                         })
                       }
                     >
