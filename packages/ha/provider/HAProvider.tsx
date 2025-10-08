@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useMe
 import { clientLogger } from "@repo/lib";
 import { Connection, getStates, subscribeEntities, Auth, ERR_INVALID_AUTH } from "home-assistant-js-websocket";
 import { connect } from "../connection"; // Import your connect logic
-import { HAInstance } from "@/components/InstanceManager/HAInstance";
+import { HAInstance } from "@repo/types/ha";
 
 export interface HAContextType {
   connection: Connection | null;

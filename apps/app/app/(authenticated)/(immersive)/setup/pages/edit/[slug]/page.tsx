@@ -2,6 +2,7 @@ import { PageActions, SupabaseServer } from "@repo/lib";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient"
 import { notFound } from "next/navigation";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
+import { HAInstance as HAInstanceType } from "@repo/types/ha";
 
 // Enable dynamic params for unknown routes
 export const dynamicParams = true;
@@ -34,7 +35,7 @@ export default async function PageEdit({ params }: PageProps) {
       .eq("id", page.ha_instance_id)
       .single();
     
-    haInstance = instanceData;
+    haInstance = instanceData as unknown as HAInstanceType;
   }
   
   console.log("edit page Instance found", haInstance);

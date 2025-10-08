@@ -1,7 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { HAInstanceActions, LinkService } from "@repo/lib";
-import { Card, CardBody, Link, Button, Spinner, Skeleton } from "@heroui/react";
+import { Card, CardBody, Link, Button } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
 import { useHA } from "@repo/ha";
@@ -9,18 +9,17 @@ import { Entitlements } from "@repo/types/subscription";
 import Icon from "@mdi/react";
 import {
   mdiHomeAssistant,
-  mdiPlus,
   mdiArrowRight,
-  mdiAlertCircle,
 } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
+import { HAInstance as HAInstanceType } from "@repo/types/ha";
 import { AddInstance } from "./AddInstance";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 
 interface HAInstanceManagerProps {
   compact?: boolean;
-  haInstances: HAInstance[];
+  haInstances: HAInstanceType[];
   entitlements: Entitlements;
 }
 

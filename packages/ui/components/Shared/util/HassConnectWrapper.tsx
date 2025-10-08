@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
-import HassErrorFallback from "./HassErrorFallback";
 import { HAProvider } from "@repo/ha";
-import { HAInstance } from "../../InstanceManager/HAInstance";
+import { HAInstance } from "@repo/types/ha";
 
 interface HassConnectWrapperProps {
   children: React.ReactNode;

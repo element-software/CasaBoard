@@ -1,5 +1,5 @@
-import { HAInstance } from "@repo/ui/components/InstanceManager/HAInstance";
 import { Data } from "@measured/puck";
+import { HAInstance as HAInstanceType } from "@repo/types/ha";
 
 export interface Page {
   id: string;
@@ -9,7 +9,7 @@ export interface Page {
   published: boolean;
   user_id: string;
   ha_instance_id?: string | null;
-  ha_instance?: HAInstance;
+  ha_instance?: HAInstanceType;
   created_at: string;
   updated_at: string;
 }

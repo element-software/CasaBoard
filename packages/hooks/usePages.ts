@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Data } from "@measured/puck";
 import { Page } from '@repo/types/page';
 import { PageActions } from '@repo/lib';
+import { Tools } from '@repo/utils';
 
 export function usePages() {
   const [pages, setPages] = useState<Page[]>([]);
@@ -24,7 +25,7 @@ export function usePages() {
 
   const createPage = async (name: string, puckData: Data = { content: [], root: { props: {} } }) => {
     try {
-      const slug = PageActions.generateSlug(name);
+      const slug = Tools.generateSlug(name);
       const newPage = await PageActions.createPage({
         name,
         slug,
@@ -40,7 +41,7 @@ export function usePages() {
 
   const updatePageData = async (slug: string, puckData: Data) => {
     try {
-      const updatedPage = await PageActions.updatePageData(slug, puckData);
+      const updatedPage = await PageActions.updatePage(slug, { puck_data: puckData });
       setPages(prev => 
         prev.map(page => 
           page.slug === slug ? updatedPage : page

@@ -15,16 +15,10 @@ import Icon from "@mdi/react";
 import { mdiCheckCircle, mdiAlertCircle } from "@mdi/js";
 import { useState } from "react";
 import { useHA } from "@repo/ha";
+import { HAInstance as HAInstanceType } from "@repo/types/ha";
 
-export interface HAInstance {
-  id: string;
-  name: string;
-  hass_url: string;
-  hass_token: string;
-  created_at: string;
-}
 export interface HAInstanceProps {
-  instance: HAInstance;
+  instance: HAInstanceType;
   compact?: boolean;
   onDelete: (id: string) => void;
 }
