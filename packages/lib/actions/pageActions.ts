@@ -52,13 +52,15 @@ export async function createPage(data: CreatePageData) {
         ha_instance_id: data.ha_instance_id ?? null,
         user_id: user.id,
       })
-      .select(`*, 
+      .select(`
+        *, 
         ha_instance:ha_instances (
           id,
           name,
           hass_url,
           created_at
-        )`)
+        )
+      `)
       .single();
 
     if (error) {
