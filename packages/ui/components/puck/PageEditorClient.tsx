@@ -48,7 +48,7 @@ export default function PageEditorClient({
   const [settings, setSettings] = useState<{
     title: string;
     slug: string;
-    haInstanceId?: string | null | undefined;
+    haInstanceId?: string | null;
   }>(() => {
     const props = (initialData?.root?.props as any) || {};
     return {
