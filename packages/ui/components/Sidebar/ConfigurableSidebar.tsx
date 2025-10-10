@@ -5,7 +5,7 @@ import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";
 import { MobileHeader } from "@repo/ui/components/Header/MobileHeader";
 import { useState, useEffect } from "react";
-import { useConfiguration } from "@repo/ui/components/ConfigurationProvider";
+import { useConfiguration } from "@/components/Shared/util/ConfigurationProvider";
 import { SupabaseClient } from "@repo/lib";
 import { useRouter } from "next/navigation";
 import { SidebarConfig } from "@repo/config";

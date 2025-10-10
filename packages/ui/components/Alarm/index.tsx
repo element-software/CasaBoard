@@ -4,7 +4,7 @@ import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
 import { AlarmUtils } from "@repo/utils";
-import EntityIcon from "@repo/ui/components/EntityIcon";
+import EntityIcon from "../Shared/util/EntityIcon";
 
 export interface AlarmProps {
   entityId: string;

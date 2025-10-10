@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { LinkService } from "@repo/lib";
-import { CasaBoardLogo } from "./Logo";
+import { CasaBoardLogo } from "../../Logo/index";
 
 export const Footer: React.FC = () => {
   const year = new Date().getFullYear();

@@ -1,7 +1,7 @@
-import { PagesList } from "@repo/ui/components/Setup/PagesList";
 import { PageActions, SubscriptionService, serverLogger } from "@repo/lib";
 import Link from "next/link";
-import { PagesManagement } from "@repo/ui/components/Setup/PagesManagement";
+import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
+import { Page } from "@repo/types/page";
 
 // Enable dynamic params for unknown routes
 export const dynamicParams = true;
@@ -9,11 +9,12 @@ export const dynamicParams = true;
 export const dynamic = "force-dynamic";
 
 export default async function PagesListPage() {
-  let pages = [];
+  let pages: Page[] = [];
   let error = null;
   const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
   try {
     pages = await PageActions.getAllPages();
+    console.log("PagesListPage", "pages", pages);
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load pages";
   }

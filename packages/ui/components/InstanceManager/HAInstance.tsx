@@ -1,19 +1,24 @@
 "use client";
-import { Chip, Button, cn, Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
+import {
+  Chip,
+  Button,
+  cn,
+  Skeleton,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Spinner,
+} from "@heroui/react";
 import Icon from "@mdi/react";
-import { mdiCheckCircle } from "@mdi/js";
+import { mdiCheckCircle, mdiAlertCircle } from "@mdi/js";
 import { useState } from "react";
 import { useHA } from "@repo/ha";
+import { HAInstance as HAInstanceType } from "@repo/types/ha";
 
-export interface HAInstance {
-  id: string;
-  name: string;
-  hass_url: string;
-  hass_token: string;
-  created_at: string;
-}
 export interface HAInstanceProps {
-  instance: HAInstance;
+  instance: HAInstanceType;
   compact?: boolean;
   onDelete: (id: string) => void;
 }
@@ -36,38 +41,54 @@ export const HAInstance = ({
   };
 
   return (
-    <Skeleton className="rounded-sm" isLoaded={connected}>
+    <>
       <div
         key={id}
         className={cn(
           "flex items-center justify-between gap-3 p-3 rounded-md",
           {
-            "bg-green-800 border border-green-200": connected
+            "bg-green-800 border border-green-200": connected,
+            "bg-amber-800 border border-amber-200": !connected,
           }
         )}
       >
         <div className="min-w-0">
           <div className="font-medium truncate">{name}</div>
-          <div className="flex items-center gap-2 text-sm text-foreground-500 truncate">
-            <span className="truncate">{hass_url}</span>
-            <Chip
-              size="sm"
-              color="default"
-              variant="flat"
-              startContent={<Icon path={mdiCheckCircle} className="w-3 h-3" />}
-            >
-              {entityCount} entities
-            </Chip>
-            {connected && (
+          <div
+            className={cn(
+              "flex gap-2 text-sm text-foreground-500",
+              {
+                "flex-col items-start": compact,
+                "items-center": !compact,
+              }
+            )}
+          >
+            <span>{hass_url}</span>
+            <div className="flex items-center gap-2">
               <Chip
                 size="sm"
                 color="default"
                 variant="flat"
-                startContent={<Icon path={mdiCheckCircle} className="w-3 h-3" />}
+                startContent={
+                  <Icon path={mdiCheckCircle} className="w-3 h-3" />
+                }
               >
-                Connected
+                {entityCount} entities
               </Chip>
-            )}
+              <Chip
+                size="sm"
+                color="default"
+                variant="flat"
+                startContent={
+                  <Icon
+                    path={connected ? mdiCheckCircle : mdiAlertCircle}
+                    className="w-3 h-3"
+                  />
+                }
+              >
+                {connected ? "Connected" : "Disconnected"}
+              </Chip>
+            </div>
           </div>
         </div>
 
@@ -83,25 +104,44 @@ export const HAInstance = ({
             </Button>
           </div>
         )}
+        {!connected && (
+          <Spinner color="primary" size="sm">
+            Connecting...
+          </Spinner>
+        )}
       </div>
-      <Modal isOpen={isConfirmOpen} onOpenChange={setIsConfirmOpen} backdrop="blur">
+      <Modal
+        isOpen={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        backdrop="blur"
+      >
         <ModalContent className="bg-theme-background text-theme-text border border-theme-border">
-          <ModalHeader className="flex flex-col gap-1">Confirm deletion</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Confirm deletion
+          </ModalHeader>
           <ModalBody>
             <p>
-              This will remove the Home Assistant instance "{name}" from your account. You can add it again later.
+              This will remove the Home Assistant instance "{name}" from your
+              account. You can add it again later.
             </p>
           </ModalBody>
           <ModalFooter className="justify-between">
             <Button variant="light" onPress={() => setIsConfirmOpen(false)}>
               Cancel
             </Button>
-            <Button color="danger" onPress={() => { setIsConfirmOpen(false); handleDelete(); }} isLoading={isDeletePending}>
+            <Button
+              color="danger"
+              onPress={() => {
+                setIsConfirmOpen(false);
+                handleDelete();
+              }}
+              isLoading={isDeletePending}
+            >
               OK
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Skeleton>
+    </>
   );
 };

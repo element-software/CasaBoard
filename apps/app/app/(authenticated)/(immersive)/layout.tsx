@@ -1,13 +1,10 @@
-import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
-import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
+import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
 import {
-  HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
-  serverLogger,
   SubscriptionService,
 } from "@repo/lib";
-import { Footer } from "@repo/ui/components/Footer";
+import { Footer } from "@repo/ui/components/Shared/Footer/index";
 import { redirect } from "next/navigation";
 
 // Force dynamic rendering for this layout since it uses cookies
@@ -36,17 +33,12 @@ export default async function AuthenticatedLayout({
     redirect("/auth/setup");
   }
 
-  // Fetch first instance (pages are tied per-instance; active flag removed)
-  const haInstance = await HAInstanceActions.getFirstHAInstance();
-
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <HassConnectWrapper haInstance={haInstance}>
-        <div className="min-h-screen">
-          <main className="flex-1 h-full">{children}</main>
-          <Footer />
-        </div>
-      </HassConnectWrapper>
+      <div className="min-h-screen">
+        <main className="flex-1 h-full">{children}</main>
+        <Footer />
+      </div>
     </ConfigurationProvider>
   );
 }

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import EntityIcon from "@repo/ui/components/EntityIcon";
+import EntityIcon from "../Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import Icon from "@mdi/react";
 import { mdiShieldAlert, mdiAlert } from "@mdi/js";

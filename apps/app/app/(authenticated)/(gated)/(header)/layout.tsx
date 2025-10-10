@@ -1,7 +1,5 @@
-import { ConfigurationProvider } from "@repo/ui/components/ConfigurationProvider";
-import { HassConnectWrapper } from "@repo/ui/components/HassConnectWrapper";
+import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
 import {
-  HAInstanceActions,
   ConfigService,
   getCurrentAuthUser,
   serverLogger,
@@ -9,7 +7,7 @@ import {
 } from "@repo/lib";
 import { redirect } from "next/navigation";
 import { Header } from "@repo/ui/components/Header/Header";
-import { Footer } from "@repo/ui/components/Footer";
+import { Footer } from "@repo/ui/components/Shared/Footer/index";
 import { Breadcrumbs } from "@repo/ui/components/Breadcrumbs/index";
 
 // Force dynamic rendering for this layout since it uses cookies
@@ -38,19 +36,16 @@ export default async function AuthenticatedLayout({
     redirect("/auth/setup");
   }
 
-  const haInstance = await HAInstanceActions.getFirstHAInstance();
   serverLogger.info("Layout (gated)::", "subscription status", subscription.status, "isTrial", isTrial);
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <HassConnectWrapper haInstance={haInstance}>
-          <Header user={authedUser} isTrial={isTrial} />
-          <Breadcrumbs />
-          <div className="min-h-screen">
-            <main className="flex-1">{children}</main>
-          </div>
-          <Footer />
-      </HassConnectWrapper>
+      <Header user={authedUser} isTrial={isTrial} />
+      <Breadcrumbs />
+      <div className="min-h-screen">
+        <main className="flex-1">{children}</main>
+      </div>
+      <Footer />
     </ConfigurationProvider>
   );
 }

@@ -104,6 +104,37 @@ export async function getFirstHAInstance() {
   return data;
 }
 
+export async function getHAInstanceByHassUrl(hassUrl: string) {
+  const supabase = await createClient();
+  const user = await getCurrentAuthUser();
+  if (!user) throw new Error("Unauthorized");
+  const { data, error } = await supabase
+    .from("ha_instances")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("hass_url", hassUrl)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function getHAInstance(id: string) {
+  console.info("getHAInstance", "id", id);
+  const supabase = await createClient();
+  const user = await getCurrentAuthUser();
+  if (!user) throw new Error("Unauthorized");
+  const { data, error } = await supabase
+    .from("ha_instances")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("id", id)
+    .single();
+  console.info("getHAInstance", "data", data, "error", error);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function updateHAInstance(data: UpdateHAInstanceInput) {
   const supabase = await createClient();
   const user = await getCurrentAuthUser();

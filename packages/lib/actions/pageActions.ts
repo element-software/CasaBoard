@@ -2,7 +2,7 @@
 
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { SubscriptionService } from "../services/subscriptionService";
-import { CreatePageData, UpdatePageData } from "@repo/types/page";
+import { CreatePageData, Page, UpdatePageData } from "@repo/types/page";
 import { revalidatePath } from "next/cache";
 import { serverLogger } from "@repo/lib";
 
@@ -52,7 +52,15 @@ export async function createPage(data: CreatePageData) {
         ha_instance_id: data.ha_instance_id ?? null,
         user_id: user.id,
       })
-      .select()
+      .select(`
+        *, 
+        ha_instance:ha_instances (
+          id,
+          name,
+          hass_url,
+          created_at
+        )
+      `)
       .single();
 
     if (error) {
@@ -62,7 +70,7 @@ export async function createPage(data: CreatePageData) {
     revalidatePath("/setup/pages");
     return page;
   } catch (error) {
-    serverLogger.error('pageActions.create', 'Failed to create page', error);
+    serverLogger.error("pageActions.create", "Failed to create page", error);
     throw error;
   }
 }
@@ -98,7 +106,7 @@ export async function updatePage(slug: string, data: UpdatePageData) {
     revalidatePath(`/${slug}`);
     return page;
   } catch (error) {
-    serverLogger.error('pageActions.update', 'Failed to update page', error);
+    serverLogger.error("pageActions.update", "Failed to update page", error);
     throw error;
   }
 }
@@ -125,12 +133,12 @@ export async function deletePage(slug: string) {
     revalidatePath("/setup/pages");
     return { success: true };
   } catch (error) {
-    serverLogger.error('pageActions.delete', 'Failed to delete page', error);
+    serverLogger.error("pageActions.delete", "Failed to delete page", error);
     throw error;
   }
 }
 
-export async function getPage(slug: string) {
+export async function getPage(slug: string): Promise<Page> {
   try {
     const supabase = await createClient();
 
@@ -143,7 +151,13 @@ export async function getPage(slug: string) {
 
     const { data: page, error } = await supabase
       .from("pages")
-      .select("*")
+      .select(`*, 
+        ha_instance:ha_instances (
+          id,
+          name,
+          hass_url,
+          created_at
+        )`)
       .eq("user_id", user.id)
       .eq("slug", slug)
       .single();
@@ -157,12 +171,12 @@ export async function getPage(slug: string) {
 
     return page;
   } catch (error) {
-    serverLogger.error('pageActions.get', 'Failed to get page', error);
+    serverLogger.error("pageActions.get", "Failed to get page", error);
     throw error;
   }
 }
 
-export async function getAllPages() {
+export async function getAllPages(): Promise<Page[]> {
   try {
     const supabase = await createClient();
 
@@ -175,7 +189,16 @@ export async function getAllPages() {
 
     const { data: pages, error } = await supabase
       .from("pages")
-      .select("*")
+      .select(
+        `*, 
+      
+      ha_instance:ha_instances (
+        id,
+        name,
+        hass_url,
+        created_at
+      )`
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -185,12 +208,12 @@ export async function getAllPages() {
 
     return pages;
   } catch (error) {
-    serverLogger.error('pageActions.getAll', 'Failed to get all pages', error);
+    serverLogger.error("pageActions.getAll", "Failed to get all pages", error);
     throw error;
   }
 }
 
-export async function getPageBySlug(slug: string) {
+export async function getPageBySlug(slug: string): Promise<Page> {
   try {
     const supabase = await createClient();
 
@@ -201,7 +224,13 @@ export async function getPageBySlug(slug: string) {
     // First, try to get the page
     const { data: page, error } = await supabase
       .from("pages")
-      .select("*")
+      .select(`*, 
+        ha_instance:ha_instances (
+          id,
+          name,
+          hass_url,
+          created_at
+        )`)
       .eq("slug", slug)
       .single();
 
@@ -223,7 +252,11 @@ export async function getPageBySlug(slug: string) {
 
     return page;
   } catch (error) {
-    serverLogger.error('pageActions.getBySlug', 'Failed to get page by slug', error);
+    serverLogger.error(
+      "pageActions.getBySlug",
+      "Failed to get page by slug",
+      error
+    );
     throw error;
   }
 }

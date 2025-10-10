@@ -3,7 +3,6 @@ export * as SupabaseServer from './supabase/server';
 export * as SupabaseMiddleware from './supabase/middleware';
 export * as SupabaseClient from './supabase/client';
 export * as ConfigService from './services/configService';
-export { PageService } from './services/pageService';
 export * as BillingService from './services/billingService';
 export { SubscriptionService } from './services/subscriptionService';
 export { StripeService } from './services/stripeService';
