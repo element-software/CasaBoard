@@ -15,17 +15,24 @@ import {
 } from "@heroui/react";
 import "@measured/puck/puck.css";
 import { useRouter } from "next/navigation";
-import { LinkService, PageActions, SidebarActions, clientLogger } from "@repo/lib";
+import { clientLogger } from "@repo/lib";
 
 type PuckEditorClientProps = {
-  type: "page" | "sidebar";
+  type: "page" | "sidebar"; // Generic type name for display purposes
   initialData?: Data;
   itemId?: string | null;
-  userId?: string | null;
   initialPublished?: boolean;
   haInstances?: { id: string; name: string; hass_url: string }[];
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
+  // Publish functions passed as props
+  onCreateItem: (data: { name: string; slug: string; puck_data: Data; [key: string]: any }) => Promise<any>;
+  onUpdateItem: (slug: string, data: { name?: string; puck_data?: Data; [key: string]: any }) => Promise<any>;
+  onPublishItem?: (slug: string, published: boolean) => Promise<any>; // Optional for items that don't have publish state
+  // Navigation URLs passed as strings
+  editUrlTemplate: string; // e.g., "/setup/pages/edit/{slug}"
+  viewUrlTemplate?: string; // e.g., "/dashboard/{slug}"
+  backUrl: string; // e.g., "/setup/pages"
 };
 
 export default function PuckEditorClient({
@@ -36,6 +43,12 @@ export default function PuckEditorClient({
   haInstances = [],
   sidebars = [],
   initialSlug,
+  onCreateItem,
+  onUpdateItem,
+  onPublishItem,
+  editUrlTemplate,
+  viewUrlTemplate,
+  backUrl,
 }: PuckEditorClientProps) {
   const [data, setData] = useState<Data>(
     initialData || { content: [], root: { props: {} } }
@@ -95,27 +108,19 @@ export default function PuckEditorClient({
   const saveItem = async () => {
     setError(null);
     try {
-      if (type === "page") {
-        const result = await PageActions.createPage({
-          name: settings.title,
-          slug: settings.slug,
-          puck_data: data,
-          ha_instance_id: settings.haInstanceId,
-          sidebar_id: settings.sidebarId,
-        });
-        setCurrentItemId(result.id);
-        setLastSavedJson(JSON.stringify(data));
-        clientLogger.info("PuckEditorClient", "Page created successfully", result);
-      } else {
-        const result = await SidebarActions.createSidebar({
-          name: settings.title,
-          slug: settings.slug,
-          puck_data: data,
-        });
-        setCurrentItemId(result.id);
-        setLastSavedJson(JSON.stringify(data));
-        clientLogger.info("PuckEditorClient", "Sidebar created successfully", result);
-      }
+      const createData = {
+        name: settings.title,
+        slug: settings.slug,
+        puck_data: data,
+        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
+        ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
+      };
+      
+      const result = await onCreateItem(createData);
+      setCurrentItemId(result.id);
+      setLastSavedJson(JSON.stringify(data));
+      clientLogger.info("PuckEditorClient", `${type} created successfully`, result);
+      router.push(editUrlTemplate.replace('{slug}', result.slug));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save";
       setError(errorMessage);
@@ -126,21 +131,15 @@ export default function PuckEditorClient({
   const updateItem = async () => {
     setError(null);
     try {
-      if (type === "page") {
-        await PageActions.updatePage(settings.slug, {
-          name: settings.title,
-          puck_data: data,
-          ha_instance_id: settings.haInstanceId,
-          sidebar_id: settings.sidebarId,
-        });
-      } else {
-        // For sidebars, use the original slug for existing items
-        const slugToUse = isExistingItem ? (initialSlug || settings.slug) : settings.slug;
-        await SidebarActions.updateSidebar(slugToUse, {
-          name: settings.title,
-          puck_data: data,
-        });
-      }
+      const updateData = {
+        name: settings.title,
+        puck_data: data,
+        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
+        ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
+      };
+      
+      const slugToUse = initialSlug || settings.slug;
+      await onUpdateItem(slugToUse, updateData);
       setLastSavedJson(JSON.stringify(data));
       clientLogger.info("PuckEditorClient", `${type} updated successfully`);
     } catch (err) {
@@ -155,28 +154,40 @@ export default function PuckEditorClient({
       await saveItem();
     } else {
       await updateItem();
+      if (onPublishItem) {
+        startPublishTransition(async () => {
+          try {
+            await onPublishItem(initialSlug || settings.slug, true);
+            setIsPublished(true);
+          } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to publish");
+            clientLogger.error("PuckEditorClient", "Publish failed", err);
+          }
+        });
+      } else {
+        // For items without publish state (like sidebars), just mark as published
+        setIsPublished(true);
+      }
     }
-    setIsPublished(true);
   };
 
   const updatePublished = async () => {
     if (!currentItemId) return;
     
-    startPublishTransition(async () => {
-      try {
-        if (type === "page") {
-          await PageActions.updatePage(settings.slug, { published: !isPublished });
-        } else {
-          // Sidebars don't have a published state, so just update the data
-          await updateItem();
+    if (onPublishItem) {
+      startPublishTransition(async () => {
+        try {
+          await onPublishItem(initialSlug || settings.slug, !isPublished);
+          setIsPublished(!isPublished);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to update status");
+          clientLogger.error("PuckEditorClient", "Publish update failed", err);
         }
-        setIsPublished(!isPublished);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to update status";
-        setError(errorMessage);
-        clientLogger.error("PuckEditorClient", "Publish update failed", err);
-      }
-    });
+      });
+    } else {
+      // For items without publish state, just toggle the local state
+      setIsPublished(!isPublished);
+    }
   };
 
   const applySettings = () => {
@@ -204,12 +215,11 @@ export default function PuckEditorClient({
   };
 
   const getHeaderTitle = () => {
-    const itemType = type === "page" ? "Page" : "Sidebar";
-    return `${itemType} Editor - ${data.root.props?.title || settings.title}`;
+    return `${type} Editor - ${data.root.props?.title || settings.title}`;
   };
 
   const getHeaderPath = () => {
-    return data.root.props?.title || settings.title;
+    return data.root.title || settings.slug;
   };
 
   return (
@@ -230,32 +240,38 @@ export default function PuckEditorClient({
         headerPath={getHeaderPath()}
         overrides={{
           headerActions: () => {
-            const rightLabel = !isPublished
-              ? "Publish"
-              : isDirty
-                ? "Update"
-                : "Unpublish";
-            const rightHandler = !isPublished
-              ? publish
-              : isDirty
-                ? updateItem
-                : updatePublished;
+            const rightLabel = !currentItemId
+              ? "Create"
+              : !isPublished
+                ? "Publish"
+                : isDirty
+                  ? "Update"
+                  : "Unpublish";
+            const rightHandler = !currentItemId
+              ? saveItem
+              : !isPublished
+                ? publish
+                : isDirty
+                  ? updateItem
+                  : updatePublished;
 
             return (
               <div className="flex gap-2">
-                <Link
-                  href={`/dashboard/${initialSlug}`}
-                  size="sm"
-                  color="secondary"
-                  target="_blank"
-                >
-                  View {type}
-                </Link>
+                {viewUrlTemplate && initialSlug && (
+                  <Link
+                    href={viewUrlTemplate.replace('{slug}', initialSlug)}
+                    size="sm"
+                    color="secondary"
+                    target="_blank"
+                  >
+                    View {type}
+                  </Link>
+                )}
                 <Button
                   size="sm"
                   variant="bordered"
                   color="secondary"
-                  onPress={() => router.push(`/setup/${type}s`)}
+                  onPress={() => router.push(backUrl)}
                 >
                   Back to {type}s
                 </Button>
@@ -272,6 +288,7 @@ export default function PuckEditorClient({
                   color="primary"
                   onPress={rightHandler}
                   isLoading={isPublishPending}
+                  isDisabled={currentItemId ? (!isDirty && !isPublished) : false}
                 >
                   {rightLabel}
                 </Button>
@@ -288,7 +305,7 @@ export default function PuckEditorClient({
       >
         <ModalContent>
           <ModalHeader>
-            {type === "page" ? "Page" : "Sidebar"} Settings
+            {type} Settings
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
@@ -306,7 +323,6 @@ export default function PuckEditorClient({
                 description={isExistingItem ? "Slug cannot be changed for existing items" : "URL-friendly version of the name"}
                 isDisabled={isExistingItem}
               />
-              {type === "page" && haInstances.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Home Assistant Instance
@@ -323,7 +339,6 @@ export default function PuckEditorClient({
                     ))}
                   </select>
                 </div>
-              )}
               {type === "page" && sidebars.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium mb-2">

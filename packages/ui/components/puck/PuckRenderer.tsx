@@ -1,16 +1,14 @@
 "use client";
+
 import { Render } from "@measured/puck";
-import { useState, useEffect } from 'react';
-import { usePages } from '@repo/hooks/usePages';
-import { Page } from '@repo/types/page'
-import { PuckConfig } from './puck.config';
+import { Page } from "@repo/types/page";
+import { PuckConfig } from "./puck.config";
 interface PuckRendererProps {
   pageId: string;
   pageData?: Page;
 }
 
 export const PuckRenderer = ({ pageId, pageData }: PuckRendererProps) => {
-
   if (!pageData) {
     return (
       <div className="p-8 text-center text-red-500">
@@ -29,9 +27,36 @@ export const PuckRenderer = ({ pageId, pageData }: PuckRendererProps) => {
     );
   }
 
+  const renderSidebar = () => {
+    if (!pageData.sidebar || !pageData.sidebar.puck_data) {
+      return null;
+    }
+    
+    try {
+      return (
+        <div className="min-w-[300px] border-r border-white h-screen p-4">
+          <Render config={PuckConfig} data={pageData.sidebar.puck_data} />
+        </div>
+      );
+    } catch (error) {
+      console.error("Error rendering sidebar:", error);
+      return (
+        <div className="sidebar-content mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <p>
+            Error rendering sidebar:{" "}
+            {error instanceof Error ? error.message : "Unknown error"}
+          </p>
+        </div>
+      );
+    }
+  };
+
   return (
-    <div className="p-4">
-      <Render config={PuckConfig} data={pageData.puck_data} />
+    <div className="flex flex-row gap-4">
+      {renderSidebar()}
+      <div className="p-4 w-full grow">
+        <Render config={PuckConfig} data={pageData.puck_data} />
+      </div>
     </div>
   );
 };

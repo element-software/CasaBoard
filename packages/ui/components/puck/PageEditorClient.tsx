@@ -1,4 +1,5 @@
 import PuckEditorClient from "./PuckEditorClient";
+import { PageActions } from "@repo/lib";
 
 type PageEditorClientProps = {
   initialData?: any;
@@ -9,6 +10,22 @@ type PageEditorClientProps = {
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
 };
+
+// Server action wrappers
+async function createPageAction(data: any) {
+  "use server";
+  return await PageActions.createPage(data);
+}
+
+async function updatePageAction(slug: string, data: any) {
+  "use server";
+  return await PageActions.updatePage(slug, data);
+}
+
+async function publishPageAction(slug: string, published: boolean) {
+  "use server";
+  return await PageActions.updatePage(slug, { published });
+}
 
 export default function PageEditorClient({
   initialData,
@@ -28,6 +45,12 @@ export default function PageEditorClient({
       haInstances={haInstances}
       sidebars={sidebars}
       initialSlug={initialSlug}
+      onCreateItem={createPageAction}
+      onUpdateItem={updatePageAction}
+      onPublishItem={publishPageAction}
+      editUrlTemplate="/setup/pages/edit/{slug}"
+      viewUrlTemplate="/dashboard/{slug}"
+      backUrl="/setup/pages"
     />
   );
 }

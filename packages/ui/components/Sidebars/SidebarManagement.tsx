@@ -134,7 +134,6 @@ export const SidebarManagement = ({
           <p className="text-theme-text-secondary mb-4">
             Create your first sidebar to get started
           </p>
-          {!showAllSidebars && (
             <Button
               as={Link}
               href="/setup/sidebars/create"
@@ -144,7 +143,6 @@ export const SidebarManagement = ({
             >
               Create Sidebar
             </Button>
-          )}
         </CardBody>
       </Card>
     );

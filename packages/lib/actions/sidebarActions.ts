@@ -3,20 +3,29 @@
 import { createClient } from "../supabase/server";
 import { getCurrentAuthUser } from "../supabase/server";
 import { serverLogger } from "../logger";
-import { Sidebar, CreateSidebarData, UpdateSidebarData } from "@repo/types/sidebar";
+import {
+  Sidebar,
+  CreateSidebarData,
+  UpdateSidebarData,
+} from "@repo/types/sidebar";
 import { SubscriptionService } from "../services/subscriptionService";
 
 export async function getAllSidebars(): Promise<Sidebar[]> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("sidebars")
-      .select("*")
+      .select(`
+        *,
+        ha_instance:ha_instances!ha_instance_id (
+          id,
+          name,
+          hass_url,
+          created_at
+        )
+      `)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -24,7 +33,10 @@ export async function getAllSidebars(): Promise<Sidebar[]> {
     }
 
     const sidebars = (data ?? []) as unknown as Sidebar[];
-    serverLogger.info("getAllSidebars", `Retrieved ${sidebars.length} sidebars for user ${user.id}`);
+    serverLogger.info(
+      "getAllSidebars",
+      `Retrieved ${sidebars.length} sidebars for user ${user.id}`
+    );
     return sidebars;
   } catch (error) {
     serverLogger.error("getAllSidebars", "Failed to get sidebars", error);
@@ -35,14 +47,19 @@ export async function getAllSidebars(): Promise<Sidebar[]> {
 export async function getSidebar(slug: string): Promise<Sidebar> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("sidebars")
-      .select("*")
+      .select(`
+        *,
+        ha_instance:ha_instances!ha_instance_id (
+          id,
+          name,
+          hass_url,
+          created_at
+        )
+      `)
       .eq("slug", slug)
       .single();
 
@@ -51,7 +68,10 @@ export async function getSidebar(slug: string): Promise<Sidebar> {
     }
 
     const sidebar = data as unknown as Sidebar;
-    serverLogger.info("getSidebar", `Retrieved sidebar ${slug} for user ${user.id}`);
+    serverLogger.info(
+      "getSidebar",
+      `Retrieved sidebar ${slug} for user ${user.id}`
+    );
     return sidebar;
   } catch (error) {
     serverLogger.error("getSidebar", `Failed to get sidebar ${slug}`, error);
@@ -59,12 +79,11 @@ export async function getSidebar(slug: string): Promise<Sidebar> {
   }
 }
 
-export async function createSidebar(sidebarData: CreateSidebarData): Promise<Sidebar> {
+export async function createSidebar(
+  sidebarData: CreateSidebarData
+): Promise<Sidebar> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
 
@@ -74,7 +93,8 @@ export async function createSidebar(sidebarData: CreateSidebarData): Promise<Sid
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id);
 
-    const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+    const entitlements =
+      await SubscriptionService.getEntitlementsForCurrentUser();
     if (
       entitlements.active &&
       entitlements.maxSidebars >= 0 &&
@@ -89,7 +109,11 @@ export async function createSidebar(sidebarData: CreateSidebarData): Promise<Sid
       slug: sidebarData.slug || generateSlug(sidebarData.name),
     };
 
-    const insertPayload = { ...finalData, user_id: user.id } as Record<string, unknown>;
+    const insertPayload = { 
+      ...finalData, 
+      user_id: user.id,
+      ha_instance_id: sidebarData.ha_instance_id ?? null
+    } as Record<string, unknown>;
 
     const { data, error } = await supabase
       .from("sidebars")
@@ -102,7 +126,10 @@ export async function createSidebar(sidebarData: CreateSidebarData): Promise<Sid
     }
 
     const sidebar = data as unknown as Sidebar;
-    serverLogger.info("createSidebar", `Created sidebar ${sidebar.slug} for user ${user.id}`);
+    serverLogger.info(
+      "createSidebar",
+      `Created sidebar ${sidebar.slug} for user ${user.id}`
+    );
     return sidebar;
   } catch (error) {
     serverLogger.error("createSidebar", "Failed to create sidebar", error);
@@ -110,17 +137,20 @@ export async function createSidebar(sidebarData: CreateSidebarData): Promise<Sid
   }
 }
 
-export async function updateSidebar(slug: string, sidebarData: UpdateSidebarData): Promise<Sidebar> {
+export async function updateSidebar(
+  slug: string,
+  sidebarData: UpdateSidebarData
+): Promise<Sidebar> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
-    
-    serverLogger.info("updateSidebar", `Looking for sidebar with slug: ${slug} for user: ${user.id}`);
-    
+
+    serverLogger.info(
+      "updateSidebar",
+      `Looking for sidebar with slug: ${slug} for user: ${user.id}`
+    );
+
     // First check if the sidebar exists and belongs to the user
     const { data: existingSidebar, error: fetchError } = await supabase
       .from("sidebars")
@@ -129,10 +159,17 @@ export async function updateSidebar(slug: string, sidebarData: UpdateSidebarData
       .eq("user_id", user.id)
       .single();
 
-    serverLogger.info("updateSidebar", `Found sidebar:`, { existingSidebar, fetchError });
+    serverLogger.info("updateSidebar", `Found sidebar:`, {
+      existingSidebar,
+      fetchError,
+    });
 
     if (fetchError || !existingSidebar) {
-      serverLogger.error("updateSidebar", `Sidebar not found. Error:`, fetchError);
+      serverLogger.error(
+        "updateSidebar",
+        `Sidebar not found. Error:`,
+        fetchError
+      );
       throw new Error("Sidebar not found or access denied");
     }
 
@@ -149,10 +186,17 @@ export async function updateSidebar(slug: string, sidebarData: UpdateSidebarData
     }
 
     const sidebar = data as unknown as Sidebar;
-    serverLogger.info("updateSidebar", `Updated sidebar ${slug} for user ${user.id}`);
+    serverLogger.info(
+      "updateSidebar",
+      `Updated sidebar ${slug} for user ${user.id}`
+    );
     return sidebar;
   } catch (error) {
-    serverLogger.error("updateSidebar", `Failed to update sidebar ${slug}`, error);
+    serverLogger.error(
+      "updateSidebar",
+      `Failed to update sidebar ${slug}`,
+      error
+    );
     throw error;
   }
 }
@@ -160,36 +204,37 @@ export async function updateSidebar(slug: string, sidebarData: UpdateSidebarData
 export async function deleteSidebar(slug: string): Promise<void> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
-    const { error } = await supabase
-      .from("sidebars")
-      .delete()
-      .eq("slug", slug);
+    const { error } = await supabase.from("sidebars").delete().eq("slug", slug);
 
     if (error) {
       throw new Error(error.message || "Failed to delete sidebar");
     }
 
-    serverLogger.info("deleteSidebar", `Deleted sidebar ${slug} for user ${user.id}`);
+    serverLogger.info(
+      "deleteSidebar",
+      `Deleted sidebar ${slug} for user ${user.id}`
+    );
   } catch (error) {
-    serverLogger.error("deleteSidebar", `Failed to delete sidebar ${slug}`, error);
+    serverLogger.error(
+      "deleteSidebar",
+      `Failed to delete sidebar ${slug}`,
+      error
+    );
     throw error;
   }
 }
 
-export async function updateSidebarData(slug: string, puckData: any): Promise<Sidebar> {
+export async function updateSidebarData(
+  slug: string,
+  puckData: any
+): Promise<Sidebar> {
   try {
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const supabase = await createClient();
-    
+
     // First check if the sidebar exists and belongs to the user
     const { data: existingSidebar, error: fetchError } = await supabase
       .from("sidebars")
@@ -215,10 +260,17 @@ export async function updateSidebarData(slug: string, puckData: any): Promise<Si
     }
 
     const sidebar = data as unknown as Sidebar;
-    serverLogger.info("updateSidebarData", `Updated sidebar data for ${slug} for user ${user.id}`);
+    serverLogger.info(
+      "updateSidebarData",
+      `Updated sidebar data for ${slug} for user ${user.id}`
+    );
     return sidebar;
   } catch (error) {
-    serverLogger.error("updateSidebarData", `Failed to update sidebar data for ${slug}`, error);
+    serverLogger.error(
+      "updateSidebarData",
+      `Failed to update sidebar data for ${slug}`,
+      error
+    );
     throw error;
   }
 }
