@@ -1,5 +1,6 @@
 import { Data } from "@measured/puck";
 import { HAInstance as HAInstanceType } from "@repo/types/ha";
+import { Sidebar } from "@repo/types/sidebar";
 
 export interface Page {
   id: string;
@@ -10,6 +11,8 @@ export interface Page {
   user_id: string;
   ha_instance_id?: string | null;
   ha_instance?: HAInstanceType;
+  sidebar_id?: string | null;
+  sidebar?: Sidebar;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +23,7 @@ export interface CreatePageData {
   puck_data: Data;
   published?: boolean;
   ha_instance_id?: string | null;
+  sidebar_id?: string | null;
 }
 
 export interface UpdatePageData {
@@ -27,4 +31,5 @@ export interface UpdatePageData {
   puck_data?: Data;
   published?: boolean;
   ha_instance_id?: string | null;
+  sidebar_id?: string | null;
 }

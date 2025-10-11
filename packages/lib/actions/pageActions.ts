@@ -50,6 +50,7 @@ export async function createPage(data: CreatePageData) {
         puck_data: data.puck_data,
         published: data.published ?? false,
         ha_instance_id: data.ha_instance_id ?? null,
+        sidebar_id: data.sidebar_id ?? null,
         user_id: user.id,
       })
       .select(`
@@ -58,6 +59,12 @@ export async function createPage(data: CreatePageData) {
           id,
           name,
           hass_url,
+          created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
           created_at
         )
       `)
@@ -157,6 +164,12 @@ export async function getPage(slug: string): Promise<Page> {
           name,
           hass_url,
           created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          created_at
         )`)
       .eq("user_id", user.id)
       .eq("slug", slug)
@@ -191,13 +204,18 @@ export async function getAllPages(): Promise<Page[]> {
       .from("pages")
       .select(
         `*, 
-      
-      ha_instance:ha_instances (
-        id,
-        name,
-        hass_url,
-        created_at
-      )`
+        ha_instance:ha_instances (
+          id,
+          name,
+          hass_url,
+          created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          created_at
+        )`
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
@@ -229,6 +247,12 @@ export async function getPageBySlug(slug: string): Promise<Page> {
           id,
           name,
           hass_url,
+          created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
           created_at
         )`)
       .eq("slug", slug)

@@ -91,14 +91,15 @@ export class SubscriptionService {
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
     const data = await this.getCurrentSubscription();
     if (!data) {
-      // Return default entitlements for users without subscriptions
-      return {
-        planId: "no-subscription",
-        maxDashboards: 1, // Minimal free tier
-        maxHAInstances: 1,
-        trialEndsAt: null,
-        active: false
-      };
+    // Return default entitlements for users without subscriptions
+    return {
+      planId: "no-subscription",
+      maxDashboards: 1, // Minimal free tier
+      maxHAInstances: 1,
+      maxSidebars: 1, // Minimal free tier
+      trialEndsAt: null,
+      active: false
+    };
     }
 
     // Get entitlements from Stripe product metadata
@@ -111,11 +112,16 @@ export class SubscriptionService {
       ? (data.product.metadata.max_ha_instances === "-1" ? -1 : parseInt(data.product.metadata.max_ha_instances))
       : 1;
 
+    const maxSidebars = data.product.metadata?.max_sidebars 
+      ? (data.product.metadata.max_sidebars === "-1" ? -1 : parseInt(data.product.metadata.max_sidebars))
+      : 1;
+
     serverLogger.info('subscriptionService', 'Retrieved entitlements from Stripe product metadata', {
       productId: data.product.id,
       productName: data.product.name,
       maxDashboards,
       maxHAInstances,
+      maxSidebars,
       isTrial: data.isTrial,
       trialEndsAt: data.trialEndsAt,
       subscriptionStatus: data.subscription.status
@@ -125,6 +131,7 @@ export class SubscriptionService {
       planId: data.product.id, // Use Stripe product ID
       maxDashboards,
       maxHAInstances,
+      maxSidebars,
       trialEndsAt: data.trialEndsAt,
       active: data.isActive
     };

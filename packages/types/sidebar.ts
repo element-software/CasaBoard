@@ -1,0 +1,22 @@
+import { Data } from "@measured/puck";
+
+export interface Sidebar {
+  id: string;
+  name: string;
+  slug: string;
+  puck_data: Data;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateSidebarData {
+  name: string;
+  slug: string;
+  puck_data: Data;
+}
+
+export interface UpdateSidebarData {
+  name?: string;
+  puck_data?: Data;
+}

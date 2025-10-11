@@ -1,4 +1,4 @@
-import { PageActions, SupabaseServer } from "@repo/lib";
+import { PageActions, SidebarActions, SupabaseServer } from "@repo/lib";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient"
 import { notFound } from "next/navigation";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
@@ -55,6 +55,9 @@ export default async function PageEdit({ params }: PageProps) {
     notFound();
   }
 
+  // Get available sidebars for the user
+  const sidebars = await SidebarActions.getAllSidebars();
+
   return (
     <HassConnectWrapper haInstance={haInstance}>
       <PageEditorClient
@@ -62,6 +65,8 @@ export default async function PageEdit({ params }: PageProps) {
         pageId={page.id}
         initialPublished={page.published}
         haInstances={instances}
+        sidebars={sidebars}
+        initialSlug={page.slug}
       />
     </HassConnectWrapper>
   );
