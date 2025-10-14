@@ -35,5 +35,5 @@ export async function getCurrentAuthUser() {
   if (!user) {
     throw new Error("Unauthorized");
   }
-  return user ?? null
+  return user
 }
