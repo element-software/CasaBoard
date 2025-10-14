@@ -1,5 +1,5 @@
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
-import { SupabaseServer, getCurrentAuthUser } from "@repo/lib";
+import { SupabaseServer, getCurrentAuthUser, SidebarActions } from "@repo/lib";
 
 // Enable dynamic params for unknown routes
 export const dynamicParams = true;
@@ -19,5 +19,9 @@ export default async function PageCreate() {
       .order("created_at", { ascending: true });
     instances = (data as any) || [];
   }
-  return <PageEditorClient haInstances={instances} />;
+
+  // Fetch available sidebars for the user
+  const sidebars = await SidebarActions.getAllSidebars();
+
+  return <PageEditorClient haInstances={instances} sidebars={sidebars} />;
 }

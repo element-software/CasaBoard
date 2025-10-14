@@ -11,9 +11,6 @@ export async function createPage(data: CreatePageData) {
     const supabase = await createClient();
 
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     // Check if slug already exists for this user
     const { data: existingPage } = await supabase
@@ -50,17 +47,27 @@ export async function createPage(data: CreatePageData) {
         puck_data: data.puck_data,
         published: data.published ?? false,
         ha_instance_id: data.ha_instance_id ?? null,
+        sidebar_id: data.sidebar_id ?? null,
         user_id: user.id,
       })
-      .select(`
+      .select(
+        `
         *, 
         ha_instance:ha_instances (
           id,
           name,
           hass_url,
           created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          puck_data,
+          created_at
         )
-      `)
+      `
+      )
       .single();
 
     if (error) {
@@ -80,9 +87,6 @@ export async function updatePage(slug: string, data: UpdatePageData) {
     const supabase = await createClient();
 
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const { data: page, error } = await supabase
       .from("pages")
@@ -116,9 +120,6 @@ export async function deletePage(slug: string) {
     const supabase = await createClient();
 
     const user = await getCurrentAuthUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
 
     const { error } = await supabase
       .from("pages")
@@ -142,22 +143,26 @@ export async function getPage(slug: string): Promise<Page> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
+    const user = await getCurrentAuthUser();
 
     const { data: page, error } = await supabase
       .from("pages")
-      .select(`*, 
+      .select(
+        `*, 
         ha_instance:ha_instances (
           id,
           name,
           hass_url,
           created_at
-        )`)
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          puck_data,
+          created_at
+        )`
+      )
       .eq("user_id", user.id)
       .eq("slug", slug)
       .single();
@@ -180,24 +185,25 @@ export async function getAllPages(): Promise<Page[]> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
+    const user = await getCurrentAuthUser();
 
     const { data: pages, error } = await supabase
       .from("pages")
       .select(
         `*, 
-      
-      ha_instance:ha_instances (
-        id,
-        name,
-        hass_url,
-        created_at
-      )`
+        ha_instance:ha_instances (
+          id,
+          name,
+          hass_url,
+          created_at
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          puck_data,
+          created_at
+        )`
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
@@ -217,20 +223,27 @@ export async function getPageBySlug(slug: string): Promise<Page> {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentAuthUser();
 
     // First, try to get the page
     const { data: page, error } = await supabase
       .from("pages")
-      .select(`*, 
+      .select(
+        `*, 
         ha_instance:ha_instances (
           id,
           name,
           hass_url,
           created_at
-        )`)
+        ),
+        sidebar:sidebars (
+          id,
+          name,
+          slug,
+          puck_data,
+          created_at
+        )`
+      )
       .eq("slug", slug)
       .single();
 

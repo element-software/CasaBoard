@@ -5,6 +5,7 @@ export interface Entitlements {
   planId: PlanId; // Stripe product ID
   maxDashboards: number; // -1 for unlimited
   maxHAInstances: number; // -1 for unlimited
+  maxSidebars: number; // -1 for unlimited
   trialEndsAt: string | null; // ISO when trial ends
   active: boolean; // whether user has active access
 }
