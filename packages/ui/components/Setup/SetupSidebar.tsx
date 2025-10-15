@@ -90,7 +90,7 @@ export const SetupSidebar = ({
     },
     {
       id: "manage",
-      title: "MANAGE",
+      title: "Manage",
       icon: mdiCog,
       items: [
         {
@@ -139,10 +139,7 @@ export const SetupSidebar = ({
             <div key={section.id}>
               <Button
                 variant="light"
-                className={cn(
-                  "w-full justify-start text-left font-semibold text-sm text-white hover:bg-theme-primary",
-                  expandedSections.has(section.id) && "bg-amber-500"
-                )}
+                className="w-full justify-start text-left font-semibold text-sm text-white hover:bg-theme-primary"
                 onPress={() => toggleSection(section.id)}
                 startContent={
                   <Icon path={section.icon} className="w-4 h-4 text-white" />
@@ -168,9 +165,9 @@ export const SetupSidebar = ({
                       <Button
                         variant="light"
                         className={cn(
-                          "w-full justify-start text-left text-sm text-white hover:bg-theme-",
+                          "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
                           isActive(item.href) &&
-                            "bg-amber-400 text-white"
+                            "bg-theme-primary text-white hover:bg-theme-primary"
                         )}
                         startContent={
                           <Icon
@@ -200,7 +197,7 @@ export const SetupSidebar = ({
                 className={cn(
                   "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
                   isActive(item.href) &&
-                    "bg-amber-400 text-white"
+                    "bg-theme-primary text-white hover:bg-theme-primary"
                 )}
                 startContent={
                   <Icon path={item.icon} className="w-4 h-4 text-white" />

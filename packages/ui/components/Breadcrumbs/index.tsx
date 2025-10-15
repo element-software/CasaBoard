@@ -19,6 +19,7 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
   // Generate breadcrumbs from pathname with simple, declarative rules
   const generateBreadcrumbs = (): Crumb[] => {
     const segments = (pathname || "/").split("/").filter(Boolean);
+    console.log("segments:", segments);
     const labelMap: Record<string, string> = {
       setup: "Setup",
       pages: "Pages",
@@ -74,15 +75,19 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
     <Skeleton isLoaded={breadcrumbItems.length > 0}>
       <div className="max-w-7xl w-full mx-auto pt-4.5 pb-2 md:pt-4 md:pb-4 ml-16">
         <HeroBreadcrumbs className="text-sm">
-          {breadcrumbItems.map((item, index) => (
-            <BreadcrumbItem key={`${item.label}-${index}`}>
-              {item.href ? (
-                <Link href={item.href}>{item.label}</Link>
-              ) : (
-                item.label
-              )}
-            </BreadcrumbItem>
-          ))}
+          {breadcrumbItems.map((item, index) => {
+            console.log("item:", item);
+            if (item.href !== "/auth")
+              return (
+                <BreadcrumbItem key={`${item.label}-${index}`}>
+                  {item.href ? (
+                    <Link href={item.href}>{item.label}</Link>
+                  ) : (
+                    item.label
+                  )}
+                </BreadcrumbItem>
+              );
+          })}
         </HeroBreadcrumbs>
       </div>
     </Skeleton>
