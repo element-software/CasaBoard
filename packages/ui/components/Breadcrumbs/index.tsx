@@ -1,6 +1,10 @@
 "use client";
 
-import { BreadcrumbItem, Breadcrumbs as HeroBreadcrumbs, Skeleton } from "@heroui/react";
+import {
+  BreadcrumbItem,
+  Breadcrumbs as HeroBreadcrumbs,
+  Skeleton,
+} from "@heroui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,16 +25,15 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
       "ha-config": "HA Configuration",
       auth: "Authentication",
       login: "Login",
-      callback: "Authentication",
-      instructions: "Instructions",
+      billing: "Billing",
+      profile: "Profile",
       about: "About",
-      create: "Create Page",
+      create: "Create",
+      edit: "Edit",
     };
 
     const toTitle = (s: string) =>
-      s
-        .replace(/[-_]+/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
     const crumbs: Crumb[] = [];
     if (showHome && pathname !== "/") crumbs.push({ label: "Home", href: "/" });
@@ -38,13 +41,17 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
     let acc = "";
     for (let i = 0; i < segments.length; i++) {
       const seg = decodeURIComponent(segments[i]);
+      console.log("seg:", seg);
 
       // Special case: edit/<slug> -> "Edit <Slug>"
       if (seg === "edit" && i + 1 < segments.length) {
         const slug = decodeURIComponent(segments[i + 1]);
         acc += `/${seg}/${slug}`;
         const isLast = i + 1 === segments.length - 1;
-        crumbs.push({ label: `Edit ${toTitle(slug)}`, href: isLast ? undefined : acc });
+        crumbs.push({
+          label: `Edit ${toTitle(slug)}`,
+          href: isLast ? undefined : acc,
+        });
         i++; // skip slug segment
         continue;
       }
@@ -65,15 +72,19 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
 
   return (
     <Skeleton isLoaded={breadcrumbItems.length > 0}>
-    <div className="max-w-7xl w-full mx-auto">
-      <HeroBreadcrumbs className="text-sm">
-        {breadcrumbItems.map((item, index) => (
-          <BreadcrumbItem key={`${item.label}-${index}`}>
-            {item.href ? <Link href={item.href}>{item.label}</Link> : item.label}
-          </BreadcrumbItem>
-        ))}
-      </HeroBreadcrumbs>
-    </div>
+      <div className="max-w-7xl w-full mx-auto pt-4.5 pb-2 md:pt-4 md:pb-4 ml-16">
+        <HeroBreadcrumbs className="text-sm">
+          {breadcrumbItems.map((item, index) => (
+            <BreadcrumbItem key={`${item.label}-${index}`}>
+              {item.href ? (
+                <Link href={item.href}>{item.label}</Link>
+              ) : (
+                item.label
+              )}
+            </BreadcrumbItem>
+          ))}
+        </HeroBreadcrumbs>
+      </div>
     </Skeleton>
   );
 };
