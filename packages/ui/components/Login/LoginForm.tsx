@@ -39,7 +39,7 @@ export function LoginForm() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center">
       {/* Left side - Logo */}
-      <div className="flex w-full md:w-1/2 items-center justify-center pr-4 border-r border-theme-border">
+      <div className="flex w-full md:w-1/2 items-center justify-center md:pr-4 border-r border-theme-border">
         <div className="text-center max-w-md py-4 px-8">
           <CasaBoardLogo size="large" variant="dark" stacked={true} />
           <h1 className="text-3xl font-bold text-theme-text mt-8 mb-4">

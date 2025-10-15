@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
-      <body className={cn("bg-gradient-to-b from-primary/10 via-transparent to-transparent",inter.className)}>
+      <body className={cn("bg-neutral-900",inter.className)}>
         {children}
         <AnalyticsWrapper gaId="G-P2JEHMNT4C" />
       </body>
