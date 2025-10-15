@@ -19,7 +19,6 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
   // Generate breadcrumbs from pathname with simple, declarative rules
   const generateBreadcrumbs = (): Crumb[] => {
     const segments = (pathname || "/").split("/").filter(Boolean);
-    console.log("segments:", segments);
     const labelMap: Record<string, string> = {
       setup: "Setup",
       pages: "Pages",
