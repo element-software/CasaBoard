@@ -53,6 +53,15 @@ export const Footer: React.FC = () => {
             className="text-theme-primary"
           >
             Element Software
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://element-connect.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-theme-primary"
+          >
+            Element Connect
           </a>
         </div>
       </div>
