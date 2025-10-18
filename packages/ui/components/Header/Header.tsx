@@ -1,27 +1,11 @@
 "use client";
-
-import React, { useState } from "react";
-import Icon from "@mdi/react";
-import { mdiMenu } from "@mdi/js";
+import React from "react";
 import { CasaBoardLogo } from "../Logo";
-import { HeaderDrawer } from "./HeaderDrawer";
 import { getPublicLinks, NavLink } from "./NavLinks";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 
-interface HeaderProps {
-  public?: boolean;
-  user?: any;
-  isTrial?: boolean;
-}
-
-export const Header: React.FC<HeaderProps> = ({
-  public: isPublic = false,
-  user,
-  isTrial = false,
-}) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-
+export const Header = () => {
   return (
     <header className="sticky top-0 z-30 max-w-7xl mx-auto">
       <div className="px-0 mx-auto bg-theme-background/80 backdrop-blur-md rounded-b-xl border-theme-border/20">
@@ -37,7 +21,6 @@ export const Header: React.FC<HeaderProps> = ({
                   key={link.href}
                   as={Link}
                   href={link.href}
-                  target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
                   variant="bordered"
                   color="primary"

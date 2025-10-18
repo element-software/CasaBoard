@@ -28,7 +28,7 @@ export const getPublicLinks = (): NavLink[] => [
     icon: <Icon path={mdiEmail} className="w-4 h-4" />,
   },
   {
-    href: LinkService.crossAppHref("app", "/"),
+    href: LinkService.crossAppHref("app", "/auth/login"),
     label: "Login",
     icon: <Icon path={mdiLogin} className="w-4 h-4" />,
   },
