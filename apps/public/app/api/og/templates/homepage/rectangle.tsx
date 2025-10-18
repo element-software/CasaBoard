@@ -13,7 +13,7 @@ const HomepageRectangle = ({
       style={{
         background: "linear-gradient(to right, #1e0c35, #120a1f)",
       }}
-      tw="w-full h-full p-8 flex flex-col items-center justify-center relative text-center"
+      tw="w-full h-full p-8 flex flex-row items-center justify-center relative text-center"
     >
       <div
         tw="absolute top-0 left-0 w-[1200px] h-[630px]"
@@ -24,19 +24,21 @@ const HomepageRectangle = ({
           linear-gradient(to bottom, #120a1f 1px, transparent 1px)`,
         }}
       />
-      <h1 tw="text-white text-7xl font-black -mb-8">{title}</h1>
       <img
         src={`data:image/png;base64,${Buffer.from(logoBuffer).toString(
           "base64"
         )}`}
         style={{
           objectFit: "contain",
-          width: "450px",
+          width: "550px",
           //filter: "brightness(0) invert(1)",
         }}
         alt="Background"
       />
-      <p tw="text-white text-2xl font-bold -mt-8">{description}</p>
+      <div tw="flex flex-col items-center justify-center pr-32">
+        <h1 tw="text-white text-8xl font-black">{title}</h1>
+        <p tw="text-white text-3xl font-bold">{description}</p>
+      </div>
     </div>
   );
 };
