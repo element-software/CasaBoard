@@ -2,8 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Card, CardBody, Button, Divider, Drawer, DrawerContent, DrawerBody, useDisclosure } from "@heroui/react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Card,
+  CardBody,
+  Button,
+  Divider,
+  Drawer,
+  DrawerContent,
+  DrawerBody,
+  useDisclosure,
+} from "@heroui/react";
 import Icon from "@mdi/react";
 import {
   mdiViewDashboard,
@@ -30,17 +39,22 @@ interface SetupSidebarProps {
   isMobile?: boolean;
 }
 
-export const SetupSidebar = ({ 
-  className, 
-  user, 
-  isOpen = true, 
-  onClose, 
-  isMobile = false 
+export const SetupSidebar = ({
+  className,
+  user,
+  isOpen = true,
+  onClose,
+  isMobile = false,
 }: SetupSidebarProps) => {
   const pathname = usePathname();
-  const { isOpen: drawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
+  const router = useRouter();
+  const {
+    isOpen: drawerOpen,
+    onOpen: onDrawerOpen,
+    onClose: onDrawerClose,
+  } = useDisclosure();
   const [isMobileView, setIsMobileView] = useState(false);
-  
+
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(["screens", "manage"])
   );
@@ -50,10 +64,10 @@ export const SetupSidebar = ({
     const checkMobile = () => {
       setIsMobileView(window.innerWidth < 768); // md breakpoint
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const toggleSection = (section: string) => {
@@ -71,6 +85,13 @@ export const SetupSidebar = ({
   };
 
   const navigationItems = [
+    {
+      id: "dashboard",
+      title: "Dashboard",
+      icon: mdiViewDashboard,
+      href: "/setup",
+      selfClick: true,
+    },
     {
       id: "screens",
       title: "Screens",
@@ -128,28 +149,35 @@ export const SetupSidebar = ({
   const renderSidebarContent = () => (
     <div className="h-full flex flex-col text-white">
       {/* Logo */}
-      <div className="p-6 border-b border-white">
-        <CasaBoardLogo variant="dark" />
+      <div className="p-2 border-b border-white flex flex-row items-center justify-start gap-2">
+        <CasaBoardLogo size="medium" />
+        <span className="text-white text-lg font-semibold">CasaBoard</span>
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-hidden">
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 h-full overflow-y-auto">
           {navigationItems.map((section) => (
             <div key={section.id}>
               <Button
                 variant="light"
                 className="w-full justify-start text-left font-semibold text-sm text-white hover:bg-theme-primary"
-                onPress={() => toggleSection(section.id)}
+                onPress={() =>
+                  section.selfClick
+                    ? router.push(section.href)
+                    : toggleSection(section.id)
+                }
                 startContent={
                   <Icon path={section.icon} className="w-4 h-4 text-white" />
                 }
                 endContent={
                   <Icon
                     path={
-                      expandedSections.has(section.id)
-                        ? mdiChevronDown
-                        : mdiChevronRight
+                      section.selfClick
+                        ? mdiChevronRight
+                        : expandedSections.has(section.id)
+                          ? mdiChevronDown
+                          : mdiChevronRight
                     }
                     className="w-4 h-4 text-white"
                   />
@@ -158,27 +186,27 @@ export const SetupSidebar = ({
                 {section.title}
               </Button>
 
-              {expandedSections.has(section.id) && (
+              {!section.selfClick && expandedSections.has(section.id) && (
                 <div className="ml-6 gap-1 mt-1 flex flex-col">
-                  {section.items.map((item) => (
-                    <Link key={item.href} href={item.href} onClick={isMobileView ? onDrawerClose : undefined}>
-                      <Button
-                        variant="light"
-                        className={cn(
-                          "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
-                          isActive(item.href) &&
-                            "bg-theme-primary text-white hover:bg-theme-primary"
-                        )}
-                        startContent={
-                          <Icon
-                            path={item.icon}
-                            className="w-4 h-4 text-white"
-                          />
-                        }
-                      >
-                        {item.title}
-                      </Button>
-                    </Link>
+                  {section.items?.map((item) => (
+                    <Button
+                      key={item.href}
+                      variant="light"
+                      className={cn(
+                        "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
+                        isActive(item.href) &&
+                          "bg-theme-primary text-white hover:bg-theme-primary"
+                      )}
+                      startContent={
+                        <Icon path={item.icon} className="w-4 h-4 text-white" />
+                      }
+                      onPress={() => {
+                        router.push(item.href);
+                        if (isMobileView) onDrawerClose();
+                      }}
+                    >
+                      {item.title}
+                    </Button>
                   ))}
                 </div>
               )}
@@ -191,7 +219,11 @@ export const SetupSidebar = ({
         {/* Bottom Items */}
         <div className="p-4 space-y-1">
           {bottomItems.map((item) => (
-            <Link key={item.href} href={item.href} onClick={isMobileView ? onDrawerClose : undefined}>
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={isMobileView ? onDrawerClose : undefined}
+            >
               <Button
                 variant="light"
                 className={cn(
@@ -232,17 +264,15 @@ export const SetupSidebar = ({
         </Button>
 
         {/* Mobile Drawer */}
-        <Drawer 
-          isOpen={drawerOpen} 
-          onClose={onDrawerClose} 
-          placement="left" 
+        <Drawer
+          isOpen={drawerOpen}
+          onClose={onDrawerClose}
+          placement="left"
           size="sm"
           className="md:hidden"
         >
           <DrawerContent>
-            <DrawerBody className="p-0">
-              {renderSidebarContent()}
-            </DrawerBody>
+            <DrawerBody className="p-0">{renderSidebarContent()}</DrawerBody>
           </DrawerContent>
         </Drawer>
       </>
@@ -257,9 +287,7 @@ export const SetupSidebar = ({
         className
       )}
     >
-      <CardBody className="p-0 h-full">
-        {renderSidebarContent()}
-      </CardBody>
+      <CardBody className="p-0 h-full">{renderSidebarContent()}</CardBody>
     </Card>
   );
 };

@@ -10,4 +10,9 @@
 /* Scan HeroUI theme from this app's node_modules */
 @source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 
+/* Primary: #111827 (Very dark gray)
+Accent: #1e0c35 (Dark Purple)
+Accent 2: #120a1f (Dark Purple)
+Highlight: #8B5CF6 (Violet)
+Text / UI: #F9FAFB */
 

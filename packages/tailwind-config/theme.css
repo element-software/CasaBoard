@@ -1,19 +1,25 @@
 /* Theme CSS Custom Properties */
 /* These are applied dynamically by the theme system */
 
+/* Primary: #111827 (Very dark gray)
+Accent: #1e0c35 (Dark Purple)
+Accent 2: #120a1f (Dark Purple)
+Highlight: #8B5CF6 (Violet)
+Text / UI: #F9FAFB */
+
 :root {
   /* Base colors */
-  --theme-background: #171717;
-  --theme-surface: #262626;
-  --theme-text: #ffffff;
-  --theme-text-primary: #f59e0b;
+  --theme-background: #111827;
+  --theme-surface: #120a1f;
+  --theme-text: #f9fafb;
+  --theme-text-primary: #8b5cf6;
   --theme-text-secondary: #a3a3a3;
-  --theme-border: #404040;
+  --theme-border: #1e0c35;
   
   /* Brand colors */
-  --theme-primary: #f59e0b;
+  --theme-primary: #8b5cf6;
   --theme-secondary: #6b7280;
-  --theme-accent: #fbbf24;
+  --theme-accent: #1e0c35;
   
   /* State colors */
   --theme-success: #10b981;
@@ -22,27 +28,27 @@
   --theme-info: #3b82f6;
   
   /* Component-specific colors */
-  --theme-card-background: #262626;
-  --theme-card-border: #404040;
-  --theme-card-hover: #2a2a2a;
+  --theme-card-background: #120a1f;
+  --theme-card-border: #1e0c35;
+  --theme-card-hover: #1e0c35;
   
   /* Entity state colors */
-  --theme-entity-on: #10b981;
-  --theme-entity-off: #6b7280;
+  --theme-entity-on: #8b5cf6;
+  --theme-entity-off: #1e0c35;
   --theme-entity-unavailable: #ef4444;
-  --theme-entity-unknown: #f59e0b;
+  --theme-entity-unknown: #8b5cf6;
   
   /* Interactive elements */
-  --theme-button-primary: #f59e0b;
-  --theme-button-secondary: #6b7280;
-  --theme-button-success: #10b981;
-  --theme-button-warning: #f59e0b;
+  --theme-button-primary: #8b5cf6;
+  --theme-button-secondary: #1e0c35;
+  --theme-button-success: #8b5cf6;
+  --theme-button-warning: #8b5cf6;
   --theme-button-error: #ef4444;
   
   /* Slider colors */
-  --theme-slider-track: #404040;
-  --theme-slider-thumb: #f59e0b;
-  --theme-slider-active: #fbbf24;
+  --theme-slider-track: #1e0c35;
+  --theme-slider-thumb: #8b5cf6;
+  --theme-slider-active: #8b5cf6;
 }
 
 /* Light theme overrides */
@@ -53,17 +59,17 @@
   --theme-text-secondary: #6b7280;
   --theme-border: #e5e7eb;
   
-  --theme-primary: #3b82f6;
+  --theme-primary: #8b5cf6;
   --theme-secondary: #6b7280;
-  --theme-accent: #2563eb;
+  --theme-accent: #1e0c35;
   
   --theme-card-background: #ffffff;
   --theme-card-border: #e5e7eb;
-  --theme-card-hover: #f9fafb;
+  --theme-card-hover: #1e0c35;
   
   --theme-slider-track: #e5e7eb;
-  --theme-slider-thumb: #3b82f6;
-  --theme-slider-active: #2563eb;
+  --theme-slider-thumb: #8b5cf6;
+  --theme-slider-active: #8b5cf6;
 }
 
 /* Utility classes for theme colors */
