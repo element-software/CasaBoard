@@ -40,12 +40,12 @@ export default async function AuthenticatedLayout({
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <div className="min-h-screen">
+      <div className="flex min-h-screen overflow-x-hidden">
         {/* Sidebar - Desktop fixed, Mobile drawer */}
         <SetupSidebar user={authedUser} className="fixed hidden md:flex" />
 
         {/* Main Content */}
-        <div className="flex flex-1 flex-col md:ml-96">
+        <div className="flex flex-1 flex-col md:ml-96 w-full">
           <Breadcrumbs />
           <main className="flex-1">{children}</main>
           <Footer />
