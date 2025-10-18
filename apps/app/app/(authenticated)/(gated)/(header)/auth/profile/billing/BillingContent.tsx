@@ -2,8 +2,8 @@
 import { Button, Card, CardBody, Chip, Modal, ModalContent, Spinner, useDisclosure, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCancel, mdiCheck, mdiRocket } from "@mdi/js";
-import { useState, useRef } from "react";
+import { mdiCheck, mdiRocket } from "@mdi/js";
+import { useState } from "react";
 import { LinkService } from "@repo/lib";
 import Stripe from "stripe";
 import { useRouter } from "next/navigation";
