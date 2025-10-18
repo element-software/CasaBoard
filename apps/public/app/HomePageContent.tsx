@@ -55,7 +55,7 @@ export function HomePageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
-            <CasaBoardLogo size="large" variant="dark" iconOnly={true} />
+            <CasaBoardLogo size="large" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-theme-text mb-6">
             CasaBoard

@@ -63,7 +63,7 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
     >
       <ModalContent className="bg-theme-background text-theme-text border border-theme-border">
         <ModalHeader className="flex flex-col items-center gap-3 text-theme-text">
-          <CasaBoardLogo size="small" variant="dark" />
+          <CasaBoardLogo size="small"/>
           <span className="font-semibold">Cookies & Privacy</span>
         </ModalHeader>
         <ModalBody className="text-theme-text-secondary">

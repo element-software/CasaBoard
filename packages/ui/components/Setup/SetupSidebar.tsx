@@ -129,7 +129,7 @@ export const SetupSidebar = ({
     <div className="h-full flex flex-col text-white">
       {/* Logo */}
       <div className="p-6 border-b border-white">
-        <CasaBoardLogo variant="dark" />
+        <CasaBoardLogo />
       </div>
 
       {/* Navigation */}
