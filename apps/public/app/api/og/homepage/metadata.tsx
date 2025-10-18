@@ -37,7 +37,7 @@ export async function generateHomepageMetadata(): Promise<Metadata> {
           alt: title,
         },
       ],
-      url: ``,
+      url: "https://casaboard.dev",
       countryName: "United Kingdom",
       phoneNumbers: ["+447394324284"],
     },
