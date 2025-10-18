@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
   CardBody,
@@ -25,6 +25,7 @@ import {
   mdiInformation,
   mdiBookOpen,
   mdiCreditCard,
+  mdiCheck,
 } from "@mdi/js";
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";
@@ -47,6 +48,7 @@ export const SetupSidebar = ({
   isMobile = false,
 }: SetupSidebarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     isOpen: drawerOpen,
     onOpen: onDrawerOpen,
@@ -84,6 +86,13 @@ export const SetupSidebar = ({
   };
 
   const navigationItems = [
+    {
+      id: "dashboard",
+      title: "Dashboard",
+      icon: mdiViewDashboard,
+      href: "/setup",
+      selfClick: true,
+    },
     {
       id: "screens",
       title: "Screens",
@@ -154,16 +163,22 @@ export const SetupSidebar = ({
               <Button
                 variant="light"
                 className="w-full justify-start text-left font-semibold text-sm text-white hover:bg-theme-primary"
-                onPress={() => toggleSection(section.id)}
+                onPress={() =>
+                  section.selfClick
+                    ? router.push(section.href)
+                    : toggleSection(section.id)
+                }
                 startContent={
                   <Icon path={section.icon} className="w-4 h-4 text-white" />
                 }
                 endContent={
                   <Icon
                     path={
-                      expandedSections.has(section.id)
-                        ? mdiChevronDown
-                        : mdiChevronRight
+                      section.selfClick
+                        ? mdiChevronRight
+                        : expandedSections.has(section.id)
+                          ? mdiChevronDown
+                          : mdiChevronRight
                     }
                     className="w-4 h-4 text-white"
                   />
@@ -172,31 +187,27 @@ export const SetupSidebar = ({
                 {section.title}
               </Button>
 
-              {expandedSections.has(section.id) && (
+              {!section.selfClick && expandedSections.has(section.id) && (
                 <div className="ml-6 gap-1 mt-1 flex flex-col">
-                  {section.items.map((item) => (
-                    <Link
+                  {section.items?.map((item) => (
+                    <Button
                       key={item.href}
-                      href={item.href}
-                      onClick={isMobileView ? onDrawerClose : undefined}
+                      variant="light"
+                      className={cn(
+                        "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
+                        isActive(item.href) &&
+                          "bg-theme-primary text-white hover:bg-theme-primary"
+                      )}
+                      startContent={
+                        <Icon path={item.icon} className="w-4 h-4 text-white" />
+                      }
+                      onPress={() => {
+                        router.push(item.href);
+                        if (isMobileView) onDrawerClose();
+                      }}
                     >
-                      <Button
-                        variant="light"
-                        className={cn(
-                          "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
-                          isActive(item.href) &&
-                            "bg-theme-primary text-white hover:bg-theme-primary"
-                        )}
-                        startContent={
-                          <Icon
-                            path={item.icon}
-                            className="w-4 h-4 text-white"
-                          />
-                        }
-                      >
-                        {item.title}
-                      </Button>
-                    </Link>
+                      {item.title}
+                    </Button>
                   ))}
                 </div>
               )}
