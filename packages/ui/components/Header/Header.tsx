@@ -5,6 +5,9 @@ import Icon from "@mdi/react";
 import { mdiMenu } from "@mdi/js";
 import { CasaBoardLogo } from "../Logo";
 import { HeaderDrawer } from "./HeaderDrawer";
+import { getPublicLinks, NavLink } from "./NavLinks";
+import Link from "next/link";
+import { Button } from "@heroui/react";
 
 interface HeaderProps {
   public?: boolean;
@@ -28,24 +31,26 @@ export const Header: React.FC<HeaderProps> = ({
               <CasaBoardLogo size="small" />
               <span className="text-theme-text font-bold">CasaBoard</span>
             </div>
-            <button
-              className="p-2 ml-1 rounded-md border border-theme-border text-theme-text"
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
-            >
-              <Icon path={mdiMenu} className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {getPublicLinks().map((link: NavLink) => (
+                <Button
+                  key={link.href}
+                  as={Link}
+                  href={link.href}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
+                  variant="bordered"
+                  color="primary"
+                  className="justify-center text-theme-text"
+                  startContent={link.icon}
+                >
+                  {link.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
-      <HeaderDrawer
-        isOpen={menuOpen}
-        onOpenChange={setMenuOpen}
-        isPublic={isPublic}
-        user={user}
-        isTrial={isTrial}
-      />
     </header>
   );
 };
