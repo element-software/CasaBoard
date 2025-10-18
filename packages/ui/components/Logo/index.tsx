@@ -20,9 +20,13 @@ export const CasaBoardLogo = ({
   className,
   size = "medium",
 }: CasaBoardLogoProps) => {
+  const url =
+    process.env.NODE_ENV === "production"
+      ? "https://casaboard.dev/casaboard-logo.png"
+      : "http://localhost:3001/casaboard-logo.png";
   return (
     <Image
-      src="/casaboard-logo.png"
+      src={url}
       alt="CasaBoard Logo"
       width={400}
       height={400}
