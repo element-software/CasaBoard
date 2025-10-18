@@ -86,7 +86,7 @@ export function HomePageContent() {
           {featureCards.map(({ icon, title, text }) => (
             <Card
               key={title}
-              className="bg-theme-surface/50 backdrop-blur-sm hover:bg-primary/20 hover:cursor-pointer border border-secondary"
+              className="bg-theme-surface/50 backdrop-blur-sm hover:bg-theme-background hover:cursor-pointer border border-secondary"
             >
               <CardBody className="p-6">
                 <div className="flex items-center gap-4 mb-4">
