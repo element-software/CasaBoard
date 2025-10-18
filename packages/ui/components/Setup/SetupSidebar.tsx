@@ -25,7 +25,6 @@ import {
   mdiInformation,
   mdiBookOpen,
   mdiCreditCard,
-  mdiCheck,
 } from "@mdi/js";
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";

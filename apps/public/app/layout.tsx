@@ -46,7 +46,7 @@ export default async function PublicLayout({
       >
         <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
         <Providers>
-          <Header public={true} />
+          <Header />
           <main className="min-h-screen flex-1 -mt-32">{children}</main>
           <Footer />
         </Providers>

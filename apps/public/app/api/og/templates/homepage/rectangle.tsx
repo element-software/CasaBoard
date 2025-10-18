@@ -31,7 +31,6 @@ const HomepageRectangle = ({
         style={{
           objectFit: "contain",
           width: "550px",
-          //filter: "brightness(0) invert(1)",
         }}
         alt="Background"
       />

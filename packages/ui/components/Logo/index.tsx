@@ -16,14 +16,15 @@ export interface CasaBoardLogoProps {
  * - Dark theme: <CasaBoardLogo variant="dark" size="medium" />
  */
 
+const url =
+    process.env.NODE_ENV === "production"
+      ? "https://casaboard.dev/casaboard-logo.png"
+      : "http://localhost:3001/casaboard-logo.png";
+
 export const CasaBoardLogo = ({
   className,
   size = "medium",
 }: CasaBoardLogoProps) => {
-  const url =
-    process.env.NODE_ENV === "production"
-      ? "https://casaboard.dev/casaboard-logo.png"
-      : "http://localhost:3001/casaboard-logo.png";
   return (
     <Image
       src={url}

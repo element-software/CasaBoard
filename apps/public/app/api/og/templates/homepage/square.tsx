@@ -32,7 +32,6 @@ const HomepageSquare = ({
         style={{
           objectFit: "contain",
           width: "250px",
-          //filter: "brightness(0) invert(1)",
         }}
         alt="Background"
       />

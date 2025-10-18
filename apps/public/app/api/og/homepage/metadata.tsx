@@ -1,18 +1,18 @@
 import { Metadata } from "next";
 
+const ogUrlRectangle =
+process.env.NODE_ENV === "production"
+  ? "https://casaboard.dev/api/og/homepage?size=rectangle"
+  : "http://localhost:3001/api/og/homepage?size=rectangle";
+
+const ogUrlSquare =
+process.env.NODE_ENV === "production"
+  ? "https://casaboard.dev/api/og/homepage?size=square"
+  : "http://localhost:3001/api/og/homepage?size=square";
+
 export async function generateHomepageMetadata(): Promise<Metadata> {
   const title = "CasaBoard";
   const description = "Cloud-Hosted Smart Home Dashboard";
-
-  const ogUrlRectangle =
-    process.env.NODE_ENV === "production"
-      ? "https://casaboard.dev/api/og/homepage?type=rectangle"
-      : "http://localhost:3001/api/og/homepage?type=rectangle";
-
-  const ogUrlSquare =
-    process.env.NODE_ENV === "production"
-      ? "https://casaboard.dev/api/og/homepage?type=square"
-      : "http://localhost:3001/api/og/homepage?type=square";
 
   return {
     title,

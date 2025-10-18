@@ -5,7 +5,7 @@ import { Footer } from "@repo/ui/components/Shared/Footer/index";
 export default async function HomePage() {
   return (
     <>
-      <Header public={true} />
+      <Header />
       <Home />
       <Footer />
     </>

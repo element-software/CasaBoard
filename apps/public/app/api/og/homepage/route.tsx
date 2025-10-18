@@ -9,7 +9,6 @@ const logoUrl =
   process.env.NODE_ENV === "production"
     ? "https://casaboard.dev/casaboard-logo.png"
     : "http://localhost:3001/casaboard-logo.png";
-const logoData = fetch(logoUrl).then((res) => res.arrayBuffer());
 
 // Image generation
 export async function GET(request: NextRequest) {
@@ -19,7 +18,15 @@ export async function GET(request: NextRequest) {
   const description =
     searchParams.get("description") || "Cloud-hosted Smart Home Dashboard";
   const imageUrl = searchParams.get("imageUrl") || "";
-  const logoBuffer = await logoData; // Wait for image to load
+  let logoBuffer: ArrayBuffer;
+  
+  try {
+    const logoData = fetch(logoUrl).then((res) => res.arrayBuffer());
+    logoBuffer = await logoData; // Wait for image to load
+  } catch (e: any) {
+    return new Response("Failed to generate OG Image", { status: 500 });
+  } // Wait for image to load
+
   const dimensions = {
     square: {
       width: 400,
