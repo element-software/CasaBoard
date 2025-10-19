@@ -127,16 +127,12 @@ const HAConnection: React.FC = () => (
           text: "Find your Home Assistant URL (e.g. http://homeassistant.local:8123 or https://your-domain.com)",
         },
         {
-          title: "Create a Long‑Lived Access Token",
-          text: 'In Home Assistant, go to Profile → Long-lived access tokens → Create token. Give it a name like "CasaBoard" and copy the token.',
+          title: "Add it to the HA Instance section",
+          text: 'Once you add it, CasaBoard will let you know you\'ll be redirected to your Home Assistant instance.',
         },
         {
-          title: "Enter Connection Details",
-          text: "In CasaBoard, go to Setup → Home Assistant Configuration and enter your HA URL and access token.",
-        },
-        {
-          title: "Test Connection",
-          text: 'Click "Test Connection" to verify that CasaBoard can connect to your Home Assistant instance.',
+          title: "Login to your Home Assistant instance",
+          text: "Once you\'re logged in to your Home Assistant instance, you\'ll be redirected to CasaBoard and can start building your dashboard.",
         },
       ].map((step, i) => (
         <div
