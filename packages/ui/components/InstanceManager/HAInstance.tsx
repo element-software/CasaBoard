@@ -92,7 +92,7 @@ export const HAInstance = ({
           </div>
         </div>
 
-        {!compact && (
+        {!compact && connected && (
           <div className="flex gap-2">
             <Button
               size="sm"
