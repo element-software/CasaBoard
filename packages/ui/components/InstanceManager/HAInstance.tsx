@@ -63,7 +63,7 @@ export const HAInstance = ({
               }
             )}
           >
-            <span className="truncate">{hass_url}</span>
+            <span className="max-w-72 sm:max-w-96 md:max-w-full truncate">{hass_url}</span>
             <div className="flex items-center gap-2">
               <Chip
                 size="sm"
