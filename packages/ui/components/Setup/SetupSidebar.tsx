@@ -42,17 +42,12 @@ interface SetupSidebarProps {
 export const SetupSidebar = ({
   className,
   user,
-  isOpen = true,
+  isOpen = false,
   onClose,
   isMobile = false,
 }: SetupSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
-  const {
-    isOpen: drawerOpen,
-    onOpen: onDrawerOpen,
-    onClose: onDrawerClose,
-  } = useDisclosure();
   const [isMobileView, setIsMobileView] = useState(false);
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -202,7 +197,7 @@ export const SetupSidebar = ({
                       }
                       onPress={() => {
                         router.push(item.href);
-                        if (isMobileView) onDrawerClose();
+                        if (isMobileView && onClose) onClose();
                       }}
                     >
                       {item.title}
@@ -222,7 +217,7 @@ export const SetupSidebar = ({
             <Link
               key={item.href}
               href={item.href}
-              onClick={isMobileView ? onDrawerClose : undefined}
+              onClick={isMobileView && onClose ? onClose : undefined}
             >
               <Button
                 variant="light"
@@ -252,30 +247,17 @@ export const SetupSidebar = ({
   // Mobile drawer
   if (isMobileView) {
     return (
-      <>
-        {/* Mobile Menu Button */}
-        <Button
-          isIconOnly
-          variant="light"
-          className="fixed top-2 left-2 z-50 md:hidden"
-          onPress={onDrawerOpen}
-        >
-          <Icon path={mdiMenu} className="w-5 h-5" />
-        </Button>
-
-        {/* Mobile Drawer */}
-        <Drawer
-          isOpen={drawerOpen}
-          onClose={onDrawerClose}
-          placement="left"
-          size="sm"
-          className="md:hidden"
-        >
-          <DrawerContent>
-            <DrawerBody className="p-0">{renderSidebarContent()}</DrawerBody>
-          </DrawerContent>
-        </Drawer>
-      </>
+      <Drawer
+        isOpen={isOpen}
+        onClose={onClose || (() => {})}
+        placement="left"
+        size="sm"
+        className="md:hidden"
+      >
+        <DrawerContent>
+          <DrawerBody className="p-0">{renderSidebarContent()}</DrawerBody>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
@@ -289,5 +271,24 @@ export const SetupSidebar = ({
     >
       <CardBody className="p-0 h-full">{renderSidebarContent()}</CardBody>
     </Card>
+  );
+};
+
+// Export a separate mobile menu button component that can be used inline
+export const MobileMenuButton = ({
+  onOpen,
+}: {
+  onOpen: () => void;
+}) => {
+  return (
+    <Button
+      isIconOnly
+      variant="light"
+      className="md:hidden"
+      onPress={onOpen}
+      aria-label="Open menu"
+    >
+      <Icon path={mdiMenu} className="w-5 h-5" />
+    </Button>
   );
 };

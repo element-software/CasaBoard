@@ -96,23 +96,25 @@ export const PuckRenderer = ({ pageId, pageData }: PuckRendererProps) => {
     if (!hasSidebar || !isMobile) return null;
     
     return (
-      <Button
-        isIconOnly
-        variant="light"
-        className="fixed top-4 left-4 z-50 md:hidden"
-        onPress={onOpen}
-      >
-        <Icon path={mdiMenu} className="w-5 h-5" />
-      </Button>
+      <div className="md:hidden p-4 pb-0">
+        <Button
+          isIconOnly
+          variant="light"
+          onPress={onOpen}
+          aria-label="Open sidebar"
+        >
+          <Icon path={mdiMenu} className="w-5 h-5" />
+        </Button>
+      </div>
     );
   };
 
   return (
-    <div className="flex flex-row gap-4 relative">
+    <div className="flex flex-col md:flex-row gap-4 relative">
       {renderDesktopSidebar()}
       {renderMobileDrawer()}
       {renderMobileToggle()}
-      <div className="p-4 w-full grow">
+      <div className="p-4 pt-0 md:pt-4 w-full grow">
         <Render config={PuckConfig} data={pageData.puck_data} />
       </div>
     </div>

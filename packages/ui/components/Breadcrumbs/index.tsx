@@ -12,9 +12,10 @@ type Crumb = { label: string; href?: string };
 
 interface BreadcrumbsProps {
   showHome?: boolean;
+  startContent?: React.ReactNode;
 }
 
-export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
+export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps) => {
   const pathname = usePathname() || "/";
   // Generate breadcrumbs from pathname with simple, declarative rules
   const generateBreadcrumbs = (): Crumb[] => {
@@ -72,7 +73,8 @@ export const Breadcrumbs = ({ showHome = true }: BreadcrumbsProps) => {
 
   return (
     <Skeleton isLoaded={breadcrumbItems.length > 0}>
-      <div className="max-w-7xl w-full mx-auto pt-4.5 pb-2 md:pt-4 md:pb-4 ml-16">
+      <div className="max-w-7xl w-full mx-auto pt-4.5 pb-2 md:pt-4 md:pb-4 flex items-center gap-2">
+        {startContent && <div className="md:hidden">{startContent}</div>}
         <HeroBreadcrumbs className="text-sm">
           {breadcrumbItems.map((item, index) => {
             if (item.href !== "/auth")
