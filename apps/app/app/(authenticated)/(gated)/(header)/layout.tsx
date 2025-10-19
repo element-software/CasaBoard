@@ -6,9 +6,7 @@ import {
   SubscriptionService,
 } from "@repo/lib";
 import { redirect } from "next/navigation";
-import { Footer } from "@repo/ui/components/Shared/Footer/index";
-import { Breadcrumbs } from "@repo/ui/components/Breadcrumbs/index";
-import { SetupSidebar } from "@repo/ui/components/Setup/SetupSidebar";
+import { SetupLayout } from "@repo/ui/components/Setup/SetupLayout";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = "force-dynamic";
@@ -40,17 +38,7 @@ export default async function AuthenticatedLayout({
 
   return (
     <ConfigurationProvider initialConfig={initialConfig}>
-      <div className="flex min-h-screen overflow-x-hidden">
-        {/* Sidebar - Desktop fixed, Mobile drawer */}
-        <SetupSidebar user={authedUser} className="fixed hidden md:flex" />
-
-        {/* Main Content */}
-        <div className="flex flex-1 flex-col md:ml-96 w-full">
-          <Breadcrumbs />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-      </div>
+      <SetupLayout user={authedUser}>{children}</SetupLayout>
     </ConfigurationProvider>
   );
 }
