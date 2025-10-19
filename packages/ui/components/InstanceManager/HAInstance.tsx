@@ -56,14 +56,14 @@ export const HAInstance = ({
           <div className="font-medium truncate">{name}</div>
           <div
             className={cn(
-              "flex gap-2 text-sm text-foreground-500",
+              "flex gap-2 text-sm text-foreground-500 min-w-0",
               {
                 "flex-col items-start": compact,
                 "items-center": !compact,
               }
             )}
           >
-            <span>{hass_url}</span>
+            <span className="truncate">{hass_url}</span>
             <div className="flex items-center gap-2">
               <Chip
                 size="sm"
