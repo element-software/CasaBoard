@@ -150,8 +150,8 @@ export const SetupSidebar = ({
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-hidden">
-        <div className="p-4 space-y-2 h-full overflow-y-auto">
+      <div className="flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="p-4 space-y-2">
           {navigationItems.map((section) => (
             <div key={section.id}>
               <Button
