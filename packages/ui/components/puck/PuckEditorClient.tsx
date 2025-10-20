@@ -191,11 +191,8 @@ export default function PuckEditorClient({
   };
 
   const applySettings = () => {
-    // For existing items, don't change the slug
-    const newSlug = isExistingItem ? settings.slug : generateSlug(settings.title);
-    if (!isExistingItem) {
-      setSettings(prev => ({ ...prev, slug: newSlug }));
-    }
+    const newSlug = generateSlug(settings.title);
+    setSettings(prev => ({ ...prev, slug: newSlug }));
     
     // Update the data with new settings
     setData(prev => ({
@@ -320,8 +317,7 @@ export default function PuckEditorClient({
                 placeholder={`${type}-slug`}
                 value={settings.slug}
                 onChange={(e) => setSettings(prev => ({ ...prev, slug: e.target.value }))}
-                description={isExistingItem ? "Slug cannot be changed for existing items" : "URL-friendly version of the name"}
-                isDisabled={isExistingItem}
+                description="URL-friendly version of the name"
               />
                 <div>
                   <label className="block text-sm font-medium mb-2">

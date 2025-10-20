@@ -8,8 +8,8 @@ export const GraphCardConfig = {
   fields: {
     entityId: {
       type: "custom",
-      label: "Light Entity",
-      description: "Select a light entity from your Home Assistant",
+      label: "Sensor Entity",
+      description: "Select a sensor entity from your Home Assistant",
       render: ({
         value,
         onChange,
@@ -26,9 +26,9 @@ export const GraphCardConfig = {
         />
       ),
     },
-    defaultProps: {
-      entityId: "",
-    },
+  },
+  defaultProps: {
+    entityId: "",
   },
   render: (props: any) =>  <GraphCard {...props} />
 };  
