@@ -11,29 +11,37 @@ interface GraphCardProps {
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
+
+  console.log("Graph data", data);
   
   const processedData = useMemo(() => {
     if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
       return [];
     }
-    return data.entityHistory.slice(data.entityHistory.length - 20).map((item: any) => ({
-      "y": item.s,
-      "x": new Date(item.lu)
-    }));
+    const last50 = data.entityHistory.slice(Math.max(0, data.entityHistory.length - 50));
+    return last50.map((item: any) => {
+      const y = typeof item.s !== 'undefined' ? item.s : item.state;
+      const time = item.lu || item.last_updated || item.last_changed;
+      return {
+        y,
+        x: time ? new Date(time) : new Date(),
+      };
+    });
   }, [data?.entityHistory]);
 
   const series = useMemo((): ApexAxisChartSeries => [
     {
-      name: "Energy Use",
+      name: data.title || "Energy Use",
       data: processedData,
       zIndex: 1,
-      color: "var(--color-primary)",
+      color: "#8b5cf6",
       type: "area",
     },
   ], [processedData]);
 
-  const dataLabelFormatter = useCallback((val: any) => Math.round(val) + "W", []);
-  const tooltipFormatter = useCallback((val: any) => val + "W", []);
+  const unit = data?.unit || "W";
+  const dataLabelFormatter = useCallback((val: any) => Math.round(val) + unit, [unit]);
+  const tooltipFormatter = useCallback((val: any) => val + unit, [unit]);
 
   var options: ApexOptions = useMemo(() => ({
     chart: {
@@ -77,8 +85,8 @@ const Graph = ({ data, className }: GraphCardProps) => {
         enabled: false,
       },
       style: {
-        colors: ["var(--color-text)"],
-        fontSize: "9px"
+        colors: ["#FFFFFF"],
+        fontSize: "8px"
       },
       formatter: dataLabelFormatter,
       textAnchor: "middle",
@@ -91,14 +99,14 @@ const Graph = ({ data, className }: GraphCardProps) => {
         opacityFrom: 0.6,
         opacityTo: 0.3,
         stops: [0, 100],
-        gradientToColors: ["var(--color-primary)"],
+        gradientToColors: ["#8b5cf6"],
       },
     },
     stroke: { width: 2, curve: 'smooth' },
     markers: {
       size: 3,
-      colors: ["var(--color-primary)"],
-      strokeColors: "var(--color-text)",
+      colors: ["#8b5cf6"],
+      strokeColors: "#FFFFFF",
       strokeWidth: 1,
       fillOpacity: 1,
       shape: "circle",
