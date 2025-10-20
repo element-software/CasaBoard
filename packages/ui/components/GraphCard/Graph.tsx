@@ -1,6 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client"
-import { VictoryChart, VictoryArea, VictoryAxis, VictoryTooltip, VictoryVoronoiContainer } from 'victory';
+"use client";
+import {
+  VictoryChart,
+  VictoryArea,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
+} from "victory";
 import { useMemo } from "react";
 
 interface GraphCardProps {
@@ -9,9 +14,8 @@ interface GraphCardProps {
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
-
   console.log("Graph data", data);
-  
+
   const processedData = useMemo(() => {
     if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
       return [];
@@ -42,12 +46,12 @@ const Graph = ({ data, className }: GraphCardProps) => {
                 flyoutStyle={{
                   fill: "var(--theme-card-background)",
                   stroke: "var(--theme-border)",
-                  strokeWidth: 1
+                  strokeWidth: 1,
                 }}
                 style={{
                   fill: "var(--theme-text)",
                   fontSize: 12,
-                  fontWeight: 500
+                  fontWeight: 500,
                 }}
               />
             }
@@ -59,9 +63,9 @@ const Graph = ({ data, className }: GraphCardProps) => {
               axis: { stroke: "transparent" },
               ticks: { stroke: "transparent" },
               tickLabels: { fill: "transparent" },
-              grid: { stroke: "transparent" }
-            }
-          }
+              grid: { stroke: "transparent" },
+            },
+          },
         }}
       >
         <VictoryArea
@@ -73,18 +77,30 @@ const Graph = ({ data, className }: GraphCardProps) => {
               stroke: "var(--theme-primary)",
               strokeWidth: 2,
               strokeLinecap: "round",
-              strokeLinejoin: "round"
-            }
+              strokeLinejoin: "round",
+            },
           }}
           animate={{
-            duration: 0
+            duration: 0,
           }}
         />
         <defs>
           <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--theme-primary)" stopOpacity={0.6} />
-            <stop offset="50%" stopColor="var(--theme-primary)" stopOpacity={0.3} />
-            <stop offset="100%" stopColor="var(--theme-primary)" stopOpacity={0.1} />
+            <stop
+              offset="0%"
+              stopColor="var(--theme-primary)"
+              stopOpacity={0.6}
+            />
+            <stop
+              offset="50%"
+              stopColor="var(--theme-primary)"
+              stopOpacity={0.3}
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--theme-primary)"
+              stopOpacity={0.1}
+            />
           </linearGradient>
         </defs>
       </VictoryChart>
