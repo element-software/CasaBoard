@@ -53,7 +53,7 @@ export const PuckRenderer = ({ pageId, pageData }: PuckRendererProps) => {
     
     try {
       return (
-        <Render config={PuckConfig} data={pageData.sidebar!.puck_data} />
+        <Render config={PuckConfig} data={pageData.sidebar!.puck_data}  />
       );
     } catch (error) {
       console.error("Error rendering sidebar:", error);
@@ -72,7 +72,7 @@ export const PuckRenderer = ({ pageId, pageData }: PuckRendererProps) => {
     if (!hasSidebar) return null;
     
     return (
-      <div className="min-w-[300px] h-screen p-4 hidden md:block">
+      <div className="min-w-[300px] max-w-[300px] h-screen p-4 hidden md:block">
         {renderSidebarContent()}
       </div>
     );

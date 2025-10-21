@@ -1,36 +1,14 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebouncedSlider } from "@repo/hooks/useDebounce";
+import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
 export interface UseLightControllerOptions {
   dimmer: boolean;
 }
 
 export function useLightLoading(entity: any, timeoutMs: number = 10000) {
-  const isEntityReady = !!entity && entity.state !== "unknown" && entity.state !== "unavailable";
-  const [unavailableTimeoutReached, setUnavailableTimeoutReached] = useState(false);
-
-  useEffect(() => {
-    let timeout: any;
-    const isUnknownOrUnavailable = !entity || entity.state === "unavailable" || entity.state === "unknown";
-    if (isUnknownOrUnavailable) {
-      setUnavailableTimeoutReached(false);
-      timeout = setTimeout(() => {
-        setUnavailableTimeoutReached(true);
-      }, timeoutMs);
-    } else {
-      setUnavailableTimeoutReached(false);
-    }
-
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [entity?.state, entity, timeoutMs]);
-
-  const showNotAvailable = !isEntityReady && unavailableTimeoutReached;
-  const isLoaded = isEntityReady || showNotAvailable;
-
-  return { isEntityReady, showNotAvailable, isLoaded };
+  return useEntityLoading(entity, { timeoutMs });
 }
 
 export function useLightController(entity: any, entityId: string, options: UseLightControllerOptions) {
