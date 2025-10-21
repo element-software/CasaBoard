@@ -22,7 +22,7 @@ type Components = {
 export const PuckConfig: Config<Components> = {
   root: {
     render: (props: any) => (
-      <div className="w-full mx-auto">{props.children}</div>
+      <div className="w-full flex flex-col gap-4 mx-auto">{props.children}</div>
     ),
   },
   components: {

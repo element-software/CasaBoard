@@ -26,9 +26,19 @@ export const GraphCardConfig = {
         />
       ),
     },
+    showStatistics: {
+      type: "radio",
+      label: "Show Statistics",
+      description: "Show statistics on the graph card",
+      options: [
+        { value: true, label: "Enabled" },
+        { value: false, label: "Disabled" },
+      ],
+    },
   },
   defaultProps: {
     entityId: "",
+    showStatistics: false,
   },
-  render: (props: any) =>  <GraphCard {...props} />
+  render: (props: any) =>  <GraphCard {...props} showStatistics={props.showStatistics} />
 };  

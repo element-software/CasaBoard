@@ -35,23 +35,25 @@ const Graph = ({ data, className }: GraphCardProps) => {
   return (
     <div className={className}>
       <VictoryChart
-        height={150}
+        height={450}
         width={1920}
-        padding={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        padding={{ top: 20, bottom: 60, left: 60, right: 20 }}
         containerComponent={
           <VictoryVoronoiContainer
-            labels={({ datum }) => `${Math.round(datum.y)}${unit}`}
+            labels={({ datum }) => 
+              `${Math.round(datum.y)}${unit} at ${datum.x ? new Date(datum.x).toLocaleTimeString() : ''}`
+            }
             labelComponent={
               <VictoryTooltip
                 flyoutStyle={{
-                  fill: "var(--theme-card-background)",
-                  stroke: "var(--theme-border)",
-                  strokeWidth: 1,
+                  fill: "rgba(0, 0, 0, 0.9)",
+                  stroke: "white",
+                  strokeWidth: 2,
                 }}
                 style={{
-                  fill: "var(--theme-text)",
-                  fontSize: 12,
-                  fontWeight: 500,
+                  fill: "white",
+                  fontSize: 40,
+                  fontWeight: 600,
                 }}
               />
             }
@@ -60,10 +62,11 @@ const Graph = ({ data, className }: GraphCardProps) => {
         theme={{
           axis: {
             style: {
-              axis: { stroke: "transparent" },
-              ticks: { stroke: "transparent" },
-              tickLabels: { fill: "transparent" },
+              //axis: { stroke: "white", strokeWidth: 2 },
+              ticks: { stroke: "white", strokeWidth: 1 },
+              tickLabels: { fill: "transparent", fontSize: 48, fontWeight: 600, fontFamily: "Inter" },
               grid: { stroke: "transparent" },
+              //axisLabel: { fill: "white", fontSize: 48, fontWeight: 700, fontFamily: "Inter" },
             },
           },
         }}
