@@ -118,9 +118,8 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
       if (selected) {
         setInputValue(selected.friendly_name);
       }
-    } else {
-      setInputValue("");
     }
+    // Don't automatically clear input when value becomes null - let user interaction handle it
   }, [value, entityOptions]);
 
   // Filter entities based on search input
@@ -136,12 +135,6 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
     );
   }, [entityOptions, inputValue]);
 
-  // Get the selected entity
-  const selectedEntity = useMemo(() => {
-    if (!value) return null;
-    return entityOptions.find((entity) => entity.id === value) || null;
-  }, [entityOptions, value]);
-
   const handleSelectionChange = useCallback(
     (key: React.Key | null) => {
       const entityId = key as string | null;
@@ -156,8 +149,9 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
   );
 
   const handleClear = useCallback(() => {
-    onChange(null);
     setInputValue("");
+    onChange(null);
+    setIsOpen(false);
   }, [onChange]);
 
   const handleInputChange = useCallback((value: string) => {
@@ -166,10 +160,11 @@ export const EntityAutocomplete: React.FC<EntityAutocompleteProps> = ({
 
   const handleOpenChange = useCallback((open: boolean) => {
     setIsOpen(open);
-    if (!open) {
+    if (!open && !value) {
+      // Only clear input when closing and no value is selected
       setInputValue("");
     }
-  }, []);
+  }, [value]);
 
   return (
     <div className={`w-full ${className || ""}`}>
