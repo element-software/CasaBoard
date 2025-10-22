@@ -27,6 +27,8 @@ import {
   DropdownItem,
   cn,
 } from "@heroui/react";
+import { HAInstance } from "@repo/types/ha";
+import { useRouter } from "next/navigation";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
@@ -34,6 +36,7 @@ interface SidebarManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
+  haInstances?: HAInstance[];
 }
 
 export const SidebarManagement = ({
@@ -42,7 +45,10 @@ export const SidebarManagement = ({
   initialError = null,
   compact = false,
   entitlements,
+  haInstances,
 }: SidebarManagementProps) => {
+  const router = useRouter();
+  const [form, setForm] = useState({ name: "", ha_instance_id: "" });
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
@@ -131,9 +137,25 @@ export const SidebarManagement = ({
           <h3 className="text-lg font-semibold text-theme-text mb-2">
             No sidebars yet
           </h3>
-          <p className="text-theme-text-secondary mb-4">
-            Create your first sidebar to get started
-          </p>
+          {!haInstances?.length ? (
+            <>
+            <p className="text-theme-text-secondary mb-4">
+              You need to have at least one Home Assistant instance to create a sidebar.
+            </p>
+            <Button
+              as={Link}
+              href="/setup/ha-config"
+              color="primary"
+              startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+            >
+              Add Home Assistant Instance
+            </Button>
+            </>
+          ) : (
+            <>
+            <p className="text-theme-text-secondary mb-4">
+              Create your first sidebar to get started
+            </p>
             <Button
               as={Link}
               href="/setup/sidebars/create"
@@ -143,6 +165,9 @@ export const SidebarManagement = ({
             >
               Create Sidebar
             </Button>
+            </>
+          )}
+
         </CardBody>
       </Card>
     );
