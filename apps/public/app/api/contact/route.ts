@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const from = "CasaBoard <website@casaboard.dev>";
     const to = ["support@casaboard.dev"];
-    const emailSubject = `[CASABOARD]New contact form message from ${name}`;
+    const emailSubject = `[CASABOARD] New contact form message from ${name}`;
     const text = `New contact form submission\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject || "(none)"}\n\nMessage:\n${message}`;
 
     // Call Resend API directly (no SDK to keep it lightweight)
