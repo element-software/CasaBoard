@@ -7,6 +7,7 @@ import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
 import { Button, Card, CardBody } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiGoogle } from "@mdi/js";
+import Link from "next/link";
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -94,7 +95,21 @@ export function LoginForm() {
                 </Button>
 
                 <p className="text-center text-xs text-theme-text-secondary">
-                  By signing in, you agree to our Terms and Privacy Policy.
+                  By signing in, you agree to our{" "}
+                  <Link
+                    href={LinkService.crossAppHref("public", "/terms")}
+                    className="text-theme-primary"
+                  >
+                    Terms
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href={LinkService.crossAppHref("public", "/privacy")}
+                    className="text-theme-primary"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
                 </p>
               </div>
             </CardBody>

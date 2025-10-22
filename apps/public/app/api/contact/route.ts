@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
+      console.error("Could not get RESEND_API_KEY env var");
       return new Response(JSON.stringify({ error: "Email service not configured" }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const from = "CasaBoard <website@casaboard.dev>";
     const to = ["support@casaboard.dev"];
-    const emailSubject = subject || `New contact form message from ${name}`;
+    const emailSubject = `[CASABOARD] New contact form message from ${name}`;
     const text = `New contact form submission\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject || "(none)"}\n\nMessage:\n${message}`;
 
     // Call Resend API directly (no SDK to keep it lightweight)
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from, to, subject: emailSubject, text }),
+      body: JSON.stringify({ from, to, subject: emailSubject, text, reply_to: email }),
     });
 
     if (!res.ok) {
