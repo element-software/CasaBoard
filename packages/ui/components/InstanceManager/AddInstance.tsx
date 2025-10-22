@@ -43,7 +43,7 @@ export const AddInstance = ({
           label="HA URL"
           value={form.hass_url}
           onChange={(e) => setForm({ ...form, hass_url: e.target.value })}
-          description="Home Assistant URL (e.g., your-domain.com) - do not include the protocol (https://) or the port (8123)"
+          description="Home Assistant URL (e.g., your-domain.com) - do not include the protocol (https://) - this will automatically be added. Also, do not include the port (8123) if your external URL does not require it."
           placeholder="your-domain.com"
           startContent={
             <span className="text-primary-400 text-sm">https://</span>

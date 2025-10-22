@@ -23,7 +23,7 @@ export const Hero = () => {
       </p>
       <p className="text-xs pb-6 w-full">
         Currently under development, so expect some bugs! FREE to use whilst in
-        development - your trial will simply auto-renew when it ends. Please see 
+        development - your trial will simply auto-renew when it ends. Please see {" "}
         <Link href="/terms" className="text-xs"> terms</Link> for more details.
       </p>
       <Button

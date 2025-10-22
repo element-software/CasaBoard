@@ -1,36 +1,17 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { PageActions } from "@repo/lib";
 import { Page } from "@repo/types/page";
 import { Entitlements } from "@repo/types/subscription";
+import { HAInstance } from "@repo/types/ha";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import {
-  mdiPlus,
-  mdiPencil,
-  mdiTrashCan,
-  mdiEye,
-  mdiWeb,
-  mdiEyeOutline,
-  mdiEyeOff,
-  mdiCheckCircle,
-  mdiAlertCircle,
-  mdiClock,
-  mdiHomeAssistant,
-  mdiDotsVertical,
-} from "@mdi/js";
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Spinner,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  cn,
-} from "@heroui/react";
+import { mdiPlus, mdiWeb } from "@mdi/js";
+import { Button, Chip, cn } from "@heroui/react";
+import { ErrorState } from "./ErrorState";
+import { EmptyState } from "./EmptyState";
+import { PageCard } from "./PageCard";
+import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
@@ -38,6 +19,7 @@ interface PagesManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
+  haInstances?: HAInstance[];
 }
 
 export const PagesManagement = ({
@@ -46,24 +28,31 @@ export const PagesManagement = ({
   initialError = null,
   compact = false,
   entitlements,
+  haInstances = [],
 }: PagesManagementProps) => {
+  const router = useRouter();
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
 
-  // Helper functions for entitlements
-  const canCreateDashboard = (currentCount: number) => {
-    if (!entitlements?.active) return false;
-    return (
-      entitlements.maxDashboards === -1 ||
-      currentCount < entitlements.maxDashboards
-    );
-  };
+  // Helper functions
+  const canCreateDashboard = (currentCount: number) =>
+    entitlements?.active &&
+    (entitlements.maxDashboards === -1 ||
+      currentCount < entitlements.maxDashboards) && haInstances.length > 0;
 
   const getRemainingDashboards = (currentCount: number) => {
-    if (!entitlements?.active) return 0;
-    if (entitlements.maxDashboards === -1) return Infinity;
+    if (!entitlements?.active || entitlements.maxDashboards === -1)
+      return Infinity;
     return Math.max(0, entitlements.maxDashboards - currentCount);
+  };
+
+  const handleCreatePage = () => {
+    if (haInstances.length === 0) {
+      router.push("/setup/ha-config");
+    } else {
+      window.location.href = "/setup/pages/create";
+    }
   };
 
   const handleDeletePage = async (slug: string, pageName: string) => {
@@ -71,9 +60,8 @@ export const PagesManagement = ({
       !confirm(
         `Are you sure you want to delete "${pageName}"? This action cannot be undone.`
       )
-    ) {
+    )
       return;
-    }
 
     startTransition(async () => {
       try {
@@ -107,73 +95,23 @@ export const PagesManagement = ({
     });
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Determine how many pages to show based on entitlements
   const maxDisplayPages =
     entitlements?.maxDashboards === -1
       ? pages.length
       : entitlements?.maxDashboards || 3;
   const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
 
-  if (error) {
+  // Early returns for error and empty states
+  if (error) return <ErrorState error={error} />;
+  if (pages.length === 0)
     return (
-      <Card className="border-red-200 bg-red-50">
-        <CardBody className="text-center py-6">
-          <div className="w-12 h-12 mx-auto mb-3 bg-red-100 rounded-full flex items-center justify-center">
-            <Icon path={mdiAlertCircle} className="w-6 h-6 text-red-600" />
-          </div>
-          <h3 className="text-lg font-semibold text-red-800 mb-2">
-            Error Loading Pages
-          </h3>
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button
-            color="primary"
-            variant="flat"
-            onPress={() => window.location.reload()}
-          >
-            Retry
-          </Button>
-        </CardBody>
-      </Card>
+      <EmptyState
+        canCreate={canCreateDashboard(0)}
+        onCreate={handleCreatePage}
+      />
     );
-  }
 
-  if (pages.length === 0) {
-    return (
-      <Card className="w-full">
-        <CardBody className="text-center py-12">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-theme-primary/10 to-theme-accent/10 rounded-3xl flex items-center justify-center">
-            <Icon path={mdiWeb} className="w-10 h-10 text-theme-primary" />
-          </div>
-          <h3 className="text-xl font-semibold text-theme-text mb-3">
-            No pages yet
-          </h3>
-          <p className="text-theme-text-secondary mb-6 max-w-sm mx-auto">
-            Get started by creating your first dashboard page to organize your
-            Home Assistant controls.
-          </p>
-          <Button
-            as={Link}
-            href="/setup/pages/create"
-            color="primary"
-            size="lg"
-            startContent={<Icon path={mdiPlus} className="w-5 h-5" />}
-            isDisabled={!canCreateDashboard(pages.length)}
-          >
-            Create First Page
-          </Button>
-        </CardBody>
-      </Card>
-    );
-  }
+  const remaining = getRemainingDashboards(pages.length);
 
   return (
     <div className="space-y-4">
@@ -181,10 +119,10 @@ export const PagesManagement = ({
       <div className="flex items-center justify-between">
         <div>
           <h2
-            className={cn("font-semibold text-theme-text", {
-              "text-lg": compact,
-              "text-xl": !compact,
-            })}
+            className={cn(
+              "font-semibold text-theme-text",
+              compact ? "text-lg" : "text-xl"
+            )}
           >
             Dashboard Pages
           </h2>
@@ -196,12 +134,11 @@ export const PagesManagement = ({
         </div>
         {!showAllPages && (
           <Button
-            as={Link}
-            href="/setup/pages/create"
             color="primary"
-            size={compact ? "sm" : "sm"}
+            size="sm"
             startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
             isDisabled={!canCreateDashboard(pages.length)}
+            onPress={handleCreatePage}
           >
             {compact ? "New" : "New Page"}
           </Button>
@@ -215,165 +152,14 @@ export const PagesManagement = ({
         )}
       >
         {displayPages.map((page) => (
-          <Card key={page.id} className="hover:shadow-md transition-shadow">
-            <CardBody className={cn(compact ? "p-3" : "p-4")}>
-              <div
-                className={cn(
-                  "flex justify-between",
-                  compact ? "items-center gap-3" : "items-start gap-4"
-                )}
-              >
-                {/* Page Info */}
-                <div className="flex-1 min-w-0">
-                  <div
-                    className={cn(
-                      "flex items-center gap-2",
-                      !compact && "mb-2"
-                    )}
-                  >
-                    <h3
-                      className={cn(
-                        "text-theme-text truncate",
-                        compact ? "font-medium text-sm" : "font-semibold"
-                      )}
-                    >
-                      {page.name}
-                    </h3>
-                    <Chip
-                      size="sm"
-                      color={page.published ? "success" : "warning"}
-                      variant="flat"
-                      className={compact ? "text-xs" : ""}
-                      startContent={
-                        !compact && (
-                          <Icon
-                            path={
-                              page.published ? mdiCheckCircle : mdiAlertCircle
-                            }
-                            className="w-3 h-3"
-                          />
-                        )
-                      }
-                    >
-                      {page.published
-                        ? compact
-                          ? "Live"
-                          : "Published"
-                        : "Draft"}
-                    </Chip>
-                  </div>
-
-                  {/* Metadata */}
-                  {compact ? (
-                    <div className="flex items-center gap-3 mt-1 text-xs text-theme-text-secondary">
-                      <span className="font-mono">/{page.slug}</span>
-                      <span>•</span>
-                      <span>{formatDate(page.updated_at)}</span>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 text-sm text-theme-text-secondary">
-                      <div className="flex items-center gap-2">
-                        <Icon path={mdiWeb} className="w-4 h-4 flex-shrink-0" />
-                        <span className="font-mono text-xs">/{page.slug}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Icon
-                          path={mdiClock}
-                          className="w-4 h-4 flex-shrink-0"
-                        />
-                        <span className="text-xs">
-                          Updated {formatDate(page.updated_at)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Icon
-                          path={mdiHomeAssistant}
-                          className="w-4 h-4 flex-shrink-0"
-                        />
-                        <span className="text-xs">{page.ha_instance?.name || page.ha_instance_id || "No instance"}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1">
-                  <Button
-                    as={Link}
-                    href={`/dashboard/${page.slug}`}
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    title="View page"
-                  >
-                    <Icon path={mdiEye} className="w-4 h-4" />
-                  </Button>
-
-                  <Button
-                    as={Link}
-                    href={`/setup/pages/edit/${page.slug}`}
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    title="Edit page"
-                  >
-                    <Icon path={mdiPencil} className="w-4 h-4" />
-                  </Button>
-
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        variant="light"
-                        title="More actions"
-                      >
-                        <Icon path={mdiDotsVertical} className="w-4 h-4" />
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Page actions">
-                      <DropdownItem key="toggle-publish" className="p-0">
-                        <Button
-                          color="primary"
-                          variant="flat"
-                          size="sm"
-                          title="Toggle publish"
-                          className="w-full"
-                          startContent={
-                            <Icon
-                              path={page.published ? mdiEyeOff : mdiEyeOutline}
-                              className="w-4 h-4"
-                            />
-                          }
-                          onPress={() =>
-                            handleTogglePublished(page.slug, page.published)
-                          }
-                        >
-                          {page.published ? "Unpublish" : "Publish"}
-                        </Button>
-                      </DropdownItem>
-                      <DropdownItem key="delete" className="p-0">
-                        <Button
-                          color="danger"
-                          variant="flat"
-                          size="sm"
-                          title="Delete page"
-                          className="w-full"
-                          onPress={() => handleDeletePage(page.slug, page.name)}
-                          startContent={
-                            <Icon path={mdiTrashCan} className="w-4 h-4" />
-                          }
-                          isLoading={isPending}
-                        >
-                          Delete
-                        </Button>
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+          <PageCard
+            key={page.id}
+            page={page}
+            compact={compact}
+            onTogglePublished={handleTogglePublished}
+            onDelete={handleDeletePage}
+            isPending={isPending}
+          />
         ))}
       </div>
 
@@ -392,7 +178,7 @@ export const PagesManagement = ({
       )}
 
       {/* Usage Info */}
-      {entitlements && entitlements.maxDashboards !== -1 && (
+      {entitlements?.maxDashboards !== -1 && (
         <div
           className={cn(
             compact
@@ -403,27 +189,24 @@ export const PagesManagement = ({
           {compact ? (
             <span className="text-xs text-theme-text-secondary">
               {pages.length}/{entitlements.maxDashboards} pages
-              {getRemainingDashboards(pages.length) === 0 && " • Limit reached"}
-              {getRemainingDashboards(pages.length) > 0 &&
-                getRemainingDashboards(pages.length) <= 2 &&
-                ` • ${getRemainingDashboards(pages.length)} remaining`}
+              {remaining === 0 && " • Limit reached"}
+              {remaining > 0 && remaining <= 2 && ` • ${remaining} remaining`}
             </span>
           ) : (
             <div className="flex items-center justify-between">
               <span className="text-sm text-theme-text-secondary">
                 Pages used: {pages.length} / {entitlements.maxDashboards}
               </span>
-              {getRemainingDashboards(pages.length) === 0 && (
+              {remaining === 0 && (
                 <Chip size="sm" color="warning" variant="flat">
                   Limit reached
                 </Chip>
               )}
-              {getRemainingDashboards(pages.length) > 0 &&
-                getRemainingDashboards(pages.length) <= 2 && (
-                  <Chip size="sm" color="warning" variant="flat">
-                    {getRemainingDashboards(pages.length)} remaining
-                  </Chip>
-                )}
+              {remaining > 0 && remaining <= 2 && (
+                <Chip size="sm" color="warning" variant="flat">
+                  {remaining} remaining
+                </Chip>
+              )}
             </div>
           )}
         </div>

@@ -6,7 +6,8 @@ import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanc
 export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
-  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+  const entitlements =
+    await SubscriptionService.getEntitlementsForCurrentUser();
   const haInstances = await HAInstanceActions.listHAInstances();
   const pages = await PageActions.getAllPages();
   return (
@@ -19,11 +20,12 @@ export default async function SetupPage() {
         </p>
       </div>
       <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
-        <PagesManagement 
-          initialPages={pages} 
-          initialError={null} 
-          compact 
+        <PagesManagement
+          initialPages={pages}
+          initialError={null}
+          compact
           entitlements={entitlements}
+          haInstances={haInstances}
         />
         <HAInstanceManager
           compact
@@ -33,7 +35,7 @@ export default async function SetupPage() {
       </div>
       {/* Quick Actions */}
       <div className="mt-8">
-        <QuickActions />
+        <QuickActions haInstances={haInstances} />
       </div>
     </div>
   );
