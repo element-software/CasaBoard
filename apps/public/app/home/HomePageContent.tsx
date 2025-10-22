@@ -2,6 +2,7 @@ import { CTA } from "./cta";
 import { Features } from "./features";
 import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
+import { Roadmap } from "./roadmap";
 
 export function HomePageContent() {
   return (
@@ -9,6 +10,7 @@ export function HomePageContent() {
       <Hero />
       <Features />
       <HowItWorks />
+      <Roadmap />
       <CTA />
     </div>
   );
