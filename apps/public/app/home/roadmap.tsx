@@ -11,6 +11,7 @@ import {
   mdiPalette,
   mdiCellphone,
   mdiEye,
+  mdiLogin,
 } from "@mdi/js";
 import Icon from "@mdi/react";
 
@@ -38,10 +39,18 @@ const roadmapItems: RoadmapItem[] = [
   {
     id: "advanced-widgets",
     title: "Advanced Widgets",
-    description: "Custom widgets and charts",
+    description: "Custom components and advanced graphs/charts",
     status: "in-progress",
     quarter: "Q1 2026",
     icon: mdiChartLine,
+  },
+  {
+    id: "login",
+    title: "Login Methods",
+    description: "Support for more login methods for the dashboard e.g. Github, Apple, etc.",
+    status: "planned",
+    quarter: "Q1 2026",
+    icon: mdiLogin,
   },
   {
     id: "device-pairing",
@@ -49,7 +58,7 @@ const roadmapItems: RoadmapItem[] = [
     description:
       "Pair dashboard devices e.g. tablets, kiosks, etc. with the dashboard to view the dashboard in a standalone mode.",
     status: "planned",
-    quarter: "Q1 2026",
+    quarter: "Q2 2026",
     icon: mdiEye,
   },
   {
@@ -57,7 +66,7 @@ const roadmapItems: RoadmapItem[] = [
     title: "Security Features",
     description: "2FA support, audit logs, and role-based access control",
     status: "planned",
-    quarter: "Q1 2026",
+    quarter: "Q2 2026",
     icon: mdiShield,
   },
   {
@@ -65,7 +74,7 @@ const roadmapItems: RoadmapItem[] = [
     title: "Custom Themes",
     description: "Custom themes, layout editor, and third-party integrations",
     status: "planned",
-    quarter: "Q2 2026",
+    quarter: "Q3 2026",
     icon: mdiPalette,
   },
 ];
@@ -107,9 +116,6 @@ export const Roadmap = () => {
       </div>
 
       <div className="relative mx-auto">
-        {/* Timeline line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-theme-primary/30 to-theme-primary/10" />
-
         <div className="space-y-4">
           {roadmapItems.map((item, index) => (
             <div key={item.id} className="relative flex items-center gap-4">

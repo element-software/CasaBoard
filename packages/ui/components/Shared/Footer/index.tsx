@@ -29,6 +29,13 @@ export const Footer: React.FC = () => {
             </Link>
             <span className="opacity-30">•</span>
             <Link
+              href="/terms"
+              className="text-theme-text-secondary hover:text-theme-primary"
+            >
+              Terms of Service
+            </Link>
+            <span className="opacity-30">•</span>
+            <Link
               href="/cookies"
               className="text-theme-text-secondary hover:text-theme-primary"
             >
