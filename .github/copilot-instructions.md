@@ -106,12 +106,14 @@ npm run build
 npm run lint
 ```
 
-- **Known Issue**: Packages `@repo/types`, `@repo/utils`, and others are missing `eslint.config.js`
-  - **Error**: `ESLint couldn't find an eslint.config.(js|mjs|cjs) file`
-  - **Current state**: Lint will fail for packages without eslint.config.js
-  - **Workaround**: Apps (app, public) have eslint.config.js and will lint successfully
-  - **Expected behavior**: Packages should either have eslint configs or be excluded from linting
-- **Apps use**: ESLint flat config from `@repo/eslint-config/next.js`
+- **Known Issue**: Multiple packages lack `eslint.config.js` files
+  - **Error**: `ESLint couldn't find an eslint.config.(js|mjs|cjs) file` for packages like `@repo/types`, `@repo/utils`, etc.
+  - **Apps**: Both apps use `next lint` which works but may prompt for ESLint setup on first run if not configured
+  - **app workspace**: Not yet configured - will interactively prompt for Strict/Base ESLint config on first lint
+  - **public workspace**: Already configured and lints successfully (shows warnings about NODE_ENV, unused vars, etc.)
+- **Workaround for full repo lint**: Expect failures in packages without eslint.config.js
+- **Better approach**: Lint individual apps using `npm run lint --workspace=public` or `npm run lint --workspace=app`
+- **Apps use**: ESLint via Next.js built-in linting (note: `next lint` is deprecated in Next.js 16)
 - **Flag**: `--max-warnings 0` (zero tolerance for warnings)
 
 ### Type Checking
@@ -208,12 +210,15 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 2. **Lint fails for packages**
    - **Symptom**: `ESLint couldn't find an eslint.config.js file` in @repo/types, @repo/utils, etc.
-   - **Fix**: Add `eslint.config.js` to each package (see `apps/public/eslint.config.js` for reference)
+   - **Current state**: Most packages don't have eslint configs; only `apps/public` has one
+   - **Workaround**: Use `npm run lint --workspace=public` to lint only the public app
+   - **For new packages**: Add `eslint.config.js` to each package
    - **Example**:
      ```js
      import { config } from "@repo/eslint-config/base";
      export default config;
      ```
+   - **Note**: `apps/app` needs ESLint setup - will prompt interactively on first `npm run lint --workspace=app`
 
 3. **Type checking fails for packages**
    - **Symptom**: TypeScript prints help text for packages without tsconfig.json
@@ -238,11 +243,13 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 ## Validation Steps Before Committing
 
-1. **Install dependencies**: `npm install`
-2. **Type check**: `npm run check-types` (expect warnings from packages without tsconfig.json)
-3. **Lint**: `npm run lint` (expect errors from packages without eslint.config.js; apps should pass)
-4. **Build** (if network allows): `npm run build` (may fail on Google Fonts)
-5. **Dev server**: `npm run dev` and verify both apps start
+1. **Install dependencies**: `npm install` (~60 seconds, installs ~742 packages)
+2. **Type check**: `npm run check-types` (expect TypeScript help output from packages without tsconfig.json; some packages will fail)
+3. **Lint**: `npm run lint` (expect failures from packages without eslint.config.js)
+   - **Better**: `npm run lint --workspace=public` to lint successfully
+   - **Note**: `apps/app` not yet configured for linting
+4. **Build** (if network allows): `npm run build` (may fail if fonts.googleapis.com unreachable)
+5. **Dev server**: `npm run dev` and verify both apps start on ports 3000 and 3001
 
 ## File Locations Reference
 
@@ -253,7 +260,8 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 **App configs:**
 
 - `apps/app/next.config.js`, `apps/app/middleware.ts`, `apps/app/tsconfig.json`, `apps/app/postcss.config.js`
-- `apps/public/next.config.js`, `apps/public/eslint.config.js`, `apps/public/tsconfig.json`
+  - **Note**: No eslint.config.js in apps/app (uses `next lint` which prompts for setup)
+- `apps/public/next.config.js`, `apps/public/eslint.config.js`, `apps/public/tsconfig.json`, `apps/public/postcss.config.js`
 
 **Package configs:**
 
