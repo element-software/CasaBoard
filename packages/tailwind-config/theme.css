@@ -14,12 +14,12 @@ Text / UI: #F9FAFB */
   --theme-text: #f9fafb;
   --theme-text-primary: #8b5cf6;
   --theme-text-secondary: #a3a3a3;
-  --theme-border: #1e0c35;
+  --theme-border: #bb37fc;
   
   /* Brand colors */
   --theme-primary: #8b5cf6;
-  --theme-secondary: #6b7280;
-  --theme-accent: #1e0c35;
+  --theme-secondary: #333dfe;
+  --theme-accent: #bb37fc;
   
   /* State colors */
   --theme-success: #10b981;
