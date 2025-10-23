@@ -51,7 +51,7 @@ export default function ContactPageContent() {
   }
 
   return (
-    <div className="pt-32">
+    <div className="pt-48">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-theme-text">

@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardBody, Chip } from "@heroui/react";
+import { Button, Card, CardBody, Chip } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
   mdiCloud,
@@ -11,6 +11,7 @@ import {
   mdiShield,
   mdiRocket,
 } from "@mdi/js";
+import Link from "next/link";
 
 interface WhyFeature {
   icon: any;
@@ -18,6 +19,10 @@ interface WhyFeature {
   description: string;
   highlight: string;
   color: "primary" | "secondary" | "success" | "warning" | "danger";
+  cta?: {
+    text: string;
+    href: string;
+  }
 }
 
 const whyFeatures: WhyFeature[] = [
@@ -54,14 +59,22 @@ const whyFeatures: WhyFeature[] = [
     title: "Secure & Reliable",
     description: "Enterprise-grade security with encrypted connections and OAuth authentication. Your data is safe.",
     highlight: "Enterprise Security",
-    color: "success"
+    color: "success",
+    cta: {
+      text: "Learn More",
+      href: "/security"
+    }
   },
   {
     icon: mdiRocket,
     title: "Easy Setup",
     description: "Get up and running in minutes with our streamlined setup process. No complex configurations needed.",
     highlight: "Quick Start",
-    color: "primary"
+    color: "primary",
+    cta: {
+      text: "View docs",
+      href: "/docs"
+    }
   }
 ];
 
@@ -116,6 +129,18 @@ export const Why = () => {
                   >
                     {feature.highlight}
                   </Chip>
+                  {feature.cta && (
+                    <Button
+                      as={Link}
+                      color="primary"
+                      variant="flat"
+                      size="sm"
+                      className="mt-4"
+                      href={feature.cta.href}
+                    >
+                      {feature.cta.text}
+                    </Button>
+                  )}
                 </div>
               </CardBody>
             </Card>

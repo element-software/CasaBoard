@@ -22,6 +22,13 @@ export const Footer: React.FC = () => {
             </Link>
             <span className="opacity-30">•</span>
             <Link
+              href={LinkService.crossAppHref("public", "/security")}
+              className="text-theme-text-secondary hover:text-theme-primary"
+            >
+              Security
+            </Link>
+            <span className="opacity-30">•</span>
+            <Link
               href="/privacy"
               className="text-theme-text-secondary hover:text-theme-primary"
             >

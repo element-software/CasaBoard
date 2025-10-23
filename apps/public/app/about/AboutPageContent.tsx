@@ -14,7 +14,7 @@ export default function AboutPageContent() {
   return (
     <div>
       {/* About – Hero */}
-      <section className="relative overflow-hidden mb-10 pt-32">
+      <section className="relative overflow-hidden mb-10 pt-48">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
           <div className="text-center space-y-6">
