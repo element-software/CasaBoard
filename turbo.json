@@ -4,7 +4,8 @@
     ".env*"
   ],
   "globalEnv": [
-    "RESEND_API_KEY"
+    "RESEND_API_KEY",
+    "STRIPE_SECRET_KEY"
   ],
   "ui": "tui",
   "tasks": {
