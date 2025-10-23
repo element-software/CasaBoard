@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { cn } from "@heroui/react";
+import { getCurrentAuthUser } from "@repo/lib";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,17 +17,20 @@ export const metadata: Metadata = {
   manifest: "./manifest.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const user = await getCurrentAuthUser();
+
   return (
     <html lang="en" className="dark">
       <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
       <body className={cn("bg-neutral-900",inter.className)}>
         {children}
-        <AnalyticsWrapper gaId="G-P2JEHMNT4C" />
+        <AnalyticsWrapper gaId="G-P2JEHMNT4C" user={user} />
       </body>
     </html>
   );

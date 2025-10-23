@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { LinkService, SubscriptionService, getCurrentAuthUser, serverLogger } from "@repo/lib";
+import { SubscriptionService, getCurrentAuthUser, serverLogger } from "@repo/lib";
 import TrialSetupWrapper from "./TrialSetupWrapper";
 
 export const dynamic = "force-dynamic";
