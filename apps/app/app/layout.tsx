@@ -5,6 +5,7 @@ import "./globals.css";
 import Script from "next/script";
 import { cn } from "@heroui/react";
 import { getCurrentAuthUser } from "@repo/lib";
+import { User } from "@supabase/supabase-js";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
 
-  const user = await getCurrentAuthUser();
+  let user: User | undefined = undefined;
+
+  try {
+    user = await getCurrentAuthUser();
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <html lang="en" className="dark">
