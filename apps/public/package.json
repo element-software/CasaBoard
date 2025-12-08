@@ -19,7 +19,7 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@tailwindcss/postcss": "^4.1.13",
-    "next": "^15.5.0",
+    "next": "^15.5.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
