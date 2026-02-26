@@ -16,6 +16,7 @@ import type {
   LoadTokensFunc,
 } from "home-assistant-js-websocket";
 import { HAInstance } from "@repo/types/ha";
+import { HAInstanceActions } from "@repo/lib";
 
 export interface HAConnectProps {
   haInstance: HAInstance;
@@ -105,4 +106,47 @@ export async function connect({
   }
 
   return { connection, auth };
+}
+/**
+ * Initiates re-authentication for an existing Home Assistant instance
+ * This clears the old token and starts a fresh OAuth flow
+ */
+export async function reauthenticateInstance({
+  haInstance,
+}: HAConnectProps): Promise<void> {
+  // Delete the old token to force a fresh auth flow
+  try {
+    await HAInstanceActions.updateHAInstance({
+      id: haInstance.id,
+      auth: null,
+      expires_at: null,
+    });
+    serverLogger.info("reauthenticateInstance", "cleared old token", haInstance.id);
+  } catch (err) {
+    serverLogger.warn("reauthenticateInstance", "failed to clear token", err);
+  }
+
+  // Initiate fresh auth flow
+  let auth: Auth | undefined;
+
+  const loadTokens = async () => {
+    serverLogger.info("reauthenticateInstance.loadTokens", "returning null to force fresh auth");
+    return null; // Return null to force fresh OAuth flow
+  };
+
+  const getAuthOptions = {
+    hassUrl: haInstance.hass_url,
+    saveTokens: saveTokensToDB,
+    loadTokens: loadTokens as unknown as LoadTokensFunc,
+    redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
+  };
+
+  try {
+    auth = await getAuth(getAuthOptions);
+    serverLogger.info("reauthenticateInstance", "got new auth");
+    // The redirect should happen via getAuth
+  } catch (err) {
+    serverLogger.error("reauthenticateInstance", "getAuth error", err);
+    throw new Error(`Home Assistant re-authentication failed: ${err}`);
+  }
 }

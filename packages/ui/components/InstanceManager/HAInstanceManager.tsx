@@ -95,7 +95,7 @@ export function HAInstanceManager({
   const renderInstancesList = () => (
     <div className="space-y-3">
       {haInstances.map((i) => (
-        <HassConnectWrapper key={i.id} haInstance={i}>
+        <HassConnectWrapper key={i.id} haInstance={i} onDelete={onDelete}>
           <HAInstance
             key={i.id}
             instance={i}
