@@ -1,16 +1,12 @@
-import { Encryption, generateSessionId, clientLogger } from "@repo/lib";
-import { createClient as createSupabaseClient } from "@repo/lib/supabase/client";
-import { haTokenKey } from "@repo/lib/storage/storageKeys";
-import { getHAInstanceByHassUrl } from "@repo/lib/storage/haInstanceStorage";
+import { Encryption, generateSessionId, clientLogger, SupabaseClient, HAInstanceStorage } from "@repo/lib";
+import { haTokenKey } from "@repo/lib";
 import {
-  Auth,
   AuthData,
-  LoadTokensFunc,
   SaveTokensFunc,
 } from "home-assistant-js-websocket";
 
 async function getCurrentUser() {
-  const supabase = createSupabaseClient();
+  const supabase = SupabaseClient.createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,7 +22,7 @@ export const saveTokensToLocalStorage: SaveTokensFunc = async (
     return;
   }
 
-  const instance = await getHAInstanceByHassUrl(data.hassUrl);
+  const instance = await HAInstanceStorage.getHAInstanceByHassUrl(data.hassUrl);
   clientLogger.info("saveTokensToLocalStorage", "instance", instance);
   if (!instance?.id) {
     clientLogger.error(
@@ -75,21 +71,9 @@ export const saveTokensToLocalStorage: SaveTokensFunc = async (
   } catch (e) {
     clientLogger.error(
       "saveTokensToLocalStorage",
-      "encryption failed, falling back to plain save",
+      "encryption failed — tokens not saved",
       e
     );
-    try {
-      const user = await getCurrentUser();
-      const userId = user?.id || "anonymous";
-      const storageKey = haTokenKey(userId, instance.id);
-      localStorage.setItem(storageKey, JSON.stringify(data));
-    } catch (e2) {
-      clientLogger.error(
-        "saveTokensToLocalStorage",
-        "fallback save failed",
-        e2
-      );
-    }
   }
 };
 

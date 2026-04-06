@@ -42,7 +42,11 @@ export function HAInstanceManager({
   const onCreate = async () => {
     setIsPending(true);
     setError(null);
-    const formattedUrl = `https://${form.hass_url}`;
+    const rawUrl = form.hass_url.trim();
+    const formattedUrl =
+      rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+        ? rawUrl
+        : `https://${rawUrl}`;
     try {
       const created = await HAInstanceStorage.createHAInstance({
         name: form.name || `Instance ${haInstances.length + 1}`,
