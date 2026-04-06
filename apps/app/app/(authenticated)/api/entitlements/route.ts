@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
-import { SubscriptionService } from "@repo/lib";
 import { getCurrentAuthUser } from "@repo/lib";
+import { Entitlements } from "@repo/types/subscription";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// All limits are now unlimited since data is stored locally
+const UNLIMITED_ENTITLEMENTS: Entitlements = {
+  planId: "local",
+  maxDashboards: -1,
+  maxHAInstances: -1,
+  maxSidebars: -1,
+  trialEndsAt: null,
+  active: true,
+};
 
 export async function GET() {
   try {
@@ -11,15 +21,8 @@ export async function GET() {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
-    
-    return NextResponse.json(entitlements);
+    return NextResponse.json(UNLIMITED_ENTITLEMENTS);
   } catch (error) {
-    console.error("Failed to fetch entitlements:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch entitlements" },
-      { status: 500 }
-    );
+    return NextResponse.json(UNLIMITED_ENTITLEMENTS);
   }
 }

@@ -1,9 +1,7 @@
 "use client";
 import { useState, useTransition, useEffect } from "react";
-import { PageActions } from "@repo/lib";
+import { PageStorage, HAInstanceStorage } from "@repo/lib";
 import { Page } from "@repo/types/page";
-import { Entitlements } from "@repo/types/subscription";
-import { HAInstance } from "@repo/types/ha";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiPlus, mdiWeb } from "@mdi/js";
@@ -15,40 +13,42 @@ import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
-  initialPages?: Page[];
-  initialError?: string | null;
   compact?: boolean;
-  entitlements: Entitlements;
-  haInstances?: HAInstance[];
 }
 
 export const PagesManagement = ({
   showAllPages = false,
-  initialPages = [],
-  initialError = null,
   compact = false,
-  entitlements,
-  haInstances = [],
 }: PagesManagementProps) => {
   const router = useRouter();
-  const [pages, setPages] = useState<Page[]>(initialPages);
-  const [error, setError] = useState<string | null>(initialError);
+  const [pages, setPages] = useState<Page[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [hasHAInstances, setHasHAInstances] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Helper functions
-  const canCreateDashboard = (currentCount: number) =>
-    entitlements?.active &&
-    (entitlements.maxDashboards === -1 ||
-      currentCount < entitlements.maxDashboards) && haInstances.length > 0;
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [loadedPages, instances] = await Promise.all([
+          PageStorage.getAllPages(),
+          HAInstanceStorage.listHAInstances(),
+        ]);
+        setPages(loadedPages);
+        setHasHAInstances(instances.length > 0);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load pages");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
-  const getRemainingDashboards = (currentCount: number) => {
-    if (!entitlements?.active || entitlements.maxDashboards === -1)
-      return Infinity;
-    return Math.max(0, entitlements.maxDashboards - currentCount);
-  };
+  const canCreateDashboard = () => hasHAInstances;
 
   const handleCreatePage = () => {
-    if (haInstances.length === 0) {
+    if (!hasHAInstances) {
       router.push("/setup/ha-config");
     } else {
       window.location.href = "/setup/pages/create";
@@ -65,7 +65,7 @@ export const PagesManagement = ({
 
     startTransition(async () => {
       try {
-        await PageActions.deletePage(slug);
+        await PageStorage.deletePage(slug);
         setPages(pages.filter((page) => page.slug !== slug));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to delete page");
@@ -79,7 +79,7 @@ export const PagesManagement = ({
   ) => {
     startTransition(async () => {
       try {
-        await PageActions.updatePage(slug, { published: !currentPublished });
+        await PageStorage.updatePage(slug, { published: !currentPublished });
         setPages(
           pages.map((page) =>
             page.slug === slug
@@ -95,23 +95,24 @@ export const PagesManagement = ({
     });
   };
 
-  const maxDisplayPages =
-    entitlements?.maxDashboards === -1
-      ? pages.length
-      : entitlements?.maxDashboards || 3;
-  const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
+  const displayPages = showAllPages ? pages : pages.slice(0, 6);
 
-  // Early returns for error and empty states
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-theme-text-secondary text-sm">Loading pages...</div>
+      </div>
+    );
+  }
+
   if (error) return <ErrorState error={error} />;
   if (pages.length === 0)
     return (
       <EmptyState
-        canCreate={canCreateDashboard(0)}
+        canCreate={canCreateDashboard()}
         onCreate={handleCreatePage}
       />
     );
-
-  const remaining = getRemainingDashboards(pages.length);
 
   return (
     <div className="space-y-4">
@@ -137,7 +138,7 @@ export const PagesManagement = ({
             color="primary"
             size="sm"
             startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-            isDisabled={!canCreateDashboard(pages.length)}
+            isDisabled={!canCreateDashboard()}
             onPress={handleCreatePage}
           >
             {compact ? "New" : "New Page"}
@@ -164,7 +165,7 @@ export const PagesManagement = ({
       </div>
 
       {/* Footer Info */}
-      {!showAllPages && pages.length > maxDisplayPages && (
+      {!showAllPages && pages.length > displayPages.length && (
         <div className={cn("text-center", compact ? "py-2" : "py-3")}>
           <p
             className={cn(
@@ -172,43 +173,8 @@ export const PagesManagement = ({
               compact ? "text-xs" : "text-sm"
             )}
           >
-            And {pages.length - maxDisplayPages} more pages
+            And {pages.length - displayPages.length} more pages
           </p>
-        </div>
-      )}
-
-      {/* Usage Info */}
-      {entitlements?.maxDashboards !== -1 && (
-        <div
-          className={cn(
-            compact
-              ? "text-center"
-              : "bg-theme-background-secondary rounded-lg p-4"
-          )}
-        >
-          {compact ? (
-            <span className="text-xs text-theme-text-secondary">
-              {pages.length}/{entitlements.maxDashboards} pages
-              {remaining === 0 && " • Limit reached"}
-              {remaining > 0 && remaining <= 2 && ` • ${remaining} remaining`}
-            </span>
-          ) : (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-theme-text-secondary">
-                Pages used: {pages.length} / {entitlements.maxDashboards}
-              </span>
-              {remaining === 0 && (
-                <Chip size="sm" color="warning" variant="flat">
-                  Limit reached
-                </Chip>
-              )}
-              {remaining > 0 && remaining <= 2 && (
-                <Chip size="sm" color="warning" variant="flat">
-                  {remaining} remaining
-                </Chip>
-              )}
-            </div>
-          )}
         </div>
       )}
 

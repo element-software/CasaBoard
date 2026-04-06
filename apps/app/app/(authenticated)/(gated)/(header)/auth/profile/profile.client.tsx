@@ -1,18 +1,13 @@
 "use client";
 import { Card, CardBody, Button, Avatar, Chip, Divider } from "@heroui/react";
-import { Entitlements, SubscriptionSummary } from "@repo/types/subscription";
 import { Profile } from "@repo/types/user";
 import { useRouter } from "next/navigation";
-
+import { DataPortabilityPanel } from "@repo/ui/components/Shared/util/DataPortability";
 
 export default function ProfileClient({
   profile,
-  entitlements,
-  subscription,
 }: {
   profile: Profile;
-  entitlements: Entitlements;
-  subscription: SubscriptionSummary;
 }) {
   const router = useRouter();
   return (
@@ -20,12 +15,12 @@ export default function ProfileClient({
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-theme-text">Profile</h1>
         <p className="text-theme-text-secondary">
-          Manage your account and subscription
+          Manage your account and data
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-theme-background border border-theme-border lg:col-span-2">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="bg-theme-background border border-theme-border">
           <CardBody className="p-6 flex flex-col items-stretch">
             <div className="flex items-start gap-4">
               <Avatar
@@ -77,59 +72,7 @@ export default function ProfileClient({
           </CardBody>
         </Card>
 
-        <Card className="bg-theme-background border border-theme-border">
-          <CardBody className="p-6 space-y-3">
-            <h2 className="text-lg font-semibold">Subscription</h2>
-            <div className="flex items-center flex-wrap gap-2">
-              <Chip
-                color={
-                  /active|trialing/.test(subscription.status)
-                    ? "success"
-                    : "warning"
-                }
-                className="capitalize"
-                variant="flat"
-              >
-                {subscription.status}
-              </Chip>
-              <Chip variant="flat" color="primary">Plan: {subscription.planLabel ?? subscription.planId}</Chip>
-              {subscription.trialEndsAt && (
-                <Chip color="danger" variant="flat">
-                  TRIAL • ends{" "}
-                  {new Date(subscription.trialEndsAt).toLocaleDateString()}
-                </Chip>
-              )}
-            </div>
-            <div className="text-sm text-theme-text-secondary">
-              <p>
-                Dashboards:{" "}
-                {entitlements.maxDashboards < 0
-                  ? "Unlimited"
-                  : entitlements.maxDashboards}
-              </p>
-              <p>
-                HA Instances:{" "}
-                {entitlements.maxHAInstances < 0
-                  ? "Unlimited"
-                  : entitlements.maxHAInstances}
-              </p>
-              {subscription.hasPaymentMethod === false && (
-                <p className="text-warning">No payment method on file</p>
-              )}
-            </div>
-            <div className="pt-2">
-              <Button
-                as="a"
-                href="/auth/profile/billing"
-                color="primary"
-                variant="solid"
-                className="w-full"
-              >
-                Manage Billing
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
+        <DataPortabilityPanel />
       </div>
     </div>
   );

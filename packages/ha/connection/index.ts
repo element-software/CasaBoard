@@ -1,6 +1,10 @@
 import { ConnectResult, EntityDomain, EntityId } from "../types/index";
 import { serverLogger } from "@repo/lib";
-import { loadTokensFromDB, saveTokensToDB } from "./token";
+import {
+  loadTokensFromLocalStorage,
+  saveTokensToLocalStorage,
+  clearTokenFromLocalStorage,
+} from "./token";
 import { LinkService } from "@repo/lib";
 import {
   getAuth,
@@ -16,7 +20,6 @@ import type {
   LoadTokensFunc,
 } from "home-assistant-js-websocket";
 import { HAInstance } from "@repo/types/ha";
-import { HAInstanceActions } from "@repo/lib";
 
 export interface HAConnectProps {
   haInstance: HAInstance;
@@ -63,12 +66,12 @@ export async function connect({
 
   const loadTokens = async () => {
     serverLogger.info("loadTokens wrapper", "haInstance", haInstance);
-    return loadTokensFromDB(haInstance.id) as unknown as AuthData;
+    return loadTokensFromLocalStorage(haInstance.id) as unknown as AuthData;
   };
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: saveTokensToDB,
+    saveTokens: saveTokensToLocalStorage,
     loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
@@ -114,13 +117,9 @@ export async function connect({
 export async function reauthenticateInstance({
   haInstance,
 }: HAConnectProps): Promise<void> {
-  // Delete the old token to force a fresh auth flow
+  // Clear the old token from localStorage to force a fresh auth flow
   try {
-    await HAInstanceActions.updateHAInstance({
-      id: haInstance.id,
-      auth: null,
-      expires_at: null,
-    });
+    await clearTokenFromLocalStorage(haInstance.id);
     serverLogger.info("reauthenticateInstance", "cleared old token", haInstance.id);
   } catch (err) {
     serverLogger.warn("reauthenticateInstance", "failed to clear token", err);
@@ -136,7 +135,7 @@ export async function reauthenticateInstance({
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: saveTokensToDB,
+    saveTokens: saveTokensToLocalStorage,
     loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };

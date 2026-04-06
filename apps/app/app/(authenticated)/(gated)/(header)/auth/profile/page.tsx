@@ -1,13 +1,8 @@
-import {
-  SupabaseServer,
-  SubscriptionService,
-  getCurrentAuthUser,
-} from "@repo/lib";
+import { getCurrentAuthUser } from "@repo/lib";
 import { redirect } from "next/navigation";
 import ProfileClient from "./profile.client";
 
 export default async function ProfilePage() {
-  const supabase = await SupabaseServer.createClient();
   const user = await getCurrentAuthUser();
   if (!user) {
     redirect("/auth/login?redirectTo=/auth/profile");
@@ -22,16 +17,5 @@ export default async function ProfilePage() {
     lastSignIn: user?.last_sign_in_at || null,
   };
 
-  const entitlements =
-    await SubscriptionService.getEntitlementsForCurrentUser();
-  const subscription =
-    await SubscriptionService.getCurrentSubscriptionSummary();
-
-  return (
-    <ProfileClient
-      profile={profile}
-      entitlements={entitlements}
-      subscription={subscription}
-    />
-  );
+  return <ProfileClient profile={profile} />;
 }

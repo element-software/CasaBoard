@@ -1,10 +1,7 @@
-import {
-  HAInstanceActions,
-  Encryption,
-  generateSessionId,
-  getCurrentAuthUser,
-  serverLogger,
-} from "@repo/lib";
+import { Encryption, generateSessionId, clientLogger } from "@repo/lib";
+import { createClient as createSupabaseClient } from "@repo/lib/supabase/client";
+import { haTokenKey } from "@repo/lib/storage/storageKeys";
+import { getHAInstanceByHassUrl } from "@repo/lib/storage/haInstanceStorage";
 import {
   Auth,
   AuthData,
@@ -12,39 +9,55 @@ import {
   SaveTokensFunc,
 } from "home-assistant-js-websocket";
 
-export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
-  serverLogger.info("saveTokensToDB", "data", data);
+async function getCurrentUser() {
+  const supabase = createSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+}
+
+export const saveTokensToLocalStorage: SaveTokensFunc = async (
+  data: AuthData | null
+) => {
+  clientLogger.info("saveTokensToLocalStorage", "data", data);
   if (!data) {
-    serverLogger.error("saveTokensToDB", "No data to save");
+    clientLogger.error("saveTokensToLocalStorage", "No data to save");
     return;
   }
 
-  const instance = await HAInstanceActions.getHAInstanceByHassUrl(data.hassUrl);
-  serverLogger.info("saveTokensToDB", "instance", instance);
+  const instance = await getHAInstanceByHassUrl(data.hassUrl);
+  clientLogger.info("saveTokensToLocalStorage", "instance", instance);
   if (!instance?.id) {
-    serverLogger.error("saveTokensToDB", "No instance found");
+    clientLogger.error(
+      "saveTokensToLocalStorage",
+      "No instance found for hassUrl",
+      data.hassUrl
+    );
     return;
   }
 
   try {
-    const user = await getCurrentAuthUser();
+    const user = await getCurrentUser();
     const userId = user?.id || "anonymous";
     const userEmail = user?.email || undefined;
 
     // Re-use existing session_id if present to ensure stable decryption key
+    const storageKey = haTokenKey(userId, instance.id);
     let existingSessionId: string | undefined;
-    const prevAuth: any = instance?.auth;
-    if (
-      prevAuth &&
-      typeof prevAuth === "object" &&
-      prevAuth.encrypted &&
-      prevAuth.session_id
-    ) {
-      existingSessionId = String(prevAuth.session_id);
+    const prevRaw = localStorage.getItem(storageKey);
+    if (prevRaw) {
+      try {
+        const prev = JSON.parse(prevRaw);
+        if (prev?.encrypted && prev?.session_id) {
+          existingSessionId = String(prev.session_id);
+        }
+      } catch {
+        // ignore
+      }
     }
 
     const sessionId = existingSessionId || generateSessionId(userId, userEmail);
-
     const plaintext = JSON.stringify(data);
     const cipher = await Encryption.encryptToken(plaintext, userId, sessionId);
 
@@ -54,90 +67,89 @@ export const saveTokensToDB: SaveTokensFunc = async (data: AuthData | null) => {
       value: cipher,
     };
 
-    const haInstance = await HAInstanceActions.updateHAInstance({
-      id: instance.id,
-      auth: payload,
-      expires_at: data.expires_in
-        ? new Date(Date.now() + data.expires_in * 1000).toISOString()
-        : null,
-    });
-
-    if (haInstance?.auth) {
-      serverLogger.info("saveTokensToDB", "Encrypted auth saved to DB");
-    } else {
-      serverLogger.error(
-        "saveTokensToDB",
-        "Failed to save encrypted auth to DB",
-        haInstance
-      );
-    }
+    localStorage.setItem(storageKey, JSON.stringify(payload));
+    clientLogger.info(
+      "saveTokensToLocalStorage",
+      "Encrypted auth saved to localStorage"
+    );
   } catch (e) {
-    serverLogger.error(
-      "saveTokensToDB",
+    clientLogger.error(
+      "saveTokensToLocalStorage",
       "encryption failed, falling back to plain save",
       e
     );
     try {
-      await HAInstanceActions.updateHAInstance({
-        id: instance.id,
-        auth: data,
-        expires_at: data.expires_in
-          ? new Date(Date.now() + data.expires_in * 1000).toISOString()
-          : null,
-      });
+      const user = await getCurrentUser();
+      const userId = user?.id || "anonymous";
+      const storageKey = haTokenKey(userId, instance.id);
+      localStorage.setItem(storageKey, JSON.stringify(data));
     } catch (e2) {
-      serverLogger.error("saveTokensToDB", "fallback save failed", e2);
+      clientLogger.error(
+        "saveTokensToLocalStorage",
+        "fallback save failed",
+        e2
+      );
     }
   }
 };
 
-export const loadTokensFromDB = async (instanceId: string) => {
-  const instance = await HAInstanceActions.getHAInstance(instanceId);
-
-  serverLogger.info("loadTokensFromDB", "instance", instance);
-
-  if (!instance?.id) {
-    serverLogger.error("loadTokensFromDB", "No instance found");
-    return null;
-  }
+export const loadTokensFromLocalStorage = async (
+  instanceId: string
+): Promise<AuthData | null> => {
   try {
-    const stored: any = instance?.auth;
-    if (!stored) {
-      serverLogger.error("loadTokensFromDB", "No token found in DB", instance);
-      return null;
-    }
+    const user = await getCurrentUser();
+    const userId = user?.id || "anonymous";
+    const storageKey = haTokenKey(userId, instanceId);
+    const raw = localStorage.getItem(storageKey);
 
-    // If encrypted payload shape
+    if (!raw) return null;
+
+    const stored = JSON.parse(raw);
+
     if (
       typeof stored === "object" &&
       stored.encrypted &&
       stored.value &&
       stored.session_id
     ) {
-      const user = await getCurrentAuthUser();
-      const userId = user?.id || "anonymous";
       const sessionId = String(stored.session_id);
       const plaintext = await Encryption.decryptToken(
         String(stored.value),
         userId,
         sessionId
       );
-      const parsed = JSON.parse(plaintext) as AuthData;
-      return parsed;
+      return JSON.parse(plaintext) as AuthData;
     }
 
-    // Legacy formats: return as-is
-    if (typeof stored === "string") {
-      // If someone stored a raw token string erroneously, we cannot reconstruct AuthData
-      serverLogger.warn(
-        "loadTokensFromDB",
-        "Unexpected string auth format; returning null"
-      );
-      return null;
-    }
     return stored as AuthData;
   } catch (e) {
-    serverLogger.error("loadTokensFromDB", "decryption failed", e);
+    clientLogger.error(
+      "loadTokensFromLocalStorage",
+      "failed to load tokens",
+      e
+    );
     return null;
+  }
+};
+
+export const clearTokenFromLocalStorage = async (
+  instanceId: string
+): Promise<void> => {
+  try {
+    const user = await getCurrentUser();
+    const userId = user?.id || "anonymous";
+    const storageKey = haTokenKey(userId, instanceId);
+    localStorage.removeItem(storageKey);
+    clientLogger.info(
+      "clearTokenFromLocalStorage",
+      "Token cleared for instance",
+      instanceId
+    );
+  } catch (e) {
+    clientLogger.error(
+      "clearTokenFromLocalStorage",
+      "failed to clear token",
+      e
+    );
   }
 };

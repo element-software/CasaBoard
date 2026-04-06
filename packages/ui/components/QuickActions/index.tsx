@@ -1,17 +1,17 @@
 "use client";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Icon from '@mdi/react';
-import { Card, CardHeader, CardBody, Button, Chip } from '@heroui/react';
+import { Card, CardHeader, CardBody, Chip } from '@heroui/react';
 import { 
   mdiPlus, 
   mdiWeb, 
   mdiHomeAssistant,
-  mdiCreditCard,
   mdiAlertCircle,
   mdiArrowRight
 } from '@mdi/js';
-import { HAInstance as HAInstanceType } from '@repo/types/ha';
+import { HAInstanceStorage } from '@repo/lib';
 import { cn } from '@heroui/react';
 
 interface QuickAction {
@@ -23,12 +23,15 @@ interface QuickAction {
   disabledReason?: string;
 }
 
-export interface QuickActionsProps {
-  haInstances: HAInstanceType[];
-}
-
-export const QuickActions = ({ haInstances }: QuickActionsProps) => {
+export const QuickActions = () => {
   const router = useRouter();
+  const [hasHAInstances, setHasHAInstances] = useState(false);
+
+  useEffect(() => {
+    HAInstanceStorage.listHAInstances()
+      .then((instances) => setHasHAInstances(instances.length > 0))
+      .catch(() => {});
+  }, []);
 
   const quickActions: QuickAction[] = [
     {
@@ -36,7 +39,7 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
       icon: mdiPlus,
       title: 'Create Page',
       description: 'New dashboard page',
-      disabled: haInstances.length === 0,
+      disabled: !hasHAInstances,
       disabledReason: 'Add a Home Assistant instance first'
     },
     {
@@ -51,12 +54,6 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
       title: 'HA Settings',
       description: 'Configure HA'
     },
-    {
-      href: '/auth/profile/billing',
-      icon: mdiCreditCard,
-      title: 'Billing',
-      description: 'Manage your billing'
-    }
   ];
 
   const handleActionClick = (action: QuickAction) => {
@@ -76,7 +73,7 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
         <p className="text-sm text-theme-text-secondary">Common tasks and shortcuts</p>
       </CardHeader>
       <CardBody className="pt-0">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((action) => (
             <Card
               key={action.href}
@@ -91,7 +88,6 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
             >
               <CardBody className="p-4">
                 <div className="flex flex-col items-center text-center space-y-3">
-                  {/* Icon */}
                   <div className={cn(
                     "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
                     action.disabled 
@@ -109,7 +105,6 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
                     />
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-1">
                     <h3 className={cn(
                       "font-medium text-sm",
@@ -129,7 +124,6 @@ export const QuickActions = ({ haInstances }: QuickActionsProps) => {
                     </p>
                   </div>
 
-                  {/* Status */}
                   {action.disabled ? (
                     <div className="flex items-center gap-1">
                       <Icon path={mdiAlertCircle} className="w-3 h-3 text-warning" />
