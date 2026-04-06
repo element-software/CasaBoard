@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { HAInstanceStorage, LinkService } from "@repo/lib";
+import { HAInstanceStorage, LinkService, toHAInstance } from "@repo/lib";
 import { Card, CardBody, Link, Button } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,6 @@ import {
 } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
-import { HAInstance as HAInstanceType } from "@repo/types/ha";
 import { AddInstance } from "./AddInstance";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 import { StoredHAInstance } from "@repo/lib/storage/haInstanceStorage";
@@ -54,13 +53,7 @@ export function HAInstanceManager({
       });
       setHaInstances((prev) => [...prev, created]);
       await connect({
-        haInstance: {
-          hass_url: formattedUrl,
-          name: created.name,
-          id: created.id,
-          hass_token: "",
-          created_at: created.created_at,
-        },
+        haInstance: toHAInstance(created),
       });
     } catch (e: any) {
       setError(e?.message || "Failed to create instance");
@@ -95,10 +88,7 @@ export function HAInstanceManager({
   const renderInstancesList = () => (
     <div className="space-y-3">
       {haInstances.map((i) => {
-        const instanceForHA: HAInstanceType = {
-          ...i,
-          hass_token: "",
-        };
+        const instanceForHA = toHAInstance(i);
         return (
           <HassConnectWrapper key={i.id} haInstance={instanceForHA} onDelete={onDelete}>
             <HAInstance

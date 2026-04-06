@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@heroui/react";
 import PuckEditorClient from "./PuckEditorClient";
-import { HAInstanceStorage, PageStorage, SidebarStorage } from "@repo/lib";
+import { HAInstanceStorage, PageStorage, SidebarStorage, toHAInstance } from "@repo/lib";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import { HAInstance } from "@repo/types/ha";
 
@@ -41,7 +41,7 @@ export default function PageEditorClient({ initialSlug }: PageEditorClientProps)
           setPageId(page.id);
           setInitialPublished(page.published);
           if (page.ha_instance) {
-            setHaInstance({ ...page.ha_instance, hass_token: "" });
+            setHaInstance(toHAInstance(page.ha_instance as any));
           }
         }
       } catch (e) {

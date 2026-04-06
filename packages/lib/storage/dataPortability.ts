@@ -5,6 +5,7 @@ import {
   STORAGE_PREFIX,
 } from "./storageKeys";
 import { getCurrentUserId, readFromStorage, writeToStorage } from "./storageUtils";
+import { clientLogger } from "../logger";
 
 interface ExportData {
   version: 1;
@@ -77,10 +78,11 @@ export async function importUserData(json: string): Promise<void> {
   }
 
   if (importData.userId && importData.userId !== currentUserId) {
-    // Warn in the console but allow the import — users may intentionally
-    // restore a backup from a different account (e.g., after email change)
-    console.warn(
-      `DataPortability: backup userId (${importData.userId}) differs from current userId (${currentUserId}). Proceeding with import.`
+    // Warn but allow import — users may intentionally restore a backup from
+    // a different account (e.g., after an email change or account migration)
+    clientLogger.warn(
+      "DataPortability",
+      `Backup userId (${importData.userId}) differs from current userId (${currentUserId}). Proceeding with import.`
     );
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PageStorage } from "@repo/lib";
+import { PageStorage, toHAInstance } from "@repo/lib";
 import { PuckRenderer } from "@repo/ui/components/puck/PuckRenderer";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import { HAInstance } from "@repo/types/ha";
@@ -24,7 +24,7 @@ export function DashboardPageClient({ slug }: DashboardPageClientProps) {
           setNotFound(true);
         } else {
           setPageData(page);
-          setHaInstance({ ...page.ha_instance, hass_token: "" });
+          setHaInstance(toHAInstance(page.ha_instance as any));
         }
       })
       .catch(() => setNotFound(true))

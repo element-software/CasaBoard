@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@heroui/react";
 import PuckEditorClient from "./PuckEditorClient";
-import { HAInstanceStorage, SidebarStorage } from "@repo/lib";
+import { HAInstanceStorage, SidebarStorage, toHAInstance } from "@repo/lib";
 import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
 import { HAInstance } from "@repo/types/ha";
 
@@ -34,7 +34,7 @@ export default function SidebarEditorClient({
           setInitialData(sidebar.puck_data);
           setSidebarId(sidebar.id);
           if (sidebar.ha_instance) {
-            setHaInstance({ ...sidebar.ha_instance, hass_token: "" });
+            setHaInstance(toHAInstance(sidebar.ha_instance as any));
           }
         }
       } catch (e) {

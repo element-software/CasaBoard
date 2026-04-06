@@ -20,7 +20,6 @@ export {
   getSessionId,
 } from "./clarity";
 
-// Local-first storage layer (client-side, localStorage)
 export * as HAInstanceStorage from "./storage/haInstanceStorage";
 export * as PageStorage from "./storage/pageStorage";
 export * as SidebarStorage from "./storage/sidebarStorage";
@@ -28,3 +27,4 @@ export * as DataPortability from "./storage/dataPortability";
 export * from "./storage/storageKeys";
 export type { StoredHAInstance } from "./storage/haInstanceStorage";
 export type { StoredSidebar } from "./storage/sidebarStorage";
+export { toHAInstance } from "./storage/haInstanceStorage";

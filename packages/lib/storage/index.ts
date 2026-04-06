@@ -6,3 +6,4 @@ export * from "./storageKeys";
 export * from "./storageUtils";
 export type { StoredHAInstance } from "./haInstanceStorage";
 export type { StoredSidebar } from "./sidebarStorage";
+export { toHAInstance } from "./haInstanceStorage";

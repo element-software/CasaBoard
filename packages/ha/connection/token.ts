@@ -36,7 +36,7 @@ export const saveTokensToLocalStorage: SaveTokensFunc = async (
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      clientLogger.error("saveTokensToLocalStorage", "No authenticated user — tokens not saved");
+      clientLogger.error("saveTokensToLocalStorage", "No authenticated user - tokens not saved");
       return;
     }
     const userId = user.id;
@@ -75,7 +75,7 @@ export const saveTokensToLocalStorage: SaveTokensFunc = async (
   } catch (e) {
     clientLogger.error(
       "saveTokensToLocalStorage",
-      "encryption failed — tokens not saved",
+      "encryption failed - tokens not saved",
       e
     );
   }
@@ -130,7 +130,7 @@ export const clearTokenFromLocalStorage = async (
   try {
     const user = await getCurrentUser();
     if (!user?.id) {
-      clientLogger.warn("clearTokenFromLocalStorage", "No authenticated user — skipping clear");
+      clientLogger.warn("clearTokenFromLocalStorage", "No authenticated user - skipping clear");
       return;
     }
     const userId = user.id;

@@ -93,3 +93,15 @@ export async function updateHAInstance(
   writeInstances(userId, instances);
   return updated;
 }
+
+/**
+ * Converts a StoredHAInstance to a full HAInstance compatible object.
+ * The `hass_token` field is not used in the local-first architecture
+ * (tokens are stored separately in encrypted localStorage), so it is
+ * set to an empty string.
+ */
+export function toHAInstance(
+  stored: StoredHAInstance
+): import("@repo/types/ha").HAInstance {
+  return { ...stored, hass_token: "" };
+}
