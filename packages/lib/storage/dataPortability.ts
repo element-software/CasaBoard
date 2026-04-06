@@ -76,6 +76,14 @@ export async function importUserData(json: string): Promise<void> {
     throw new Error("Invalid backup file: missing data section.");
   }
 
+  if (importData.userId && importData.userId !== currentUserId) {
+    // Warn in the console but allow the import — users may intentionally
+    // restore a backup from a different account (e.g., after email change)
+    console.warn(
+      `DataPortability: backup userId (${importData.userId}) differs from current userId (${currentUserId}). Proceeding with import.`
+    );
+  }
+
   const { ha_instances = [], pages = [], sidebars = [] } = importData.data;
 
   writeToStorage(haInstancesKey(currentUserId), ha_instances);

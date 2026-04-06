@@ -32,6 +32,16 @@ export function DataPortabilityPanel() {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const MAX_FILE_SIZE_MB = 10;
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setMessage({
+        type: "error",
+        text: `File is too large (max ${MAX_FILE_SIZE_MB} MB). Please check that this is a valid CasaBoard backup.`,
+      });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     setImporting(true);
     setMessage(null);
     try {

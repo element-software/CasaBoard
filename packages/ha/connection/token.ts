@@ -35,8 +35,12 @@ export const saveTokensToLocalStorage: SaveTokensFunc = async (
 
   try {
     const user = await getCurrentUser();
-    const userId = user?.id || "anonymous";
-    const userEmail = user?.email || undefined;
+    if (!user?.id) {
+      clientLogger.error("saveTokensToLocalStorage", "No authenticated user — tokens not saved");
+      return;
+    }
+    const userId = user.id;
+    const userEmail = user.email || undefined;
 
     // Re-use existing session_id if present to ensure stable decryption key
     const storageKey = haTokenKey(userId, instance.id);
@@ -82,7 +86,11 @@ export const loadTokensFromLocalStorage = async (
 ): Promise<AuthData | null> => {
   try {
     const user = await getCurrentUser();
-    const userId = user?.id || "anonymous";
+    if (!user?.id) {
+      clientLogger.error("loadTokensFromLocalStorage", "No authenticated user");
+      return null;
+    }
+    const userId = user.id;
     const storageKey = haTokenKey(userId, instanceId);
     const raw = localStorage.getItem(storageKey);
 
@@ -121,7 +129,11 @@ export const clearTokenFromLocalStorage = async (
 ): Promise<void> => {
   try {
     const user = await getCurrentUser();
-    const userId = user?.id || "anonymous";
+    if (!user?.id) {
+      clientLogger.warn("clearTokenFromLocalStorage", "No authenticated user — skipping clear");
+      return;
+    }
+    const userId = user.id;
     const storageKey = haTokenKey(userId, instanceId);
     localStorage.removeItem(storageKey);
     clientLogger.info(

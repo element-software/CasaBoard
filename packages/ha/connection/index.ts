@@ -64,15 +64,15 @@ export async function connect({
   let auth: Auth | undefined;
   let connection: Connection | undefined;
 
-  const loadTokens = async () => {
-    serverLogger.info("loadTokens wrapper", "haInstance", haInstance);
+  const loadTokensWrapper = async () => {
+    serverLogger.info("loadTokensWrapper", "haInstance", haInstance);
     return loadTokensFromLocalStorage(haInstance.id) as unknown as AuthData;
   };
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
     saveTokens: saveTokensToLocalStorage,
-    loadTokens: loadTokens as unknown as LoadTokensFunc,
+    loadTokens: loadTokensWrapper as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
 
@@ -128,15 +128,15 @@ export async function reauthenticateInstance({
   // Initiate fresh auth flow
   let auth: Auth | undefined;
 
-  const loadTokens = async () => {
-    serverLogger.info("reauthenticateInstance.loadTokens", "returning null to force fresh auth");
+  const loadTokensWrapper = async () => {
+    serverLogger.info("reauthenticateInstance.loadTokensWrapper", "returning null to force fresh auth");
     return null; // Return null to force fresh OAuth flow
   };
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
     saveTokens: saveTokensToLocalStorage,
-    loadTokens: loadTokens as unknown as LoadTokensFunc,
+    loadTokens: loadTokensWrapper as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
 
