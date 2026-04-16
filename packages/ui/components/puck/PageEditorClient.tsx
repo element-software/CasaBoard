@@ -1,5 +1,5 @@
 import PuckEditorClient from "./PuckEditorClient";
-import { PageActions } from "@repo/lib";
+import { PageActions, SubscriptionService } from "@repo/lib";
 
 type PageEditorClientProps = {
   initialData?: any;
@@ -27,7 +27,7 @@ async function publishPageAction(slug: string, published: boolean) {
   return await PageActions.updatePage(slug, { published });
 }
 
-export default function PageEditorClient({
+export default async function PageEditorClient({
   initialData,
   pageId,
   userId,
@@ -36,6 +36,8 @@ export default function PageEditorClient({
   sidebars = [],
   initialSlug,
 }: PageEditorClientProps) {
+  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+
   return (
     <PuckEditorClient
       type="page"
@@ -45,6 +47,7 @@ export default function PageEditorClient({
       haInstances={haInstances}
       sidebars={sidebars}
       initialSlug={initialSlug}
+      maxItemsPerDashboard={entitlements.maxItemsPerDashboard}
       onCreateItem={createPageAction}
       onUpdateItem={updatePageAction}
       onPublishItem={publishPageAction}

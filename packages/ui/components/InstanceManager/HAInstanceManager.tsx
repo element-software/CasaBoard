@@ -1,6 +1,6 @@
 "use client";
-import { useState, useTransition } from "react";
-import { HAInstanceActions, LinkService } from "@repo/lib";
+import { useState, useTransition, useEffect } from "react";
+import { HAInstanceActions, LinkService, SupabaseClient } from "@repo/lib";
 import { Card, CardBody, Link, Button } from "@heroui/react";
 import { connect } from "@repo/ha";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,15 @@ export function HAInstanceManager({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [form, setForm] = useState({ name: "", hass_url: "" });
+  const [userId, setUserId] = useState<string>("");
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = SupabaseClient.createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? "anonymous");
+    });
+  }, []);
 
   // Helper functions for entitlements
   const canCreateHAInstance = (currentCount: number) => {
@@ -58,6 +66,7 @@ export function HAInstanceManager({
           hass_url: formattedUrl,
         });
         await connect({
+          userId,
           haInstance: { 
             hass_url: formattedUrl,
             name: form.name || `Instance ${haInstances.length + 1}`,
