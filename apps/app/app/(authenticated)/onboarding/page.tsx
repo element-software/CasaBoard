@@ -49,10 +49,7 @@ export default function OnboardingPage() {
 
   const handleContinue = () => {
     if (!selected) return;
-    // If cloud selected but user is not on a paid plan, fall back to local
-    const effectiveMode: StorageMode =
-      selected === "cloud" && !isPaidUser ? "local" : selected;
-    setStorageMode(effectiveMode);
+    setStorageMode(selected);
     router.push("/setup");
   };
 
@@ -188,15 +185,6 @@ export default function OnboardingPage() {
             </Card>
           </button>
         </div>
-
-        {/* Cloud selected but not a paid user — informational note */}
-        {selected === "cloud" && !isPaidUser && !checkingSubscription && (
-          <p className="text-sm text-warning-600 bg-warning/10 rounded-lg px-4 py-3 border border-warning/20">
-            Cloud sync requires a paid plan. You&apos;ll be set up with{" "}
-            <strong>local storage</strong> for now. You can upgrade and switch in
-            your profile settings at any time.
-          </p>
-        )}
 
         {/* Continue Button */}
         <div className="flex flex-col items-center gap-3">

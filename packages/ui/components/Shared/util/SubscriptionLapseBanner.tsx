@@ -64,8 +64,8 @@ export function SubscriptionLapseBanner({
             <CardBody className="p-8 sm:p-10 text-center space-y-4">
               <Icon path={mdiAlertCircleOutline} className="w-12 h-12 text-warning mx-auto" />
               <h1 className="text-2xl font-semibold">Subscription required</h1>
-              <p className="text-foreground-500">
-                Your free trial has ended or your subscription is inactive.
+              <p className="text-sm text-foreground-500">
+                Your subscription has ended or is no longer active.
                 Choose a plan to continue using CasaBoard cloud features,
                 or switch to the free local tier.
               </p>

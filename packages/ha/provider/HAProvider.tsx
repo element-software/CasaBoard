@@ -44,8 +44,14 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
   // Resolve the Supabase user ID on mount (browser-side only)
   useEffect(() => {
     const supabase = SupabaseClient.createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? "anonymous");
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error || !data.user?.id) {
+        clientLogger.error('HAProvider', 'Could not resolve user ID — HA connection aborted', error);
+        setError(new Error('Unable to verify your session. Please refresh the page.'));
+        setLoading(false);
+        return;
+      }
+      setUserId(data.user.id);
     });
   }, []);
 

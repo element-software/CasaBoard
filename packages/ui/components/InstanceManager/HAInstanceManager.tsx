@@ -38,8 +38,9 @@ export function HAInstanceManager({
 
   useEffect(() => {
     const supabase = SupabaseClient.createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? "anonymous");
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error || !data.user?.id) return;
+      setUserId(data.user.id);
     });
   }, []);
 

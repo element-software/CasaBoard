@@ -117,12 +117,19 @@ export default function PuckEditorClient({
     !isAtLimit &&
     itemCount >= Math.max(0, maxItemsPerDashboard - 3);
 
+  /** Returns an error message if the item limit is exceeded, otherwise null. */
+  const getItemLimitError = (): string | null => {
+    if (maxItemsPerDashboard !== -1 && data.content.length > maxItemsPerDashboard) {
+      return `This dashboard has ${data.content.length} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`;
+    }
+    return null;
+  };
+
   const saveItem = async () => {
     setError(null);
-    if (maxItemsPerDashboard !== -1 && data.content.length > maxItemsPerDashboard) {
-      setError(
-        `This dashboard has ${data.content.length} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`
-      );
+    const limitError = getItemLimitError();
+    if (limitError) {
+      setError(limitError);
       return;
     }
     try {
@@ -148,10 +155,9 @@ export default function PuckEditorClient({
 
   const updateItem = async () => {
     setError(null);
-    if (maxItemsPerDashboard !== -1 && data.content.length > maxItemsPerDashboard) {
-      setError(
-        `This dashboard has ${data.content.length} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`
-      );
+    const limitError = getItemLimitError();
+    if (limitError) {
+      setError(limitError);
       return;
     }
     try {

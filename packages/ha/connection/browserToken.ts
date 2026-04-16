@@ -59,9 +59,10 @@ export async function saveTokensToLocalStorage(
 
     localStorage.setItem(storageKey(instanceId), payload);
   } catch (err) {
-    console.error("[browserToken] saveTokensToLocalStorage failed", err);
-    // Fallback: store unencrypted so auth still works
-    localStorage.setItem(storageKey(instanceId), JSON.stringify(data));
+    // Do not store unencrypted tokens — propagate the error so the caller
+    // can handle it (e.g. trigger a re-authentication flow).
+    console.error("[browserToken] saveTokensToLocalStorage failed — token NOT stored", err);
+    throw new Error("Failed to securely store HA credentials. Please try re-authenticating.");
   }
 }
 
@@ -94,7 +95,9 @@ export async function loadTokensFromLocalStorage(
     // Legacy / fallback: plain JSON
     return stored as AuthData;
   } catch (err) {
-    console.error("[browserToken] loadTokensFromLocalStorage failed", err);
+    console.error("[browserToken] loadTokensFromLocalStorage failed — clearing corrupt entry", err);
+    // Remove the corrupt entry so the next call triggers a fresh OAuth flow
+    localStorage.removeItem(storageKey(instanceId));
     return null;
   }
 }
