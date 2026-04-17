@@ -54,22 +54,23 @@ Text / UI: #F9FAFB */
 /* Light theme overrides */
 .light {
   --theme-background: #ffffff;
-  --theme-surface: #f9fafb;
-  --theme-text: #111827;
-  --theme-text-secondary: #6b7280;
-  --theme-border: #e5e7eb;
-  
-  --theme-primary: #8b5cf6;
-  --theme-secondary: #6b7280;
-  --theme-accent: #1e0c35;
-  
+  --theme-surface: #f8f7ff;
+  --theme-text: #0f0a23;
+  --theme-text-primary: #7c3aed;
+  --theme-text-secondary: #64748b;
+  --theme-border: #e2e8f0;
+
+  --theme-primary: #7c3aed;
+  --theme-secondary: #4338ca;
+  --theme-accent: #7c3aed;
+
   --theme-card-background: #ffffff;
-  --theme-card-border: #e5e7eb;
-  --theme-card-hover: #1e0c35;
-  
-  --theme-slider-track: #e5e7eb;
-  --theme-slider-thumb: #8b5cf6;
-  --theme-slider-active: #8b5cf6;
+  --theme-card-border: #f1f5f9;
+  --theme-card-hover: #f8f7ff;
+
+  --theme-slider-track: #e2e8f0;
+  --theme-slider-thumb: #7c3aed;
+  --theme-slider-active: #7c3aed;
 }
 
 /* Utility classes for theme colors */

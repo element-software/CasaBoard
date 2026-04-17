@@ -238,9 +238,9 @@ export default function SecurityPage() {
                 </ul>
               </div>
             </div>
-            <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-              <h4 className="font-medium text-blue-300 mb-2">How RLS Works:</h4>
-              <p className="text-blue-200 text-sm">
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+              <h4 className="font-medium text-blue-700 mb-2">How RLS Works:</h4>
+              <p className="text-slate-600 text-sm">
                 Every database query automatically includes a filter like <code>WHERE auth.uid() = user_id</code>. 
                 This means even if we tried to query all users&apos; data, the database would only return 
                 records belonging to the authenticated user. This protection is built into the database itself.
@@ -292,12 +292,12 @@ export default function SecurityPage() {
           <h2 className="text-2xl font-semibold text-theme-text">Developer Access & Transparency</h2>
         </div>
         
-        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6 mb-6">
+        <div className="bg-red-50 border border-red-100 rounded-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <Icon path={mdiAlertCircle} className="w-6 h-6 text-red-400" />
-            <h3 className="text-xl font-semibold text-red-400">We Cannot Access Your Data</h3>
+            <Icon path={mdiAlertCircle} className="w-6 h-6 text-red-500" />
+            <h3 className="text-xl font-semibold text-red-700">We Cannot Access Your Data</h3>
           </div>
-          <p className="text-red-200 mb-4">
+          <p className="text-slate-600 mb-4">
             In the default configuration, CasaBoard never receives your Home Assistant OAuth tokens at
             our servers. They exist only in encrypted form in your browser. We cannot decrypt them
             remotely because we do not host them. If you enable optional cloud sync, we may store your
@@ -306,8 +306,8 @@ export default function SecurityPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h4 className="font-medium text-red-300 mb-2">What we cannot do:</h4>
-              <ul className="text-red-200 space-y-1">
+              <h4 className="font-medium text-red-700 mb-2">What we cannot do:</h4>
+              <ul className="text-slate-600 space-y-1">
                 <li>• Access or decrypt HA tokens in default local mode (we don&apos;t have them)</li>
                 <li>• Log into your Home Assistant as you</li>
                 <li>• Bypass Supabase authentication or RLS for other users&apos; data</li>
@@ -315,8 +315,8 @@ export default function SecurityPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-red-300 mb-2">Technical barriers:</h4>
-              <ul className="text-red-200 space-y-1">
+              <h4 className="font-medium text-red-700 mb-2">Technical barriers:</h4>
+              <ul className="text-slate-600 space-y-1">
                 <li>• Browser-local encryption for tokens</li>
                 <li>• Supabase Row Level Security on all persisted app data</li>
                 <li>• Separation of concerns: HA auth lives in the client, not the API layer</li>

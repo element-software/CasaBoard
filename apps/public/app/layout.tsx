@@ -40,10 +40,10 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <body
         className={cn(
-          "bg-neutral-900",
+          "bg-white",
           inter.className
         )}
       >

@@ -1,7 +1,6 @@
 "use client";
-import { Card, CardBody, CardHeader } from "@heroui/react";
-import { mdiDrag, mdiEye, mdiGoogle, mdiHomeAssistant } from "@mdi/js";
 import Icon from "@mdi/react";
+import { mdiDrag, mdiEye, mdiGoogle, mdiHomeAssistant } from "@mdi/js";
 
 const steps = [
   {
@@ -25,35 +24,40 @@ const steps = [
     description: "Access your beautiful dashboard from anywhere",
     icon: mdiEye,
   },
-]
+];
 
 export const HowItWorks = () => {
   return (
-    <Card className="mb-16 p-8">
-      <CardHeader className="text-center flex flex-col pb-4">
-        <h2 className="text-3xl font-bold text-theme-text">How It Works</h2>
-        <p className="text-theme-text-secondary text-lg">
+    <div className="mb-16 py-16 px-8 bg-slate-50 rounded-2xl">
+      <div className="text-center mb-12">
+        <p className="text-violet-600 text-sm font-semibold uppercase tracking-wider mb-3">
+          Getting started
+        </p>
+        <h2 className="text-4xl font-bold text-slate-900 tracking-tight">How It Works</h2>
+        <p className="text-slate-500 text-lg mt-3">
           Get a 14-day free trial with CasaBoard in just a few simple steps
         </p>
-      </CardHeader>
-      <CardBody>
-        <div className="grid md:grid-cols-4 gap-8">
-          {steps.map((step, index) => (
-            <div className="text-center" key={index}>
-            <div className="w-16 h-16 bg-theme-primary rounded-full flex items-center justify-center text-2xl font-bold text-black mx-auto mb-4">
+      </div>
+      <div className="grid md:grid-cols-4 gap-8 relative">
+        {/* Connecting line on desktop */}
+        <div className="hidden md:block absolute top-6 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-violet-100" />
+        {steps.map((step, index) => (
+          <div className="text-center relative" key={index}>
+            <div className="w-12 h-12 bg-white border-2 border-violet-200 rounded-full flex items-center justify-center text-lg font-bold text-violet-700 mx-auto mb-4 relative z-10">
               {index + 1}
             </div>
-            <h3 className="text-lg font-semibold text-theme-text mb-2">
+            <div className="w-8 h-8 flex items-center justify-center mx-auto mb-3">
+              <Icon path={step.icon} className="w-6 h-6 text-violet-400" />
+            </div>
+            <h3 className="text-base font-semibold text-slate-900 mb-2">
               {step.title}
             </h3>
-            <Icon path={step.icon} className="w-6 h-6 text-theme-primary mx-auto mb-4" />
-            <p className="text-theme-text-secondary text-sm">
+            <p className="text-slate-500 text-sm leading-relaxed">
               {step.description}
             </p>
           </div>
-          ))}
-        </div>
-      </CardBody>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 };

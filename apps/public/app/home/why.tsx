@@ -83,37 +83,39 @@ export const Why = () => {
   return (
     <div className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-theme-text mb-4">
-            Why choose CasaBoard?
+        <div className="text-center mb-12">
+          <p className="text-violet-600 text-sm font-semibold uppercase tracking-wider mb-3">
+            Why CasaBoard
+          </p>
+          <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+            Powerful dashboards, without the trade-offs
           </h2>
-          <p className="text-xl text-theme-text-secondary max-w-3xl mx-auto">
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
             Privacy-first by design: Home Assistant credentials stay local unless you
-            explicitly opt into cloud sync on a paid plan. Powerful dashboards without
-            trading away control of your smart home.
+            explicitly opt into cloud sync.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {whyFeatures.map((feature, index) => (
             <Card
               key={index}
-              className="group hover:shadow-lg transition-all duration-300 bg-theme-surface/50 backdrop-blur-sm border border-secondary hover:border-theme-primary/30"
+              className="group hover:shadow-md transition-all duration-300 bg-white border border-slate-100 shadow-sm"
             >
               <CardBody className="p-8">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-theme-primary/20 to-theme-accent/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center group-hover:bg-violet-100 transition-colors duration-300">
                     <Icon
                       path={feature.icon}
-                      className="w-8 h-8 text-theme-primary"
+                      className="w-6 h-6 text-violet-600"
                     />
                   </div>
 
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-semibold text-theme-text group-hover:text-theme-primary transition-colors">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-slate-900 group-hover:text-violet-700 transition-colors">
                       {feature.title}
                     </h3>
-                    <p className="text-theme-text-secondary leading-relaxed">
+                    <p className="text-slate-500 leading-relaxed text-sm">
                       {feature.description}
                     </p>
                   </div>
@@ -130,9 +132,9 @@ export const Why = () => {
                     <Button
                       as={Link}
                       color="primary"
-                      variant="flat"
+                      variant="light"
                       size="sm"
-                      className="mt-4"
+                      className="mt-2"
                       href={feature.cta.href}
                     >
                       {feature.cta.text}
@@ -144,22 +146,22 @@ export const Why = () => {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <Card className="bg-gradient-to-r from-theme-primary/10 to-theme-accent/10 border border-theme-primary/20">
-            <CardBody className="p-8">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <Icon path={mdiCodeTags} className="w-6 h-6 text-theme-primary" />
-                <h3 className="text-2xl font-bold text-theme-text">
-                  No coding experience required
-                </h3>
+        <div className="mt-12">
+          <div className="bg-violet-50 border border-violet-100 rounded-2xl p-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                <Icon path={mdiCodeTags} className="w-5 h-5 text-violet-600" />
               </div>
-              <p className="text-theme-text-secondary text-lg max-w-2xl mx-auto">
-                CasaBoard is for everyone—from power users to newcomers. An intuitive
-                drag-and-drop interface helps you create polished dashboards while your
-                Home Assistant credentials stay under your control.
-              </p>
-            </CardBody>
-          </Card>
+              <h3 className="text-xl font-bold text-slate-900">
+                No coding experience required
+              </h3>
+            </div>
+            <p className="text-slate-500 text-base max-w-2xl mx-auto">
+              CasaBoard is for everyone—from power users to newcomers. An intuitive
+              drag-and-drop interface helps you create polished dashboards while your
+              Home Assistant credentials stay under your control.
+            </p>
+          </div>
         </div>
       </div>
     </div>

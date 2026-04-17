@@ -109,8 +109,11 @@ export const Roadmap = () => {
   return (
     <div className="space-y-6 p-4 w-full pb-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-theme-text mb-2">Roadmap</h2>
-        <p className="text-theme-text-secondary">
+        <p className="text-violet-600 text-sm font-semibold uppercase tracking-wider mb-3">
+          What&apos;s next
+        </p>
+        <h2 className="text-4xl font-bold text-slate-900 mb-2 tracking-tight">Roadmap</h2>
+        <p className="text-slate-500">
           Upcoming features and improvements
         </p>
       </div>
@@ -120,7 +123,7 @@ export const Roadmap = () => {
           {roadmapItems.map((item, index) => (
             <div key={item.id} className="relative flex items-center gap-4">
               {/* Timeline dot */}
-              <div className="relative z-10 min-w-12 min-h-12 w-12 h-12 bg-theme-background rounded-full border-2 border-theme-primary/30 flex items-center justify-center">
+              <div className="relative z-10 min-w-12 min-h-12 w-12 h-12 bg-white rounded-full border-2 border-violet-200 flex items-center justify-center shadow-sm">
                 <Icon
                   path={getStatusIcon(item.status)}
                   className={`w-5 h-5 ${
@@ -137,20 +140,20 @@ export const Roadmap = () => {
               <div className="flex-1 py-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-theme-primary/10 rounded-lg flex items-center justify-center mt-1">
+                    <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center mt-1">
                       <Icon
                         path={item.icon}
-                        className="w-4 h-4 text-theme-primary"
+                        className="w-4 h-4 text-violet-600"
                       />
                     </div>
                     <div className="flex flex-col w-full">
-                      <h3 className="font-medium text-theme-text">
+                      <h3 className="font-medium text-slate-900">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-theme-text-secondary mb-1">
+                      <p className="text-sm text-slate-400 mb-1">
                         {item.quarter}
                       </p>
-                      <p className="text-sm text-theme-text-secondary/80">
+                      <p className="text-sm text-slate-500">
                         {item.description}
                       </p>
                     </div>

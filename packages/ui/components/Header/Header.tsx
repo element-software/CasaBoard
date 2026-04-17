@@ -19,30 +19,45 @@ export const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 max-w-7xl mx-auto">
-        <div className="px-0 mx-auto bg-theme-background/80 backdrop-blur-md rounded-b-xl border-theme-border/20">
+      <header className="sticky top-0 z-30 max-w-7xl mx-auto px-4 pt-3">
+        <div className="px-0 mx-auto bg-white border border-slate-200 shadow-sm rounded-2xl">
           <div className="flex items-center h-14 sm:px-4 px-2 sm:h-16">
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 w-full justify-between">
               <div className="min-w-0 flex items-center gap-2">
                 <CasaBoardLogo size="small" />
-                <span className="text-theme-text font-bold">CasaBoard</span>
+                <span className="text-slate-900 font-semibold tracking-tight">CasaBoard</span>
               </div>
               {/* Desktop Navigation */}
-              <div className="hidden sm:flex items-center gap-2">
-                {getPublicLinks().map((link: NavLink) => (
-                  <Button
-                    key={link.href}
-                    as={Link}
-                    href={link.href}
-                    rel={link.external ? "noopener noreferrer" : undefined}
-                    variant="bordered"
-                    color="primary"
-                    className="justify-center text-theme-text"
-                    startContent={link.icon}
-                  >
-                    {link.label}
-                  </Button>
-                ))}
+              <div className="hidden sm:flex items-center gap-1">
+                {getPublicLinks().map((link: NavLink) =>
+                  link.label === "Login" ? (
+                    <Button
+                      key={link.href}
+                      as={Link}
+                      href={link.href}
+                      color="primary"
+                      variant="solid"
+                      size="sm"
+                      className="font-medium ml-2"
+                      startContent={link.icon}
+                    >
+                      {link.label}
+                    </Button>
+                  ) : (
+                    <Button
+                      key={link.href}
+                      as={Link}
+                      href={link.href}
+                      rel={link.external ? "noopener noreferrer" : undefined}
+                      variant="light"
+                      color="default"
+                      size="sm"
+                      className="text-slate-600 hover:text-slate-900 font-medium"
+                    >
+                      {link.label}
+                    </Button>
+                  )
+                )}
               </div>
               {/* Mobile Menu Button */}
               <Button
@@ -67,10 +82,10 @@ export const Header = () => {
         backdrop="blur"
         className="sm:hidden"
       >
-        <DrawerContent className="bg-theme-background text-theme-text border-l border-theme-border">
-          <DrawerHeader className="border-b border-theme-border flex flex-col items-center gap-2 py-6">
+        <DrawerContent className="bg-white text-slate-900 border-l border-slate-100">
+          <DrawerHeader className="border-b border-slate-100 flex flex-col items-center gap-2 py-6">
             <CasaBoardLogo size="small" />
-            <span className="text-theme-text font-bold text-lg">CasaBoard</span>
+            <span className="text-slate-900 font-semibold text-lg">CasaBoard</span>
           </DrawerHeader>
           <DrawerBody className="flex flex-col gap-2 py-4">
             {getPublicLinks().map((link: NavLink) => (
@@ -80,8 +95,9 @@ export const Header = () => {
                 href={link.href}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
-                variant="light"
-                className="justify-start text-theme-text"
+                variant={link.label === "Login" ? "solid" : "light"}
+                color={link.label === "Login" ? "primary" : "default"}
+                className={link.label === "Login" ? "justify-start font-medium" : "justify-start text-slate-600"}
                 startContent={link.icon}
                 onPress={() => setIsDrawerOpen(false)}
               >
@@ -89,25 +105,25 @@ export const Header = () => {
               </Button>
             ))}
           </DrawerBody>
-          <DrawerFooter className="border-t border-theme-border flex flex-col items-center gap-2 py-4">
-            <div className="text-xs text-theme-text-secondary text-center">
+          <DrawerFooter className="border-t border-slate-100 flex flex-col items-center gap-2 py-4">
+            <div className="text-xs text-slate-500 text-center">
               <a
                 href="mailto:support@casaboard.dev"
-                className="text-theme-primary hover:underline"
+                className="text-violet-600 hover:underline"
               >
                 support@casaboard.dev
               </a>
             </div>
-            <div className="text-xs text-theme-text-secondary text-center">
+            <div className="text-xs text-slate-500 text-center">
               © {new Date().getFullYear()} CasaBoard. All rights reserved.
             </div>
-            <div className="text-xs text-theme-text-secondary text-center">
+            <div className="text-xs text-slate-500 text-center">
               Powered by{" "}
               <a
                 href="https://element-software.co.uk"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-theme-primary hover:underline"
+                className="text-violet-600 hover:underline"
               >
                 Element Software
               </a>{" "}
@@ -116,7 +132,7 @@ export const Header = () => {
                 href="https://element-connect.co.uk"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-theme-primary hover:underline"
+                className="text-violet-600 hover:underline"
               >
                 Element Connect
               </a>
