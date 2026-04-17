@@ -100,6 +100,7 @@ export class SubscriptionService {
         maxItemsPerDashboard: 20,
         trialEndsAt: null,
         active: true,
+        haCloudSync: false,
       };
     }
 
@@ -121,6 +122,8 @@ export class SubscriptionService {
       ? (data.product.metadata.max_items_per_dashboard === "-1" ? -1 : parseInt(data.product.metadata.max_items_per_dashboard))
       : -1; // Paid tiers default to unlimited if metadata not set
 
+    const haCloudSync = data.product.metadata?.ha_cloud_sync === "true";
+
     serverLogger.info('subscriptionService', 'Retrieved entitlements from Stripe product metadata', {
       productId: data.product.id,
       productName: data.product.name,
@@ -140,7 +143,8 @@ export class SubscriptionService {
       maxSidebars,
       maxItemsPerDashboard,
       trialEndsAt: data.trialEndsAt,
-      active: data.isActive
+      active: data.isActive,
+      haCloudSync,
     };
   }
 

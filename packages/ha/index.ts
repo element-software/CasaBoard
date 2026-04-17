@@ -5,3 +5,5 @@ export { useEntities } from "./hooks/useEntities";
 export { useEntityHistory } from "./hooks/useEntityHistory";
 export { connect, getEntity, reauthenticateInstance } from "./connection";
 export type { ConnectResult, EntityDomain, EntityId } from "./types";
+export * from "./registry/localHARegistry";
+export * from "./registry/mergeHAInstances";

@@ -1,48 +1,31 @@
-import PuckEditorClient from "./PuckEditorClient";
-import { SidebarActions } from "@repo/lib";
+import type { Data } from "@measured/puck";
+import SidebarEditorBody from "./SidebarEditorBody";
+import { SubscriptionService } from "@repo/lib";
 
 type SidebarEditorClientProps = {
-  initialData?: any;
+  initialData?: Data;
   sidebarId?: string | null;
   userId?: string | null;
   initialPublished?: boolean;
   initialSlug?: string;
-  haInstances?: { id: string; name: string; hass_url: string }[];
 };
 
-// Server action wrappers
-async function createSidebarAction(data: any) {
-  "use server";
-  return await SidebarActions.createSidebar(data);
-}
-
-async function updateSidebarAction(slug: string, data: any) {
-  "use server";
-  return await SidebarActions.updateSidebar(slug, data);
-}
-
-export default function SidebarEditorClient({
+export default async function SidebarEditorClient({
   initialData,
   sidebarId,
-  userId,
-  initialPublished = true, // Sidebars are always "published"
+  initialPublished = true,
   initialSlug,
-  haInstances = [],
 }: SidebarEditorClientProps) {
+  const entitlements =
+    await SubscriptionService.getEntitlementsForCurrentUser();
+
   return (
-    <PuckEditorClient
-      type="sidebar"
+    <SidebarEditorBody
+      entitlements={entitlements}
       initialData={initialData}
-      itemId={sidebarId}
+      sidebarId={sidebarId}
       initialPublished={initialPublished}
-      haInstances={haInstances}
       initialSlug={initialSlug}
-      onCreateItem={createSidebarAction}
-      onUpdateItem={updateSidebarAction}
-      // Sidebars don't have a publish state, so no onPublishItem
-      editUrlTemplate="/setup/sidebars/edit/{slug}"
-      // Sidebars don't have a view URL, so no viewUrlTemplate
-      backUrl="/setup/sidebars"
     />
   );
 }

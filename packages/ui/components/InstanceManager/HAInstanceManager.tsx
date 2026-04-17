@@ -1,40 +1,48 @@
 "use client";
+
 import { useState, useTransition, useEffect } from "react";
-import { HAInstanceActions, LinkService, SupabaseClient } from "@repo/lib";
-import { Card, CardBody, Link, Button } from "@heroui/react";
-import { connect } from "@repo/ha";
-import { useRouter } from "next/navigation";
-import { useHA } from "@repo/ha";
+import {
+  HAInstanceActions,
+  LinkService,
+  SupabaseClient,
+  UserSettingsActions,
+} from "@repo/lib";
+import { Card, CardBody, Link, Button, Switch } from "@heroui/react";
+import {
+  connect,
+  addLocalInstance,
+  upsertLocalEntry,
+  removeLocalEntry,
+  useHA,
+} from "@repo/ha";
 import { Entitlements } from "@repo/types/subscription";
 import Icon from "@mdi/react";
-import {
-  mdiHomeAssistant,
-  mdiArrowRight,
-} from "@mdi/js";
+import { mdiHomeAssistant, mdiArrowRight } from "@mdi/js";
 import { InstancesHeader } from "./InstancesHeader";
 import { HAInstance } from "./HAInstance";
 import { HAInstance as HAInstanceType } from "@repo/types/ha";
 import { AddInstance } from "./AddInstance";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
+import { useMergedHAInstances } from "@repo/hooks";
 
 interface HAInstanceManagerProps {
   compact?: boolean;
-  haInstances: HAInstanceType[];
   entitlements: Entitlements;
 }
 
 export function HAInstanceManager({
   compact = false,
-  haInstances,
   entitlements,
 }: HAInstanceManagerProps) {
   const { connection } = useHA();
+  const { instances: haInstances, loading, refresh } =
+    useMergedHAInstances(entitlements);
 
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [form, setForm] = useState({ name: "", hass_url: "" });
   const [userId, setUserId] = useState<string>("");
-  const router = useRouter();
+  const [haCloudSync, setHaCloudSync] = useState(false);
 
   useEffect(() => {
     const supabase = SupabaseClient.createClient();
@@ -44,7 +52,13 @@ export function HAInstanceManager({
     });
   }, []);
 
-  // Helper functions for entitlements
+  useEffect(() => {
+    UserSettingsActions.getHaCloudSyncPreference().then(setHaCloudSync);
+  }, []);
+
+  const useCloudStorage =
+    entitlements.haCloudSync && entitlements.active && haCloudSync;
+
   const canCreateHAInstance = (currentCount: number) => {
     if (!entitlements?.active) return false;
     return (
@@ -53,31 +67,68 @@ export function HAInstanceManager({
     );
   };
 
-  const canCreate = () => {
-    return canCreateHAInstance(haInstances.length);
+  const canCreate = () => canCreateHAInstance(haInstances.length);
+
+  const onCloudSyncChange = (next: boolean) => {
+    startTransition(async () => {
+      setError(null);
+      try {
+        await UserSettingsActions.setHaCloudSyncPreference(next);
+        setHaCloudSync(next);
+        await refresh();
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to update preference");
+      }
+    });
   };
 
   const onCreate = () =>
     startTransition(async () => {
       setError(null);
       const formattedUrl = `https://${form.hass_url}`;
+      const name = form.name || `Instance ${haInstances.length + 1}`;
       try {
-        await HAInstanceActions.createHAInstance({
-          name: form.name || `Instance ${haInstances.length + 1}`,
-          hass_url: formattedUrl,
-        });
+        let ha: HAInstanceType;
+
+        if (useCloudStorage) {
+          const row = await HAInstanceActions.createHAInstance({
+            name,
+            hass_url: formattedUrl,
+          });
+          upsertLocalEntry({
+            id: row.id,
+            name: row.name,
+            hass_url: row.hass_url,
+            source: "cloud",
+          });
+          ha = {
+            id: row.id,
+            name: row.name,
+            hass_url: row.hass_url,
+            hass_token: "",
+            created_at: row.created_at ?? new Date().toISOString(),
+            source: "cloud",
+          };
+        } else {
+          const entry = addLocalInstance(name, formattedUrl);
+          ha = {
+            id: entry.id,
+            name: entry.name,
+            hass_url: entry.hass_url,
+            hass_token: "",
+            created_at: new Date().toISOString(),
+            source: "local",
+          };
+        }
+
         await connect({
           userId,
-          haInstance: { 
-            hass_url: formattedUrl,
-            name: form.name || `Instance ${haInstances.length + 1}`,
-            id: "",
-            hass_token: "",
-            created_at: "",
-          }
+          haInstance: ha,
         });
-      } catch (e: any) {
-        setError(e?.message || "Failed to create instance");
+        await refresh();
+        setForm({ name: "", hass_url: "" });
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to create instance");
       }
     });
 
@@ -85,11 +136,15 @@ export function HAInstanceManager({
     startTransition(async () => {
       setError(null);
       try {
-        await HAInstanceActions.deleteHAInstance(id);
+        const inst = haInstances.find((i) => i.id === id);
+        if (inst?.source === "cloud" && useCloudStorage) {
+          await HAInstanceActions.deleteHAInstance(id);
+        }
+        removeLocalEntry(id);
         connection?.close();
-        router.push("/setup/ha-config");
-      } catch (e: any) {
-        setError(e?.message || "Failed to delete instance");
+        await refresh();
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to delete instance");
       }
     });
 
@@ -154,7 +209,7 @@ export function HAInstanceManager({
           Connect your Home Assistant instance to start managing your smart home
           devices and creating beautiful dashboards.
         </p>
-        {!canCreate() && !entitlements && (
+        {!canCreate() && !entitlements?.active && (
           <div className="text-center">
             <p className="text-foreground-500 mb-3">
               You need an active subscription to add instances.
@@ -174,10 +229,39 @@ export function HAInstanceManager({
     );
   };
 
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardBody className="py-12 text-center text-foreground-500">
+          Loading…
+        </CardBody>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       {renderHeader()}
       <CardBody className="space-y-4">
+        {entitlements.haCloudSync && entitlements.active && (
+          <div className="flex flex-col gap-2 rounded-lg border border-default-200 p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-medium text-sm">Sync Home Assistant across devices</p>
+                <p className="text-xs text-foreground-500">
+                  When enabled, your Home Assistant base URL and display name are stored on
+                  CasaBoard servers. Tokens always stay in this browser only.
+                </p>
+              </div>
+              <Switch
+                isSelected={haCloudSync}
+                onValueChange={onCloudSyncChange}
+                isDisabled={isPending}
+              />
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="p-3 bg-red-100 border border-red-300 rounded text-red-700 text-sm">
             {error}
@@ -191,7 +275,7 @@ export function HAInstanceManager({
             <div data-create-form>{renderCreateForm()}</div>
           ) : (
             <p className="text-white text-md w-full text-center">
-              You've reached the limit of HA instances for your plan. Please{" "}
+              You&apos;ve reached the limit of HA instances for your plan. Please{" "}
               <Link
                 href="/auth/profile/billing"
                 className="text-primary underline"

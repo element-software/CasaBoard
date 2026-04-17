@@ -17,6 +17,7 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "@repo/types": "*",
     "home-assistant-js-websocket": "^9.5.0"
   }
 }

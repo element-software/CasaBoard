@@ -1,59 +1,34 @@
-import PuckEditorClient from "./PuckEditorClient";
-import { PageActions, SubscriptionService } from "@repo/lib";
+import type { Data } from "@measured/puck";
+import PageEditorBody from "./PageEditorBody";
+import { SubscriptionService } from "@repo/lib";
 
 type PageEditorClientProps = {
-  initialData?: any;
+  initialData?: Data;
   pageId?: string | null;
   userId?: string | null;
   initialPublished?: boolean;
-  haInstances?: { id: string; name: string; hass_url: string }[];
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
 };
 
-// Server action wrappers
-async function createPageAction(data: any) {
-  "use server";
-  return await PageActions.createPage(data);
-}
-
-async function updatePageAction(slug: string, data: any) {
-  "use server";
-  return await PageActions.updatePage(slug, data);
-}
-
-async function publishPageAction(slug: string, published: boolean) {
-  "use server";
-  return await PageActions.updatePage(slug, { published });
-}
-
 export default async function PageEditorClient({
   initialData,
   pageId,
-  userId,
   initialPublished = false,
-  haInstances = [],
   sidebars = [],
   initialSlug,
 }: PageEditorClientProps) {
-  const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
+  const entitlements =
+    await SubscriptionService.getEntitlementsForCurrentUser();
 
   return (
-    <PuckEditorClient
-      type="page"
+    <PageEditorBody
+      entitlements={entitlements}
       initialData={initialData}
-      itemId={pageId}
+      pageId={pageId}
       initialPublished={initialPublished}
-      haInstances={haInstances}
       sidebars={sidebars}
       initialSlug={initialSlug}
-      maxItemsPerDashboard={entitlements.maxItemsPerDashboard}
-      onCreateItem={createPageAction}
-      onUpdateItem={updatePageAction}
-      onPublishItem={publishPageAction}
-      editUrlTemplate="/setup/pages/edit/{slug}"
-      viewUrlTemplate="/dashboard/{slug}"
-      backUrl="/setup/pages"
     />
   );
 }

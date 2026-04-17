@@ -1,32 +1,53 @@
 "use server";
+
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { SubscriptionService } from "../services/subscriptionService";
+import { getHaCloudSyncPreference } from "./userSettingsActions";
 
 export interface CreateHAInstanceInput {
   name: string;
   hass_url: string;
-    auth?: any | null; // Store full AuthData object
-  expires_at?: string | null;
 }
 
-export type UpdateHAInstanceInput = Partial<CreateHAInstanceInput> & {
+export type UpdateHAInstanceInput = Partial<
+  Pick<CreateHAInstanceInput, "name" | "hass_url">
+> & {
   id: string;
 };
+
+async function canAccessCloudMetadata(): Promise<boolean> {
+  const entitlements =
+    await SubscriptionService.getEntitlementsForCurrentUser();
+  if (!entitlements.haCloudSync) return false;
+  return getHaCloudSyncPreference();
+}
 
 export async function listHAInstances() {
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
+
+  if (!(await canAccessCloudMetadata())) {
+    return [];
+  }
+
   const { data, error } = await supabase
     .from("ha_instances")
-    .select("*")
+    .select("id,name,hass_url,created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
+
   if (error) throw new Error(error.message);
   return data ?? [];
 }
 
 export async function createHAInstance(input: CreateHAInstanceInput) {
+  if (!(await canAccessCloudMetadata())) {
+    throw new Error(
+      "Enable cloud sync (paid plans) to store Home Assistant URLs on the server, or add instances locally."
+    );
+  }
+
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
@@ -52,142 +73,82 @@ export async function createHAInstance(input: CreateHAInstanceInput) {
       user_id: user.id,
       name: input.name,
       hass_url: input.hass_url,
-  auth: input.auth ?? null,
-      expires_at: input.expires_at ?? null,
     })
-    .select()
+    .select("id,name,hass_url,created_at")
     .single();
 
   if (error) throw new Error(error.message);
-  // No longer syncing to user_settings
   return data;
 }
 
 export async function deleteHAInstance(id?: string) {
+  if (!(await canAccessCloudMetadata())) {
+    throw new Error("Cloud sync is not enabled.");
+  }
+
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
+
   if (!id) {
-    // Delete first instance
     const { error: deleteErr } = await supabase
       .from("ha_instances")
       .delete()
       .eq("user_id", user.id);
     if (deleteErr) throw new Error(deleteErr.message);
     return { success: true };
-  } else {
-    const { error } = await supabase
-      .from("ha_instances")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("id", id);
-    if (error) throw new Error(error.message);
   }
 
-  // After deletion, nothing else to do (active selection removed)
+  const { error } = await supabase
+    .from("ha_instances")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+
   return { success: true };
 }
 
 export async function getFirstHAInstance() {
+  const rows = await listHAInstances();
+  return rows[0] ?? null;
+}
+
+export async function getHAInstance(id: string) {
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
+
+  if (!(await canAccessCloudMetadata())) {
+    return null;
+  }
+
   const { data, error } = await supabase
     .from("ha_instances")
-    .select("*")
+    .select("id,name,hass_url,created_at")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
+    .eq("id", id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
   return data;
 }
 
-export async function getHAInstanceByHassUrl(hassUrl: string) {
-  const supabase = await createClient();
-  const user = await getCurrentAuthUser();
-  if (!user) throw new Error("Unauthorized");
-  const { data, error } = await supabase
-    .from("ha_instances")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("hass_url", hassUrl)
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function getHAInstance(id: string) {
-  console.info("getHAInstance", "id", id);
-  const supabase = await createClient();
-  const user = await getCurrentAuthUser();
-  if (!user) throw new Error("Unauthorized");
-  const { data, error } = await supabase
-    .from("ha_instances")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("id", id)
-    .single();
-  console.info("getHAInstance", "data", data, "error", error);
-  if (error) throw new Error(error.message);
-  return data;
-}
-
 export async function updateHAInstance(data: UpdateHAInstanceInput) {
+  if (!(await canAccessCloudMetadata())) {
+    throw new Error("Cloud sync is not enabled.");
+  }
+
   const supabase = await createClient();
   const user = await getCurrentAuthUser();
   if (!user) throw new Error("Unauthorized");
 
+  const { id, ...patch } = data;
   const { error } = await supabase
     .from("ha_instances")
-    .update(data)
-    .eq("user_id", user.id)
-    .eq("id", data.id);
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function getLongLivedTokenForHAInstance(id: string) {
-  const supabase = await createClient();
-  const user = await getCurrentAuthUser();
-  if (!user) throw new Error("Unauthorized");
-  const { data, error } = await supabase
-    .from("ha_instances")
-    .select("hass_url,hass_token")
-    .eq("user_id", user.id)
-    .eq("id", id)
-    .single();
-
-  if (error) throw new Error(error.message);
-  // Exchange short-lived token for a long-lived token via REST
-  const response = await fetch(
-    `${data.hass_url}/auth/long_lived_access_token`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${data.hass_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        // Name visible in HA UI; can be 'My App'
-        client_name: "My App",
-        // Expiry in days (e.g., 365 for 1 year)
-        lifespan: 365,
-      }),
-    }
-  );
-
-  if (!response.ok) throw new Error("Failed to create long-lived token");
-  const longLivedTokenData = await response.json();
-
-  // Update the instance with the new long-lived token
-  const { error: updateErr } = await supabase
-    .from("ha_instances")
-    .update({ hass_token: longLivedTokenData.token })
+    .update(patch)
     .eq("user_id", user.id)
     .eq("id", id);
-  if (updateErr) throw new Error(updateErr.message);
-  return longLivedTokenData.token;
+  if (error) throw new Error(error.message);
+  return data;
 }

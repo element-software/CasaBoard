@@ -137,7 +137,6 @@ export default function PuckEditorClient({
         name: settings.title,
         slug: settings.slug,
         puck_data: data,
-        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
       };
       
@@ -164,7 +163,6 @@ export default function PuckEditorClient({
       const updateData = {
         name: settings.title,
         puck_data: data,
-        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
       };
       

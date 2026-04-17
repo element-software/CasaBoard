@@ -16,7 +16,6 @@ import type {
   LoadTokensFunc,
 } from "home-assistant-js-websocket";
 import { HAInstance } from "@repo/types/ha";
-import { HAInstanceActions } from "@repo/lib";
 
 export interface HAConnectProps {
   haInstance: HAInstance;

@@ -27,8 +27,7 @@ import {
   DropdownItem,
   cn,
 } from "@heroui/react";
-import { HAInstance } from "@repo/types/ha";
-import { useRouter } from "next/navigation";
+import { useMergedHAInstances } from "@repo/hooks";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
@@ -36,7 +35,6 @@ interface SidebarManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
-  haInstances?: HAInstance[];
 }
 
 export const SidebarManagement = ({
@@ -45,10 +43,8 @@ export const SidebarManagement = ({
   initialError = null,
   compact = false,
   entitlements,
-  haInstances,
 }: SidebarManagementProps) => {
-  const router = useRouter();
-  const [form, setForm] = useState({ name: "", ha_instance_id: "" });
+  const { instances: haInstances } = useMergedHAInstances(entitlements);
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();

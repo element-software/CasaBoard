@@ -17,15 +17,7 @@ export async function getAllSidebars(): Promise<Sidebar[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("sidebars")
-      .select(`
-        *,
-        ha_instance:ha_instances!ha_instance_id (
-          id,
-          name,
-          hass_url,
-          created_at
-        )
-      `)
+      .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -51,15 +43,7 @@ export async function getSidebar(slug: string): Promise<Sidebar> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("sidebars")
-      .select(`
-        *,
-        ha_instance:ha_instances!ha_instance_id (
-          id,
-          name,
-          hass_url,
-          created_at
-        )
-      `)
+      .select("*")
       .eq("slug", slug)
       .single();
 
@@ -109,10 +93,9 @@ export async function createSidebar(
       slug: sidebarData.slug || generateSlug(sidebarData.name),
     };
 
-    const insertPayload = { 
-      ...finalData, 
+    const insertPayload = {
+      ...finalData,
       user_id: user.id,
-      ha_instance_id: sidebarData.ha_instance_id ?? null
     } as Record<string, unknown>;
 
     const { data, error } = await supabase
