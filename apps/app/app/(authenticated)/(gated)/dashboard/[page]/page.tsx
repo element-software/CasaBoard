@@ -1,16 +1,11 @@
 import {
   PageActions,
-  SupabaseServer,
-  Encryption,
-  getCurrentAuthUser,
+  SubscriptionService,
 } from "@repo/lib";
-import { PuckRenderer } from "@repo/ui/components/puck/PuckRenderer";
-import { HassConnectWrapper } from "@repo/ui/components/Shared/util/HassConnectWrapper";
+import { DashboardHAClient } from "@repo/ui/components/Shared/util/DashboardHAClient";
 import { notFound } from "next/navigation";
 
-// Enable dynamic params for unknown routes
 export const dynamicParams = true;
-// Force dynamic rendering since pages are stored in Supabase
 export const dynamic = "force-dynamic";
 
 interface PageProps {
@@ -23,21 +18,24 @@ export default async function ConfigurablePage({ params }: PageProps) {
   const { page } = await params;
 
   try {
-    // Use getPageBySlug to allow access to published pages
-    const pageData = await PageActions.getPageBySlug(page);
+    const [pageData, entitlements] = await Promise.all([
+      PageActions.getPageBySlug(page),
+      SubscriptionService.getEntitlementsForCurrentUser(),
+    ]);
 
-    if (!pageData || !pageData.ha_instance) {
+    if (!pageData) {
       notFound();
     }
 
     return (
-      <HassConnectWrapper haInstance={pageData.ha_instance}>
-        <PuckRenderer pageId={page} pageData={pageData} />
-      </HassConnectWrapper>
+      <DashboardHAClient
+        page={pageData}
+        pageSlug={page}
+        entitlements={entitlements}
+      />
     );
   } catch (error) {
     console.error("Error fetching page:", error);
-    // If page not found or access denied, return 404
     notFound();
   }
 }

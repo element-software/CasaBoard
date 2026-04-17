@@ -108,9 +108,10 @@ export const PageCard = ({
                     className="w-4 h-4 flex-shrink-0"
                   />
                   <span className="text-xs">
-                    {page.ha_instance?.name ||
-                      page.ha_instance_id ||
-                      "No instance"}
+                    {(page.puck_data?.root?.props as { haInstanceId?: string } | undefined)
+                      ?.haInstanceId
+                      ? "HA linked"
+                      : "No HA instance in page settings"}
                   </span>
                 </div>
               </div>

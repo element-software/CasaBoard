@@ -2,19 +2,18 @@
 import { Button, Card, CardBody, Chip } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
-  mdiCloud,
+  mdiCloudOutline,
   mdiDrag,
   mdiPalette,
   mdiCodeTags,
   mdiAccountGroup,
-  mdiCog,
+  mdiShieldLock,
   mdiShield,
-  mdiRocket,
 } from "@mdi/js";
 import Link from "next/link";
 
 interface WhyFeature {
-  icon: any;
+  icon: string;
   title: string;
   description: string;
   highlight: string;
@@ -22,78 +21,79 @@ interface WhyFeature {
   cta?: {
     text: string;
     href: string;
-  }
+  };
 }
 
 const whyFeatures: WhyFeature[] = [
   {
-    icon: mdiCloud,
-    title: "Cloud-Native",
-    description: "No need for locally installed dashboards on Home Assistant. Access your dashboard from anywhere, anytime.",
-    highlight: "Always Available",
-    color: "primary"
+    icon: mdiShieldLock,
+    title: "Privacy-first & local",
+    description:
+      "By default your Home Assistant URL and OAuth tokens stay in your browser—encrypted—not on our servers. You stay in control of what leaves your device.",
+    highlight: "Local by default",
+    color: "success",
+  },
+  {
+    icon: mdiCloudOutline,
+    title: "Optional cloud sync",
+    description:
+      "On paid plans you can opt in to store your Home Assistant URL in the cloud so the same instance details follow you across browsers and devices. Tokens still stay local.",
+    highlight: "You choose",
+    color: "primary",
   },
   {
     icon: mdiDrag,
-    title: "Drag & Drop Editor",
-    description: "Customizable interface that requires no coding experience. Build beautiful dashboards with simple drag and drop.",
-    highlight: "No Code Required",
-    color: "success"
+    title: "Drag & drop editor",
+    description:
+      "Build dashboards without code. Arrange cards and widgets with a simple drag-and-drop interface.",
+    highlight: "No code required",
+    color: "success",
   },
   {
     icon: mdiAccountGroup,
-    title: "Community-Driven",
-    description: "Features and improvements are driven by the community and users. Your feedback shapes the platform.",
-    highlight: "User-Powered",
-    color: "secondary"
+    title: "Community-driven",
+    description:
+      "Features and improvements are shaped by feedback from people who use CasaBoard every day.",
+    highlight: "User-powered",
+    color: "secondary",
   },
   {
     icon: mdiPalette,
-    title: "Advanced Theming",
-    description: "Complete customization with themes, layouts, and visual elements. Make it truly yours. Planned for the future.",
-    highlight: "Fully Customizable",
-    color: "warning"
+    title: "Advanced theming",
+    description:
+      "Themes, layouts, and visual polish—roadmapped so your dashboards can look and feel like yours.",
+    highlight: "Fully customizable",
+    color: "warning",
   },
   {
     icon: mdiShield,
-    title: "Secure & Reliable",
-    description: "Enterprise-grade security with encrypted connections and OAuth authentication. Your data is safe.",
-    highlight: "Enterprise Security",
+    title: "Secure connections",
+    description:
+      "Industry-standard encryption for tokens in the browser and secure OAuth with Home Assistant. Read how we approach security end to end.",
+    highlight: "Built to protect",
     color: "success",
     cta: {
-      text: "Learn More",
-      href: "/security"
-    }
+      text: "Security",
+      href: "/security",
+    },
   },
-  {
-    icon: mdiRocket,
-    title: "Easy Setup",
-    description: "Get up and running in minutes with our streamlined setup process. No complex configurations needed.",
-    highlight: "Quick Start",
-    color: "primary",
-    cta: {
-      text: "View docs",
-      href: "/docs"
-    }
-  }
 ];
 
 export const Why = () => {
   return (
     <div className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-theme-text mb-4">
-            Why Choose CasaBoard?
+            Why choose CasaBoard?
           </h2>
           <p className="text-xl text-theme-text-secondary max-w-3xl mx-auto">
-            The modern way to manage your smart home with powerful features, 
-            beautiful design, and zero technical complexity.
+            Privacy-first by design: Home Assistant credentials stay local unless you
+            explicitly opt into cloud sync on a paid plan. Powerful dashboards without
+            trading away control of your smart home.
           </p>
         </div>
 
-        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {whyFeatures.map((feature, index) => (
             <Card
@@ -102,15 +102,13 @@ export const Why = () => {
             >
               <CardBody className="p-8">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  {/* Icon */}
                   <div className="w-16 h-16 bg-gradient-to-br from-theme-primary/20 to-theme-accent/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Icon 
-                      path={feature.icon} 
-                      className="w-8 h-8 text-theme-primary" 
+                    <Icon
+                      path={feature.icon}
+                      className="w-8 h-8 text-theme-primary"
                     />
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-3">
                     <h3 className="text-xl font-semibold text-theme-text group-hover:text-theme-primary transition-colors">
                       {feature.title}
@@ -120,7 +118,6 @@ export const Why = () => {
                     </p>
                   </div>
 
-                  {/* Highlight Chip */}
                   <Chip
                     color={feature.color}
                     variant="flat"
@@ -147,20 +144,19 @@ export const Why = () => {
           ))}
         </div>
 
-        {/* Bottom CTA */}
         <div className="mt-16 text-center">
           <Card className="bg-gradient-to-r from-theme-primary/10 to-theme-accent/10 border border-theme-primary/20">
             <CardBody className="p-8">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Icon path={mdiCodeTags} className="w-6 h-6 text-theme-primary" />
                 <h3 className="text-2xl font-bold text-theme-text">
-                  No Coding Experience Required
+                  No coding experience required
                 </h3>
               </div>
               <p className="text-theme-text-secondary text-lg max-w-2xl mx-auto">
-                CasaBoard is designed for everyone. Whether you're a tech enthusiast or just getting started 
-                with smart home automation, our intuitive drag-and-drop interface makes it easy to create 
-                professional-looking dashboards.
+                CasaBoard is for everyone—from power users to newcomers. An intuitive
+                drag-and-drop interface helps you create polished dashboards while your
+                Home Assistant credentials stay under your control.
               </p>
             </CardBody>
           </Card>

@@ -11,8 +11,9 @@ import {
   mdiAlertCircle,
   mdiArrowRight
 } from '@mdi/js';
-import { HAInstance as HAInstanceType } from '@repo/types/ha';
 import { cn } from '@heroui/react';
+import type { Entitlements } from '@repo/types/subscription';
+import { useMergedHAInstances } from '@repo/hooks';
 
 interface QuickAction {
   href: string;
@@ -24,11 +25,12 @@ interface QuickAction {
 }
 
 export interface QuickActionsProps {
-  haInstances: HAInstanceType[];
+  entitlements: Entitlements;
 }
 
-export const QuickActions = ({ haInstances }: QuickActionsProps) => {
+export const QuickActions = ({ entitlements }: QuickActionsProps) => {
   const router = useRouter();
+  const { instances: haInstances } = useMergedHAInstances(entitlements);
 
   const quickActions: QuickAction[] = [
     {

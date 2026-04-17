@@ -1,6 +1,6 @@
 import { ConnectResult, EntityDomain, EntityId } from "../types/index";
 import { serverLogger } from "@repo/lib";
-import { loadTokensFromDB, saveTokensToDB } from "./token";
+import { makeSaveTokens, loadTokensFromLocalStorage } from "./browserToken";
 import { LinkService } from "@repo/lib";
 import {
   getAuth,
@@ -16,10 +16,11 @@ import type {
   LoadTokensFunc,
 } from "home-assistant-js-websocket";
 import { HAInstance } from "@repo/types/ha";
-import { HAInstanceActions } from "@repo/lib";
 
 export interface HAConnectProps {
   haInstance: HAInstance;
+  /** Supabase user ID — required for browser-side token encryption. */
+  userId: string;
 }
 
 function normalizeNameToSlug(name: string): string {
@@ -57,18 +58,19 @@ export async function getEntity(
 
 export async function connect({
   haInstance,
+  userId,
 }: HAConnectProps): Promise<ConnectResult> {
   let auth: Auth | undefined;
   let connection: Connection | undefined;
 
   const loadTokens = async () => {
     serverLogger.info("loadTokens wrapper", "haInstance", haInstance);
-    return loadTokensFromDB(haInstance.id) as unknown as AuthData;
+    return loadTokensFromLocalStorage(haInstance.id, userId) as unknown as AuthData;
   };
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: saveTokensToDB,
+    saveTokens: makeSaveTokens(haInstance.id, userId),
     loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
@@ -113,18 +115,12 @@ export async function connect({
  */
 export async function reauthenticateInstance({
   haInstance,
+  userId,
 }: HAConnectProps): Promise<void> {
-  // Delete the old token to force a fresh auth flow
-  try {
-    await HAInstanceActions.updateHAInstance({
-      id: haInstance.id,
-      auth: null,
-      expires_at: null,
-    });
-    serverLogger.info("reauthenticateInstance", "cleared old token", haInstance.id);
-  } catch (err) {
-    serverLogger.warn("reauthenticateInstance", "failed to clear token", err);
-  }
+  // Clear browser-stored token to force a fresh auth flow
+  const { clearTokensFromLocalStorage } = await import("./browserToken");
+  clearTokensFromLocalStorage(haInstance.id);
+  serverLogger.info("reauthenticateInstance", "cleared local token", haInstance.id);
 
   // Initiate fresh auth flow
   let auth: Auth | undefined;
@@ -136,7 +132,7 @@ export async function reauthenticateInstance({
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: saveTokensToDB,
+    saveTokens: makeSaveTokens(haInstance.id, userId),
     loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };

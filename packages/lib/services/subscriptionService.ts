@@ -91,15 +91,17 @@ export class SubscriptionService {
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
     const data = await this.getCurrentSubscription();
     if (!data) {
-    // Return default entitlements for users without subscriptions
-    return {
-      planId: "no-subscription",
-      maxDashboards: 1, // Minimal free tier
-      maxHAInstances: 1,
-      maxSidebars: 1, // Minimal free tier
-      trialEndsAt: null,
-      active: false
-    };
+      // Free tier — users with no subscription still get access
+      return {
+        planId: "free",
+        maxDashboards: 1,
+        maxHAInstances: 1,
+        maxSidebars: 0,
+        maxItemsPerDashboard: 20,
+        trialEndsAt: null,
+        active: true,
+        haCloudSync: false,
+      };
     }
 
     // Get entitlements from Stripe product metadata
@@ -116,12 +118,19 @@ export class SubscriptionService {
       ? (data.product.metadata.max_sidebars === "-1" ? -1 : parseInt(data.product.metadata.max_sidebars))
       : 1;
 
+    const maxItemsPerDashboard = data.product.metadata?.max_items_per_dashboard
+      ? (data.product.metadata.max_items_per_dashboard === "-1" ? -1 : parseInt(data.product.metadata.max_items_per_dashboard))
+      : -1; // Paid tiers default to unlimited if metadata not set
+
+    const haCloudSync = data.product.metadata?.ha_cloud_sync === "true";
+
     serverLogger.info('subscriptionService', 'Retrieved entitlements from Stripe product metadata', {
       productId: data.product.id,
       productName: data.product.name,
       maxDashboards,
       maxHAInstances,
       maxSidebars,
+      maxItemsPerDashboard,
       isTrial: data.isTrial,
       trialEndsAt: data.trialEndsAt,
       subscriptionStatus: data.subscription.status
@@ -132,8 +141,10 @@ export class SubscriptionService {
       maxDashboards,
       maxHAInstances,
       maxSidebars,
+      maxItemsPerDashboard,
       trialEndsAt: data.trialEndsAt,
-      active: data.isActive
+      active: data.isActive,
+      haCloudSync,
     };
   }
 

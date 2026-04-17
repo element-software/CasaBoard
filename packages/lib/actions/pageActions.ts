@@ -46,19 +46,12 @@ export async function createPage(data: CreatePageData) {
         slug: data.slug,
         puck_data: data.puck_data,
         published: data.published ?? false,
-        ha_instance_id: data.ha_instance_id ?? null,
         sidebar_id: data.sidebar_id ?? null,
         user_id: user.id,
       })
       .select(
         `
-        *, 
-        ha_instance:ha_instances (
-          id,
-          name,
-          hass_url,
-          created_at
-        ),
+        *,
         sidebar:sidebars (
           id,
           name,
@@ -148,13 +141,7 @@ export async function getPage(slug: string): Promise<Page> {
     const { data: page, error } = await supabase
       .from("pages")
       .select(
-        `*, 
-        ha_instance:ha_instances (
-          id,
-          name,
-          hass_url,
-          created_at
-        ),
+        `*,
         sidebar:sidebars (
           id,
           name,
@@ -190,13 +177,7 @@ export async function getAllPages(): Promise<Page[]> {
     const { data: pages, error } = await supabase
       .from("pages")
       .select(
-        `*, 
-        ha_instance:ha_instances (
-          id,
-          name,
-          hass_url,
-          created_at
-        ),
+        `*,
         sidebar:sidebars (
           id,
           name,
@@ -229,13 +210,7 @@ export async function getPageBySlug(slug: string): Promise<Page> {
     const { data: page, error } = await supabase
       .from("pages")
       .select(
-        `*, 
-        ha_instance:ha_instances (
-          id,
-          name,
-          hass_url,
-          created_at
-        ),
+        `*,
         sidebar:sidebars (
           id,
           name,

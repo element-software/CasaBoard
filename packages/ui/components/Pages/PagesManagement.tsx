@@ -1,10 +1,10 @@
 "use client";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { PageActions } from "@repo/lib";
 import { Page } from "@repo/types/page";
 import { Entitlements } from "@repo/types/subscription";
-import { HAInstance } from "@repo/types/ha";
 import Link from "next/link";
+import { useMergedHAInstances } from "@repo/hooks";
 import Icon from "@mdi/react";
 import { mdiPlus, mdiWeb } from "@mdi/js";
 import { Button, Chip, cn } from "@heroui/react";
@@ -19,7 +19,6 @@ interface PagesManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
-  haInstances?: HAInstance[];
 }
 
 export const PagesManagement = ({
@@ -28,8 +27,8 @@ export const PagesManagement = ({
   initialError = null,
   compact = false,
   entitlements,
-  haInstances = [],
 }: PagesManagementProps) => {
+  const { instances: haInstances } = useMergedHAInstances(entitlements);
   const router = useRouter();
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [error, setError] = useState<string | null>(initialError);

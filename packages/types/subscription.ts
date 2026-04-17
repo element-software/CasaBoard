@@ -6,8 +6,11 @@ export interface Entitlements {
   maxDashboards: number; // -1 for unlimited
   maxHAInstances: number; // -1 for unlimited
   maxSidebars: number; // -1 for unlimited
+  maxItemsPerDashboard: number; // -1 for unlimited; free tier = 20
   trialEndsAt: string | null; // ISO when trial ends
-  active: boolean; // whether user has active access
+  active: boolean; // whether user has active access (free tier = true)
+  /** When true, user may opt in to storing HA URLs in Supabase (paid + user toggle). */
+  haCloudSync: boolean;
 }
 
 export interface Plan {

@@ -25,6 +25,9 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "@repo/hooks": "*",
+    "@repo/lib": "*",
+    "@repo/types": "*",
     "@repo/config": "*",
     "@tailwindcss/postcss": "^4.1.13",
     "next": "15.5.7",

@@ -13,8 +13,8 @@ export const CTA = () => {
             Ready to Get Started?
           </h2>
           <p className="text-center text-theme-text-secondary text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of smart home enthusiasts who have already
-            transformed their Home Assistant experience with CasaBoard.
+            Join smart home enthusiasts who want powerful dashboards without giving up control.
+            Local-first Home Assistant credentials, with optional cloud sync when you choose it.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button

@@ -8,6 +8,7 @@ export * as BillingService from "./services/billingService";
 export { SubscriptionService } from "./services/subscriptionService";
 export { StripeService } from "./services/stripeService";
 export * as HAInstanceActions from "./actions/haInstanceActions";
+export * as UserSettingsActions from "./actions/userSettingsActions";
 export * as Encryption from "./encryption";
 export { generateSessionId } from "./encryption";
 export * as LinkService from "./services/linkService";

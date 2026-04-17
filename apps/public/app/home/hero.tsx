@@ -15,11 +15,13 @@ export const Hero = () => {
         CasaBoard
       </h1>
       <p className="text-xl md:text-2xl text-theme-text-secondary mb-8 max-w-3xl mx-auto">
-        Cloud-Hosted Smart Home Dashboard
+        Privacy-first smart home dashboards
       </p>
       <p className="text-lg text-theme-text-secondary mb-12 max-w-4xl mx-auto">
-        Create beautiful, customizable dashboards for your Home Assistant setup.
-        Drag, drop, and design your perfect smart home interface with ease.
+        Build beautiful dashboards for Home Assistant with a drag-and-drop editor. By default,
+        your Home Assistant URL and tokens stay on your device—never on our database. Your layouts
+        and pages sync through CasaBoard so you can edit and publish from anywhere. Prefer the
+        cloud? Paid plans can opt in to sync your HA connection details across devices.
       </p>
       <p className="text-xs pb-6 w-full">
         Currently under development, so expect some bugs! FREE to use whilst in

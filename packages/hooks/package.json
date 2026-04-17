@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    ".": "./index.ts",
     "./*": "./*.ts"
   },
   "scripts": {
@@ -10,6 +11,8 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/ha": "*",
+    "@repo/lib": "*",
     "@repo/types": "*"
   },
   "devDependencies": {

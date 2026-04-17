@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HAProvider, useHA, reauthenticateInstance } from "@repo/ha";
 import { HAInstance } from "@repo/types/ha";
 import { ConnectionErrorIndicator } from "./ConnectionErrorFallback";
-import { clientLogger } from "@repo/lib";
+import { clientLogger, SupabaseClient } from "@repo/lib";
 
 interface HassConnectWrapperProps {
   children: React.ReactNode;
@@ -22,6 +22,18 @@ const HassConnectWrapperContent = ({
 }: HassConnectWrapperProps) => {
   const { error, loading, retry } = useHA();
   const router = useRouter();
+  const [userId, setUserId] = useState<string>("");
+
+  useEffect(() => {
+    const supabase = SupabaseClient.createClient();
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error || !data.user?.id) {
+        clientLogger.error('HassConnectWrapper', 'Could not resolve user ID', error);
+        return;
+      }
+      setUserId(data.user.id);
+    });
+  }, []);
 
   // Log connection details
   useEffect(() => {
@@ -35,14 +47,9 @@ const HassConnectWrapperContent = ({
   const handleReauthenticate = async () => {
     try {
       clientLogger.info('HassConnectWrapper', 'initiating re-authentication for', haInstance.id);
-      // This will clear the old token and start a fresh OAuth flow
-      // The user will be redirected to Home Assistant for login
-      // After successful auth, they'll be redirected back to /setup/ha-config
-      await reauthenticateInstance({ haInstance });
+      await reauthenticateInstance({ haInstance, userId });
     } catch (error) {
       clientLogger.error('HassConnectWrapper', 're-authentication failed', error);
-      // Even if there's an error, the OAuth flow may have started
-      // The user might still be redirected to Home Assistant
     }
   };
 

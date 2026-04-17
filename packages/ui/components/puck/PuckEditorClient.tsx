@@ -5,6 +5,7 @@ import { PuckConfig } from "./puck.config";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   Button,
+  Chip,
   Modal,
   ModalContent,
   ModalHeader,
@@ -25,6 +26,7 @@ type PuckEditorClientProps = {
   haInstances?: { id: string; name: string; hass_url: string }[];
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
+  maxItemsPerDashboard?: number; // -1 for unlimited; free tier = 20
   // Publish functions passed as props
   onCreateItem: (data: { name: string; slug: string; puck_data: Data; [key: string]: any }) => Promise<any>;
   onUpdateItem: (slug: string, data: { name?: string; puck_data?: Data; [key: string]: any }) => Promise<any>;
@@ -43,6 +45,7 @@ export default function PuckEditorClient({
   haInstances = [],
   sidebars = [],
   initialSlug,
+  maxItemsPerDashboard = -1,
   onCreateItem,
   onUpdateItem,
   onPublishItem,
@@ -105,14 +108,35 @@ export default function PuckEditorClient({
     }
   }, [data, lastSavedJson]);
 
+  // Derived item-count state for limit enforcement
+  const itemCount = data.content.length;
+  const isAtLimit =
+    maxItemsPerDashboard !== -1 && itemCount >= maxItemsPerDashboard;
+  const isNearLimit =
+    maxItemsPerDashboard !== -1 &&
+    !isAtLimit &&
+    itemCount >= Math.max(0, maxItemsPerDashboard - 3);
+
+  /** Returns an error message if the item limit is exceeded, otherwise null. */
+  const getItemLimitError = (): string | null => {
+    if (maxItemsPerDashboard !== -1 && data.content.length > maxItemsPerDashboard) {
+      return `This dashboard has ${data.content.length} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`;
+    }
+    return null;
+  };
+
   const saveItem = async () => {
     setError(null);
+    const limitError = getItemLimitError();
+    if (limitError) {
+      setError(limitError);
+      return;
+    }
     try {
       const createData = {
         name: settings.title,
         slug: settings.slug,
         puck_data: data,
-        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
       };
       
@@ -130,11 +154,15 @@ export default function PuckEditorClient({
 
   const updateItem = async () => {
     setError(null);
+    const limitError = getItemLimitError();
+    if (limitError) {
+      setError(limitError);
+      return;
+    }
     try {
       const updateData = {
         name: settings.title,
         puck_data: data,
-        ...(haInstances.length > 0 && { ha_instance_id: settings.haInstanceId }),
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
       };
       
@@ -253,7 +281,17 @@ export default function PuckEditorClient({
                   : updatePublished;
 
             return (
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {/* Item count indicator */}
+                {maxItemsPerDashboard !== -1 && (
+                  <Chip
+                    size="sm"
+                    color={isAtLimit ? "danger" : isNearLimit ? "warning" : "default"}
+                    variant="flat"
+                  >
+                    {itemCount}/{maxItemsPerDashboard} items
+                  </Chip>
+                )}
                 {viewUrlTemplate && initialSlug && (
                   <Link
                     href={viewUrlTemplate.replace('{slug}', initialSlug)}

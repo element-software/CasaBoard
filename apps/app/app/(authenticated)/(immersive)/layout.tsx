@@ -2,7 +2,6 @@ import { ConfigurationProvider } from "@repo/ui/components/Shared/util/Configura
 import {
   ConfigService,
   getCurrentAuthUser,
-  SubscriptionService,
 } from "@repo/lib";
 import { Footer } from "@repo/ui/components/Shared/Footer/index";
 import { redirect } from "next/navigation";
@@ -22,15 +21,6 @@ export default async function AuthenticatedLayout({
   const authedUser = await getCurrentAuthUser();
   if (!authedUser) {
     redirect("/auth/login?redirectTo=/");
-  }
-
-  // Check if user needs trial setup
-  const subscription = await SubscriptionService.getCurrentSubscriptionSummary();
-  const isTrial = subscription.status === 'trialing';
-  
-  // If user has no active subscription, redirect to trial setup
-  if (!isTrial && subscription.status !== 'active') {
-    redirect("/auth/setup");
   }
 
   return (
