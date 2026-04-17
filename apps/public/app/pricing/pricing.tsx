@@ -20,9 +20,20 @@ export default function BillingContent({
   const monthlyPlans = stripePlans.filter(
     (p) => p.recurring?.interval === "month"
   );
-  const yearlyPlans = stripePlans.filter(
-    (p) => p.recurring?.interval === "year"
-  );
+
+  // Deduplicate yearly plans by product — prefer the price that has a monthly
+  // counterpart (so the discount can be calculated), then take the lowest price.
+  const yearlyPlans = stripePlans
+    .filter((p) => p.recurring?.interval === "year")
+    .reduce<Array<Stripe.Price & { product: Stripe.Product }>>((acc, plan) => {
+      const existing = acc.find((p) => p.product.id === plan.product.id);
+      if (!existing) return [...acc, plan];
+      const existingHasMonthly = monthlyPlans.some((m) => m.product.id === existing.product.id);
+      const newHasMonthly = monthlyPlans.some((m) => m.product.id === plan.product.id);
+      if (!existingHasMonthly && newHasMonthly) return [...acc.filter((p) => p.product.id !== plan.product.id), plan];
+      if ((plan.unit_amount || 0) < (existing.unit_amount || 0)) return [...acc.filter((p) => p.product.id !== plan.product.id), plan];
+      return acc;
+    }, []);
 
   // Get plans for current billing cycle
   const currentPlans = billing === "monthly" ? monthlyPlans : yearlyPlans;
@@ -148,6 +159,10 @@ export default function BillingContent({
                         {feature.name}
                       </li>
                     ))}
+                    <li className="flex items-start gap-2 pt-1">
+                      <Icon path={mdiCheck} className="w-4 h-4 text-success shrink-0 mt-0.5" />
+                      <span>Optional cloud sync <span className="text-foreground-400">(off by default)</span></span>
+                    </li>
                   </ul>
                     <Button
                       as={Link}
