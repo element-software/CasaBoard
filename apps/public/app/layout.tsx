@@ -8,7 +8,8 @@ import { cn } from "@heroui/react";
 
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
-  description: "Cloud-hosted, customizable dashboard for Home Assistant",
+  description:
+    "Privacy-first Home Assistant dashboards. Credentials stay local by default; optional cloud sync on paid plans.",
   metadataBase: new URL("https://casaboard.dev"),
   icons: {
     icon: "/icon.svg",
@@ -16,7 +17,8 @@ export const metadata = {
   manifest: "./manifest.webmanifest",
   openGraph: {
     title: "CasaBoard — Smart Home Dashboard",
-    description: "Cloud-hosted, customizable dashboard for Home Assistant",
+    description:
+      "Privacy-first Home Assistant dashboards. Local by default; optional cloud sync for subscribers.",
     url: "https://casaboard.dev",
     siteName: "CasaBoard",
     images: [],
@@ -25,7 +27,8 @@ export const metadata = {
   twitter: {
     card: "summary",
     title: "CasaBoard — Smart Home Dashboard",
-    description: "Cloud-hosted, customizable dashboard for Home Assistant",
+    description:
+      "Privacy-first Home Assistant dashboards. Local credentials by default; optional cloud sync.",
   },
 };
 

@@ -11,7 +11,8 @@ const steps = [
   },
   {
     title: "Connect HA",
-    description: "Link your Home Assistant instance with your dashboard",
+    description:
+      "Sign in to Home Assistant from your browser. Tokens stay encrypted locally by default; optional paid cloud sync can store your HA URL if you want the same setup on every device.",
     icon: mdiHomeAssistant,
   },
   {

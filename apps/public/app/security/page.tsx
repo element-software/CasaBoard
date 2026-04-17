@@ -35,8 +35,9 @@ export default function SecurityPage() {
         </div>
         <h1 className="text-4xl font-bold text-theme-text mb-4">Security & Privacy</h1>
         <p className="text-xl text-theme-text-secondary max-w-2xl mx-auto">
-          Your Home Assistant credentials and data are protected by multiple layers of security. 
-          We cannot access your Home Assistant instance, even as the developers.
+          CasaBoard is privacy-first: Home Assistant access tokens stay encrypted in your browser by
+          default. We never see your HA credentials on our servers. Optional cloud sync (paid plans) can
+          store your HA base URL on our database if you explicitly turn it on—tokens stay local either way.
         </p>
       </div>
 
@@ -48,60 +49,115 @@ export default function SecurityPage() {
         </div>
         <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6 mb-6">
           <p className="text-theme-text-secondary mb-4">
-            CasaBoard is designed with privacy and security as core principles. We believe that your 
-            smart home data should remain private and that you should have complete control over your 
-            Home Assistant instance.
+            By default, nothing that lets CasaBoard log into Home Assistant on your behalf is stored in
+            our database. Your OAuth tokens are encrypted and kept in the browser. We still protect your
+            account, billing, and dashboard layouts with authentication and Row Level Security like any
+            serious SaaS product.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Icon path={mdiLock} className="w-6 h-6 text-green-400" />
-                <h3 className="text-lg font-medium text-theme-text">What We Protect</h3>
+                <h3 className="text-lg font-medium text-theme-text">What stays on your device (default)</h3>
               </div>
               <ul className="text-theme-text-secondary space-y-2">
                 <li className="flex items-center gap-2">
                   <Icon path={mdiKey} className="w-4 h-4 text-green-400" />
-                  Your Home Assistant access tokens
+                  Home Assistant OAuth tokens (encrypted in browser storage)
                 </li>
                 <li className="flex items-center gap-2">
                   <Icon path={mdiWeb} className="w-4 h-4 text-green-400" />
-                  Your Home Assistant URL and credentials
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiDatabase} className="w-4 h-4 text-green-400" />
-                  Your dashboard configurations
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiAccountKey} className="w-4 h-4 text-green-400" />
-                  Your personal data and preferences
+                  Your HA base URL, unless you enable optional cloud sync
                 </li>
               </ul>
             </div>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Icon path={mdiEyeOff} className="w-6 h-6 text-red-400" />
-                <h3 className="text-lg font-medium text-theme-text">What We Cannot Access</h3>
+                <Icon path={mdiDatabase} className="w-6 h-6 text-green-400" />
+                <h3 className="text-lg font-medium text-theme-text">What we host for you</h3>
               </div>
               <ul className="text-theme-text-secondary space-y-2">
                 <li className="flex items-center gap-2">
-                  <Icon path={mdiServer} className="w-4 h-4 text-red-400" />
-                  Your Home Assistant instance directly
+                  <Icon path={mdiDatabase} className="w-4 h-4 text-green-400" />
+                  Dashboard and page layouts (e.g. Puck JSON), sidebars, publishing flags
                 </li>
                 <li className="flex items-center gap-2">
-                  <Icon path={mdiShieldOutline} className="w-4 h-4 text-red-400" />
-                  Your smart home devices or their data
+                  <Icon path={mdiAccountKey} className="w-4 h-4 text-green-400" />
+                  Account and subscription metadata tied to your login
                 </li>
                 <li className="flex items-center gap-2">
-                  <Icon path={mdiDatabaseOutline} className="w-4 h-4 text-red-400" />
-                  Your Home Assistant logs or history
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiLockOutline} className="w-4 h-4 text-red-400" />
-                  Any data outside of CasaBoard
+                  <Icon path={mdiCloud} className="w-4 h-4 text-green-400" />
+                  <span>
+                    <strong>Optional:</strong> HA instance label + URL, only if you are on a paid plan
+                    and turn on &quot;cloud sync&quot; in settings
+                  </span>
                 </li>
               </ul>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Local vs cloud */}
+      <section className="mb-12">
+        <div className="flex items-center gap-3 mb-6">
+          <Icon path={mdiShieldLock} className="w-8 h-8 text-theme-primary" />
+          <h2 className="text-2xl font-semibold text-theme-text">Local-first vs optional cloud sync</h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-theme-text mb-2">Default (everyone)</h3>
+            <p className="text-theme-text-secondary text-sm mb-3">
+              Home Assistant authentication completes in your browser. Tokens are encrypted with Web
+              Crypto and stored locally; they are not written to CasaBoard databases. Your HA URL is also
+              kept in the browser unless you choose otherwise.
+            </p>
+            <ul className="text-theme-text-secondary text-sm space-y-1">
+              <li>• No HA access tokens on our servers</li>
+              <li>• No HA URL in our database</li>
+              <li>• Same connection model on free and paid tiers unless you opt in below</li>
+            </ul>
+          </div>
+          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-theme-text mb-2">Optional cloud sync (paid, opt-in)</h3>
+            <p className="text-theme-text-secondary text-sm mb-3">
+              If your plan supports it and you enable cloud sync in settings, we can store{" "}
+              <strong>metadata only</strong>—display name and base URL for each Home Assistant instance—so
+              you can see the same instances when you sign in from another device.
+            </p>
+            <ul className="text-theme-text-secondary text-sm space-y-1">
+              <li>• OAuth tokens remain encrypted and local; we do not store HA passwords or tokens in the cloud</li>
+              <li>• You can turn cloud sync off; local-only mode continues to work</li>
+              <li>• Row Level Security ensures only your user rows are readable</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* What we never touch */}
+      <section className="mb-12">
+        <div className="flex items-center gap-3 mb-6">
+          <Icon path={mdiEyeOff} className="w-8 h-8 text-theme-primary" />
+          <h2 className="text-2xl font-semibold text-theme-text">What CasaBoard cannot access</h2>
+        </div>
+        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <ul className="text-theme-text-secondary space-y-2">
+            <li className="flex items-center gap-2">
+              <Icon path={mdiServer} className="w-4 h-4 text-red-400" />
+              Your Home Assistant server directly (we are not a proxy into HA)
+            </li>
+            <li className="flex items-center gap-2">
+              <Icon path={mdiShieldOutline} className="w-4 h-4 text-red-400" />
+              Your smart home devices, entities, or automations inside HA
+            </li>
+            <li className="flex items-center gap-2">
+              <Icon path={mdiDatabaseOutline} className="w-4 h-4 text-red-400" />
+              Home Assistant logs, history, or backups
+            </li>
+            <li className="flex items-center gap-2">
+              <Icon path={mdiLockOutline} className="w-4 h-4 text-red-400" />
+              Decrypted HA tokens in our infrastructure—those keys never leave your browser by design</li>
+          </ul>
         </div>
       </section>
 
@@ -117,29 +173,31 @@ export default function SecurityPage() {
           <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
               <Icon path={mdiLock} className="w-6 h-6 text-blue-400" />
-              <h3 className="text-xl font-semibold text-theme-text">End-to-End Encryption</h3>
+              <h3 className="text-xl font-semibold text-theme-text">Token encryption in your browser</h3>
             </div>
             <p className="text-theme-text-secondary mb-4">
-              Your Home Assistant credentials are encrypted using industry-standard AES-GCM encryption 
-              with 256-bit keys before being stored in our database.
+              Home Assistant OAuth tokens are encrypted using industry-standard{" "}
+              <strong>AES-GCM</strong> in the browser before being written to{" "}
+              <strong>local storage</strong>. They are not persisted in CasaBoard application databases
+              in the default configuration. Decryption happens only in your session when connecting to
+              Home Assistant.
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Encryption Details:</h4>
+                <h4 className="font-medium text-theme-text mb-2">Encryption details:</h4>
                 <ul className="text-theme-text-secondary space-y-1">
                   <li>• Algorithm: AES-GCM 256-bit</li>
-                  <li>• Key Derivation: PBKDF2 with 100,000 iterations</li>
-                  <li>• Hash Function: SHA-256</li>
+                  <li>• Key derivation tied to your account identity</li>
                   <li>• Random IV for each encryption</li>
+                  <li>• Web Crypto API (browser-native)</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Key Security:</h4>
+                <h4 className="font-medium text-theme-text mb-2">What this means:</h4>
                 <ul className="text-theme-text-secondary space-y-1">
-                  <li>• Keys derived from your user data</li>
-                  <li>• Unique session identifiers</li>
-                  <li>• Cannot be decrypted without your account</li>
-                  <li>• Web Crypto API (browser-native)</li>
+                  <li>• Server-side code does not hold a copy of your HA tokens</li>
+                  <li>• Clearing browser data or a new device requires signing in to HA again</li>
+                  <li>• Optional cloud sync does not change where tokens live</li>
                 </ul>
               </div>
             </div>
@@ -152,10 +210,11 @@ export default function SecurityPage() {
               <h3 className="text-xl font-semibold text-theme-text">Database Security with Supabase</h3>
             </div>
             <p className="text-theme-text-secondary mb-4">
-              Our database is powered by <strong>Supabase</strong> (built on PostgreSQL) and uses 
-              <strong> Row Level Security (RLS)</strong> to ensure that you can only access your own data. 
-              RLS is enforced at the database level, meaning even if someone gained direct database access, 
-              they could only see their own records.
+              Our database is powered by <strong>Supabase</strong> (built on PostgreSQL) and uses{" "}
+              <strong>Row Level Security (RLS)</strong> so each query only returns rows owned by the
+              signed-in user. That applies to pages, sidebars, billing, and—if you use it—optional HA
+              instance metadata for cloud sync. It does <strong>not</strong> apply to HA tokens, because
+              those are not stored in the app database by default.
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div>
@@ -169,13 +228,13 @@ export default function SecurityPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Data Protection:</h4>
+                <h4 className="font-medium text-theme-text mb-2">Data protection:</h4>
                 <ul className="text-theme-text-secondary space-y-1">
-                  <li>• Encrypted at rest in database</li>
-                  <li>• No plaintext credential storage</li>
-                  <li>• Automatic data cleanup on account deletion</li>
-                  <li>• Regular security audits</li>
-                  <li>• Supabase&apos;s enterprise security</li>
+                  <li>• Encrypted at rest (Supabase / PostgreSQL)</li>
+                  <li>• No HA access tokens in our tables in default local mode</li>
+                  <li>• Optional cloud sync rows contain URL/name only, not OAuth secrets</li>
+                  <li>• Automatic cleanup on account deletion where applicable</li>
+                  <li>• Supabase&apos;s operational security posture</li>
                 </ul>
               </div>
             </div>
@@ -239,29 +298,29 @@ export default function SecurityPage() {
             <h3 className="text-xl font-semibold text-red-400">We Cannot Access Your Data</h3>
           </div>
           <p className="text-red-200 mb-4">
-            As the developers of CasaBoard, we have implemented multiple security layers that prevent us 
-            from accessing your Home Assistant instance or credentials, even if we wanted to.
+            In the default configuration, CasaBoard never receives your Home Assistant OAuth tokens at
+            our servers. They exist only in encrypted form in your browser. We cannot decrypt them
+            remotely because we do not host them. If you enable optional cloud sync, we may store your
+            HA base URL (not credentials) under your user ID—still subject to RLS and never including
+            tokens.
           </p>
           <div className="grid md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h4 className="font-medium text-red-300 mb-2">What We Cannot Do:</h4>
+              <h4 className="font-medium text-red-300 mb-2">What we cannot do:</h4>
               <ul className="text-red-200 space-y-1">
-                <li>• Access your Home Assistant credentials</li>
-                <li>• Decrypt your stored tokens</li>
-                <li>• Bypass authentication systems</li>
-                <li>• Access your HA instance directly</li>
-                <li>• See other users&apos; data</li>
+                <li>• Access or decrypt HA tokens in default local mode (we don&apos;t have them)</li>
+                <li>• Log into your Home Assistant as you</li>
+                <li>• Bypass Supabase authentication or RLS for other users&apos; data</li>
+                <li>• Read your smart home state from our infrastructure</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-red-300 mb-2">Technical Barriers:</h4>
+              <h4 className="font-medium text-red-300 mb-2">Technical barriers:</h4>
               <ul className="text-red-200 space-y-1">
-                <li>• User-specific encryption keys</li>
-                <li>• Supabase Row Level Security policies</li>
-                <li>• No admin bypass mechanisms</li>
-                <li>• No service account access</li>
-                <li>• No backdoor access patterns</li>
-                <li>• Supabase&apos;s built-in access controls</li>
+                <li>• Browser-local encryption for tokens</li>
+                <li>• Supabase Row Level Security on all persisted app data</li>
+                <li>• Separation of concerns: HA auth lives in the client, not the API layer</li>
+                <li>• No admin bypass for end-user smart home data</li>
               </ul>
             </div>
           </div>
@@ -273,14 +332,18 @@ export default function SecurityPage() {
             <h3 className="text-xl font-semibold text-theme-text">What We Can See (Limited)</h3>
           </div>
           <p className="text-theme-text-secondary mb-4">
-            For debugging and support purposes, we can only see:
+            For debugging and support we may see:
           </p>
           <ul className="text-theme-text-secondary space-y-2">
-            <li>• <strong>Encrypted data structure</strong> - We can see that encrypted data exists, but not its contents</li>
-            <li>• <strong>Error logs</strong> - To help troubleshoot issues (no sensitive data included)</li>
-            <li>• <strong>Usage statistics</strong> - Anonymous analytics to improve the service</li>
-            <li>• <strong>Account information</strong> - Basic account details for support (email, subscription status)</li>
+            <li>• <strong>Account & billing</strong> — email, plan, subscription status, as needed for support</li>
+            <li>• <strong>Dashboard metadata</strong> — page names, slugs, layout structure (not live HA state)</li>
+            <li>• <strong>Optional cloud HA rows</strong> — only if you enabled cloud sync (instance name and URL)</li>
+            <li>• <strong>Error logs & analytics</strong> — scrubbed of secrets; used to improve reliability</li>
           </ul>
+          <p className="text-theme-text-secondary text-sm mt-3">
+            We do not have access to plaintext Home Assistant tokens in our databases or logs in the
+            default local-first configuration.
+          </p>
         </div>
       </section>
 
@@ -297,39 +360,42 @@ export default function SecurityPage() {
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">1</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">Initial Setup</h3>
+              <h3 className="text-lg font-semibold text-theme-text">Sign in & connect Home Assistant</h3>
             </div>
             <p className="text-theme-text-secondary">
-              When you connect your Home Assistant instance, your credentials are encrypted using your 
-              unique user data and stored in our database. The encryption key is derived from your 
-              account information and cannot be recreated by anyone else.
+              You authenticate to CasaBoard (e.g. Supabase Auth). When you connect Home Assistant, the
+              OAuth flow completes in your browser. Tokens are encrypted and written to browser storage;
+              by default CasaBoard servers never receive or store those tokens.
             </p>
           </div>
-          
+
           <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">2</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">Daily Usage</h3>
+              <h3 className="text-lg font-semibold text-theme-text">Using your dashboard</h3>
             </div>
             <p className="text-theme-text-secondary">
-              When you use CasaBoard, your encrypted credentials are retrieved from the database, 
-              decrypted using your account-specific key, and used to communicate with your Home 
-              Assistant instance. The decrypted data never leaves your browser session.
+              When you open a dashboard, the app loads encrypted tokens from local storage, decrypts
+              them in the browser, and opens a WebSocket connection from your device to your Home
+              Assistant instance. Live entity data flows between your browser and HA—not through our
+              database as a proxy.
             </p>
           </div>
-          
+
           <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">3</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">Data Storage</h3>
+              <h3 className="text-lg font-semibold text-theme-text">What we persist</h3>
             </div>
             <p className="text-theme-text-secondary">
-              All sensitive data is encrypted before being stored. Your dashboard configurations 
-              and preferences are also protected, though they don&apos;t contain sensitive credentials.
+              We save your layout JSON, page settings, and account data in Supabase. If you opt into
+              cloud sync on a paid plan, we may also save HA instance metadata (name + URL) for
+              convenience. Your HA access tokens remain local-only unless our product model changes
+              and we document it here.
             </p>
           </div>
         </div>

@@ -12,7 +12,8 @@ process.env.NODE_ENV === "production"
 
 export async function generateHomepageMetadata(): Promise<Metadata> {
   const title = "CasaBoard";
-  const description = "Cloud-Hosted Smart Home Dashboard";
+  const description =
+    "Privacy-first Home Assistant dashboards — local credentials by default, optional cloud sync on paid plans.";
 
   return {
     title,

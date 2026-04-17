@@ -29,9 +29,10 @@ export default function AboutPageContent() {
             </h1>
             <p className="max-w-3xl mx-auto text-theme-text-secondary">
               Design beautiful, responsive pages with a drag‑and‑drop editor and
-              real‑time controls. Connect multiple Home Assistant instances,
-              choose the right one per page, and share dashboards across your
-              home.
+              real‑time controls. Your Home Assistant credentials stay in your
+              browser by default; optional cloud sync on paid plans can keep HA
+              URLs in sync across devices when you want it. Connect multiple
+              instances and assign the right one per page.
             </p>
             <div className="grid gap-3 sm:grid-cols-3 max-w-3xl mx-auto">
               <div className="p-3 bg-theme-surface rounded-lg flex items-center gap-2 justify-center">
@@ -53,7 +54,7 @@ export default function AboutPageContent() {
                   className="w-5 h-5 text-green-500"
                 />
                 <span className="text-sm text-theme-text">
-                  Multi‑instance ready
+                  Privacy‑first local HA
                 </span>
               </div>
             </div>
