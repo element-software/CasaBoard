@@ -13,7 +13,7 @@ export default function CancelContent({
 }) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-      <Card className="bg-theme-surface/60 backdrop-blur border border-theme-border shadow-xl">
+      <Card className="bg-white border border-slate-100 shadow-sm">
         <CardBody className="p-8 sm:p-10 space-y-6 text-center">
           <div className="w-20 h-20 mx-auto rounded-full bg-warning/10 text-warning flex items-center justify-center">
             <Icon path={mdiClockOutline} className="w-10 h-10" />

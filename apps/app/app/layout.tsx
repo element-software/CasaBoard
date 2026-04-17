@@ -33,9 +33,9 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
-      <body className={cn("bg-neutral-900",inter.className)}>
+      <body className={cn("bg-white",inter.className)}>
         {children}
         <AnalyticsWrapper gaId="G-P2JEHMNT4C" user={user} />
       </body>

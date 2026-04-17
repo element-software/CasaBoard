@@ -10,8 +10,8 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24">
           <div className="text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-theme-border bg-theme-surface/60 backdrop-blur">
-              <Icon path={mdiHomeAssistant} className="w-4 h-4 text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-100 bg-violet-50">
+              <Icon path={mdiHomeAssistant} className="w-4 h-4 text-violet-600" />
               <span className="text-sm text-theme-text-secondary">CasaBoard for Home Assistant</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-theme-text">
@@ -33,7 +33,7 @@ export default function Home() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 pb-20 grid md:grid-cols-3 gap-6">
-        <Card className="bg-theme-surface/60 backdrop-blur border border-theme-border">
+        <Card className="bg-white border border-slate-100 shadow-sm">
           <CardBody className="p-6 space-y-3">
             <Icon path={mdiPuzzle} className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-semibold text-theme-text">Drag-and-drop editor</h3>
@@ -42,7 +42,7 @@ export default function Home() {
             </p>
           </CardBody>
         </Card>
-        <Card className="bg-theme-surface/60 backdrop-blur border border-theme-border">
+        <Card className="bg-white border border-slate-100 shadow-sm">
           <CardBody className="p-6 space-y-3">
             <Icon path={mdiLightningBolt} className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-semibold text-theme-text">Live Home Assistant data</h3>
@@ -51,7 +51,7 @@ export default function Home() {
             </p>
           </CardBody>
         </Card>
-        <Card className="bg-theme-surface/60 backdrop-blur border border-theme-border">
+        <Card className="bg-white border border-slate-100 shadow-sm">
           <CardBody className="p-6 space-y-3">
             <Icon path={mdiShieldCheck} className="w-8 h-8 text-primary" />
             <h3 className="text-lg font-semibold text-theme-text">Profiles & permissions</h3>

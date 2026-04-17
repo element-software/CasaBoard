@@ -142,28 +142,28 @@ export const SetupSidebar = ({
   ];
 
   const renderSidebarContent = () => (
-    <div className="h-full flex flex-col text-white">
+    <div className="h-full flex flex-col bg-white">
       {/* Logo */}
-      <div className="p-2 border-b border-white flex flex-row items-center justify-start gap-2">
+      <div className="p-4 border-b border-slate-100 flex flex-row items-center justify-start gap-2">
         <CasaBoardLogo size="medium" />
-        <span className="text-white text-lg font-semibold">CasaBoard</span>
+        <span className="text-slate-900 text-lg font-semibold tracking-tight">CasaBoard</span>
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-x-hidden overflow-y-auto">
-        <div className="p-4 space-y-2">
+        <div className="p-3 space-y-1">
           {navigationItems.map((section) => (
             <div key={section.id}>
               <Button
                 variant="light"
-                className="w-full justify-start text-left font-semibold text-sm text-white hover:bg-theme-primary"
+                className="w-full justify-start text-left font-semibold text-sm text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                 onPress={() =>
                   section.selfClick
                     ? router.push(section.href)
                     : toggleSection(section.id)
                 }
                 startContent={
-                  <Icon path={section.icon} className="w-4 h-4 text-white" />
+                  <Icon path={section.icon} className="w-4 h-4 text-slate-400" />
                 }
                 endContent={
                   <Icon
@@ -174,7 +174,7 @@ export const SetupSidebar = ({
                           ? mdiChevronDown
                           : mdiChevronRight
                     }
-                    className="w-4 h-4 text-white"
+                    className="w-4 h-4 text-slate-400"
                   />
                 }
               >
@@ -182,18 +182,24 @@ export const SetupSidebar = ({
               </Button>
 
               {!section.selfClick && expandedSections.has(section.id) && (
-                <div className="ml-6 gap-1 mt-1 flex flex-col">
+                <div className="ml-6 gap-0.5 mt-0.5 flex flex-col">
                   {section.items?.map((item) => (
                     <Button
                       key={item.href}
                       variant="light"
                       className={cn(
-                        "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
+                        "w-full justify-start text-left text-sm text-slate-600 hover:bg-violet-50 hover:text-violet-700",
                         isActive(item.href) &&
-                          "bg-theme-primary text-white hover:bg-theme-primary"
+                          "bg-violet-100 text-violet-700 hover:bg-violet-100"
                       )}
                       startContent={
-                        <Icon path={item.icon} className="w-4 h-4 text-white" />
+                        <Icon
+                          path={item.icon}
+                          className={cn(
+                            "w-4 h-4 text-slate-400",
+                            isActive(item.href) && "text-violet-600"
+                          )}
+                        />
                       }
                       onPress={() => {
                         router.push(item.href);
@@ -212,7 +218,7 @@ export const SetupSidebar = ({
         <Divider className="mx-4" />
 
         {/* Bottom Items */}
-        <div className="p-4 space-y-1">
+        <div className="p-3 space-y-0.5">
           {bottomItems.map((item) => (
             <Link
               key={item.href}
@@ -222,12 +228,11 @@ export const SetupSidebar = ({
               <Button
                 variant="light"
                 className={cn(
-                  "w-full justify-start text-left text-sm text-white hover:bg-theme-primary",
-                  isActive(item.href) &&
-                    "bg-theme-primary text-white hover:bg-theme-primary"
+                  "w-full justify-start text-left text-sm text-slate-600 hover:bg-violet-50 hover:text-violet-700",
+                  isActive(item.href) && "bg-violet-100 text-violet-700"
                 )}
                 startContent={
-                  <Icon path={item.icon} className="w-4 h-4 text-white" />
+                  <Icon path={item.icon} className="w-4 h-4 text-slate-400" />
                 }
               >
                 {item.title}
@@ -238,7 +243,7 @@ export const SetupSidebar = ({
       </div>
 
       {/* User Profile */}
-      <div className="p-4">
+      <div className="p-4 border-t border-slate-100">
         <UserMenu user={user} />
       </div>
     </div>
@@ -265,7 +270,7 @@ export const SetupSidebar = ({
   return (
     <Card
       className={cn(
-        "h-screen w-96 text-white border-r rounded-none",
+        "h-screen w-96 border-r border-slate-100 rounded-none bg-white shadow-none",
         className
       )}
     >

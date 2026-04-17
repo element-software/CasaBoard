@@ -25,13 +25,13 @@ export default function ProfileClient({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-theme-background border border-theme-border lg:col-span-2">
+        <Card className="bg-white border border-slate-100 shadow-sm lg:col-span-2">
           <CardBody className="p-6 flex flex-col items-stretch">
             <div className="flex items-start gap-4">
               <Avatar
                 name={(profile.email || "?")[0].toUpperCase()}
                 size="lg"
-                className="bg-theme-primary text-black"
+                className="bg-violet-600 text-white"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

@@ -40,7 +40,7 @@ export function LoginForm() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center">
       {/* Left side - Logo */}
-      <div className="flex w-full md:w-1/2 items-center justify-center md:pr-4 border-r border-theme-border">
+      <div className="flex w-full md:w-1/2 items-center justify-center md:pr-4 border-r border-slate-100 bg-gradient-to-br from-violet-50 to-indigo-50">
         <div className="text-center flex flex-col items-center justify-center max-w-md py-4 px-8">
           <CasaBoardLogo size="large" />
           <h1 className="text-3xl font-bold text-theme-text mt-8 mb-4">
@@ -63,7 +63,7 @@ export function LoginForm() {
       {/* Right side - Login form */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          <Card className="bg-theme-surface/60 backdrop-blur border border-theme-border">
+          <Card className="bg-white border border-slate-100 shadow-sm">
             <CardBody className="p-8">
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-semibold text-theme-text mb-2">
