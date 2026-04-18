@@ -4,10 +4,16 @@ import { useState } from "react";
 import { LinkService, SupabaseClient } from "@repo/lib";
 import { useSearchParams } from "next/navigation";
 import { CasaBoardLogo } from "@repo/ui/components/Logo/index";
-import { Button, Card, CardBody } from "@heroui/react";
+import { Button } from "@heroui/react";
 import Icon from "@mdi/react";
-import { mdiGoogle } from "@mdi/js";
+import { mdiGoogle, mdiShieldLock, mdiDrag, mdiCloudOutline } from "@mdi/js";
 import Link from "next/link";
+
+const features = [
+  { icon: mdiDrag, text: "Drag-and-drop dashboard editor" },
+  { icon: mdiShieldLock, text: "Credentials stay local by default" },
+  { icon: mdiCloudOutline, text: "Optional cloud sync on paid plans" },
+];
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -38,82 +44,100 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center">
-      {/* Left side - Logo */}
-      <div className="flex w-full md:w-1/2 items-center justify-center md:pr-4 border-r border-slate-100 bg-gradient-to-br from-violet-50 to-indigo-50">
-        <div className="text-center flex flex-col items-center justify-center max-w-md py-4 px-8">
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left panel — branding */}
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-violet-600 to-indigo-700 flex-col items-center justify-center p-12 relative overflow-hidden">
+        {/* Subtle background circles */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white/5 rounded-full" />
+
+        <div className="relative z-10 text-center flex flex-col items-center max-w-md">
           <CasaBoardLogo size="large" />
-          <h1 className="text-3xl font-bold text-theme-text mt-8 mb-4">
-            Welcome to CasaBoard
+          <h1 className="text-4xl font-bold text-white mt-8 mb-3 tracking-tight">
+            CasaBoard
           </h1>
-          <p className="text-theme-text text-lg">
-            Your smart home dashboard, simplified and beautiful.
+          <p className="text-violet-200 text-lg mb-10">
+            Beautiful Home Assistant dashboards, built by you.
           </p>
-          <Button
-            className="mt-4"
-            as={"a"}
+
+          <div className="w-full space-y-4 text-left mb-10">
+            {features.map((f) => (
+              <div key={f.text} className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                  <Icon path={f.icon} className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-violet-100 text-sm">{f.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <a
             href={LinkService.crossAppHref("public", "/")}
-            color="primary"
+            className="text-violet-300 text-sm hover:text-white transition-colors"
           >
-            Back to Home
-          </Button>
+            ← Back to casaboard.dev
+          </a>
         </div>
       </div>
 
-      {/* Right side - Login form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <Card className="bg-white border border-slate-100 shadow-sm">
-            <CardBody className="p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-semibold text-theme-text mb-2">
-                  Sign in
-                </h2>
+      {/* Right panel — form */}
+      <div className="flex flex-1 md:w-1/2 items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-sm">
+          {/* Mobile logo */}
+          <div className="flex flex-col items-center mb-8 md:hidden">
+            <CasaBoardLogo size="medium" />
+            <span className="text-slate-900 font-semibold text-xl mt-3">CasaBoard</span>
+          </div>
+
+          <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">
+            Sign in
+          </h2>
+          <p className="text-slate-500 mb-8 text-sm">
+            Welcome back — sign in to your account.
+          </p>
+
+          <div className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
               </div>
+            )}
 
-              <div className="space-y-6">
-                {error && (
-                  <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
+            <Button
+              onPress={handleGoogleSignIn}
+              color="primary"
+              size="lg"
+              className="w-full font-semibold shadow-md shadow-violet-100"
+              isDisabled={loading}
+            >
+              {loading ? (
+                "Signing in…"
+              ) : (
+                <>
+                  <Icon path={mdiGoogle} className="w-4 h-4 mr-2" />
+                  Continue with Google
+                </>
+              )}
+            </Button>
+          </div>
 
-                <Button
-                  onPress={handleGoogleSignIn}
-                  color="primary"
-                  className="w-full font-medium"
-                  isDisabled={loading}
-                >
-                  {loading ? (
-                    "Signing in..."
-                  ) : (
-                    <>
-                      <Icon path={mdiGoogle} className="w-4 h-4 mr-2" />
-                      Continue with Google
-                    </>
-                  )}
-                </Button>
-
-                <p className="text-center text-xs text-theme-text-secondary">
-                  By signing in, you agree to our{" "}
-                  <Link
-                    href={LinkService.crossAppHref("public", "/terms")}
-                    className="text-theme-primary"
-                  >
-                    Terms
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    href={LinkService.crossAppHref("public", "/privacy")}
-                    className="text-theme-primary"
-                  >
-                    Privacy Policy
-                  </Link>
-                  .
-                </p>
-              </div>
-            </CardBody>
-          </Card>
+          <p className="mt-6 text-center text-xs text-slate-400">
+            By signing in you agree to our{" "}
+            <Link
+              href={LinkService.crossAppHref("public", "/terms")}
+              className="text-violet-600 hover:underline"
+            >
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href={LinkService.crossAppHref("public", "/privacy")}
+              className="text-violet-600 hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>
