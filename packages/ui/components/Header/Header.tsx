@@ -25,7 +25,7 @@ export const Header = () => {
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 w-full justify-between">
               <div className="min-w-0 flex items-center gap-2">
                 <CasaBoardLogo size="small" />
-                <span className="text-slate-900 font-semibold tracking-tight">CasaBoard</span>
+                <Link href="/" className="text-slate-900 font-semibold tracking-tight hover:text-violet-700 transition-colors">CasaBoard</Link>
               </div>
               {/* Desktop Navigation */}
               <div className="hidden sm:flex items-center gap-1">
@@ -85,7 +85,7 @@ export const Header = () => {
         <DrawerContent className="bg-white text-slate-900 border-l border-slate-100">
           <DrawerHeader className="border-b border-slate-100 flex flex-col items-center gap-2 py-6">
             <CasaBoardLogo size="small" />
-            <span className="text-slate-900 font-semibold text-lg">CasaBoard</span>
+            <Link href="/" className="text-slate-900 font-semibold text-lg hover:text-violet-700 transition-colors">CasaBoard</Link>
           </DrawerHeader>
           <DrawerBody className="flex flex-col gap-2 py-4">
             {getPublicLinks().map((link: NavLink) => (
