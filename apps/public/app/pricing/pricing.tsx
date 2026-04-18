@@ -2,7 +2,7 @@
 import { Button, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
-import { mdiCheck } from "@mdi/js";
+import { mdiCheck, mdiArrowRight, mdiInfinity } from "@mdi/js";
 import { useState } from "react";
 import { LinkService } from "@repo/lib";
 import Stripe from "stripe";
@@ -42,6 +42,63 @@ export default function BillingContent({
   return (
     <div className="max-w-7xl w-full mx-auto px-4 py-16 pb-24">
       <div className="w-full flex flex-col gap-8 justify-center items-center">
+
+        {/* ── Free plan ── */}
+        <div className="w-full bg-white border border-slate-100 shadow-sm rounded-2xl p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10">
+            {/* Left: heading + price */}
+            <div className="sm:w-48 shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full mb-3">
+                <Icon path={mdiInfinity} className="w-3.5 h-3.5" />
+                Free forever
+              </span>
+              <h3 className="text-2xl font-bold text-slate-900">£0</h3>
+              <p className="text-sm text-slate-400 mt-0.5">No credit card required</p>
+            </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px self-stretch bg-slate-100" />
+
+            {/* Middle: features */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+              {[
+                "1 dashboard page",
+                "1 Home Assistant instance",
+                "Full drag-and-drop editor",
+                "Live entity data via WebSocket",
+                "All built-in components",
+                "Shareable live view URL",
+                "Local-first — tokens stay in your browser",
+                "No cloud sync (optional on paid plans)",
+              ].map((f) => (
+                <div key={f} className="flex items-center gap-2 text-sm text-slate-600">
+                  <Icon path={mdiCheck} className="w-4 h-4 text-emerald-500 shrink-0" />
+                  {f}
+                </div>
+              ))}
+            </div>
+
+            {/* Right: CTA */}
+            <div className="sm:w-40 shrink-0">
+              <Button
+                as={Link}
+                href={LinkService.crossAppHref("app", "/auth/login")}
+                className="w-full font-semibold bg-slate-900 text-white hover:bg-slate-700"
+              >
+                Get started free
+                <Icon path={mdiArrowRight} className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Separator */}
+        <div className="flex items-center gap-4 w-full">
+          <div className="flex-1 h-px bg-slate-100" />
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest shrink-0">Or upgrade for more</p>
+          <div className="flex-1 h-px bg-slate-100" />
+        </div>
+
         {/* Billing toggle */}
         <div className="inline-flex rounded-full bg-slate-100 p-1">
           <button
