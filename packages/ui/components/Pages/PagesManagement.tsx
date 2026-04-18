@@ -186,10 +186,18 @@ export const PagesManagement = ({
           )}
         >
           {compact ? (
-            <span className="text-xs text-theme-text-secondary">
+            <span className="text-xs text-theme-text-secondary inline-flex items-center gap-2 flex-wrap justify-center">
               {pages.length}/{entitlements.maxDashboards} pages
               {remaining === 0 && " • Limit reached"}
               {remaining > 0 && remaining <= 2 && ` • ${remaining} remaining`}
+              {remaining === 0 && (
+                <Link
+                  href="/auth/profile/billing"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-600 text-white text-xs font-medium hover:bg-violet-700 transition-colors"
+                >
+                  Upgrade now
+                </Link>
+              )}
             </span>
           ) : (
             <div className="flex items-center justify-between">
