@@ -52,7 +52,7 @@ export function LoginForm() {
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-white/5 rounded-full" />
 
         <div className="relative z-10 text-center flex flex-col items-center max-w-md">
-          <CasaBoardLogo size="large" />
+          <CasaBoardLogo size="large" className="brightness-0 invert" />
           <h1 className="text-4xl font-bold text-white mt-8 mb-3 tracking-tight">
             CasaBoard
           </h1>
