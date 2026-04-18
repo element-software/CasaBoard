@@ -73,7 +73,7 @@ export default function TermsPage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
 
         {/* Beta notice */}
         <div className="flex gap-4 p-5 bg-amber-50 border border-amber-200 rounded-2xl">
