@@ -1,36 +1,223 @@
-const terms = [
-  "Whilst under development, the service is free to use. Your free 14-day trial will simply auto-renew at no cost whilst in development.",
-  "When you sign up, you agree to be contacted by us via email for updates and notifications about the service. You can opt out of these emails at any time by sending us an email to support@casaboard.dev.",
-  "Attempting to purchase a subscription whilst CasaBoard is under development will result in no payment being taken, since it's all in test mode.",
-  "Whilst under development, your data may be deleted at any time without notice e.g. for database updates, major table and schema changes, etc. You cannot hold us responsible for any data loss or damage or inconvenience or loss of data or any other loss or damage during this period.",
-  "Since you are allowing us to store your data, specifically your Home Assistant instance data, you are agreeing to hold us harmless from any data loss or damage or inconvenience or loss of data or any other loss or damage. We will not be held responsible for any data loss, breaches, or inconsistencies with your Home Assistant instance data.",
-  "Once we deem the service ready for production, the free trial will end and you will need to purchase a subscription to continue using the service. Your data may or may not be deleted at this point.",
-  "When we deem the service ready for production, we will notify you via email and you will have 30 days to purchase a subscription to continue using the service. If you do not purchase a subscription within 30 days, your data will be deleted. All active users will be notified via email and you will have 30 days to purchase a subscription to continue using the service. If you do not purchase a subscription within 30 days, your data will be deleted.",
-  "Once the service is ready for production, your data will be retained for as long as you have an active subscription. You can cancel your subscription at any time and your data will be deleted within 30 days.",
-  "We reserve the right to change these terms at any time without notice. Any changes will be posted on this page.",
-];
+import Icon from "@mdi/react";
+import Link from "next/link";
+import {
+  mdiFileDocumentOutline,
+  mdiAlertCircleOutline,
+  mdiCheckCircle,
+  mdiEmail,
+  mdiClockOutline,
+  mdiShieldCheck,
+} from "@mdi/js";
+
+function SectionLabel({ n, label }: { n: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <span className="font-mono text-xs text-violet-400 tracking-widest select-none">{n}</span>
+      <div className="h-px flex-1 bg-slate-100" />
+      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</span>
+    </div>
+  );
+}
 
 export default function TermsPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-48">
-      <h1 className="text-3xl font-bold text-theme-text mb-4">
-        Terms of Service
-      </h1>
-      <p className="text-theme-text-secondary mb-6">
-        By using CasaBoard, you agree to the following terms of service:
-      </p>
-      <ul className="list-disc pl-6 text-theme-text-secondary mb-6">
-        {terms.map((term, index) => (
-          <li key={index}>{term}</li>
-        ))}
-      </ul>
-      <p className="text-theme-text-secondary mb-6">
-        For questions, contact us at{" "}
-        <a className="text-theme-primary" href="mailto:support@casaboard.dev">
-          support@casaboard.dev
-        </a>
-        .
-      </p>
-    </div>
+    <>
+      {/* ── Full-width hero ── */}
+      <div className="relative w-full overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-violet-700 via-violet-800 to-indigo-900" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at 25% 65%, rgba(167,139,250,0.3) 0%, transparent 55%), radial-gradient(ellipse at 75% 20%, rgba(99,102,241,0.35) 0%, transparent 55%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 text-center">
+          <p className="text-violet-300 text-xs font-semibold uppercase tracking-widest mb-5">
+            Legal
+          </p>
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+              <Icon path={mdiFileDocumentOutline} className="w-12 h-12 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+            Terms of Service
+          </h1>
+          <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
+            CasaBoard is currently in active development. These terms explain what that means
+            for your data, your access, and what happens when we go live.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { icon: mdiClockOutline, label: "Beta period" },
+              { icon: mdiCheckCircle, label: "30-day notice" },
+              { icon: mdiShieldCheck, label: "Clear terms" },
+            ].map((badge) => (
+              <div
+                key={badge.label}
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-sm text-white font-medium"
+              >
+                <Icon path={badge.icon} className="w-4 h-4 text-violet-300" />
+                {badge.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Content ── */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+
+        {/* Beta notice */}
+        <div className="flex gap-4 p-5 bg-amber-50 border border-amber-200 rounded-2xl">
+          <Icon path={mdiAlertCircleOutline} className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-amber-900 text-sm mb-1">CasaBoard is in active development</p>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              The service is currently free to use while we build and refine it. These terms cover what
+              to expect during this period and how we&apos;ll handle the transition to a paid service.
+            </p>
+          </div>
+        </div>
+
+        {/* 01 · During development */}
+        <section>
+          <SectionLabel n="01" label="During development" />
+          <div className="space-y-4">
+            <div className="border-l-4 border-slate-200 pl-6 space-y-4">
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Free access</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Whilst under development, CasaBoard is free to use. Any subscription shown is in test
+                  mode — no payments are taken. Your free trial will auto-renew at no cost for as long
+                  as we remain in development.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Data stability</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Your data may be deleted at any time without notice during this period — for example,
+                  when we make major database schema changes or run migrations. You cannot hold us
+                  responsible for any data loss, damage, or inconvenience during the development phase.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Email communications</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  By signing up, you agree to be contacted by email about service updates and
+                  notifications. You can opt out at any time by emailing{" "}
+                  <a href="mailto:support@casaboard.dev" className="text-violet-600 hover:underline">
+                    support@casaboard.dev
+                  </a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 02 · Data & Home Assistant */}
+        <section>
+          <SectionLabel n="02" label="Your data & Home Assistant" />
+          <p className="text-slate-600 text-sm leading-relaxed mb-6">
+            By using CasaBoard, you allow us to store certain data on your behalf — specifically,
+            your dashboard layouts, account information, and optionally your Home Assistant instance
+            metadata if you enable cloud sync on a paid plan.
+          </p>
+          <div className="p-5 bg-white border border-slate-100 rounded-2xl mb-4">
+            <p className="text-sm text-slate-600 leading-relaxed">
+              You agree to hold us harmless from any data loss, breach, inconsistency, or damage
+              relating to your stored data, including Home Assistant instance data. We will not be
+              held responsible for any loss during the development period or beyond.
+            </p>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            For a full explanation of what we store versus what stays in your browser, see our{" "}
+            <Link href="/security" className="text-violet-600 hover:underline">Security page</Link> and{" "}
+            <Link href="/privacy" className="text-violet-600 hover:underline">Privacy Policy</Link>.
+          </p>
+        </section>
+
+        {/* 03 · Transition to production */}
+        <section>
+          <SectionLabel n="03" label="Transition to production" />
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
+              <p className="font-semibold text-slate-900 text-sm mb-2">When we go live</p>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Once we consider CasaBoard production-ready, the free development period will end. All
+                active users will be notified by email and given <strong>30 days</strong> to purchase a
+                subscription to continue using the service.
+              </p>
+            </div>
+            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
+              <p className="font-semibold text-slate-900 text-sm mb-2">If you don&apos;t subscribe</p>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                If no subscription is taken within the 30-day window, your account data will be
+                deleted. Once subscribed, your data is retained for as long as your subscription
+                remains active. You can cancel at any time.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 p-4 bg-violet-50 border border-violet-100 rounded-xl">
+            <p className="text-sm text-violet-800">
+              Your data <em>may or may not</em> be carried over from development to production — we
+              will do our best to preserve it, but cannot guarantee continuity across major migrations.
+              We will communicate clearly before any such event.
+            </p>
+          </div>
+        </section>
+
+        {/* 04 · Changes */}
+        <section>
+          <SectionLabel n="04" label="Changes to these terms" />
+          <p className="text-slate-600 text-sm leading-relaxed">
+            We reserve the right to update these terms at any time. Changes will be posted on this
+            page. For significant changes, we will notify you by email where possible. Continued use
+            of CasaBoard after any changes constitutes acceptance of the revised terms.
+          </p>
+        </section>
+
+        {/* Contact */}
+        <section className="bg-slate-50 border border-slate-100 rounded-2xl p-8">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center shrink-0">
+              <Icon path={mdiEmail} className="w-5 h-5 text-violet-600" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Questions about these terms?</h2>
+              <p className="text-slate-500 text-sm mb-5">
+                If anything here is unclear or you&apos;d like more information, get in touch.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="mailto:support@casaboard.dev"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
+                >
+                  <Icon path={mdiEmail} className="w-4 h-4" />
+                  support@casaboard.dev
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all"
+                >
+                  Contact form
+                </Link>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-slate-400 mt-6 pt-5 border-t border-slate-200">
+            Last reviewed April 2026. These terms are updated as the service evolves.
+          </p>
+        </section>
+
+      </div>
+    </>
   );
 }
