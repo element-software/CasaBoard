@@ -18,7 +18,7 @@ export const DocsWrapper = () => {
         <DocsSidebar index={index} setIndex={setIndex} total={sections.length} />
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 max-w-2xl">
+        <main className="flex-1 min-w-0 max-w-5xl">
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 mb-8 text-xs text-slate-400">
             <span>Docs</span>

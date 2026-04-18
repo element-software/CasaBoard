@@ -40,7 +40,7 @@ export default function BillingContent({
 
 
   return (
-    <div className="max-w-5xl w-full mx-auto px-4 py-16 pb-24">
+    <div className="max-w-7xl w-full mx-auto px-4 py-16 pb-24">
       <div className="w-full flex flex-col gap-8 justify-center items-center">
         {/* Billing toggle */}
         <div className="inline-flex rounded-full bg-slate-100 p-1">
