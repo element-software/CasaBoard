@@ -26,19 +26,61 @@ import {
 
 export default function SecurityPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-48">
-      <div className="text-center mb-12">
-        <div className="flex justify-center mb-6">
-          <div className="p-4 bg-violet-50 rounded-full">
-            <Icon path={mdiShieldCheck} className="w-16 h-16 text-violet-600" />
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16">
+
+      {/* ── Hero banner ── */}
+      <div className="relative rounded-2xl overflow-hidden mb-14">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-700 via-violet-800 to-indigo-900" />
+        {/* Radial mesh */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at 15% 60%, rgba(167,139,250,0.35) 0%, transparent 55%), radial-gradient(ellipse at 85% 20%, rgba(99,102,241,0.40) 0%, transparent 55%)",
+          }}
+        />
+        {/* SVG grain texture */}
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        {/* Content */}
+        <div className="relative z-10 px-8 sm:px-14 py-16 sm:py-20 text-center">
+          <p className="text-violet-300 text-xs font-semibold uppercase tracking-widest mb-5">
+            Security & Privacy
+          </p>
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+              <Icon path={mdiShieldCheck} className="w-12 h-12 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+            Privacy-first by design
+          </h1>
+          <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
+            Your Home Assistant tokens stay encrypted in your browser. We never see your credentials—by architecture, not just policy.
+          </p>
+          {/* Trust badges */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { icon: mdiLock, label: "AES-256 Encrypted" },
+              { icon: mdiShieldCheck, label: "Local-first" },
+              { icon: mdiEyeOff, label: "Zero server access" },
+              { icon: mdiDatabase, label: "Supabase RLS" },
+            ].map((badge) => (
+              <div
+                key={badge.label}
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-sm text-white font-medium"
+              >
+                <Icon path={badge.icon} className="w-4 h-4 text-violet-300" />
+                {badge.label}
+              </div>
+            ))}
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-slate-900 mb-4">Security & Privacy</h1>
-        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-          CasaBoard is privacy-first: Home Assistant access tokens stay encrypted in your browser by
-          default. We never see your HA credentials on our servers. Optional cloud sync (paid plans) can
-          store your HA base URL on our database if you explicitly turn it on—tokens stay local either way.
-        </p>
       </div>
 
       {/* Overview Section */}
