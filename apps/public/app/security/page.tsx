@@ -1,37 +1,62 @@
 import Icon from "@mdi/react";
-import { 
-  mdiShieldCheck, 
-  mdiLock, 
-  mdiDatabase, 
-  mdiKey, 
-  mdiEyeOff, 
-  mdiShieldAccount, 
-  mdiShieldLock, 
+import Link from "next/link";
+import {
+  mdiShieldCheck,
+  mdiLock,
+  mdiDatabase,
+  mdiEyeOff,
   mdiDatabaseLock,
   mdiAccountKey,
-  mdiShieldStar,
-  mdiSecurity,
-  mdiShieldCrown,
   mdiCheckCircle,
-  mdiAlertCircle,
-  mdiInformation,
+  mdiCloseCircle,
   mdiEmail,
-  mdiWeb,
-  mdiCloud,
   mdiServer,
-  mdiShieldOutline,
-  mdiLockOutline,
-  mdiDatabaseOutline
+  mdiCloudOffOutline,
+  mdiArrowRight,
+  mdiWifiOff,
+  mdiLanConnect,
 } from "@mdi/js";
+
+// ── Reusable primitives ──────────────────────────────────────────────────────
+
+function SectionLabel({ n, label }: { n: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <span className="font-mono text-xs text-violet-400 tracking-widest select-none">{n}</span>
+      <div className="h-px flex-1 bg-slate-100" />
+      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{label}</span>
+    </div>
+  );
+}
+
+function SpecRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-4 py-3 border-b border-slate-50 last:border-0">
+      <span className="font-mono text-xs text-slate-400 w-44 shrink-0 pt-0.5">{label}</span>
+      <span className="text-sm text-slate-700">{value}</span>
+    </div>
+  );
+}
+
+function CheckItem({ children, color = "emerald" }: { children: React.ReactNode; color?: "emerald" | "red" | "slate" }) {
+  const icon = color === "red" ? mdiCloseCircle : mdiCheckCircle;
+  const iconColor = color === "emerald" ? "text-emerald-500" : color === "red" ? "text-red-400" : "text-slate-400";
+  return (
+    <li className="flex items-start gap-2.5 text-sm text-slate-600 leading-relaxed">
+      <Icon path={icon} className={`w-4 h-4 ${iconColor} shrink-0 mt-0.5`} />
+      {children}
+    </li>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function SecurityPage() {
   return (
     <>
       {/* ── Full-width hero ── */}
       <div className="relative w-full overflow-hidden">
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-700 via-violet-800 to-indigo-900" />
-        {/* Radial mesh */}
+        <div className="absolute inset-0 bg-linear-to-br from-violet-700 via-violet-800 to-indigo-900" />
         <div
           className="absolute inset-0"
           style={{
@@ -39,14 +64,12 @@ export default function SecurityPage() {
               "radial-gradient(ellipse at 15% 60%, rgba(167,139,250,0.35) 0%, transparent 55%), radial-gradient(ellipse at 85% 20%, rgba(99,102,241,0.40) 0%, transparent 55%)",
           }}
         />
-        {/* SVG grain texture */}
         <div
           className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")`,
           }}
         />
-        {/* Content */}
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 text-center">
           <p className="text-violet-300 text-xs font-semibold uppercase tracking-widest mb-5">
             Security & Privacy
@@ -60,14 +83,14 @@ export default function SecurityPage() {
             Privacy-first by design
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            Your Home Assistant tokens stay encrypted in your browser. We never see your credentials—by architecture, not just policy.
+            Your Home Assistant tokens stay encrypted in your browser. We never see your
+            credentials — by architecture, not just policy.
           </p>
-          {/* Trust badges */}
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { icon: mdiLock, label: "AES-256 Encrypted" },
+              { icon: mdiLock, label: "AES-GCM 256-bit" },
               { icon: mdiShieldCheck, label: "Local-first" },
-              { icon: mdiEyeOff, label: "Zero server access" },
+              { icon: mdiEyeOff, label: "Zero server tokens" },
               { icon: mdiDatabase, label: "Supabase RLS" },
             ].map((badge) => (
               <div
@@ -83,498 +106,297 @@ export default function SecurityPage() {
       </div>
 
       {/* ── Page content ── */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
 
-      {/* Overview Section */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldStar} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Security Overview</h2>
-        </div>
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 mb-6">
-          <p className="text-slate-600 mb-4">
-            By default, nothing that lets CasaBoard log into Home Assistant on your behalf is stored in
-            our database. Your OAuth tokens are encrypted and kept in the browser. We still protect your
-            account, billing, and dashboard layouts with authentication and Row Level Security like any
-            serious SaaS product.
+        {/* ── 01 · Core guarantee ── */}
+        <section>
+          <SectionLabel n="01" label="Core guarantee" />
+          <div className="border-l-4 border-violet-600 pl-6 mb-10">
+            <p className="text-2xl font-bold text-slate-900 leading-snug mb-2">
+              Your Home Assistant tokens never leave your browser.
+            </p>
+            <p className="text-slate-500">
+              This isn&apos;t a policy promise — it&apos;s the way the system is built. CasaBoard servers have
+              no route to receive, store, or decrypt your HA credentials.
+            </p>
+          </div>
+
+          {/* Data map */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Local */}
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Icon path={mdiCloudOffOutline} className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest">Stays on your device</p>
+                  <p className="text-xs text-emerald-600/70">Default · all plans</p>
+                </div>
+              </div>
+              <ul className="space-y-2.5">
+                <CheckItem color="emerald">HA OAuth tokens (encrypted in browser storage)</CheckItem>
+                <CheckItem color="emerald">HA base URL (unless you opt into cloud sync)</CheckItem>
+                <CheckItem color="emerald">Decryption keys — never transmitted anywhere</CheckItem>
+              </ul>
+            </div>
+
+            {/* Server */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-7 h-7 bg-slate-200 rounded-lg flex items-center justify-center">
+                  <Icon path={mdiDatabase} className="w-4 h-4 text-slate-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">Stored by CasaBoard</p>
+                  <p className="text-xs text-slate-400">All protected by Supabase RLS</p>
+                </div>
+              </div>
+              <ul className="space-y-2.5">
+                <CheckItem color="slate">Dashboard & page layouts</CheckItem>
+                <CheckItem color="slate">Account & subscription info</CheckItem>
+                <CheckItem color="slate">
+                  HA instance name + URL{" "}
+                  <span className="text-slate-400 font-medium">(paid cloud sync only, opt-in)</span>
+                </CheckItem>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 02 · Direct connection ── */}
+        <section>
+          <SectionLabel n="02" label="Direct connection" />
+          <p className="text-slate-600 mb-8 max-w-2xl">
+            When you open a dashboard, your browser decrypts the HA token locally and opens a WebSocket
+            directly to your Home Assistant instance. Live entity data flows between your device and
+            Home Assistant — CasaBoard servers are not in the path.
           </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Icon path={mdiLock} className="w-6 h-6 text-green-400" />
-                <h3 className="text-lg font-medium text-slate-900">What stays on your device (default)</h3>
-              </div>
-              <ul className="text-slate-600 space-y-2">
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiKey} className="w-4 h-4 text-green-400" />
-                  Home Assistant OAuth tokens (encrypted in browser storage)
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiWeb} className="w-4 h-4 text-green-400" />
-                  Your HA base URL, unless you enable optional cloud sync
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Icon path={mdiDatabase} className="w-6 h-6 text-green-400" />
-                <h3 className="text-lg font-medium text-slate-900">What we host for you</h3>
-              </div>
-              <ul className="text-slate-600 space-y-2">
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiDatabase} className="w-4 h-4 text-green-400" />
-                  Dashboard and page layouts (e.g. Puck JSON), sidebars, publishing flags
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiAccountKey} className="w-4 h-4 text-green-400" />
-                  Account and subscription metadata tied to your login
-                </li>
-                <li className="flex items-center gap-2">
-                  <Icon path={mdiCloud} className="w-4 h-4 text-green-400" />
-                  <span>
-                    <strong>Optional:</strong> HA instance label + URL, only if you are on a paid plan
-                    and turn on &quot;cloud sync&quot; in settings
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Local vs cloud */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldLock} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Local-first vs optional cloud sync</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Default (everyone)</h3>
-            <p className="text-slate-600 text-sm mb-3">
-              Home Assistant authentication completes in your browser. Tokens are encrypted with Web
-              Crypto and stored locally; they are not written to CasaBoard databases. Your HA URL is also
-              kept in the browser unless you choose otherwise.
-            </p>
-            <ul className="text-slate-600 text-sm space-y-1">
-              <li>• No HA access tokens on our servers</li>
-              <li>• No HA URL in our database</li>
-              <li>• Same connection model on free and paid tiers unless you opt in below</li>
-            </ul>
-          </div>
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Optional cloud sync (paid, opt-in)</h3>
-            <p className="text-slate-600 text-sm mb-3">
-              If your plan supports it and you enable cloud sync in settings, we can store{" "}
-              <strong>metadata only</strong>—display name and base URL for each Home Assistant instance—so
-              you can see the same instances when you sign in from another device.
-            </p>
-            <ul className="text-slate-600 text-sm space-y-1">
-              <li>• OAuth tokens remain encrypted and local; we do not store HA passwords or tokens in the cloud</li>
-              <li>• You can turn cloud sync off; local-only mode continues to work</li>
-              <li>• Row Level Security ensures only your user rows are readable</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* What we never touch */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiEyeOff} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">What CasaBoard cannot access</h2>
-        </div>
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-          <ul className="text-slate-600 space-y-2">
-            <li className="flex items-center gap-2">
-              <Icon path={mdiServer} className="w-4 h-4 text-red-400" />
-              Your Home Assistant server directly (we are not a proxy into HA)
-            </li>
-            <li className="flex items-center gap-2">
-              <Icon path={mdiShieldOutline} className="w-4 h-4 text-red-400" />
-              Your smart home devices, entities, or automations inside HA
-            </li>
-            <li className="flex items-center gap-2">
-              <Icon path={mdiDatabaseOutline} className="w-4 h-4 text-red-400" />
-              Home Assistant logs, history, or backups
-            </li>
-            <li className="flex items-center gap-2">
-              <Icon path={mdiLockOutline} className="w-4 h-4 text-red-400" />
-              Decrypted HA tokens in our infrastructure—those keys never leave your browser by design</li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Technical Security Measures */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiSecurity} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Technical Security Measures</h2>
-        </div>
-        
-        <div className="space-y-6">
-          {/* Encryption */}
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon path={mdiLock} className="w-6 h-6 text-blue-400" />
-              <h3 className="text-xl font-semibold text-slate-900">Token encryption in your browser</h3>
+          {/* Flow diagram */}
+          <div className="flex flex-col sm:flex-row items-center gap-0 sm:gap-0 rounded-2xl overflow-hidden border border-slate-100">
+            <div className="flex-1 bg-white p-6 text-center">
+              <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Icon path={mdiLanConnect} className="w-5 h-5 text-violet-600" />
+              </div>
+              <p className="font-semibold text-slate-900 text-sm mb-0.5">Your Browser</p>
+              <p className="text-xs text-slate-400">Decrypts token locally</p>
             </div>
-            <p className="text-slate-600 mb-4">
-              Home Assistant OAuth tokens are encrypted using industry-standard{" "}
-              <strong>AES-GCM</strong> in the browser before being written to{" "}
-              <strong>local storage</strong>. They are not persisted in CasaBoard application databases
-              in the default configuration. Decryption happens only in your session when connecting to
-              Home Assistant.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">Encryption details:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Algorithm: AES-GCM 256-bit</li>
-                  <li>• Key derivation tied to your account identity</li>
-                  <li>• Random IV for each encryption</li>
-                  <li>• Web Crypto API (browser-native)</li>
-                </ul>
+
+            <div className="flex flex-row sm:flex-col items-center justify-center px-4 py-4 sm:py-6 bg-emerald-50 border-y sm:border-y-0 sm:border-x border-emerald-100 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <Icon path={mdiArrowRight} className="w-4 h-4 text-emerald-500 rotate-90 sm:rotate-0" />
+                <div className="text-center">
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest">WebSocket</p>
+                  <p className="text-xs text-emerald-600/70">Direct · no proxy</p>
+                </div>
+                <Icon path={mdiArrowRight} className="w-4 h-4 text-emerald-500 rotate-90 sm:rotate-0" />
               </div>
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">What this means:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Server-side code does not hold a copy of your HA tokens</li>
-                  <li>• Clearing browser data or a new device requires signing in to HA again</li>
-                  <li>• Optional cloud sync does not change where tokens live</li>
-                </ul>
+            </div>
+
+            <div className="flex-1 bg-white p-6 text-center">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Icon path={mdiServer} className="w-5 h-5 text-indigo-600" />
               </div>
+              <p className="font-semibold text-slate-900 text-sm mb-0.5">Your Home Assistant</p>
+              <p className="text-xs text-slate-400">On your network</p>
+            </div>
+
+            {/* CasaBoard — NOT in the path */}
+            <div className="hidden sm:flex flex-col items-center absolute pointer-events-none" aria-hidden>
             </div>
           </div>
 
-          {/* Database Security */}
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon path={mdiDatabaseLock} className="w-6 h-6 text-purple-400" />
-              <h3 className="text-xl font-semibold text-slate-900">Database Security with Supabase</h3>
-            </div>
-            <p className="text-slate-600 mb-4">
-              Our database is powered by <strong>Supabase</strong> (built on PostgreSQL) and uses{" "}
-              <strong>Row Level Security (RLS)</strong> so each query only returns rows owned by the
-              signed-in user. That applies to pages, sidebars, billing, and—if you use it—optional HA
-              instance metadata for cloud sync. It does <strong>not</strong> apply to HA tokens, because
-              those are not stored in the app database by default.
+          <div className="mt-4 flex items-center gap-2.5 p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <Icon path={mdiWifiOff} className="w-4 h-4 text-slate-400 shrink-0" />
+            <p className="text-xs text-slate-500">
+              <strong className="text-slate-700">CasaBoard servers are not in this diagram.</strong>{" "}
+              We have no route to intercept or read live entity data from your home.
             </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">Supabase RLS Policies:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Database-level access control</li>
-                  <li>• User-specific data isolation</li>
-                  <li>• No admin bypass mechanisms</li>
-                  <li>• Automatic user filtering on all queries</li>
-                  <li>• Policy: <code>auth.uid() = user_id</code></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">Data protection:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Encrypted at rest (Supabase / PostgreSQL)</li>
-                  <li>• No HA access tokens in our tables in default local mode</li>
-                  <li>• Optional cloud sync rows contain URL/name only, not OAuth secrets</li>
-                  <li>• Automatic cleanup on account deletion where applicable</li>
-                  <li>• Supabase&apos;s operational security posture</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-              <h4 className="font-medium text-blue-700 mb-2">How RLS Works:</h4>
-              <p className="text-slate-600 text-sm">
-                Every database query automatically includes a filter like <code>WHERE auth.uid() = user_id</code>. 
-                This means even if we tried to query all users&apos; data, the database would only return 
-                records belonging to the authenticated user. This protection is built into the database itself.
+          </div>
+        </section>
+
+        {/* ── 03 · Token encryption ── */}
+        <section>
+          <SectionLabel n="03" label="Token encryption" />
+          <div className="grid md:grid-cols-[1fr_1.2fr] gap-8 items-start">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 mb-3">How HA tokens are protected</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                When you authorise Home Assistant, the OAuth flow completes in your browser. The resulting
+                tokens are encrypted immediately using the Web Crypto API and written to local storage.
+                They are decrypted only in your session when a dashboard needs to connect to HA.
+              </p>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Clearing browser data or signing in on a new device requires re-authenticating with Home
+                Assistant — this is intentional. It means no credentials are silently migrated through our
+                servers.
               </p>
             </div>
-          </div>
-
-          {/* Authentication */}
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Icon path={mdiAccountKey} className="w-6 h-6 text-orange-400" />
-              <h3 className="text-xl font-semibold text-slate-900">Authentication & Authorization</h3>
+            <div className="bg-slate-900 rounded-2xl p-6">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                Encryption spec
+              </p>
+              <SpecRow label="algorithm" value="AES-GCM" />
+              <SpecRow label="key-length" value="256-bit" />
+              <SpecRow label="key-derivation" value="Tied to your account identity" />
+              <SpecRow label="iv" value="Random per encryption (browser crypto)" />
+              <SpecRow label="api" value="Web Crypto API (W3C standard)" />
+              <SpecRow label="storage" value="Browser localStorage only" />
+              <SpecRow label="server-copy" value="None — never transmitted" />
             </div>
-            <p className="text-slate-600 mb-4">
-              Every request to your data requires valid authentication. We use <strong>Supabase Auth</strong> 
-              for secure user management and session handling, which provides enterprise-grade security 
-              and is trusted by thousands of applications worldwide.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">Supabase Authentication:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Industry-standard JWT tokens</li>
-                  <li>• Secure session management</li>
-                  <li>• Automatic token refresh</li>
-                  <li>• Multi-factor authentication support</li>
-                  <li>• OAuth providers (Google, GitHub, etc.)</li>
-                  <li>• Password reset and email verification</li>
+          </div>
+        </section>
+
+        {/* ── 04 · Database & authentication ── */}
+        <section>
+          <SectionLabel n="04" label="Database & authentication" />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center">
+                  <Icon path={mdiDatabaseLock} className="w-5 h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 text-sm">Row Level Security</h3>
+                  <p className="text-xs text-slate-400">Supabase / PostgreSQL</p>
+                </div>
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                Every table in our database enforces RLS — a built-in PostgreSQL feature that makes every
+                query automatically include <code className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">WHERE auth.uid() = user_id</code>.
+                Even if a query tried to read all rows, the database would only return your own records.
+              </p>
+              <p className="text-xs text-slate-400">Applies to: pages, sidebars, billing, and optional HA metadata.</p>
+            </div>
+
+            <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 bg-violet-50 rounded-xl flex items-center justify-center">
+                  <Icon path={mdiAccountKey} className="w-5 h-5 text-violet-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 text-sm">Authentication</h3>
+                  <p className="text-xs text-slate-400">Supabase Auth</p>
+                </div>
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                CasaBoard uses Supabase Auth for account management. Sessions are handled via JWT tokens
+                with automatic rotation. All API requests require a valid, verified session — there is no
+                unauthenticated path to user data.
+              </p>
+              <ul className="space-y-1.5">
+                <CheckItem color="emerald">OAuth sign-in (Google)</CheckItem>
+                <CheckItem color="emerald">JWT session management</CheckItem>
+                <CheckItem color="emerald">Middleware protection on all routes</CheckItem>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 05 · Optional cloud sync ── */}
+        <section>
+          <SectionLabel n="05" label="Optional cloud sync" />
+          <div className="grid md:grid-cols-[1.2fr_1fr] gap-8 items-start">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 mb-3">What cloud sync actually stores</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                Available on paid plans, cloud sync lets you see the same Home Assistant instances when
+                you sign in from a different device. It stores <em>metadata only</em> — the display name
+                and base URL you gave an instance — so you don&apos;t have to re-enter it.
+              </p>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                OAuth tokens are not included. You&apos;ll still need to re-authorise Home Assistant on each
+                new device. Cloud sync removes the URL lookup, not the security step.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-2">Cloud sync stores</p>
+                <ul className="space-y-1.5">
+                  <CheckItem color="emerald">HA instance display name</CheckItem>
+                  <CheckItem color="emerald">HA base URL</CheckItem>
                 </ul>
               </div>
-              <div>
-                <h4 className="font-medium text-slate-900 mb-2">Authorization & RLS:</h4>
-                <ul className="text-slate-600 space-y-1">
-                  <li>• Every API call requires valid user session</li>
-                  <li>• User ID verification on all operations</li>
-                  <li>• No cross-user data access possible</li>
-                  <li>• Middleware protection on all routes</li>
+              <div className="p-4 bg-red-50 border border-red-100 rounded-xl">
+                <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Cloud sync never stores</p>
+                <ul className="space-y-1.5">
+                  <CheckItem color="red">HA OAuth tokens or refresh tokens</CheckItem>
+                  <CheckItem color="red">Passwords or HA admin credentials</CheckItem>
+                  <CheckItem color="red">Entity states or smart home data</CheckItem>
                 </ul>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Developer Access */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldAccount} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Developer Access & Transparency</h2>
-        </div>
-        
-        <div className="bg-red-50 border border-red-100 rounded-lg p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Icon path={mdiAlertCircle} className="w-6 h-6 text-red-500" />
-            <h3 className="text-xl font-semibold text-red-700">We Cannot Access Your Data</h3>
-          </div>
-          <p className="text-slate-600 mb-4">
-            In the default configuration, CasaBoard never receives your Home Assistant OAuth tokens at
-            our servers. They exist only in encrypted form in your browser. We cannot decrypt them
-            remotely because we do not host them. If you enable optional cloud sync, we may store your
-            HA base URL (not credentials) under your user ID—still subject to RLS and never including
-            tokens.
+        {/* ── 06 · Developer transparency ── */}
+        <section>
+          <SectionLabel n="06" label="Developer transparency" />
+          <h2 className="text-xl font-bold text-slate-900 mb-2">What the CasaBoard team can see</h2>
+          <p className="text-slate-600 text-sm leading-relaxed mb-8 max-w-2xl">
+            For support and debugging, certain data is visible to the team. Here&apos;s what that includes
+            — and what it structurally cannot include.
           </p>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <h4 className="font-medium text-red-700 mb-2">What we cannot do:</h4>
-              <ul className="text-slate-600 space-y-1">
-                <li>• Access or decrypt HA tokens in default local mode (we don&apos;t have them)</li>
-                <li>• Log into your Home Assistant as you</li>
-                <li>• Bypass Supabase authentication or RLS for other users&apos; data</li>
-                <li>• Read your smart home state from our infrastructure</li>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white border border-slate-100 rounded-2xl p-6">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">We can access</p>
+              <ul className="space-y-2.5">
+                <CheckItem color="slate">Account & billing — email, plan, subscription status</CheckItem>
+                <CheckItem color="slate">Dashboard metadata — page names, slugs, layout JSON</CheckItem>
+                <CheckItem color="slate">Optional cloud sync rows — HA instance name and URL only</CheckItem>
+                <CheckItem color="slate">Error logs and analytics — scrubbed of sensitive values</CheckItem>
               </ul>
             </div>
-            <div>
-              <h4 className="font-medium text-red-700 mb-2">Technical barriers:</h4>
-              <ul className="text-slate-600 space-y-1">
-                <li>• Browser-local encryption for tokens</li>
-                <li>• Supabase Row Level Security on all persisted app data</li>
-                <li>• Separation of concerns: HA auth lives in the client, not the API layer</li>
-                <li>• No admin bypass for end-user smart home data</li>
+
+            <div className="bg-white border border-slate-100 rounded-2xl p-6">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">We cannot access</p>
+              <ul className="space-y-2.5">
+                <CheckItem color="red">HA OAuth tokens — not stored in our infrastructure in default mode</CheckItem>
+                <CheckItem color="red">Your HA server, devices, entities, or automations</CheckItem>
+                <CheckItem color="red">Live smart home state — data flows browser↔HA, not through us</CheckItem>
+                <CheckItem color="red">Other users&apos; data — RLS prevents cross-account queries at the database level</CheckItem>
               </ul>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Icon path={mdiInformation} className="w-6 h-6 text-yellow-400" />
-            <h3 className="text-xl font-semibold text-slate-900">What We Can See (Limited)</h3>
-          </div>
-          <p className="text-slate-600 mb-4">
-            For debugging and support we may see:
-          </p>
-          <ul className="text-slate-600 space-y-2">
-            <li>• <strong>Account & billing</strong> — email, plan, subscription status, as needed for support</li>
-            <li>• <strong>Dashboard metadata</strong> — page names, slugs, layout structure (not live HA state)</li>
-            <li>• <strong>Optional cloud HA rows</strong> — only if you enabled cloud sync (instance name and URL)</li>
-            <li>• <strong>Error logs & analytics</strong> — scrubbed of secrets; used to improve reliability</li>
-          </ul>
-          <p className="text-slate-600 text-sm mt-3">
-            We do not have access to plaintext Home Assistant tokens in our databases or logs in the
-            default local-first configuration.
-          </p>
-        </div>
-      </section>
-
-      {/* Data Flow */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiCloud} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">How Your Data Flows</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">1</span>
+        {/* ── Contact ── */}
+        <section className="bg-slate-50 border border-slate-100 rounded-2xl p-8">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center shrink-0">
+              <Icon path={mdiEmail} className="w-5 h-5 text-violet-600" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Questions about security?</h2>
+              <p className="text-slate-500 text-sm mb-5">
+                If you have specific questions, found a potential issue, or want a deeper technical
+                explanation of any of the above, reach out directly.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="mailto:support@casaboard.dev"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
+                >
+                  <Icon path={mdiEmail} className="w-4 h-4" />
+                  support@casaboard.dev
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all"
+                >
+                  Contact form
+                  <Icon path={mdiArrowRight} className="w-4 h-4" />
+                </Link>
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">Sign in & connect Home Assistant</h3>
             </div>
-            <p className="text-slate-600">
-              You authenticate to CasaBoard (e.g. Supabase Auth). When you connect Home Assistant, the
-              OAuth flow completes in your browser. Tokens are encrypted and written to browser storage;
-              by default CasaBoard servers never receive or store those tokens.
-            </p>
           </div>
-
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">2</span>
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">Using your dashboard</h3>
-            </div>
-            <p className="text-slate-600">
-              When you open a dashboard, the app loads encrypted tokens from local storage, decrypts
-              them in the browser, and opens a WebSocket connection from your device to your Home
-              Assistant instance. Live entity data flows between your browser and HA—not through our
-              database as a proxy.
-            </p>
-          </div>
-
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">3</span>
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">What we persist</h3>
-            </div>
-            <p className="text-slate-600">
-              We save your layout JSON, page settings, and account data in Supabase. If you opt into
-              cloud sync on a paid plan, we may also save HA instance metadata (name + URL) for
-              convenience. Your HA access tokens remain local-only unless our product model changes
-              and we document it here.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Supabase Security */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldCrown} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Powered by Supabase Security</h2>
-        </div>
-        
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Icon path={mdiServer} className="w-6 h-6 text-indigo-400" />
-            <h3 className="text-xl font-semibold text-slate-900">Enterprise-Grade Infrastructure</h3>
-          </div>
-          <p className="text-slate-600 mb-4">
-            CasaBoard is built on <strong>Supabase</strong>, a trusted platform used by thousands of applications 
-            worldwide. Supabase provides enterprise-grade security, compliance, and infrastructure that we leverage 
-            to protect your data.
+          <p className="text-xs text-slate-400 mt-6 pt-5 border-t border-slate-200">
+            Last reviewed April 2026. This page is updated whenever our data handling practices change.
           </p>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-medium text-slate-900 mb-2">Authentication</h4>
-              <ul className="text-slate-600 space-y-1 text-sm">
-                <li>• JWT-based authentication</li>
-                <li>• OAuth providers (Google, GitHub)</li>
-                <li>• Multi-factor authentication</li>
-                <li>• Secure session management</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-slate-900 mb-2">Database Security</h4>
-              <ul className="text-slate-600 space-y-1 text-sm">
-                <li>• PostgreSQL with RLS</li>
-                <li>• Encrypted connections (TLS)</li>
-                <li>• Automatic backups</li>
-                <li>• Point-in-time recovery</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-slate-900 mb-2">Infrastructure</h4>
-              <ul className="text-slate-600 space-y-1 text-sm">
-                <li>• AWS infrastructure</li>
-                <li>• SOC 2 Type II compliant</li>
-                <li>• GDPR compliant</li>
-                <li>• Regular security audits</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Compliance & Standards */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldLock} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Security Standards & Compliance</h2>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Icon path={mdiCheckCircle} className="w-6 h-6 text-green-400" />
-              <h3 className="text-lg font-semibold text-slate-900">Security Standards</h3>
-            </div>
-            <ul className="text-slate-600 space-y-2">
-              <li>• AES-GCM encryption (FIPS 140-2 compliant)</li>
-              <li>• PBKDF2 key derivation (OWASP recommended)</li>
-              <li>• Web Crypto API (W3C standard)</li>
-              <li>• HTTPS everywhere (TLS 1.2+)</li>
-              <li>• Secure session management</li>
-            </ul>
-          </div>
-          
-          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Icon path={mdiShieldStar} className="w-6 h-6 text-blue-400" />
-              <h3 className="text-lg font-semibold text-slate-900">Best Practices</h3>
-            </div>
-            <ul className="text-slate-600 space-y-2">
-              <li>• Principle of least privilege</li>
-              <li>• Defense in depth</li>
-              <li>• Regular security audits</li>
-              <li>• No hardcoded secrets</li>
-              <li>• Secure development lifecycle</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact & Support */}
-      <section className="mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiEmail} className="w-8 h-8 text-violet-600" />
-          <h2 className="text-2xl font-semibold text-slate-900">Questions or Concerns?</h2>
-        </div>
-        
-        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
-          <p className="text-slate-600 mb-4">
-            We understand that security and privacy are paramount when it comes to your smart home. 
-            If you have any questions about our security measures or would like more technical details, 
-            please don&apos;t hesitate to reach out.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="mailto:support@casaboard.dev"
-              className="inline-flex items-center justify-center px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
-            >
-              Email Us
-            </a>
-            <a
-              href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 border border-slate-200 text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              Contact Us
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Last Updated */}
-      <div className="text-center text-sm text-slate-600">
-        <p>Last updated: {new Date().toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })}</p>
-        <p className="mt-2">
-          This security documentation is regularly reviewed and updated to reflect our current practices.
-        </p>
-      </div>
       </div>
     </>
   );
