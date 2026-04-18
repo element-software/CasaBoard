@@ -1,5 +1,5 @@
 "use client";
-import { Button, Card, CardBody, Chip, cn } from "@heroui/react";
+import { Button, cn } from "@heroui/react";
 import Link from "next/link";
 import Icon from "@mdi/react";
 import { mdiCheck } from "@mdi/js";
@@ -40,26 +40,23 @@ export default function BillingContent({
 
 
   return (
-    <div className="max-w-7xl w-full mx-auto py-10 px-4 pt-40">
-      <div className="mb-8 flex flex-row items-center justify-between">
-        <div className="flex flex-row items-start w-full">
-          <div className="flex flex-col">
-            <h1 className="text-3xl font-semibold">Pricing</h1>
-            <p className="text-foreground-500 mt-1">
-              Pick a plan that suits you.
-            </p>
-          </div>
-        </div>
+    <div className="max-w-5xl w-full mx-auto px-4 pt-40 pb-24">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <p className="text-violet-600 text-xs font-semibold uppercase tracking-widest mb-3">Pricing</p>
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Simple, honest pricing</h1>
+        <p className="text-slate-500 mt-3 text-lg">Pick a plan that suits you. Cancel anytime.</p>
       </div>
 
-      <div className="w-full flex flex-col gap-4 justify-center items-center">
-        <div className="mt-6 inline-flex rounded-full bg-content2 p-1 shadow-sm">
+      <div className="w-full flex flex-col gap-8 justify-center items-center">
+        {/* Billing toggle */}
+        <div className="inline-flex rounded-full bg-slate-100 p-1">
           <button
             type="button"
             onClick={() => setBilling("monthly")}
-            className={cn("px-4 py-1 text-sm rounded-full transition-colors", {
-              "bg-primary shadow text-foreground": billing === "monthly",
-              "text-foreground-500": billing !== "monthly",
+            className={cn("px-5 py-1.5 text-sm rounded-full font-medium transition-all", {
+              "bg-white shadow text-slate-900": billing === "monthly",
+              "text-slate-500 hover:text-slate-700": billing !== "monthly",
             })}
           >
             Monthly
@@ -67,9 +64,9 @@ export default function BillingContent({
           <button
             type="button"
             onClick={() => setBilling("yearly")}
-            className={cn("px-4 py-1 text-sm rounded-full transition-colors", {
-              "bg-primary shadow text-foreground": billing === "yearly",
-              "text-foreground-500": billing !== "yearly",
+            className={cn("px-5 py-1.5 text-sm rounded-full font-medium transition-all", {
+              "bg-white shadow text-slate-900": billing === "yearly",
+              "text-slate-500 hover:text-slate-700": billing !== "yearly",
             })}
           >
             Yearly
@@ -78,116 +75,100 @@ export default function BillingContent({
 
         <div className="w-full grid gap-6 md:grid-cols-3">
           {currentPlans.map((plan, idx) => {
-            const isPopular = idx === 1; // Make middle plan popular
-            const price = (plan.unit_amount || 0) / 100; // Convert from cents
+            const isPopular = idx === 1;
+            const price = (plan.unit_amount || 0) / 100;
             const interval = plan.recurring?.interval || "month";
 
-            // Calculate yearly discount if applicable
             let discount = 0;
             if (billing === "yearly" && interval === "year") {
-              const monthlyEquivalent = monthlyPlans.find(
-                (p) => p.product.id === plan.product.id
-              );
+              const monthlyEquivalent = monthlyPlans.find((p) => p.product.id === plan.product.id);
               if (monthlyEquivalent) {
                 const monthlyPrice = (monthlyEquivalent.unit_amount || 0) / 100;
-                const yearlyEquivalent = monthlyPrice * 12;
-                discount = Math.max(0, yearlyEquivalent - price);
+                discount = Math.max(0, monthlyPrice * 12 - price);
               }
             }
 
             return (
-              <Card
+              <div
                 key={plan.id}
-                className={cn("border-default-200", {
-                  "bg-primary/10 border-primary/40":
-                    isPopular,
-                })}
+                className={cn(
+                  "relative rounded-2xl p-6 flex flex-col gap-4 border transition-all",
+                  isPopular
+                    ? "bg-violet-600 border-violet-600 shadow-xl shadow-violet-200"
+                    : "bg-white border-slate-100 shadow-sm hover:shadow-md"
+                )}
               >
-                <CardBody className="p-6 space-y-4 relative">
-                  {isPopular && (
-                    <Chip
-                      color="primary"
-                      variant="flat"
-                      size="sm"
-                      className="absolute top-4 right-4"
-                    >
-                      POPULAR
-                    </Chip>
-                  )}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-foreground-500 font-medium">
-                        {billing === "monthly" ? "Monthly" : "Yearly"}
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-semibold">
-                      {plan.product.name}
-                    </h3>
-                  </div>
-                  <div className="text-4xl font-semibold">
+                {isPopular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-white text-violet-700 text-xs font-bold rounded-full shadow">
+                    MOST POPULAR
+                  </span>
+                )}
+
+                <div>
+                  <p className={cn("text-xs font-semibold uppercase tracking-widest mb-1", isPopular ? "text-violet-200" : "text-slate-400")}>
+                    {billing === "monthly" ? "Monthly" : "Yearly"}
+                  </p>
+                  <h3 className={cn("text-xl font-bold", isPopular ? "text-white" : "text-slate-900")}>
+                    {plan.product.name}
+                  </h3>
+                </div>
+
+                <div className="flex items-end gap-1">
+                  <span className={cn("text-4xl font-bold", isPopular ? "text-white" : "text-slate-900")}>
                     £{price.toFixed(0)}
-                    <span className="text-base font-normal text-foreground-500">
-                      /{interval === "month" ? "mo" : "yr"}
+                  </span>
+                  <span className={cn("text-sm mb-1", isPopular ? "text-violet-200" : "text-slate-400")}>
+                    /{interval === "month" ? "mo" : "yr"}
+                  </span>
+                  {billing === "yearly" && discount > 0 && (
+                    <span className="ml-2 mb-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                      Save £{discount.toFixed(0)}
                     </span>
-                    {billing === "yearly" && discount > 0 && (
-                      <Chip
-                        color="success"
-                        variant="flat"
-                        size="sm"
-                        className="ml-2"
-                      >
-                        Save £{discount.toFixed(0)}
-                      </Chip>
-                    )}
-                  </div>
-                  {plan.product.description && (
-                    <p className="flex items-center gap-2">
-                      <Icon path={mdiCheck} className="w-4 h-4 text-success" />{" "}
-                      {plan.product.description}
-                    </p>
                   )}
-                  <ul className="text-sm text-foreground-500 space-y-1 h-full grow">
-                    {plan.product.marketing_features.map((feature) => (
-                      <li
-                        className="flex items-center gap-2"
-                        key={feature.name}
-                      >
-                        <Icon
-                          path={mdiCheck}
-                          className="w-4 h-4 text-success"
-                        />{" "}
-                        {feature.name}
-                      </li>
-                    ))}
-                    <li className="flex items-start gap-2 pt-1">
-                      <Icon path={mdiCheck} className="w-4 h-4 text-success shrink-0 mt-0.5" />
-                      <span>Optional cloud sync <span className="text-foreground-400">(off by default)</span></span>
+                </div>
+
+                {plan.product.description && (
+                  <p className={cn("text-sm flex items-center gap-2", isPopular ? "text-violet-100" : "text-slate-500")}>
+                    <Icon path={mdiCheck} className={cn("w-4 h-4 shrink-0", isPopular ? "text-violet-200" : "text-green-500")} />
+                    {plan.product.description}
+                  </p>
+                )}
+
+                <ul className="space-y-2 flex-1">
+                  {plan.product.marketing_features.map((feature) => (
+                    <li key={feature.name} className={cn("flex items-center gap-2 text-sm", isPopular ? "text-violet-100" : "text-slate-600")}>
+                      <Icon path={mdiCheck} className={cn("w-4 h-4 shrink-0", isPopular ? "text-violet-200" : "text-green-500")} />
+                      {feature.name}
                     </li>
-                  </ul>
-                    <Button
-                      as={Link}
-                      href={LinkService.crossAppHref("app", "/auth/login")}
-                      color="primary"
-                      type="button"
-                      className="w-full py-3 px-4 rounded-sm"
-                    >
-                      Subscribe
-                    </Button>
-                </CardBody>
-              </Card>
+                  ))}
+                  <li className={cn("flex items-start gap-2 text-sm pt-1", isPopular ? "text-violet-100" : "text-slate-600")}>
+                    <Icon path={mdiCheck} className={cn("w-4 h-4 shrink-0 mt-0.5", isPopular ? "text-violet-200" : "text-green-500")} />
+                    <span>Optional cloud sync <span className={isPopular ? "text-violet-300" : "text-slate-400"}>(off by default)</span></span>
+                  </li>
+                </ul>
+
+                <Button
+                  as={Link}
+                  href={LinkService.crossAppHref("app", "/auth/login")}
+                  type="button"
+                  className={cn(
+                    "w-full font-semibold",
+                    isPopular
+                      ? "bg-white text-violet-700 hover:bg-violet-50"
+                      : "bg-violet-600 text-white hover:bg-violet-700"
+                  )}
+                >
+                  Subscribe
+                </Button>
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Mobile keeps same cards grid above */}
-
-      <div className="mt-10 text-center text-sm text-foreground-500">
+      <div className="mt-12 text-center text-sm text-slate-400">
         Questions about plans?{" "}
-        <Link
-          href={LinkService.crossAppHref("public", "/contact")}
-          className="text-primary"
-        >
+        <Link href={LinkService.crossAppHref("public", "/contact")} className="text-violet-600 hover:underline">
           Contact us
         </Link>
       </div>

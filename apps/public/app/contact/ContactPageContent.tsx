@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, CardBody, CardHeader, Input, Textarea } from "@heroui/react";
+import { Button, Input, Textarea } from "@heroui/react";
 
 export default function ContactPageContent() {
   const [name, setName] = useState("");
@@ -51,28 +51,35 @@ export default function ContactPageContent() {
   }
 
   return (
-    <div className="pt-48">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-theme-text">
+    <div className="pt-48 pb-24">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <p className="text-violet-600 text-xs font-semibold uppercase tracking-widest mb-3">
+            Get in touch
+          </p>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
             Contact us
           </h1>
-          <p className="text-theme-text-secondary mt-3">
-            Have a question or feedback? Fill out the form and we'll get back to you.
+          <p className="text-slate-500 mt-3 text-lg">
+            Have a question or feedback? Fill out the form and we&apos;ll get back to you.
           </p>
         </div>
 
-        <Card>
-          <CardHeader className="bg-theme-primary/10">
-            <h2 className="text-xl font-semibold text-theme-text">Send a message</h2>
-          </CardHeader>
-          <CardBody className="pt-6">
+        {/* Form card */}
+        <div className="bg-white border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/60">
+            <h2 className="text-base font-semibold text-slate-900">Send a message</h2>
+          </div>
+          <div className="p-6">
             <form onSubmit={handleSubmit} className="grid gap-4">
               <Input
                 label="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 isRequired
+                variant="bordered"
+                classNames={{ inputWrapper: "border-slate-200" }}
               />
               <Input
                 type="email"
@@ -80,12 +87,16 @@ export default function ContactPageContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 isRequired
+                variant="bordered"
+                classNames={{ inputWrapper: "border-slate-200" }}
               />
               <Input
                 label="Subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="How can we help?"
+                variant="bordered"
+                classNames={{ inputWrapper: "border-slate-200" }}
               />
               <Textarea
                 label="Message"
@@ -93,30 +104,30 @@ export default function ContactPageContent() {
                 onChange={(e) => setMessage(e.target.value)}
                 minRows={6}
                 isRequired
+                variant="bordered"
+                classNames={{ inputWrapper: "border-slate-200" }}
               />
 
               {successMessage && (
-                <div className="text-green-500 text-sm" role="status" aria-live="polite">
+                <div className="px-4 py-3 bg-green-50 border border-green-100 text-green-700 text-sm rounded-lg" role="status" aria-live="polite">
                   {successMessage}
                 </div>
               )}
               {errorMessage && (
-                <div className="text-red-500 text-sm" role="alert" aria-live="assertive">
+                <div className="px-4 py-3 bg-red-50 border border-red-100 text-red-700 text-sm rounded-lg" role="alert" aria-live="assertive">
                   {errorMessage}
                 </div>
               )}
 
-              <div className="flex justify-end">
+              <div className="flex justify-end pt-2">
                 <Button color="primary" type="submit" isLoading={isSubmitting}>
                   Send message
                 </Button>
               </div>
             </form>
-          </CardBody>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-

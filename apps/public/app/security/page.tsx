@@ -29,12 +29,12 @@ export default function SecurityPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-48">
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
-          <div className="p-4 bg-theme-primary/10 rounded-full">
-            <Icon path={mdiShieldCheck} className="w-16 h-16 text-theme-primary" />
+          <div className="p-4 bg-violet-50 rounded-full">
+            <Icon path={mdiShieldCheck} className="w-16 h-16 text-violet-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-theme-text mb-4">Security & Privacy</h1>
-        <p className="text-xl text-theme-text-secondary max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold text-slate-900 mb-4">Security & Privacy</h1>
+        <p className="text-xl text-slate-600 max-w-2xl mx-auto">
           CasaBoard is privacy-first: Home Assistant access tokens stay encrypted in your browser by
           default. We never see your HA credentials on our servers. Optional cloud sync (paid plans) can
           store your HA base URL on our database if you explicitly turn it on—tokens stay local either way.
@@ -44,11 +44,11 @@ export default function SecurityPage() {
       {/* Overview Section */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldStar} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Security Overview</h2>
+          <Icon path={mdiShieldStar} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Security Overview</h2>
         </div>
-        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6 mb-6">
-          <p className="text-theme-text-secondary mb-4">
+        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 mb-6">
+          <p className="text-slate-600 mb-4">
             By default, nothing that lets CasaBoard log into Home Assistant on your behalf is stored in
             our database. Your OAuth tokens are encrypted and kept in the browser. We still protect your
             account, billing, and dashboard layouts with authentication and Row Level Security like any
@@ -58,9 +58,9 @@ export default function SecurityPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Icon path={mdiLock} className="w-6 h-6 text-green-400" />
-                <h3 className="text-lg font-medium text-theme-text">What stays on your device (default)</h3>
+                <h3 className="text-lg font-medium text-slate-900">What stays on your device (default)</h3>
               </div>
-              <ul className="text-theme-text-secondary space-y-2">
+              <ul className="text-slate-600 space-y-2">
                 <li className="flex items-center gap-2">
                   <Icon path={mdiKey} className="w-4 h-4 text-green-400" />
                   Home Assistant OAuth tokens (encrypted in browser storage)
@@ -74,9 +74,9 @@ export default function SecurityPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Icon path={mdiDatabase} className="w-6 h-6 text-green-400" />
-                <h3 className="text-lg font-medium text-theme-text">What we host for you</h3>
+                <h3 className="text-lg font-medium text-slate-900">What we host for you</h3>
               </div>
-              <ul className="text-theme-text-secondary space-y-2">
+              <ul className="text-slate-600 space-y-2">
                 <li className="flex items-center gap-2">
                   <Icon path={mdiDatabase} className="w-4 h-4 text-green-400" />
                   Dashboard and page layouts (e.g. Puck JSON), sidebars, publishing flags
@@ -101,31 +101,31 @@ export default function SecurityPage() {
       {/* Local vs cloud */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldLock} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Local-first vs optional cloud sync</h2>
+          <Icon path={mdiShieldLock} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Local-first vs optional cloud sync</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-theme-text mb-2">Default (everyone)</h3>
-            <p className="text-theme-text-secondary text-sm mb-3">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Default (everyone)</h3>
+            <p className="text-slate-600 text-sm mb-3">
               Home Assistant authentication completes in your browser. Tokens are encrypted with Web
               Crypto and stored locally; they are not written to CasaBoard databases. Your HA URL is also
               kept in the browser unless you choose otherwise.
             </p>
-            <ul className="text-theme-text-secondary text-sm space-y-1">
+            <ul className="text-slate-600 text-sm space-y-1">
               <li>• No HA access tokens on our servers</li>
               <li>• No HA URL in our database</li>
               <li>• Same connection model on free and paid tiers unless you opt in below</li>
             </ul>
           </div>
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-theme-text mb-2">Optional cloud sync (paid, opt-in)</h3>
-            <p className="text-theme-text-secondary text-sm mb-3">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Optional cloud sync (paid, opt-in)</h3>
+            <p className="text-slate-600 text-sm mb-3">
               If your plan supports it and you enable cloud sync in settings, we can store{" "}
               <strong>metadata only</strong>—display name and base URL for each Home Assistant instance—so
               you can see the same instances when you sign in from another device.
             </p>
-            <ul className="text-theme-text-secondary text-sm space-y-1">
+            <ul className="text-slate-600 text-sm space-y-1">
               <li>• OAuth tokens remain encrypted and local; we do not store HA passwords or tokens in the cloud</li>
               <li>• You can turn cloud sync off; local-only mode continues to work</li>
               <li>• Row Level Security ensures only your user rows are readable</li>
@@ -137,11 +137,11 @@ export default function SecurityPage() {
       {/* What we never touch */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiEyeOff} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">What CasaBoard cannot access</h2>
+          <Icon path={mdiEyeOff} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">What CasaBoard cannot access</h2>
         </div>
-        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
-          <ul className="text-theme-text-secondary space-y-2">
+        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
+          <ul className="text-slate-600 space-y-2">
             <li className="flex items-center gap-2">
               <Icon path={mdiServer} className="w-4 h-4 text-red-400" />
               Your Home Assistant server directly (we are not a proxy into HA)
@@ -164,18 +164,18 @@ export default function SecurityPage() {
       {/* Technical Security Measures */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiSecurity} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Technical Security Measures</h2>
+          <Icon path={mdiSecurity} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Technical Security Measures</h2>
         </div>
         
         <div className="space-y-6">
           {/* Encryption */}
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Icon path={mdiLock} className="w-6 h-6 text-blue-400" />
-              <h3 className="text-xl font-semibold text-theme-text">Token encryption in your browser</h3>
+              <h3 className="text-xl font-semibold text-slate-900">Token encryption in your browser</h3>
             </div>
-            <p className="text-theme-text-secondary mb-4">
+            <p className="text-slate-600 mb-4">
               Home Assistant OAuth tokens are encrypted using industry-standard{" "}
               <strong>AES-GCM</strong> in the browser before being written to{" "}
               <strong>local storage</strong>. They are not persisted in CasaBoard application databases
@@ -184,8 +184,8 @@ export default function SecurityPage() {
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Encryption details:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">Encryption details:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Algorithm: AES-GCM 256-bit</li>
                   <li>• Key derivation tied to your account identity</li>
                   <li>• Random IV for each encryption</li>
@@ -193,8 +193,8 @@ export default function SecurityPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-theme-text mb-2">What this means:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">What this means:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Server-side code does not hold a copy of your HA tokens</li>
                   <li>• Clearing browser data or a new device requires signing in to HA again</li>
                   <li>• Optional cloud sync does not change where tokens live</li>
@@ -204,12 +204,12 @@ export default function SecurityPage() {
           </div>
 
           {/* Database Security */}
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Icon path={mdiDatabaseLock} className="w-6 h-6 text-purple-400" />
-              <h3 className="text-xl font-semibold text-theme-text">Database Security with Supabase</h3>
+              <h3 className="text-xl font-semibold text-slate-900">Database Security with Supabase</h3>
             </div>
-            <p className="text-theme-text-secondary mb-4">
+            <p className="text-slate-600 mb-4">
               Our database is powered by <strong>Supabase</strong> (built on PostgreSQL) and uses{" "}
               <strong>Row Level Security (RLS)</strong> so each query only returns rows owned by the
               signed-in user. That applies to pages, sidebars, billing, and—if you use it—optional HA
@@ -218,8 +218,8 @@ export default function SecurityPage() {
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Supabase RLS Policies:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">Supabase RLS Policies:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Database-level access control</li>
                   <li>• User-specific data isolation</li>
                   <li>• No admin bypass mechanisms</li>
@@ -228,8 +228,8 @@ export default function SecurityPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Data protection:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">Data protection:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Encrypted at rest (Supabase / PostgreSQL)</li>
                   <li>• No HA access tokens in our tables in default local mode</li>
                   <li>• Optional cloud sync rows contain URL/name only, not OAuth secrets</li>
@@ -249,20 +249,20 @@ export default function SecurityPage() {
           </div>
 
           {/* Authentication */}
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <Icon path={mdiAccountKey} className="w-6 h-6 text-orange-400" />
-              <h3 className="text-xl font-semibold text-theme-text">Authentication & Authorization</h3>
+              <h3 className="text-xl font-semibold text-slate-900">Authentication & Authorization</h3>
             </div>
-            <p className="text-theme-text-secondary mb-4">
+            <p className="text-slate-600 mb-4">
               Every request to your data requires valid authentication. We use <strong>Supabase Auth</strong> 
               for secure user management and session handling, which provides enterprise-grade security 
               and is trusted by thousands of applications worldwide.
             </p>
             <div className="grid md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Supabase Authentication:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">Supabase Authentication:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Industry-standard JWT tokens</li>
                   <li>• Secure session management</li>
                   <li>• Automatic token refresh</li>
@@ -272,8 +272,8 @@ export default function SecurityPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium text-theme-text mb-2">Authorization & RLS:</h4>
-                <ul className="text-theme-text-secondary space-y-1">
+                <h4 className="font-medium text-slate-900 mb-2">Authorization & RLS:</h4>
+                <ul className="text-slate-600 space-y-1">
                   <li>• Every API call requires valid user session</li>
                   <li>• User ID verification on all operations</li>
                   <li>• No cross-user data access possible</li>
@@ -288,8 +288,8 @@ export default function SecurityPage() {
       {/* Developer Access */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldAccount} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Developer Access & Transparency</h2>
+          <Icon path={mdiShieldAccount} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Developer Access & Transparency</h2>
         </div>
         
         <div className="bg-red-50 border border-red-100 rounded-lg p-6 mb-6">
@@ -326,21 +326,21 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <Icon path={mdiInformation} className="w-6 h-6 text-yellow-400" />
-            <h3 className="text-xl font-semibold text-theme-text">What We Can See (Limited)</h3>
+            <h3 className="text-xl font-semibold text-slate-900">What We Can See (Limited)</h3>
           </div>
-          <p className="text-theme-text-secondary mb-4">
+          <p className="text-slate-600 mb-4">
             For debugging and support we may see:
           </p>
-          <ul className="text-theme-text-secondary space-y-2">
+          <ul className="text-slate-600 space-y-2">
             <li>• <strong>Account & billing</strong> — email, plan, subscription status, as needed for support</li>
             <li>• <strong>Dashboard metadata</strong> — page names, slugs, layout structure (not live HA state)</li>
             <li>• <strong>Optional cloud HA rows</strong> — only if you enabled cloud sync (instance name and URL)</li>
             <li>• <strong>Error logs & analytics</strong> — scrubbed of secrets; used to improve reliability</li>
           </ul>
-          <p className="text-theme-text-secondary text-sm mt-3">
+          <p className="text-slate-600 text-sm mt-3">
             We do not have access to plaintext Home Assistant tokens in our databases or logs in the
             default local-first configuration.
           </p>
@@ -350,33 +350,33 @@ export default function SecurityPage() {
       {/* Data Flow */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiCloud} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">How Your Data Flows</h2>
+          <Icon path={mdiCloud} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">How Your Data Flows</h2>
         </div>
         
         <div className="space-y-4">
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">1</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">Sign in & connect Home Assistant</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Sign in & connect Home Assistant</h3>
             </div>
-            <p className="text-theme-text-secondary">
+            <p className="text-slate-600">
               You authenticate to CasaBoard (e.g. Supabase Auth). When you connect Home Assistant, the
               OAuth flow completes in your browser. Tokens are encrypted and written to browser storage;
               by default CasaBoard servers never receive or store those tokens.
             </p>
           </div>
 
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">2</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">Using your dashboard</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Using your dashboard</h3>
             </div>
-            <p className="text-theme-text-secondary">
+            <p className="text-slate-600">
               When you open a dashboard, the app loads encrypted tokens from local storage, decrypts
               them in the browser, and opens a WebSocket connection from your device to your Home
               Assistant instance. Live entity data flows between your browser and HA—not through our
@@ -384,14 +384,14 @@ export default function SecurityPage() {
             </p>
           </div>
 
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">3</span>
               </div>
-              <h3 className="text-lg font-semibold text-theme-text">What we persist</h3>
+              <h3 className="text-lg font-semibold text-slate-900">What we persist</h3>
             </div>
-            <p className="text-theme-text-secondary">
+            <p className="text-slate-600">
               We save your layout JSON, page settings, and account data in Supabase. If you opt into
               cloud sync on a paid plan, we may also save HA instance metadata (name + URL) for
               convenience. Your HA access tokens remain local-only unless our product model changes
@@ -404,16 +404,16 @@ export default function SecurityPage() {
       {/* Supabase Security */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldCrown} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Powered by Supabase Security</h2>
+          <Icon path={mdiShieldCrown} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Powered by Supabase Security</h2>
         </div>
         
-        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6 mb-6">
+        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Icon path={mdiServer} className="w-6 h-6 text-indigo-400" />
-            <h3 className="text-xl font-semibold text-theme-text">Enterprise-Grade Infrastructure</h3>
+            <h3 className="text-xl font-semibold text-slate-900">Enterprise-Grade Infrastructure</h3>
           </div>
-          <p className="text-theme-text-secondary mb-4">
+          <p className="text-slate-600 mb-4">
             CasaBoard is built on <strong>Supabase</strong>, a trusted platform used by thousands of applications 
             worldwide. Supabase provides enterprise-grade security, compliance, and infrastructure that we leverage 
             to protect your data.
@@ -421,8 +421,8 @@ export default function SecurityPage() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <h4 className="font-medium text-theme-text mb-2">Authentication</h4>
-              <ul className="text-theme-text-secondary space-y-1 text-sm">
+              <h4 className="font-medium text-slate-900 mb-2">Authentication</h4>
+              <ul className="text-slate-600 space-y-1 text-sm">
                 <li>• JWT-based authentication</li>
                 <li>• OAuth providers (Google, GitHub)</li>
                 <li>• Multi-factor authentication</li>
@@ -430,8 +430,8 @@ export default function SecurityPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-theme-text mb-2">Database Security</h4>
-              <ul className="text-theme-text-secondary space-y-1 text-sm">
+              <h4 className="font-medium text-slate-900 mb-2">Database Security</h4>
+              <ul className="text-slate-600 space-y-1 text-sm">
                 <li>• PostgreSQL with RLS</li>
                 <li>• Encrypted connections (TLS)</li>
                 <li>• Automatic backups</li>
@@ -439,8 +439,8 @@ export default function SecurityPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-theme-text mb-2">Infrastructure</h4>
-              <ul className="text-theme-text-secondary space-y-1 text-sm">
+              <h4 className="font-medium text-slate-900 mb-2">Infrastructure</h4>
+              <ul className="text-slate-600 space-y-1 text-sm">
                 <li>• AWS infrastructure</li>
                 <li>• SOC 2 Type II compliant</li>
                 <li>• GDPR compliant</li>
@@ -454,17 +454,17 @@ export default function SecurityPage() {
       {/* Compliance & Standards */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiShieldLock} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Security Standards & Compliance</h2>
+          <Icon path={mdiShieldLock} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Security Standards & Compliance</h2>
         </div>
         
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <Icon path={mdiCheckCircle} className="w-6 h-6 text-green-400" />
-              <h3 className="text-lg font-semibold text-theme-text">Security Standards</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Security Standards</h3>
             </div>
-            <ul className="text-theme-text-secondary space-y-2">
+            <ul className="text-slate-600 space-y-2">
               <li>• AES-GCM encryption (FIPS 140-2 compliant)</li>
               <li>• PBKDF2 key derivation (OWASP recommended)</li>
               <li>• Web Crypto API (W3C standard)</li>
@@ -473,12 +473,12 @@ export default function SecurityPage() {
             </ul>
           </div>
           
-          <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
+          <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <Icon path={mdiShieldStar} className="w-6 h-6 text-blue-400" />
-              <h3 className="text-lg font-semibold text-theme-text">Best Practices</h3>
+              <h3 className="text-lg font-semibold text-slate-900">Best Practices</h3>
             </div>
-            <ul className="text-theme-text-secondary space-y-2">
+            <ul className="text-slate-600 space-y-2">
               <li>• Principle of least privilege</li>
               <li>• Defense in depth</li>
               <li>• Regular security audits</li>
@@ -492,12 +492,12 @@ export default function SecurityPage() {
       {/* Contact & Support */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-6">
-          <Icon path={mdiEmail} className="w-8 h-8 text-theme-primary" />
-          <h2 className="text-2xl font-semibold text-theme-text">Questions or Concerns?</h2>
+          <Icon path={mdiEmail} className="w-8 h-8 text-violet-600" />
+          <h2 className="text-2xl font-semibold text-slate-900">Questions or Concerns?</h2>
         </div>
         
-        <div className="bg-theme-background/50 border border-theme-border/30 rounded-lg p-6">
-          <p className="text-theme-text-secondary mb-4">
+        <div className="bg-white border border-slate-100 shadow-sm rounded-xl p-6">
+          <p className="text-slate-600 mb-4">
             We understand that security and privacy are paramount when it comes to your smart home. 
             If you have any questions about our security measures or would like more technical details, 
             please don&apos;t hesitate to reach out.
@@ -506,13 +506,13 @@ export default function SecurityPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <a
               href="mailto:support@casaboard.dev"
-              className="inline-flex items-center justify-center px-6 py-3 bg-theme-primary text-white rounded-lg hover:bg-theme-primary/90 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
             >
               Email Us
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 border border-theme-border text-theme-text rounded-lg hover:bg-theme-background/50 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border border-slate-200 text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Contact Us
             </a>
@@ -521,7 +521,7 @@ export default function SecurityPage() {
       </section>
 
       {/* Last Updated */}
-      <div className="text-center text-sm text-theme-text-secondary">
+      <div className="text-center text-sm text-slate-600">
         <p>Last updated: {new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long', 

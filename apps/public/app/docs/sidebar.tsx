@@ -1,5 +1,5 @@
 "use client";
-import { Card, cn } from "@heroui/react";
+import { cn } from "@heroui/react";
 import { sections } from "./sections";
 import Icon from "@mdi/react";
 
@@ -11,29 +11,33 @@ export interface DocsSidebarProps {
 export const DocsSidebar = ({ index, setIndex }: DocsSidebarProps) => {
   return (
     <aside className="space-y-3">
-      <Card className="p-3 sticky top-24 h-full md:min-h-screen">
-        <nav className="flex flex-col gap-1">
+      <div className="sticky top-24 bg-white border border-slate-100 rounded-xl shadow-sm p-3">
+        <nav className="flex flex-col gap-0.5">
           {sections.map((s, i) => (
             <button
               key={s.slug}
               onClick={() => setIndex(i)}
               className={cn(
-                "flex items-center gap-2 rounded px-2 py-2 text-sm text-left transition-colors hover:cursor-pointer",
-                {
-                  "bg-primary/10 text-theme-text": i === index,
-                  "hover:bg-theme-surface text-theme-text-secondary":
-                    i !== index,
-                }
+                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-left transition-colors",
+                i === index
+                  ? "bg-violet-50 text-violet-700 font-medium"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
               )}
             >
               {s.icon && (
-                <Icon path={s.icon} className="w-4 h-4 text-primary" />
+                <Icon
+                  path={s.icon}
+                  className={cn(
+                    "w-4 h-4 flex-shrink-0",
+                    i === index ? "text-violet-500" : "text-slate-400"
+                  )}
+                />
               )}
               <span>{s.title}</span>
             </button>
           ))}
         </nav>
-      </Card>
+      </div>
     </aside>
   );
 };
