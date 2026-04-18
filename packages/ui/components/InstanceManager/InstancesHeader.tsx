@@ -13,8 +13,8 @@ export const InstancesHeader = ({ count, max, compact, manageHref }: InstancesHe
   return (
     <CardHeader className="flex items-center justify-between p-4 sm:p-6">
       <div className="flex items-center min-w-0 flex-1">
-        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-          <Icon path={mdiHomeAssistant} className="w-6 h-6 text-cyan-400" />
+        <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+          <Icon path={mdiHomeAssistant} className="w-6 h-6 text-violet-600" />
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-lg font-semibold">Home Assistant Instances</h3>

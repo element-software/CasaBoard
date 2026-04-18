@@ -72,10 +72,10 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
   };
 
   return (
-    <Card className="w-full bg-theme-surface/50 backdrop-blur-sm border border-secondary">
-      <CardHeader className="pb- flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-theme-text">Quick Actions</h2>
-        <p className="text-sm text-theme-text-secondary">Common tasks and shortcuts</p>
+    <Card className="w-full bg-white border border-slate-100 shadow-sm">
+      <CardHeader className="flex flex-col gap-1 pb-2">
+        <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+        <p className="text-sm text-slate-500">Common tasks and shortcuts</p>
       </CardHeader>
       <CardBody className="pt-0">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -83,10 +83,10 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
             <Card
               key={action.href}
               className={cn(
-                "group cursor-pointer transition-all duration-200 hover:shadow-md",
-                action.disabled 
-                  ? "bg-theme-background/50 border-dashed border-secondary/50 cursor-not-allowed" 
-                  : "bg-theme-background border-secondary hover:border-theme-primary/30 hover:bg-theme-primary/5"
+                "group cursor-pointer transition-all duration-200 border-none shadow-none",
+                action.disabled
+                  ? "bg-slate-50 cursor-not-allowed opacity-60"
+                  : "bg-slate-50 hover:bg-violet-50 hover:shadow-sm"
               )}
               isPressable={!action.disabled}
               onPress={() => handleActionClick(action)}
@@ -95,37 +95,37 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
                 <div className="flex flex-col items-center text-center space-y-3">
                   {/* Icon */}
                   <div className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
-                    action.disabled 
-                      ? "bg-theme-text-secondary/10" 
-                      : "bg-theme-primary/10 group-hover:bg-theme-primary/20"
+                    "w-11 h-11 rounded-xl flex items-center justify-center transition-colors",
+                    action.disabled
+                      ? "bg-slate-100"
+                      : "bg-violet-50 group-hover:bg-violet-100"
                   )}>
-                    <Icon 
-                      path={action.icon} 
+                    <Icon
+                      path={action.icon}
                       className={cn(
-                        "w-6 h-6 transition-colors",
-                        action.disabled 
-                          ? "text-theme-text-secondary/50" 
-                          : "text-theme-primary group-hover:text-theme-primary"
-                      )} 
+                        "w-5 h-5 transition-colors",
+                        action.disabled
+                          ? "text-slate-400"
+                          : "text-violet-600"
+                      )}
                     />
                   </div>
 
                   {/* Content */}
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <h3 className={cn(
-                      "font-medium text-sm",
-                      action.disabled 
-                        ? "text-theme-text-secondary/60" 
-                        : "text-theme-text group-hover:text-theme-primary"
+                      "font-semibold text-sm",
+                      action.disabled
+                        ? "text-slate-400"
+                        : "text-slate-900 group-hover:text-violet-700"
                     )}>
                       {action.title}
                     </h3>
                     <p className={cn(
                       "text-xs",
-                      action.disabled 
-                        ? "text-theme-text-secondary/40" 
-                        : "text-theme-text-secondary"
+                      action.disabled
+                        ? "text-slate-400"
+                        : "text-slate-500"
                     )}>
                       {action.description}
                     </p>
@@ -140,9 +140,9 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
                       </Chip>
                     </div>
                   ) : (
-                    <Icon 
-                      path={mdiArrowRight} 
-                      className="w-4 h-4 text-theme-text-secondary/60 group-hover:text-theme-primary group-hover:translate-x-1 transition-all" 
+                    <Icon
+                      path={mdiArrowRight}
+                      className="w-4 h-4 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-1 transition-all"
                     />
                   )}
                 </div>

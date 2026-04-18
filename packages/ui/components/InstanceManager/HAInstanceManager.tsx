@@ -274,7 +274,7 @@ export function HAInstanceManager({
           (canCreate() ? (
             <div data-create-form>{renderCreateForm()}</div>
           ) : (
-            <p className="text-white text-md w-full text-center">
+            <p className="text-slate-500 text-sm w-full text-center">
               You&apos;ve reached the limit of HA instances for your plan. Please{" "}
               <Link
                 href="/auth/profile/billing"

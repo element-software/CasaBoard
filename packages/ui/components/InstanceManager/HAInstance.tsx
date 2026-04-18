@@ -45,18 +45,18 @@ export const HAInstance = ({
       <div
         key={id}
         className={cn(
-          "flex items-center justify-between gap-3 p-3 rounded-md",
+          "flex items-center justify-between gap-3 p-4 rounded-xl border",
           {
-            "bg-green-800 border border-green-200": connected,
-            "bg-amber-800 border border-amber-200": !connected,
+            "bg-green-50 border-green-200": connected,
+            "bg-amber-50 border-amber-200": !connected,
           }
         )}
       >
         <div className="min-w-0">
-          <div className="font-medium truncate">{name}</div>
+          <div className="font-semibold text-slate-900 truncate">{name}</div>
           <div
             className={cn(
-              "flex gap-2 text-sm text-foreground-500 min-w-0",
+              "flex gap-2 text-sm text-slate-500 min-w-0",
               {
                 "flex-col items-start": compact,
                 "items-center": !compact,
@@ -115,7 +115,7 @@ export const HAInstance = ({
         onOpenChange={setIsConfirmOpen}
         backdrop="blur"
       >
-        <ModalContent className="bg-theme-background text-theme-text border border-theme-border">
+        <ModalContent className="bg-white border border-slate-100">
           <ModalHeader className="flex flex-col gap-1">
             Confirm deletion
           </ModalHeader>
