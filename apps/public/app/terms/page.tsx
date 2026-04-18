@@ -79,52 +79,78 @@ export default function TermsPage() {
         <div className="flex gap-4 p-5 bg-amber-50 border border-amber-200 rounded-2xl">
           <Icon path={mdiAlertCircleOutline} className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-amber-900 text-sm mb-1">CasaBoard is in active development</p>
+            <p className="font-semibold text-amber-900 text-sm mb-1">CasaBoard is in active development — not yet suitable for production use</p>
             <p className="text-sm text-amber-800 leading-relaxed">
-              The service is currently free to use while we build and refine it. These terms cover what
-              to expect during this period and how we&apos;ll handle the transition to a paid service.
+              Dashboard data may be deleted without notice if significant changes are required. Do not
+              rely on CasaBoard for anything critical until we announce the first production release.
+              We will notify all signed-up users when that happens.
             </p>
           </div>
         </div>
 
-        {/* 01 · During development */}
+        {/* 01 · Plans & pricing */}
         <section>
-          <SectionLabel n="01" label="During development" />
-          <div className="space-y-4">
-            <div className="border-l-4 border-slate-200 pl-6 space-y-4">
-              <div>
-                <h3 className="font-semibold text-slate-900 text-sm mb-1">Free access</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Whilst under development, CasaBoard is free to use. Any subscription shown is in test
-                  mode — no payments are taken. Your free trial will auto-renew at no cost for as long
-                  as we remain in development.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900 text-sm mb-1">Data stability</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Your data may be deleted at any time without notice during this period — for example,
-                  when we make major database schema changes or run migrations. You cannot hold us
-                  responsible for any data loss, damage, or inconvenience during the development phase.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-slate-900 text-sm mb-1">Email communications</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  By signing up, you agree to be contacted by email about service updates and
-                  notifications. You can opt out at any time by emailing{" "}
-                  <a href="mailto:support@casaboard.dev" className="text-violet-600 hover:underline">
-                    support@casaboard.dev
-                  </a>.
-                </p>
-              </div>
+          <SectionLabel n="01" label="Plans & pricing" />
+          <div className="border-l-4 border-slate-200 pl-6 space-y-4">
+            <div>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Free tier</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                CasaBoard offers a free tier that remains available for as long as the service is run and
+                maintained. The free plan includes a limited feature set — see the{" "}
+                <Link href="/pricing" className="text-violet-600 hover:underline">pricing page</Link>{" "}
+                for what&apos;s included.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Paid plans</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Paid plans are available for users who need additional pages, features, or support.
+                Subscriptions are billed through Stripe. During development, all billing is in test mode
+                — no payments are taken. You will not be charged until we announce the first production
+                release and you actively subscribe.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* 02 · Data & Home Assistant */}
+        {/* 02 · During development */}
         <section>
-          <SectionLabel n="02" label="Your data & Home Assistant" />
+          <SectionLabel n="02" label="During development" />
+          <div className="border-l-4 border-slate-200 pl-6 space-y-4">
+            <div>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Not for production use</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                CasaBoard is not yet suitable for production use. Dashboard data — including page layouts
+                and connected instance metadata — may be deleted without notice if a significant change
+                such as a major database migration is required. Bear this in mind and do not use
+                CasaBoard for anything critical during this period.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Data stability</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                You cannot hold us responsible for any data loss, damage, or inconvenience during the
+                development phase. Once we have released the first production version, you can have
+                confidence that the service is stable and suitable for everyday use.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900 text-sm mb-1">Email communications</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                By signing up, you agree to be contacted by email about service updates and
+                notifications — including the first production release announcement. You can opt out of
+                non-essential emails at any time by emailing{" "}
+                <a href="mailto:support@casaboard.dev" className="text-violet-600 hover:underline">
+                  support@casaboard.dev
+                </a>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 03 · Data & Home Assistant */}
+        <section>
+          <SectionLabel n="03" label="Your data & Home Assistant" />
           <p className="text-slate-600 text-sm leading-relaxed mb-6">
             By using CasaBoard, you allow us to store certain data on your behalf — specifically,
             your dashboard layouts, account information, and optionally your Home Assistant instance
@@ -144,39 +170,39 @@ export default function TermsPage() {
           </p>
         </section>
 
-        {/* 03 · Transition to production */}
+        {/* 04 · First production release */}
         <section>
-          <SectionLabel n="03" label="Transition to production" />
-          <div className="grid md:grid-cols-2 gap-4">
+          <SectionLabel n="04" label="First production release" />
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">When we go live</p>
+              <p className="font-semibold text-slate-900 text-sm mb-2">What changes at launch</p>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Once we consider CasaBoard production-ready, the free development period will end. All
-                active users will be notified by email and given <strong>30 days</strong> to purchase a
-                subscription to continue using the service.
+                When we release the first production version, CasaBoard will be considered stable and
+                suitable for everyday production use. All signed-up users will be notified by email.
+                The free tier continues post-launch. Paid features will require an active subscription.
               </p>
             </div>
             <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">If you don&apos;t subscribe</p>
+              <p className="font-semibold text-slate-900 text-sm mb-2">Subscribing after launch</p>
               <p className="text-sm text-slate-600 leading-relaxed">
-                If no subscription is taken within the 30-day window, your account data will be
-                deleted. Once subscribed, your data is retained for as long as your subscription
-                remains active. You can cancel at any time.
+                Active users will be given <strong>30 days</strong> from the launch announcement to
+                subscribe if they use paid features. If no subscription is taken within that window,
+                paid-tier data will be deleted. You can cancel a subscription at any time.
               </p>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-violet-50 border border-violet-100 rounded-xl">
+          <div className="p-4 bg-violet-50 border border-violet-100 rounded-xl">
             <p className="text-sm text-violet-800">
-              Your data <em>may or may not</em> be carried over from development to production — we
-              will do our best to preserve it, but cannot guarantee continuity across major migrations.
-              We will communicate clearly before any such event.
+              We will do our best to carry data over from development to production, but cannot
+              guarantee continuity across major migrations. We will communicate clearly before any
+              such event.
             </p>
           </div>
         </section>
 
-        {/* 04 · Changes */}
+        {/* 05 · Changes */}
         <section>
-          <SectionLabel n="04" label="Changes to these terms" />
+          <SectionLabel n="05" label="Changes to these terms" />
           <p className="text-slate-600 text-sm leading-relaxed">
             We reserve the right to update these terms at any time. Changes will be posted on this
             page. For significant changes, we will notify you by email where possible. Continued use
