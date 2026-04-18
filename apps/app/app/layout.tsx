@@ -1,4 +1,5 @@
 import { AnalyticsWrapper } from "@repo/ui/components/Shared/util/AnalyticsWrapper";
+import { UnderDevelopmentBanner } from "@repo/ui/components/Shared/util/UnderDevelopmentBanner";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -36,6 +37,7 @@ export default async function RootLayout({
     <html lang="en" className="light">
       <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
       <body className={cn("bg-white",inter.className)}>
+        <UnderDevelopmentBanner />
         {children}
         <AnalyticsWrapper gaId="G-P2JEHMNT4C" user={user} />
       </body>

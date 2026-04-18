@@ -7,6 +7,7 @@ import {
   mdiEmail,
   mdiClockOutline,
   mdiShieldCheck,
+  mdiLightbulbOnOutline,
 } from "@mdi/js";
 
 function SectionLabel({ n, label }: { n: string; label: string }) {
@@ -208,6 +209,41 @@ export default function TermsPage() {
             page. For significant changes, we will notify you by email where possible. Continued use
             of CasaBoard after any changes constitutes acceptance of the revised terms.
           </p>
+        </section>
+
+        {/* 06 · Feedback & feature requests */}
+        <section>
+          <SectionLabel n="06" label="Feedback & feature requests" />
+          <div className="flex gap-4 p-5 bg-violet-50/80 border border-violet-100 rounded-2xl">
+            <Icon path={mdiLightbulbOnOutline} className="w-5 h-5 text-violet-600 shrink-0 mt-0.5" />
+            <div className="space-y-3">
+              <p className="text-sm text-slate-700 leading-relaxed">
+                CasaBoard is shaped by people who use it. We welcome your ideas — whether that&apos;s a
+                rough sketch for a new feature, a pain point in your workflow, or something that
+                doesn&apos;t feel quite right yet. Honest feedback helps us prioritize what to build
+                next and how to improve the product for everyone.
+              </p>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                There&apos;s no obligation; sending feedback doesn&apos;t create a contract or promise
+                that a specific change will ship. We read what you send and use it to guide our roadmap.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
+                >
+                  Share feedback or a feature idea
+                </Link>
+                <a
+                  href="mailto:support@casaboard.dev?subject=CasaBoard%20feedback"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-violet-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-300 hover:bg-white transition-all"
+                >
+                  <Icon path={mdiEmail} className="w-4 h-4 text-violet-600" />
+                  Email us
+                </a>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Contact */}
