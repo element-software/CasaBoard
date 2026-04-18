@@ -1,15 +1,14 @@
 "use client";
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Icon from '@mdi/react';
-import { Card, CardHeader, CardBody, Button, Chip } from '@heroui/react';
-import { 
-  mdiPlus, 
-  mdiWeb, 
+import { Chip } from '@heroui/react';
+import {
+  mdiPlus,
+  mdiWeb,
   mdiHomeAssistant,
   mdiCreditCard,
   mdiAlertCircle,
-  mdiArrowRight
+  mdiArrowRight,
 } from '@mdi/js';
 import { cn } from '@heroui/react';
 import type { Entitlements } from '@repo/types/subscription';
@@ -20,6 +19,8 @@ interface QuickAction {
   icon: string;
   title: string;
   description: string;
+  gradient: string;
+  hoverBg: string;
   disabled?: boolean;
   disabledReason?: string;
 }
@@ -37,120 +38,107 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
       href: '/setup/pages/create',
       icon: mdiPlus,
       title: 'Create Page',
-      description: 'New dashboard page',
+      description: 'Build a new dashboard page',
+      gradient: 'from-violet-500 to-purple-600',
+      hoverBg: 'hover:bg-violet-50',
       disabled: haInstances.length === 0,
-      disabledReason: 'Add a Home Assistant instance first'
+      disabledReason: 'Add a Home Assistant instance first',
     },
     {
       href: '/setup/pages',
       icon: mdiWeb,
       title: 'All Pages',
-      description: 'Manage all pages'
+      description: 'View and manage every page',
+      gradient: 'from-blue-500 to-indigo-600',
+      hoverBg: 'hover:bg-blue-50',
     },
     {
       href: '/setup/ha-config',
       icon: mdiHomeAssistant,
       title: 'HA Settings',
-      description: 'Configure HA'
+      description: 'Configure Home Assistant',
+      gradient: 'from-teal-500 to-emerald-600',
+      hoverBg: 'hover:bg-teal-50',
     },
     {
       href: '/auth/profile/billing',
       icon: mdiCreditCard,
       title: 'Billing',
-      description: 'Manage your billing'
-    }
+      description: 'Manage your subscription',
+      gradient: 'from-amber-500 to-orange-500',
+      hoverBg: 'hover:bg-amber-50',
+    },
   ];
 
   const handleActionClick = (action: QuickAction) => {
     if (action.disabled) {
-      if (action.href === '/setup/pages/create') {
-        router.push('/setup/ha-config');
-      }
+      if (action.href === '/setup/pages/create') router.push('/setup/ha-config');
       return;
     }
     router.push(action.href);
   };
 
   return (
-    <Card className="w-full bg-white border border-slate-100 shadow-sm">
-      <CardHeader className="flex flex-col gap-1 pb-2">
-        <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+    <section>
+      <div className="mb-4">
+        <h2 className="text-base font-semibold text-slate-900">Quick Actions</h2>
         <p className="text-sm text-slate-500">Common tasks and shortcuts</p>
-      </CardHeader>
-      <CardBody className="pt-0">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action) => (
-            <Card
-              key={action.href}
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {quickActions.map((action) => (
+          <button
+            key={action.href}
+            type="button"
+            onClick={() => handleActionClick(action)}
+            disabled={action.disabled}
+            className={cn(
+              "group relative text-left rounded-2xl p-5 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-violet-500",
+              action.disabled
+                ? "bg-slate-50 cursor-not-allowed opacity-50"
+                : cn("bg-white shadow-sm border border-slate-100 cursor-pointer", action.hoverBg, "hover:shadow-md hover:border-transparent")
+            )}
+          >
+            {/* Gradient icon */}
+            <div
               className={cn(
-                "group cursor-pointer transition-all duration-200 border-none shadow-none",
-                action.disabled
-                  ? "bg-slate-50 cursor-not-allowed opacity-60"
-                  : "bg-slate-50 hover:bg-violet-50 hover:shadow-sm"
+                "w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br shadow-sm",
+                action.disabled ? "from-slate-300 to-slate-400" : action.gradient
               )}
-              isPressable={!action.disabled}
-              onPress={() => handleActionClick(action)}
             >
-              <CardBody className="p-4">
-                <div className="flex flex-col items-center text-center space-y-3">
-                  {/* Icon */}
-                  <div className={cn(
-                    "w-11 h-11 rounded-xl flex items-center justify-center transition-colors",
-                    action.disabled
-                      ? "bg-slate-100"
-                      : "bg-violet-50 group-hover:bg-violet-100"
-                  )}>
-                    <Icon
-                      path={action.icon}
-                      className={cn(
-                        "w-5 h-5 transition-colors",
-                        action.disabled
-                          ? "text-slate-400"
-                          : "text-violet-600"
-                      )}
-                    />
-                  </div>
+              <Icon path={action.icon} className="w-5 h-5 text-white" />
+            </div>
 
-                  {/* Content */}
-                  <div className="space-y-0.5">
-                    <h3 className={cn(
-                      "font-semibold text-sm",
-                      action.disabled
-                        ? "text-slate-400"
-                        : "text-slate-900 group-hover:text-violet-700"
-                    )}>
-                      {action.title}
-                    </h3>
-                    <p className={cn(
-                      "text-xs",
-                      action.disabled
-                        ? "text-slate-400"
-                        : "text-slate-500"
-                    )}>
-                      {action.description}
-                    </p>
-                  </div>
+            {/* Text */}
+            <p className={cn(
+              "font-semibold text-sm mb-0.5",
+              action.disabled ? "text-slate-400" : "text-slate-900"
+            )}>
+              {action.title}
+            </p>
+            <p className={cn(
+              "text-xs leading-relaxed",
+              action.disabled ? "text-slate-400" : "text-slate-500"
+            )}>
+              {action.description}
+            </p>
 
-                  {/* Status */}
-                  {action.disabled ? (
-                    <div className="flex items-center gap-1">
-                      <Icon path={mdiAlertCircle} className="w-3 h-3 text-warning" />
-                      <Chip size="sm" color="warning" variant="flat" className="text-xs">
-                        {action.disabledReason}
-                      </Chip>
-                    </div>
-                  ) : (
-                    <Icon
-                      path={mdiArrowRight}
-                      className="w-4 h-4 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-1 transition-all"
-                    />
-                  )}
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </CardBody>
-    </Card>
+            {/* Arrow or warning */}
+            {action.disabled ? (
+              <div className="mt-3 flex items-center gap-1">
+                <Icon path={mdiAlertCircle} className="w-3 h-3 text-amber-500" />
+                <span className="text-xs text-amber-600">{action.disabledReason}</span>
+              </div>
+            ) : (
+              <div className="mt-4">
+                <Icon
+                  path={mdiArrowRight}
+                  className="w-4 h-4 text-slate-400 transition-all duration-200 group-hover:text-slate-700 group-hover:translate-x-1"
+                />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+    </section>
   );
 };
