@@ -40,14 +40,7 @@ export default function BillingContent({
 
 
   return (
-    <div className="max-w-5xl w-full mx-auto px-4 pt-40 pb-24">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="text-violet-600 text-xs font-semibold uppercase tracking-widest mb-3">Pricing</p>
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight">Simple, honest pricing</h1>
-        <p className="text-slate-500 mt-3 text-lg">Pick a plan that suits you. Cancel anytime.</p>
-      </div>
-
+    <div className="max-w-5xl w-full mx-auto px-4 py-16 pb-24">
       <div className="w-full flex flex-col gap-8 justify-center items-center">
         {/* Billing toggle */}
         <div className="inline-flex rounded-full bg-slate-100 p-1">

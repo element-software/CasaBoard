@@ -51,21 +51,8 @@ export default function ContactPageContent() {
   }
 
   return (
-    <div className="pt-48 pb-24">
+    <div className="py-16 pb-24">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <p className="text-violet-600 text-xs font-semibold uppercase tracking-widest mb-3">
-            Get in touch
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
-            Contact us
-          </h1>
-          <p className="text-slate-500 mt-3 text-lg">
-            Have a question or feedback? Fill out the form and we&apos;ll get back to you.
-          </p>
-        </div>
-
         {/* Form card */}
         <div className="bg-white border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/60">

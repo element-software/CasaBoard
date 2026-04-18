@@ -13,14 +13,7 @@ export const DocsWrapper = () => {
   const next = index < sections.length - 1 ? () => setIndex(index + 1) : undefined;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 pt-48">
-      {/* Page header */}
-      <div className="mb-10">
-        <p className="text-violet-600 text-xs font-semibold uppercase tracking-widest mb-2">Documentation</p>
-        <h1 className="text-3xl font-bold text-slate-900">How to use CasaBoard</h1>
-        <p className="text-slate-500 mt-1">Step-by-step guides for getting started and beyond.</p>
-      </div>
-
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
       <div className="grid gap-8 md:grid-cols-[240px_1fr]">
         <DocsSidebar index={index} setIndex={setIndex} />
 
