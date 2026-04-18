@@ -26,10 +26,9 @@ import {
 
 export default function SecurityPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-36 pb-16">
-
-      {/* ── Hero banner ── */}
-      <div className="relative rounded-2xl overflow-hidden mb-14">
+    <>
+      {/* ── Full-width hero ── */}
+      <div className="relative w-full overflow-hidden">
         {/* Base gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-700 via-violet-800 to-indigo-900" />
         {/* Radial mesh */}
@@ -48,7 +47,7 @@ export default function SecurityPage() {
           }}
         />
         {/* Content */}
-        <div className="relative z-10 px-8 sm:px-14 py-16 sm:py-20 text-center">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 text-center">
           <p className="text-violet-300 text-xs font-semibold uppercase tracking-widest mb-5">
             Security & Privacy
           </p>
@@ -82,6 +81,9 @@ export default function SecurityPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Page content ── */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
       {/* Overview Section */}
       <section className="mb-12">
@@ -573,6 +575,7 @@ export default function SecurityPage() {
           This security documentation is regularly reviewed and updated to reflect our current practices.
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
