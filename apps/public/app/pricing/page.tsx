@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { StripeService } from "@repo/lib";
 import Pricing from "./pricing";
 import Stripe from "stripe";
 import Icon from "@mdi/react";
 import { mdiTag, mdiShieldCheck, mdiClose, mdiCalendarMonth } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const metadata: Metadata = metadataForRoute("pricing");
 
 export default async function BillingPage() {
   let stripePlans: Array<Stripe.Price & { product: Stripe.Product }> = [];

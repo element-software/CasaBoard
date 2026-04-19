@@ -1,11 +1,7 @@
-import { Metadata } from "next";
 import { HomePageContent } from "./home/HomePageContent";
-import { generateHomepageMetadata } from "./api/og/homepage/metadata";
+import { metadataForRoute } from "./lib/og/content";
 
-export async function generateMetadata(): Promise<Metadata> {
-
-  return await generateHomepageMetadata();
-}
+export const metadata = metadataForRoute("home");
 
 export default function HomePage() {
   return (

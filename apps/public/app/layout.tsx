@@ -21,11 +21,10 @@ export const metadata = {
       "Privacy-first Home Assistant dashboards. Local by default; optional cloud sync for subscribers.",
     url: "https://casaboard.dev",
     siteName: "CasaBoard",
-    images: [],
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "CasaBoard — Smart Home Dashboard",
     description:
       "Privacy-first Home Assistant dashboards. Local credentials by default; optional cloud sync.",

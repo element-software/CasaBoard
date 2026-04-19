@@ -1,7 +1,11 @@
-export const dynamic = "force-dynamic";
+import type { Metadata } from "next";
 import AboutPageContent from "./AboutPageContent";
 import Icon from "@mdi/react";
 import { mdiInformation, mdiGrid, mdiHomeAssistant, mdiShieldCheck } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = metadataForRoute("about");
 
 export default function AboutPage() {
   return (

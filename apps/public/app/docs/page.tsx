@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import { DocsWrapper } from "./DocsWrapper";
 import Icon from "@mdi/react";
 import { mdiBookOpenPageVariant, mdiLightbulb, mdiHomeAssistant, mdiDrag } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const metadata: Metadata = metadataForRoute("docs");
 
 export default function DocsPage() {
   return (

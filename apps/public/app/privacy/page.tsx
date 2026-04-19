@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Icon from "@mdi/react";
 import Link from "next/link";
 import {
@@ -9,6 +10,9 @@ import {
   mdiGoogleAnalytics,
   mdiDatabaseOutline,
 } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const metadata: Metadata = metadataForRoute("privacy");
 
 function SectionLabel({ n, label }: { n: string; label: string }) {
   return (

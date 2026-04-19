@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Icon from "@mdi/react";
 import Link from "next/link";
 import {
@@ -16,6 +17,9 @@ import {
   mdiWifiOff,
   mdiLanConnect,
 } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const metadata: Metadata = metadataForRoute("security");
 
 // ── Reusable primitives ──────────────────────────────────────────────────────
 

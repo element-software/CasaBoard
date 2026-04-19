@@ -1,7 +1,11 @@
-export const dynamic = "force-dynamic";
+import type { Metadata } from "next";
 import ContactPageContent from "./ContactPageContent";
 import Icon from "@mdi/react";
 import { mdiEmailOutline, mdiClockFast, mdiHeadset } from "@mdi/js";
+import { metadataForRoute } from "../lib/og/content";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = metadataForRoute("contact");
 
 export default function ContactPage() {
   return (
