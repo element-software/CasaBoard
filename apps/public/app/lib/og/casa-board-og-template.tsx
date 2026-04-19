@@ -24,9 +24,13 @@ const TEXT_COLUMN_STYLE: CSSProperties = {
 
 const TITLE_STYLE: CSSProperties = {
   margin: 0,
-  alignSelf: "stretch",
-  width: "100%",
-  maxWidth: "100%",
+  alignSelf: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 620,
+  maxWidth: 620,
   color: "#5b21b6",
   fontSize: 68,
   fontWeight: 900,
@@ -40,9 +44,13 @@ const TITLE_STYLE: CSSProperties = {
 
 const DESCRIPTION_STYLE: CSSProperties = {
   margin: 0,
-  alignSelf: "stretch",
-  width: "100%",
-  maxWidth: "100%",
+  alignSelf: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 620,
+  maxWidth: 620,
   color: "#475569",
   fontSize: 25,
   fontWeight: 700,
