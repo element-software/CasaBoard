@@ -4,7 +4,8 @@ import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { SubscriptionService } from "../services/subscriptionService";
 import { CreatePageData, Page, UpdatePageData } from "@repo/types/page";
 import { revalidatePath } from "next/cache";
-import { serverLogger } from "@repo/lib";
+import { assertPuckDataWithinItemLimit } from "../puck/assertPuckDataWithinItemLimit";
+import { serverLogger } from "../logger";
 
 export async function createPage(data: CreatePageData) {
   try {
@@ -23,6 +24,8 @@ export async function createPage(data: CreatePageData) {
     if (existingPage) {
       throw new Error("A page with this slug already exists");
     }
+
+    await assertPuckDataWithinItemLimit(data.puck_data);
 
     // Enforce entitlement: limit dashboards
     const { count: dashboardCount } = await supabase
@@ -80,6 +83,10 @@ export async function updatePage(slug: string, data: UpdatePageData) {
     const supabase = await createClient();
 
     const user = await getCurrentAuthUser();
+
+    if (data.puck_data !== undefined) {
+      await assertPuckDataWithinItemLimit(data.puck_data);
+    }
 
     const { data: page, error } = await supabase
       .from("pages")

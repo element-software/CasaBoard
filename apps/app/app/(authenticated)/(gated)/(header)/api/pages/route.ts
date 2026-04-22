@@ -1,4 +1,4 @@
-import { getCurrentAuthUser, SupabaseClient } from '@repo/lib'
+import { assertPuckDataWithinItemLimit, getCurrentAuthUser, SupabaseClient } from '@repo/lib'
 import { NextRequest, NextResponse } from 'next/server'
 import { CreatePageData } from '@repo/types/page'
 
@@ -48,6 +48,13 @@ export async function POST(request: NextRequest) {
       { error: 'A page with this slug already exists' },
       { status: 400 }
     )
+  }
+
+  try {
+    await assertPuckDataWithinItemLimit(body.puck_data)
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Item limit exceeded'
+    return NextResponse.json({ error: message }, { status: 400 })
   }
 
   const { data: page, error } = await supabase

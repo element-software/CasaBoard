@@ -16,6 +16,7 @@ import {
 } from "@heroui/react";
 import "@measured/puck/puck.css";
 import { useRouter } from "next/navigation";
+import { countPuckDataWidgets } from "@repo/lib/puck/countPuckDataWidgets";
 import { clientLogger } from "@repo/lib";
 
 type PuckEditorClientProps = {
@@ -108,8 +109,8 @@ export default function PuckEditorClient({
     }
   }, [data, lastSavedJson]);
 
-  // Derived item-count state for limit enforcement
-  const itemCount = data.content.length;
+  // Derived item-count: all layout + nested slot widgets (e.g. inside Grid)
+  const itemCount = useMemo(() => countPuckDataWidgets(data), [data]);
   const isAtLimit =
     maxItemsPerDashboard !== -1 && itemCount >= maxItemsPerDashboard;
   const isNearLimit =
@@ -119,8 +120,8 @@ export default function PuckEditorClient({
 
   /** Returns an error message if the item limit is exceeded, otherwise null. */
   const getItemLimitError = (): string | null => {
-    if (maxItemsPerDashboard !== -1 && data.content.length > maxItemsPerDashboard) {
-      return `This dashboard has ${data.content.length} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`;
+    if (maxItemsPerDashboard !== -1 && itemCount > maxItemsPerDashboard) {
+      return `This dashboard has ${itemCount} items but your plan allows a maximum of ${maxItemsPerDashboard}. Please remove some items before saving.`;
     }
     return null;
   };

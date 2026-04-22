@@ -14,6 +14,8 @@ export { generateSessionId } from "./encryption";
 export * as LinkService from "./services/linkService";
 export { getCurrentAuthUser } from "./supabase/server";
 export { createLogger, serverLogger, clientLogger } from "./logger";
+export { countPuckDataWidgets } from "./puck/countPuckDataWidgets";
+export { assertPuckDataWithinItemLimit } from "./puck/assertPuckDataWithinItemLimit";
 export * as Clarity from "./clarity";
 export {
   initClarity,
