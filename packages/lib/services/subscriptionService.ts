@@ -153,13 +153,13 @@ export class SubscriptionService {
    */
   private static async toSubscriptionSummary(data: SubscriptionData | null): Promise<SubscriptionSummary> {
     if (!data) {
-      return { 
-        status: 'none', 
-        planId: 'unknown', 
-        trialEndsAt: null, 
-        hasPaymentMethod: null, 
-        planLabel: null, 
-        currentPeriodEnd: null 
+      return {
+        status: "none",
+        planId: "free",
+        trialEndsAt: null,
+        hasPaymentMethod: null,
+        planLabel: "Free",
+        currentPeriodEnd: null,
       };
     }
 

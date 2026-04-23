@@ -51,7 +51,8 @@ export interface SubscriptionData {
 // Public API type derived from SubscriptionData
 export interface SubscriptionSummary {
   status: string;
-  planId: PlanId | 'unknown';
+  /** Stripe product id, or `free` when there is no paid subscription, or `unknown` if unset. */
+  planId: PlanId | "free" | "unknown";
   trialEndsAt: string | null;
   hasPaymentMethod: boolean | null;
   planLabel?: string | null;
