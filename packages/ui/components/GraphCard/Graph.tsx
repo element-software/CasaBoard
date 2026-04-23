@@ -77,7 +77,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
             data: {
               fill: "url(#gradient)",
               fillOpacity: 0.4,
-              stroke: "var(--theme-primary)",
+              stroke: "var(--theme-chart-line)",
               strokeWidth: 2,
               strokeLinecap: "round",
               strokeLinejoin: "round",
@@ -91,17 +91,17 @@ const Graph = ({ data, className }: GraphCardProps) => {
           <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop
               offset="0%"
-              stopColor="var(--theme-primary)"
+              stopColor="var(--theme-chart-fill)"
               stopOpacity={0.6}
             />
             <stop
               offset="50%"
-              stopColor="var(--theme-primary)"
+              stopColor="var(--theme-chart-fill)"
               stopOpacity={0.3}
             />
             <stop
               offset="100%"
-              stopColor="var(--theme-primary)"
+              stopColor="var(--theme-chart-fill)"
               stopOpacity={0.1}
             />
           </linearGradient>

@@ -5,13 +5,15 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.{ts,tsx}",
-    "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts"
+    "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts",
+    "./actions/themeActions": "./actions/themeActions.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/types": "*",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/serialize": "^1.3.3",
@@ -41,7 +43,6 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
-    "@repo/types": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^22.15.3",
     "eslint": "^9.34.0",

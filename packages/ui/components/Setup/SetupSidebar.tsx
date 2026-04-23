@@ -24,6 +24,7 @@ import {
   mdiBookOpen,
   mdiCreditCard,
   mdiLogout,
+  mdiPaletteSwatch,
 } from "@mdi/js";
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";
@@ -82,7 +83,11 @@ export const SetupSidebar = ({
     setExpandedSections(next);
   };
 
-  const isActive = (path: string) => pathname === path;
+  /** Exact match for `/setup`; prefix match for other setup paths (e.g. theme editor). */
+  const isActivePath = (path: string) => {
+    if (path === "/setup") return pathname === path;
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
 
   const handleLogout = async () => {
     const supabase = SupabaseClient.createClient();
@@ -108,6 +113,7 @@ export const SetupSidebar = ({
       items: [
         { title: "Pages", href: "/setup/pages", icon: mdiHome },
         { title: "Sidebars", href: "/setup/sidebars", icon: mdiMenu },
+        { title: "Themes", href: "/setup/themes", icon: mdiPaletteSwatch },
       ],
     },
     {
@@ -134,7 +140,17 @@ export const SetupSidebar = ({
   ];
 
   // ── Collapsed icon button with tooltip ────────────────────────────────────
-  const CollapsedItem = ({ item, onClick }: { item: NavLeaf; onClick?: () => void }) => (
+  const CollapsedItem = ({
+    item,
+    onClick,
+    exactMatch = false,
+  }: {
+    item: NavLeaf;
+    onClick?: () => void;
+    exactMatch?: boolean;
+  }) => {
+    const active = exactMatch ? pathname === item.href : isActivePath(item.href);
+    return (
     <div className="relative group px-2">
       <button
         onClick={() => {
@@ -144,13 +160,13 @@ export const SetupSidebar = ({
         title={item.title}
         className={cn(
           "w-full h-10 flex items-center justify-center rounded-lg transition-all duration-150",
-          isActive(item.href)
+          active
             ? "bg-violet-50 text-violet-600"
             : "text-slate-400 hover:bg-slate-50 hover:text-slate-700"
         )}
       >
         <Icon path={item.icon} className="w-5 h-5 flex-shrink-0" />
-        {isActive(item.href) && (
+        {active && (
           <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-violet-500 rounded-r-full" />
         )}
       </button>
@@ -160,7 +176,8 @@ export const SetupSidebar = ({
         <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
       </div>
     </div>
-  );
+    );
+  };
 
   // ── Main sidebar content (expanded) ───────────────────────────────────────
   const renderExpandedContent = (closeMobile?: () => void) => (
@@ -186,7 +203,7 @@ export const SetupSidebar = ({
               }
               className={cn(
                 "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 text-left",
-                section.selfClick && section.href && isActive(section.href)
+                section.selfClick && section.href && isActivePath(section.href)
                   ? "bg-violet-50 text-violet-700"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               )}
@@ -195,7 +212,7 @@ export const SetupSidebar = ({
                 path={section.icon}
                 className={cn(
                   "w-4 h-4 flex-shrink-0",
-                  section.selfClick && section.href && isActive(section.href)
+                  section.selfClick && section.href && isActivePath(section.href)
                     ? "text-violet-600"
                     : "text-slate-400"
                 )}
@@ -223,7 +240,7 @@ export const SetupSidebar = ({
                     }}
                     className={cn(
                       "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 text-left",
-                      isActive(item.href)
+                      isActivePath(item.href)
                         ? "bg-violet-50 text-violet-700 font-medium"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
                     )}
@@ -232,7 +249,7 @@ export const SetupSidebar = ({
                       path={item.icon}
                       className={cn(
                         "w-4 h-4 flex-shrink-0",
-                        isActive(item.href) ? "text-violet-500" : "text-slate-300"
+                        isActivePath(item.href) ? "text-violet-500" : "text-slate-300"
                       )}
                     />
                     {item.title}
@@ -254,7 +271,7 @@ export const SetupSidebar = ({
             onClick={closeMobile}
             className={cn(
               "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150",
-              isActive(item.href)
+              pathname === item.href
                 ? "bg-violet-50 text-violet-700 font-medium"
                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
             )}
@@ -304,7 +321,7 @@ export const SetupSidebar = ({
         <div className="my-2 h-px bg-slate-100 mx-3" />
 
         {bottomItems.map((item) => (
-          <CollapsedItem key={item.href} item={item} />
+          <CollapsedItem key={item.href} item={item} exactMatch />
         ))}
       </div>
 

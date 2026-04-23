@@ -1,0 +1,10 @@
+/* Load after @measured/puck/puck.css.
+ * Puck sets #puck-canvas-root to white; ThemeScope provides --theme-page-background. */
+[data-casaboard-theme] #puck-canvas-root {
+  background-color: var(--theme-page-background) !important;
+}
+
+/* Grey “workspace” padding around the artboard → same page canvas tone */
+[data-casaboard-theme] div:has(> div:has(#puck-canvas-root)) {
+  background: var(--theme-page-background) !important;
+}

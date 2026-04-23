@@ -1,6 +1,7 @@
 import {
   PageActions,
   SubscriptionService,
+  resolveDashboardThemeStyles,
 } from "@repo/lib";
 import { DashboardHAClient } from "@repo/ui/components/Shared/util/DashboardHAClient";
 import { notFound } from "next/navigation";
@@ -27,11 +28,15 @@ export default async function ConfigurablePage({ params }: PageProps) {
       notFound();
     }
 
+    const themeStyles = await resolveDashboardThemeStyles(pageData);
+
     return (
       <DashboardHAClient
         page={pageData}
         pageSlug={page}
         entitlements={entitlements}
+        themeMainStyle={themeStyles.main}
+        themeSidebarStyle={themeStyles.sidebar}
       />
     );
   } catch (error) {

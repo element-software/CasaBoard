@@ -3,6 +3,7 @@ import * as BinarySensorUtils from "./binarySensor";
 import * as AlarmUtils from "./alarm";
 import * as EntityIconsUtils from "./entityIcons";
 import * as Tools from "./tools";
+import * as EntityTheme from "./entityTheme";
 
 export {
   AlarmUtils,
@@ -10,4 +11,5 @@ export {
   BinarySensorUtils,
   EntityIconsUtils,
   Tools,
+  EntityTheme,
 }

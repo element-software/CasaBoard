@@ -29,6 +29,7 @@ export default async function SidebarEditPage({
       userId={sidebar.user_id}
       initialPublished={true}
       initialSlug={sidebar.slug}
+      initialThemeId={sidebar.theme_id ?? null}
     />
   );
 }

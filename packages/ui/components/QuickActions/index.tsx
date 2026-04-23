@@ -9,6 +9,7 @@ import {
   mdiCreditCard,
   mdiAlertCircle,
   mdiArrowRight,
+  mdiPaletteSwatch,
 } from '@mdi/js';
 import { cn } from '@heroui/react';
 import type { Entitlements } from '@repo/types/subscription';
@@ -53,6 +54,14 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
       hoverBg: 'hover:bg-blue-50',
     },
     {
+      href: '/setup/themes',
+      icon: mdiPaletteSwatch,
+      title: 'Themes',
+      description: 'Custom colors for dashboards and sidebars',
+      gradient: 'from-fuchsia-500 to-pink-600',
+      hoverBg: 'hover:bg-fuchsia-50',
+    },
+    {
       href: '/setup/ha-config',
       icon: mdiHomeAssistant,
       title: 'HA Settings',
@@ -84,7 +93,7 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
         <h2 className="text-base font-semibold text-slate-900">Quick Actions</h2>
         <p className="text-sm text-slate-500">Common tasks and shortcuts</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {quickActions.map((action) => (
           <button
             key={action.href}

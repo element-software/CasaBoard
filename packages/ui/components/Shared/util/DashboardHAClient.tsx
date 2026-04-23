@@ -8,17 +8,22 @@ import { HassConnectWrapper } from "./HassConnectWrapper";
 import { useMergedHAInstances } from "@repo/hooks";
 import { Button, Spinner } from "@heroui/react";
 import NextLink from "next/link";
+import type { CSSProperties } from "react";
 
 type DashboardHAClientProps = {
   page: Page;
   pageSlug: string;
   entitlements: Entitlements;
+  themeMainStyle?: CSSProperties;
+  themeSidebarStyle?: CSSProperties;
 };
 
 export function DashboardHAClient({
   page,
   pageSlug,
   entitlements,
+  themeMainStyle,
+  themeSidebarStyle,
 }: DashboardHAClientProps) {
   const { instances, loading } = useMergedHAInstances(entitlements);
   const [mounted, setMounted] = useState(false);
@@ -57,7 +62,12 @@ export function DashboardHAClient({
 
   return (
     <HassConnectWrapper haInstance={haInstance}>
-      <PuckRenderer pageId={pageSlug} pageData={page} />
+      <PuckRenderer
+        pageId={pageSlug}
+        pageData={page}
+        themeMainStyle={themeMainStyle}
+        themeSidebarStyle={themeSidebarStyle}
+      />
     </HassConnectWrapper>
   );
 }

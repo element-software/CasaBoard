@@ -28,6 +28,8 @@ export default async function PageEdit({ params }: PageProps) {
       initialPublished={page.published}
       sidebars={sidebars}
       initialSlug={page.slug}
+      initialThemeId={page.theme_id ?? null}
+      initialThemeOverrides={page.theme_overrides ?? null}
     />
   );
 }

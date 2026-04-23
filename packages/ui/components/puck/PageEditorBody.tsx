@@ -10,7 +10,12 @@ import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 import { useMergedHAInstances } from "@repo/hooks";
 import type { Entitlements } from "@repo/types/subscription";
 import type { Data } from "@measured/puck";
+import type { ThemeTokens } from "@repo/types/theme";
 import { Spinner } from "@heroui/react";
+
+type ThemePickerOption = { id: string; name: string };
+
+type ThemeLibraryEntry = { id: string; tokens: ThemeTokens };
 
 type PageEditorBodyProps = {
   entitlements: Entitlements;
@@ -19,6 +24,10 @@ type PageEditorBodyProps = {
   initialPublished?: boolean;
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
+  themePickerThemes?: ThemePickerOption[];
+  themeLibrary?: ThemeLibraryEntry[];
+  initialThemeId?: string | null;
+  initialThemeOverrides?: ThemeTokens | null;
 };
 
 export default function PageEditorBody({
@@ -28,6 +37,10 @@ export default function PageEditorBody({
   initialPublished = false,
   sidebars = [],
   initialSlug,
+  themePickerThemes = [],
+  themeLibrary = [],
+  initialThemeId,
+  initialThemeOverrides,
 }: PageEditorBodyProps) {
   const { instances, loading } = useMergedHAInstances(entitlements);
 
@@ -45,6 +58,10 @@ export default function PageEditorBody({
       haInstances={instances}
       sidebars={sidebars}
       initialSlug={initialSlug}
+      themePickerThemes={themePickerThemes}
+      themeLibrary={themeLibrary}
+      initialThemeId={initialThemeId}
+      initialThemeOverrides={initialThemeOverrides}
       maxItemsPerDashboard={entitlements.maxItemsPerDashboard}
       onCreateItem={createPageEditorAction}
       onUpdateItem={updatePageEditorAction}

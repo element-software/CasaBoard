@@ -32,8 +32,8 @@ export const Alarm = ({ entityId }: AlarmProps) => {
           className={classNames("h-12 w-12", "text-theme-error")}
           aria-hidden="true"
         />
-        <p className="text-xs text-theme-secondary">{entityId}</p>
-        <p className="text-xs text-theme-secondary">Unavailable</p>
+        <p className="text-xs text-theme-text-secondary">{entityId}</p>
+        <p className="text-xs text-theme-text-secondary">Unavailable</p>
       </div>
     );
 
@@ -50,7 +50,7 @@ export const Alarm = ({ entityId }: AlarmProps) => {
         entity.state.split("_")[0].slice(1) +
         " " +
         (entity.state.split("_")[1] || "")}
-      <p className="text-xs text-theme-secondary">
+      <p className="text-xs text-theme-text-secondary">
         Last Changed {new Date(entity.last_changed).toLocaleTimeString()}
       </p>
     </div>

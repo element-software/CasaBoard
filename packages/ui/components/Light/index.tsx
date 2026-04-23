@@ -90,7 +90,7 @@ export const Light = ({
             <EntityIcon
               entity={entity}
               className={cn("h-8 w-8 flex-shrink-0", {
-                "text-white": isOn && !dimmer,
+                "text-theme-text-on-primary": isOn && !dimmer,
               })}
             />
 
@@ -118,8 +118,8 @@ export const Light = ({
               className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
               style={{
                 width: `${brightnessPercentage}%`,
-                backgroundColor: "var(--theme-primary)",
-                boxShadow: `0 0 4px var(--theme-primary)40`,
+                backgroundColor: "var(--theme-slider-thumb)",
+                boxShadow: `0 0 4px color-mix(in srgb, var(--theme-slider-thumb) 40%, transparent)`,
                 maxWidth: "100%",
               }}
             />

@@ -47,14 +47,14 @@ const EntityCard = ({
       return (
         <div
           key={entityId}
-          className="flex flex-col items-center gap-2 text-center p-2 bg-red-500/20 border border-red-500/50 rounded-lg"
+          className="flex flex-col items-center gap-2 text-center p-2 rounded-lg border border-theme-error bg-theme-surface"
         >
           <Icon
             path={mdiAlert}
-            className={classNames("h-6 w-6", "text-red-500")}
+            className={classNames("h-6 w-6", "text-theme-error")}
             aria-hidden="true"
           />
-          <div className="text-xs text-red-200">
+          <div className="text-xs text-theme-text-secondary">
             <div className="font-medium">Entity Not Found</div>
             <div className="text-[10px] opacity-80 break-all">{entityId}</div>
           </div>

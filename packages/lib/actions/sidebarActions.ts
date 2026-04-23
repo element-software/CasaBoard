@@ -45,6 +45,7 @@ export async function getSidebar(slug: string): Promise<Sidebar> {
       .from("sidebars")
       .select("*")
       .eq("slug", slug)
+      .eq("user_id", user.id)
       .single();
 
     if (error) {
@@ -189,7 +190,11 @@ export async function deleteSidebar(slug: string): Promise<void> {
     const user = await getCurrentAuthUser();
 
     const supabase = await createClient();
-    const { error } = await supabase.from("sidebars").delete().eq("slug", slug);
+    const { error } = await supabase
+      .from("sidebars")
+      .delete()
+      .eq("slug", slug)
+      .eq("user_id", user.id);
 
     if (error) {
       throw new Error(error.message || "Failed to delete sidebar");

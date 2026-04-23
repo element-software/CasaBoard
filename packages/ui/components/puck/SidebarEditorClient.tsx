@@ -1,6 +1,9 @@
 import type { Data } from "@measured/puck";
 import SidebarEditorBody from "./SidebarEditorBody";
 import { SubscriptionService } from "@repo/lib";
+import { listThemes } from "@repo/lib/actions/themeActions";
+
+type ThemePickerOption = { id: string; name: string };
 
 type SidebarEditorClientProps = {
   initialData?: Data;
@@ -8,6 +11,7 @@ type SidebarEditorClientProps = {
   userId?: string | null;
   initialPublished?: boolean;
   initialSlug?: string;
+  initialThemeId?: string | null;
 };
 
 export default async function SidebarEditorClient({
@@ -15,9 +19,22 @@ export default async function SidebarEditorClient({
   sidebarId,
   initialPublished = true,
   initialSlug,
+  initialThemeId,
 }: SidebarEditorClientProps) {
-  const entitlements =
-    await SubscriptionService.getEntitlementsForCurrentUser();
+  const [entitlements, themes] = await Promise.all([
+    SubscriptionService.getEntitlementsForCurrentUser(),
+    listThemes(),
+  ]);
+
+  const themePickerThemes: ThemePickerOption[] = themes.map((t) => ({
+    id: t.id,
+    name: t.name,
+  }));
+
+  const themeLibrary = themes.map((t) => ({
+    id: t.id,
+    tokens: t.tokens ?? {},
+  }));
 
   return (
     <SidebarEditorBody
@@ -26,6 +43,9 @@ export default async function SidebarEditorClient({
       sidebarId={sidebarId}
       initialPublished={initialPublished}
       initialSlug={initialSlug}
+      themePickerThemes={themePickerThemes}
+      themeLibrary={themeLibrary}
+      initialThemeId={initialThemeId}
     />
   );
 }
