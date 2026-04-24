@@ -7,6 +7,7 @@ import { useState } from "react";
 import { LinkService } from "@repo/lib";
 import Stripe from "stripe";
 import { useRouter } from "next/navigation";
+import { displaySubscriptionPlanName } from "@repo/types/subscription";
 
 interface Entitlements {
   planId: string;
@@ -103,7 +104,10 @@ export default function BillingContent({
               {entitlements.active ? "Active" : "Inactive"}
             </Chip>
             <Chip variant="flat" color="primary">
-              Plan: <strong>{planLabel ?? entitlements.planId}</strong>
+              Plan:{" "}
+              <strong>
+                {displaySubscriptionPlanName(planLabel, entitlements.planId)}
+              </strong>
             </Chip>
             {entitlements.trialEndsAt && (
               <Chip variant="flat" color="danger">

@@ -6,7 +6,7 @@ import {
   VictoryTooltip,
   VictoryVoronoiContainer,
 } from "victory";
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 
 interface GraphCardProps {
   data: any;
@@ -14,7 +14,11 @@ interface GraphCardProps {
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
-  console.log("Graph data", data);
+  const reactGradientId = useId();
+  const gradientId = useMemo(
+    () => `graph-grad-${reactGradientId.replace(/[^a-zA-Z0-9_-]/g, "")}`,
+    [reactGradientId]
+  );
 
   const processedData = useMemo(() => {
     if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
@@ -33,7 +37,34 @@ const Graph = ({ data, className }: GraphCardProps) => {
   const unit = data?.unit || "W";
 
   return (
-    <div className={className}>
+    <div className={className ? `relative ${className}` : "relative"}>
+      <svg
+        width={0}
+        height={0}
+        className="absolute overflow-hidden"
+        aria-hidden
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop
+              offset="0%"
+              stopColor="var(--theme-chart-fill)"
+              stopOpacity={0.6}
+            />
+            <stop
+              offset="50%"
+              stopColor="var(--theme-chart-fill)"
+              stopOpacity={0.3}
+            />
+            <stop
+              offset="100%"
+              stopColor="var(--theme-chart-fill)"
+              stopOpacity={0.1}
+            />
+          </linearGradient>
+        </defs>
+      </svg>
       <VictoryChart
         height={450}
         width={1920}
@@ -75,7 +106,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
           data={processedData}
           style={{
             data: {
-              fill: "url(#gradient)",
+              fill: `url(#${gradientId})`,
               fillOpacity: 0.4,
               stroke: "var(--theme-chart-line)",
               strokeWidth: 2,
@@ -87,25 +118,6 @@ const Graph = ({ data, className }: GraphCardProps) => {
             duration: 0,
           }}
         />
-        <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop
-              offset="0%"
-              stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.6}
-            />
-            <stop
-              offset="50%"
-              stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.3}
-            />
-            <stop
-              offset="100%"
-              stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.1}
-            />
-          </linearGradient>
-        </defs>
       </VictoryChart>
     </div>
   );

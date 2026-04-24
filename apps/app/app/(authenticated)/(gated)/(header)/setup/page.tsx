@@ -4,6 +4,7 @@ import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
 import { HAInstanceManager } from "@repo/ui/components/InstanceManager/HAInstanceManager";
 import { Syne } from "next/font/google";
 import { cn } from "@heroui/react";
+import { displaySubscriptionPlanName } from "@repo/types/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export default async function SetupPage() {
     await SubscriptionService.getEntitlementsForCurrentUser();
   const pages = await PageActions.getAllPages();
 
-  const planLabel = (entitlements as any).planLabel ?? entitlements.planId ?? "Free";
+  const planLabel = displaySubscriptionPlanName(null, entitlements.planId);
   const isActive = entitlements.active;
 
   return (

@@ -58,3 +58,15 @@ export interface SubscriptionSummary {
   planLabel?: string | null;
   currentPeriodEnd?: string | null;
 }
+
+/** Plan text for profile/billing UI (maps legacy `unknown` and `free` ids to “Free”). */
+export function displaySubscriptionPlanName(
+  planLabel: string | null | undefined,
+  planId: string
+): string {
+  const trimmed = planLabel?.trim();
+  if (trimmed) return trimmed;
+  const id = planId.trim().toLowerCase();
+  if (id === "free" || id === "unknown") return "Free";
+  return planId;
+}

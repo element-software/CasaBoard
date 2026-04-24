@@ -1,6 +1,10 @@
 "use client";
 import { Card, CardBody, Button, Avatar, Chip, Divider } from "@heroui/react";
-import { Entitlements, SubscriptionSummary } from "@repo/types/subscription";
+import {
+  Entitlements,
+  SubscriptionSummary,
+  displaySubscriptionPlanName,
+} from "@repo/types/subscription";
 import { Profile } from "@repo/types/user";
 import { useRouter } from "next/navigation";
 
@@ -92,7 +96,13 @@ export default function ProfileClient({
               >
                 {subscription.status}
               </Chip>
-              <Chip variant="flat" color="primary">Plan: {subscription.planLabel ?? subscription.planId}</Chip>
+              <Chip variant="flat" color="primary">
+                Plan:{" "}
+                {displaySubscriptionPlanName(
+                  subscription.planLabel,
+                  subscription.planId
+                )}
+              </Chip>
               {subscription.trialEndsAt && (
                 <Chip color="danger" variant="flat">
                   TRIAL • ends{" "}
