@@ -1,6 +1,6 @@
-import { SidebarActions } from "@repo/lib";
+import { SidebarActions, SubscriptionService } from "@repo/lib";
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -16,10 +16,17 @@ export default async function SidebarEditPage({
 }: SidebarEditPageProps) {
   const { slug } = await params;
 
-  const sidebar = await SidebarActions.getSidebar(slug);
+  const [sidebar, entitlements] = await Promise.all([
+    SidebarActions.getSidebar(slug),
+    SubscriptionService.getEntitlementsForCurrentUser(),
+  ]);
 
   if (!sidebar) {
     notFound();
+  }
+
+  if (entitlements.maxSidebars === 0) {
+    redirect("/setup/sidebars");
   }
 
   return (
