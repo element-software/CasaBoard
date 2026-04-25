@@ -67,7 +67,6 @@ export default function BillingContent({
                 "Full drag-and-drop editor",
                 "Live entity data via WebSocket",
                 "All built-in components",
-                "Shareable live view URL",
                 "Local-first — tokens stay in your browser",
                 "No cloud sync (optional on paid plans)",
               ].map((f) => (
