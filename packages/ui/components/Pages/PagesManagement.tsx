@@ -19,6 +19,7 @@ interface PagesManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
+  lockedPageIds?: string[];
 }
 
 export const PagesManagement = ({
@@ -27,7 +28,9 @@ export const PagesManagement = ({
   initialError = null,
   compact = false,
   entitlements,
+  lockedPageIds = [],
 }: PagesManagementProps) => {
+  const lockedSet = new Set(lockedPageIds);
   const { instances: haInstances } = useMergedHAInstances(entitlements);
   const router = useRouter();
   const [pages, setPages] = useState<Page[]>(initialPages);
@@ -94,11 +97,9 @@ export const PagesManagement = ({
     });
   };
 
-  const maxDisplayPages =
-    entitlements?.maxDashboards === -1
-      ? pages.length
-      : entitlements?.maxDashboards || 3;
-  const displayPages = showAllPages ? pages : pages.slice(0, maxDisplayPages);
+  const maxDisplayPages = compact ? 3 : 6;
+  // Always show all pages (including locked ones) so users know they exist.
+  const displayPages = showAllPages ? pages : pages.slice(0, Math.max(maxDisplayPages, pages.length));
 
   // Early returns for error and empty states
   if (error) return <ErrorState error={error} />;
@@ -158,6 +159,7 @@ export const PagesManagement = ({
             onTogglePublished={handleTogglePublished}
             onDelete={handleDeletePage}
             isPending={isPending}
+            locked={lockedSet.has(page.id)}
           />
         ))}
       </div>

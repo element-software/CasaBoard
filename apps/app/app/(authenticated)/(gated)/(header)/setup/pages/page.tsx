@@ -1,4 +1,4 @@
-import { PageActions, SubscriptionService, serverLogger } from "@repo/lib";
+import { PageActions, SubscriptionService, serverLogger, getLockedIds } from "@repo/lib";
 import Link from "next/link";
 import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
 import { Page } from "@repo/types/page";
@@ -21,9 +21,16 @@ export default async function PagesListPage() {
 
   serverLogger.info("SetupPages", "pages", pages, "error", error);
 
+  const lockedPageIds = getLockedIds(pages, entitlements.maxDashboards);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <PagesManagement initialPages={pages} initialError={error} entitlements={entitlements} />
+      <PagesManagement
+        initialPages={pages}
+        initialError={error}
+        entitlements={entitlements}
+        lockedPageIds={lockedPageIds}
+      />
 
       <div className="mt-8 pt-6 border-t border-theme-border">
         <Link

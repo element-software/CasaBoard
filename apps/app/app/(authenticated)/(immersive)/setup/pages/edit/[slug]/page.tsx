@@ -1,6 +1,6 @@
-import { PageActions, SidebarActions } from "@repo/lib";
+import { PageActions, SidebarActions, SubscriptionService, getLockedIds } from "@repo/lib";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -14,12 +14,21 @@ interface PageProps {
 export default async function PageEdit({ params }: PageProps) {
   const { slug } = await params;
 
-  const page = await PageActions.getPage(slug);
+  const [page, entitlements, allPages, sidebars] = await Promise.all([
+    PageActions.getPage(slug),
+    SubscriptionService.getEntitlementsForCurrentUser(),
+    PageActions.getAllPages(),
+    SidebarActions.getAllSidebars(),
+  ]);
+
   if (!page) {
     notFound();
   }
 
-  const sidebars = await SidebarActions.getAllSidebars();
+  const lockedIds = new Set(getLockedIds(allPages, entitlements.maxDashboards));
+  if (lockedIds.has(page.id)) {
+    redirect("/auth/profile/billing");
+  }
 
   return (
     <PageEditorClient

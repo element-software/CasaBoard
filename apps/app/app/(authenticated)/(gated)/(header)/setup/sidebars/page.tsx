@@ -1,4 +1,4 @@
-import { SidebarActions, SubscriptionService } from "@repo/lib";
+import { SidebarActions, SubscriptionService, getLockedIds } from "@repo/lib";
 import { SidebarManagement } from "@repo/ui/components/Sidebars/SidebarManagement";
 import { notFound } from "next/navigation";
 
@@ -7,9 +7,13 @@ export const dynamic = "force-dynamic";
 
 export default async function SidebarsPage() {
   try {
-    const sidebars = await SidebarActions.getAllSidebars();
-    const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
-    
+    const [sidebars, entitlements] = await Promise.all([
+      SidebarActions.getAllSidebars(),
+      SubscriptionService.getEntitlementsForCurrentUser(),
+    ]);
+
+    const lockedSidebarIds = getLockedIds(sidebars, entitlements.maxSidebars);
+
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
@@ -25,6 +29,7 @@ export default async function SidebarsPage() {
           showAllSidebars={true}
           initialSidebars={sidebars}
           entitlements={entitlements}
+          lockedSidebarIds={lockedSidebarIds}
         />
       </div>
     );

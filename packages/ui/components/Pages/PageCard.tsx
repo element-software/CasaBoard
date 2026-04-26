@@ -25,6 +25,7 @@ import {
   mdiEyeOutline,
 } from "@mdi/js";
 import Link from "next/link";
+import { PlanLockCard } from "../Shared/util/PlanLockOverlay";
 
 export const PageCard = ({
   page,
@@ -32,13 +33,20 @@ export const PageCard = ({
   onTogglePublished,
   onDelete,
   isPending,
+  locked = false,
 }: {
   page: Page;
   compact: boolean;
   onTogglePublished: (slug: string, published: boolean) => void;
   onDelete: (slug: string, name: string) => void;
   isPending: boolean;
+  locked?: boolean;
 }) => {
+  if (locked) {
+    return (
+      <PlanLockCard name={page.name} compact={compact} />
+    );
+  }
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
       month: "short",

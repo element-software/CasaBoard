@@ -4,6 +4,7 @@ import { SidebarActions } from "@repo/lib";
 import { Sidebar } from "@repo/types/sidebar";
 import { Entitlements } from "@repo/types/subscription";
 import Link from "next/link";
+import { PlanLockCard } from "../Shared/util/PlanLockOverlay";
 import Icon from "@mdi/react";
 import {
   mdiPlus,
@@ -35,6 +36,7 @@ interface SidebarManagementProps {
   initialError?: string | null;
   compact?: boolean;
   entitlements: Entitlements;
+  lockedSidebarIds?: string[];
 }
 
 export const SidebarManagement = ({
@@ -43,7 +45,9 @@ export const SidebarManagement = ({
   initialError = null,
   compact = false,
   entitlements,
+  lockedSidebarIds = [],
 }: SidebarManagementProps) => {
+  const lockedSet = new Set(lockedSidebarIds);
   const { instances: haInstances } = useMergedHAInstances(entitlements);
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
@@ -208,7 +212,10 @@ export const SidebarManagement = ({
           compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 gap-3"
         )}
       >
-        {displaySidebars.map((sidebar) => (
+        {displaySidebars.map((sidebar) =>
+          lockedSet.has(sidebar.id) ? (
+            <PlanLockCard key={sidebar.id} name={sidebar.name} compact={compact} />
+          ) : (
           <Card key={sidebar.id} className="hover:shadow-md transition-shadow">
             <CardBody className={cn(compact ? "p-3" : "p-4")}>
               <div
@@ -324,7 +331,8 @@ export const SidebarManagement = ({
               </div>
             </CardBody>
           </Card>
-        ))}
+          )
+        )}
       </div>
 
       {/* Footer Info */}

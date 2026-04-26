@@ -23,6 +23,7 @@ export { getCurrentAuthUser } from "./supabase/server";
 export { createLogger, serverLogger, clientLogger } from "./logger";
 export { countPuckDataWidgets } from "./puck/countPuckDataWidgets";
 export { assertPuckDataWithinItemLimit } from "./puck/assertPuckDataWithinItemLimit";
+export { getLockedIds } from "./utils/entitlementLimits";
 export * as Clarity from "./clarity";
 export {
   initClarity,

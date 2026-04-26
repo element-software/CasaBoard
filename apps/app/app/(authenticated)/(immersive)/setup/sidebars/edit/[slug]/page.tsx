@@ -1,4 +1,4 @@
-import { SidebarActions, SubscriptionService } from "@repo/lib";
+import { SidebarActions, SubscriptionService, getLockedIds } from "@repo/lib";
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
 import { notFound, redirect } from "next/navigation";
 
@@ -16,17 +16,20 @@ export default async function SidebarEditPage({
 }: SidebarEditPageProps) {
   const { slug } = await params;
 
-  const [sidebar, entitlements] = await Promise.all([
-    SidebarActions.getSidebar(slug),
+  const [allSidebars, entitlements] = await Promise.all([
+    SidebarActions.getAllSidebars(),
     SubscriptionService.getEntitlementsForCurrentUser(),
   ]);
+
+  const sidebar = allSidebars.find((s) => s.slug === slug);
 
   if (!sidebar) {
     notFound();
   }
 
-  if (entitlements.maxSidebars === 0) {
-    redirect("/setup/sidebars");
+  const lockedIds = new Set(getLockedIds(allSidebars, entitlements.maxSidebars));
+  if (lockedIds.has(sidebar.id)) {
+    redirect("/auth/profile/billing");
   }
 
   return (
