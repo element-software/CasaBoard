@@ -20,10 +20,10 @@ export default function TrialSetupLoader({
           
           <div className="space-y-2">
             <h1 className="text-2xl font-semibold text-foreground">
-              Setting up your trial
+              Setting up your account
             </h1>
             <p className="text-foreground-600">
-              We're preparing your 14-day free trial. This will just take a moment...
+              We're setting up your account. This will just take a moment...
             </p>
           </div>
           

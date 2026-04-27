@@ -41,7 +41,7 @@ export const Hero = () => {
         href={LinkService.crossAppHref("app", "/auth/login")}
         as={Link}
       >
-        Start 14-Day Free Trial
+        Get Started
       </Button>
     </div>
   );

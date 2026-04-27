@@ -35,7 +35,7 @@ export const HowItWorks = () => {
         </p>
         <h2 className="text-4xl font-bold text-slate-900 tracking-tight">How It Works</h2>
         <p className="text-slate-500 text-lg mt-3">
-          Get a 14-day free trial with CasaBoard in just a few simple steps
+          Get started with CasaBoard in just a few simple steps
         </p>
       </div>
       <div className="grid md:grid-cols-4 gap-8 relative">
