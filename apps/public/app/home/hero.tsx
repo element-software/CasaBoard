@@ -29,9 +29,7 @@ export const Hero = () => {
         Optional cloud sync available on paid plans.
       </p>
       <p className="text-xs pb-8 text-slate-400 max-w-xl mx-auto">
-        Currently in development — free to use whilst we build.{" "}
-        <Link href="/terms" className="text-xs text-violet-600 hover:underline">See terms</Link>
-        {" "}for details.
+        Free plan available — no credit card required. Paid plans unlock more dashboards, sidebars, and cloud sync.
       </p>
       <Button
         size="lg"
