@@ -31,6 +31,14 @@ const GAP_OPTIONS = [
   { label: "32px", value: "gap-8" },
 ] as const;
 
+const PADDING_OPTIONS = [
+  { label: "None", value: "p-0" },
+  { label: "8px", value: "p-2" },
+  { label: "16px", value: "p-4" },
+  { label: "24px", value: "p-6" },
+  { label: "32px", value: "p-8" },
+] as const;
+
 const ALIGN_X_OPTIONS = [
   { label: "Start", value: "start" },
   { label: "Center", value: "center" },
@@ -124,6 +132,7 @@ function RootCanvas(props: any) {
     children,
     layoutDirection = "column",
     layoutGap = "gap-4",
+    layoutPadding = "p-0",
     alignX = "start",
     alignY = "stretch",
     layoutWrap = "nowrap",
@@ -141,6 +150,7 @@ function RootCanvas(props: any) {
         "w-full mx-auto flex min-h-0",
         directionClassMap[layoutDirection] ?? "flex-col",
         layoutGap,
+        layoutPadding,
         wrapClassMap[layoutWrap] ?? "flex-nowrap",
         justify,
         items
@@ -171,6 +181,11 @@ export const PuckConfig: Config<Components> = {
         label: "Gap",
         options: [...GAP_OPTIONS],
       },
+      layoutPadding: {
+        type: "select",
+        label: "Padding",
+        options: [...PADDING_OPTIONS],
+      },
       layoutWrap: {
         type: "select",
         label: "Wrap",
@@ -194,6 +209,7 @@ export const PuckConfig: Config<Components> = {
     defaultProps: {
       layoutDirection: "column",
       layoutGap: "gap-4",
+      layoutPadding: "p-0",
       layoutWrap: "nowrap",
       alignX: "start",
       alignY: "stretch",
