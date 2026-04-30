@@ -32,6 +32,7 @@ import { useMergedHAInstances } from "@repo/hooks";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
+  showHeader?: boolean;
   initialSidebars?: Sidebar[];
   initialError?: string | null;
   compact?: boolean;
@@ -41,6 +42,7 @@ interface SidebarManagementProps {
 
 export const SidebarManagement = ({
   showAllSidebars = false,
+  showHeader = true,
   initialSidebars = [],
   initialError = null,
   compact = false,
@@ -175,35 +177,35 @@ export const SidebarManagement = ({
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2
-            className={cn("font-semibold text-theme-text", {
-              "text-lg": compact,
-              "text-xl": !compact,
-            })}
-          >
-            Sidebars
-          </h2>
-          {!compact && (
-            <p className="text-sm text-theme-text-secondary">
-              {sidebars.length} sidebar{sidebars.length !== 1 ? "s" : ""} total
-            </p>
-          )}
-        </div>
-        {!showAllSidebars && (
-          <Button
-            as={Link}
-            href="/setup/sidebars/create"
-            color="primary"
-            size={compact ? "sm" : "sm"}
-            startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-            isDisabled={!canCreateSidebar(sidebars.length)}
-          >
-            {compact ? "New" : "New Sidebar"}
-          </Button>
+      {/* Header — same structure regardless of showHeader to keep React Aria IDs stable */}
+      <div className={cn("flex items-center", showHeader ? "justify-between" : "justify-end")}>
+        {showHeader && (
+          <div>
+            <h2
+              className={cn("font-semibold text-theme-text", {
+                "text-lg": compact,
+                "text-xl": !compact,
+              })}
+            >
+              Sidebars
+            </h2>
+            {!compact && (
+              <p className="text-sm text-theme-text-secondary">
+                {sidebars.length} sidebar{sidebars.length !== 1 ? "s" : ""} total
+              </p>
+            )}
+          </div>
         )}
+        <Button
+          as={Link}
+          href="/setup/sidebars/create"
+          color="primary"
+          size="sm"
+          startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+          isDisabled={!canCreateSidebar(sidebars.length)}
+        >
+          {compact ? "New" : "New Sidebar"}
+        </Button>
       </div>
 
       {/* Sidebars List */}

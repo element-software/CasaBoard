@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
+  showHeader?: boolean;
   initialPages?: Page[];
   initialError?: string | null;
   compact?: boolean;
@@ -24,6 +25,7 @@ interface PagesManagementProps {
 
 export const PagesManagement = ({
   showAllPages = false,
+  showHeader = true,
   initialPages = [],
   initialError = null,
   compact = false,
@@ -115,34 +117,34 @@ export const PagesManagement = ({
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2
-            className={cn(
-              "font-semibold text-theme-text",
-              compact ? "text-lg" : "text-xl"
+      {/* Header — same structure regardless of showHeader to keep React Aria IDs stable */}
+      <div className={cn("flex items-center", showHeader ? "justify-between" : "justify-end")}>
+        {showHeader && (
+          <div>
+            <h2
+              className={cn(
+                "font-semibold text-theme-text",
+                compact ? "text-lg" : "text-xl"
+              )}
+            >
+              Dashboard Pages
+            </h2>
+            {!compact && (
+              <p className="text-sm text-theme-text-secondary">
+                {pages.length} page{pages.length !== 1 ? "s" : ""} total
+              </p>
             )}
-          >
-            Dashboard Pages
-          </h2>
-          {!compact && (
-            <p className="text-sm text-theme-text-secondary">
-              {pages.length} page{pages.length !== 1 ? "s" : ""} total
-            </p>
-          )}
-        </div>
-        {!showAllPages && (
-          <Button
-            color="primary"
-            size="sm"
-            startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-            isDisabled={!canCreateDashboard(pages.length)}
-            onPress={handleCreatePage}
-          >
-            {compact ? "New" : "New Page"}
-          </Button>
+          </div>
         )}
+        <Button
+          color="primary"
+          size="sm"
+          startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+          isDisabled={!canCreateDashboard(pages.length)}
+          onPress={handleCreatePage}
+        >
+          {compact ? "New" : "New Page"}
+        </Button>
       </div>
 
       {/* Pages List */}

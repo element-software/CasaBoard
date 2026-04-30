@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Button, Input } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Input,
+  Chip,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import Link from "next/link";
 import type { Theme } from "@repo/types/theme";
 import {
@@ -10,9 +20,30 @@ import {
   duplicateTheme,
 } from "@repo/lib/actions/themeActions";
 import { useRouter } from "next/navigation";
+import Icon from "@mdi/react";
+import {
+  mdiPlus,
+  mdiPencil,
+  mdiTrashCan,
+  mdiDotsVertical,
+  mdiContentCopy,
+  mdiClock,
+} from "@mdi/js";
 
 type ThemesListProps = {
   initialThemes: Theme[];
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  );
+  if (diffInHours < 1) return "Just now";
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  if (diffInHours < 48) return "Yesterday";
+  return date.toLocaleDateString("en-GB");
 };
 
 export function ThemesList({ initialThemes }: ThemesListProps) {
@@ -25,9 +56,7 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
     setError(null);
     startTransition(async () => {
       try {
-        const t = await createTheme({
-          name: name.trim() || "New theme",
-        });
+        const t = await createTheme({ name: name.trim() || "New theme" });
         setName("");
         router.push(`/setup/themes/${t.id}/edit`);
         router.refresh();
@@ -38,6 +67,7 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
   };
 
   const remove = (id: string) => {
+    if (!confirm("Delete this theme? This cannot be undone.")) return;
     startTransition(async () => {
       try {
         await deleteTheme(id);
@@ -61,68 +91,140 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {error && (
-        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800">
-          {error}
-        </div>
+        <Card className="border-danger-200 bg-danger-50">
+          <CardBody className="p-4">
+            <p className="text-sm text-danger-600">{error}</p>
+            <Button
+              size="sm"
+              color="danger"
+              variant="flat"
+              className="mt-2"
+              onPress={() => setError(null)}
+            >
+              Dismiss
+            </Button>
+          </CardBody>
+        </Card>
       )}
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-theme-border p-4 bg-theme-surface">
-        <Input
-          label="New theme name"
-          placeholder="e.g. Midnight lounge"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button color="primary" onPress={create} isLoading={pending}>
-          Add theme
-        </Button>
-      </div>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Add theme card — always first in the grid */}
+        <Card className="border-dashed border-2 border-theme-border bg-theme-surface">
+          <CardBody className="p-4">
+            <div className="flex items-end gap-2">
+              <Input
+                label="New theme name"
+                placeholder="e.g. Midnight lounge"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && create()}
+                size="sm"
+                className="flex-1"
+              />
+              <Button
+                color="primary"
+                size="sm"
+                startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
+                onPress={create}
+                isLoading={pending}
+                className="shrink-0 mb-0.5"
+              >
+                Add theme
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Theme cards */}
         {initialThemes.map((t) => (
-          <li
-            key={t.id}
-            className="rounded-xl border border-theme-border bg-theme-background p-4 flex flex-col gap-3"
-          >
-            <div>
-              <p className="font-semibold text-theme-text">{t.name}</p>
-              <p className="text-xs text-theme-text-secondary">
-                Updated {new Date(t.updated_at).toLocaleString("en-GB")}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-auto">
-              <Link href={`/setup/themes/${t.id}/edit`}>
-                <Button size="sm" color="primary">
-                  Edit
-                </Button>
-              </Link>
-              <Button
-                size="sm"
-                variant="bordered"
-                onPress={() => dup(t.id)}
-                isDisabled={pending}
-              >
-                Duplicate
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                variant="light"
-                onPress={() => remove(t.id)}
-                isDisabled={pending}
-              >
-                Delete
-              </Button>
-            </div>
-          </li>
+          <Card key={t.id} className="hover:shadow-md transition-shadow">
+            <CardBody className="p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-4 h-4 rounded-full border border-theme-border shrink-0"
+                      style={{
+                        backgroundColor:
+                          t.tokens?.primary ?? "var(--theme-primary, #8b5cf6)",
+                      }}
+                    />
+                    <h3 className="font-semibold text-theme-text truncate">
+                      {t.name}
+                    </h3>
+                    <Chip size="sm" color="default" variant="flat">
+                      Custom
+                    </Chip>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-theme-text-secondary">
+                    <Icon path={mdiClock} className="w-3.5 h-3.5 shrink-0" />
+                    <span>Updated {formatDate(t.updated_at)}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Button
+                    as={Link}
+                    href={`/setup/themes/${t.id}/edit`}
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    title="Edit theme"
+                  >
+                    <Icon path={mdiPencil} className="w-4 h-4" />
+                  </Button>
+
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        title="More actions"
+                      >
+                        <Icon path={mdiDotsVertical} className="w-4 h-4" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Theme actions">
+                      <DropdownItem key="duplicate" className="p-0">
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          className="w-full"
+                          startContent={
+                            <Icon path={mdiContentCopy} className="w-4 h-4" />
+                          }
+                          onPress={() => dup(t.id)}
+                          isDisabled={pending}
+                        >
+                          Duplicate
+                        </Button>
+                      </DropdownItem>
+                      <DropdownItem key="delete" className="p-0">
+                        <Button
+                          color="danger"
+                          variant="flat"
+                          size="sm"
+                          className="w-full"
+                          startContent={
+                            <Icon path={mdiTrashCan} className="w-4 h-4" />
+                          }
+                          onPress={() => remove(t.id)}
+                          isDisabled={pending}
+                        >
+                          Delete
+                        </Button>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
         ))}
-      </ul>
-      {initialThemes.length === 0 && (
-        <p className="text-theme-text-secondary text-sm">
-          No custom themes yet. Add one above or use the default built-in palette on each page.
-        </p>
-      )}
+      </div>
     </div>
   );
 }

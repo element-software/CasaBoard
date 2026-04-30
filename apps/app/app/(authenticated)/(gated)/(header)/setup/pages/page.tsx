@@ -1,11 +1,9 @@
 import { PageActions, SubscriptionService, serverLogger, getLockedIds } from "@repo/lib";
-import Link from "next/link";
 import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
+import { SetupPageShell } from "@repo/ui/components/Setup/SetupPageShell";
 import { Page } from "@repo/types/page";
 
-// Enable dynamic params for unknown routes
 export const dynamicParams = true;
-// Force dynamic rendering since pages are stored in Supabase
 export const dynamic = "force-dynamic";
 
 export default async function PagesListPage() {
@@ -14,7 +12,6 @@ export default async function PagesListPage() {
   const entitlements = await SubscriptionService.getEntitlementsForCurrentUser();
   try {
     pages = await PageActions.getAllPages();
-    console.log("PagesListPage", "pages", pages);
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load pages";
   }
@@ -24,22 +21,18 @@ export default async function PagesListPage() {
   const lockedPageIds = getLockedIds(pages, entitlements.maxDashboards);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <SetupPageShell
+      title="Pages"
+      subtitle={`${pages.length} page${pages.length !== 1 ? "s" : ""} total`}
+    >
       <PagesManagement
         initialPages={pages}
         initialError={error}
+        showAllPages={true}
+        showHeader={false}
         entitlements={entitlements}
         lockedPageIds={lockedPageIds}
       />
-
-      <div className="mt-8 pt-6 border-t border-theme-border">
-        <Link
-          href="/setup"
-          className="inline-flex items-center text-theme-text-secondary hover:text-theme-text transition-colors"
-        >
-          ← Back to Setup Dashboard
-        </Link>
-      </div>
-    </div>
+    </SetupPageShell>
   );
 }
