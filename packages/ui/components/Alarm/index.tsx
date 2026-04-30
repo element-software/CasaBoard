@@ -75,23 +75,16 @@ export const Alarm = ({
 
   if (!entityId)
     return (
-      <div className="p-4 border-2 border-dashed border-theme-border rounded-lg text-center text-theme-text-muted">
+      <div className="p-4 border-2 border-dashed border-theme-border rounded-xl text-center text-theme-text-muted">
         Configure Alarm Entity
       </div>
     );
 
   if (!entity)
     return (
-      <div
-        className="relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface"
-      >
-        <Icon
-          path={mdiShieldAlert}
-          className={classNames("h-12 w-12", "text-theme-error")}
-          aria-hidden="true"
-        />
-        <p className="text-xs text-theme-text-secondary">{entityId}</p>
-        <p className="text-xs text-theme-text-secondary">Unavailable</p>
+      <div className="border-2 border-dashed border-theme-border rounded-xl p-3 text-center text-theme-text-muted">
+        <Icon path={mdiShieldAlert} className="h-8 w-8 mx-auto mb-1 text-theme-error" aria-hidden="true" />
+        <p className="text-xs">{entityId} unavailable</p>
       </div>
     );
 
@@ -99,28 +92,34 @@ export const Alarm = ({
     (tapAction && tapAction !== "none") ||
     (longPressAction && longPressAction !== "none");
 
+  const stateLabel = entity.state
+    .split("_")
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
   return (
     <div
       key={entity.entity_id}
       className={classNames(
-        "relative overflow-hidden w-full text-center flex flex-col items-center justify-between gap-2 p-6 h-44 text-theme-text rounded-2xl shadow-card shadow-theme-surface select-none",
+        "w-full rounded-xl overflow-hidden select-none transition-all duration-200",
         AlarmUtils.stateClassNameBg(entity as any),
-        { "cursor-pointer active:scale-[0.97] transition-transform": isInteractive }
+        { "cursor-pointer hover:brightness-110": isInteractive }
       )}
       onPointerDown={isInteractive ? handlePointerDown : undefined}
       onPointerUp={isInteractive ? handlePointerUp : undefined}
       onPointerLeave={isInteractive ? handlePointerLeave : undefined}
     >
-      <EntityIcon entity={entity} />
-      <div className="text-sm font-medium capitalize">
-        {entity.state
-          .split("_")
-          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" ")}
+      <div className="p-3 flex items-center gap-3">
+        <EntityIcon entity={entity} className="h-8 w-8 flex-shrink-0" />
+        <div className="flex flex-col flex-1 min-w-0">
+          <h3 className="text-sm font-semibold capitalize truncate text-theme-text">
+            {entity.attributes?.friendly_name || entityId}
+          </h3>
+          <div className="text-xs font-medium opacity-80 text-theme-text">
+            {stateLabel}
+          </div>
+        </div>
       </div>
-      <p className="text-xs text-theme-text-secondary">
-        Last Changed {new Date(entity.last_changed).toLocaleTimeString()}
-      </p>
     </div>
   );
 };
