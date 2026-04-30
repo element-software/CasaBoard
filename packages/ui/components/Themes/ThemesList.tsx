@@ -88,7 +88,7 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
             <div>
               <p className="font-semibold text-theme-text">{t.name}</p>
               <p className="text-xs text-theme-text-secondary">
-                Updated {new Date(t.updated_at).toLocaleString()}
+                Updated {new Date(t.updated_at).toLocaleString("en-GB")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 mt-auto">
