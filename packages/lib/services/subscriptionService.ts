@@ -2,6 +2,7 @@ import { Entitlements, SubscriptionData, SubscriptionSummary } from "@repo/types
 import { createClient, getCurrentAuthUser } from "../supabase/server";
 import { StripeService } from "./stripeService";
 import { serverLogger } from "../logger";
+import { getEmulatedEntitlements } from "../utils/planEmulation";
 
 export class SubscriptionService {
   /**
@@ -89,6 +90,15 @@ export class SubscriptionService {
    * Prioritizes active trials over other subscriptions
    */
   static async getEntitlementsForCurrentUser(): Promise<Entitlements> {
+    // Dev-only: tier emulation bypass (only for the designated dev email)
+    try {
+      const user = await getCurrentAuthUser();
+      const emulated = await getEmulatedEntitlements(user.email ?? "");
+      if (emulated) return emulated;
+    } catch {
+      // Not authenticated — fall through to normal Stripe lookup
+    }
+
     const data = await this.getCurrentSubscription();
     if (!data) {
       // Free tier — users with no subscription still get access

@@ -6,7 +6,8 @@
     ".": "./index.ts",
     "./*": "./*.{ts,tsx}",
     "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts",
-    "./actions/themeActions": "./actions/themeActions.ts"
+    "./actions/themeActions": "./actions/themeActions.ts",
+    "./utils/planEmulation": "./utils/planEmulation.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

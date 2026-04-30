@@ -2,6 +2,7 @@
 
 import EntitiesCard from "./index";
 import { Entity } from "@repo/types/shared";
+import { EntityAutocomplete } from "../EntityAutocomplete/EntityAutocomplete";
 
 interface EntitiesCardProps {
   title: string;
@@ -25,12 +26,28 @@ export const EntitiesCardConfig = {
       getItemSummary: (item: Entity) => item.id || "Entity",
       arrayFields: {
         id: {
-          type: "text",
-          label: "Entity ID",
+          type: "custom",
+          label: "Entity",
+          render: ({
+            value,
+            onChange,
+          }: {
+            value?: string;
+            onChange: (value: string) => void;
+          }) => (
+            <EntityAutocomplete
+              value={value}
+              onChange={(v) => onChange(v ?? "")}
+              label="Search entities"
+              allowClear={false}
+              showEntityState={true}
+              showEntityIcon={true}
+            />
+          ),
         },
         icon: {
           type: "text",
-          label: "Icon",
+          label: "Override Icon (optional)",
         },
       },
     },

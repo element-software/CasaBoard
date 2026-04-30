@@ -95,7 +95,7 @@ export const SidebarManagement = ({
     if (diffInHours < 1) return "Just now";
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInHours < 48) return "Yesterday";
-    return date.toLocaleDateString();
+    return date.toLocaleDateString("en-GB");
   };
 
   // Filter sidebars based on showAllSidebars

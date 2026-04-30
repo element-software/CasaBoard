@@ -1,9 +1,9 @@
 "use client";
 import { useEntity, useHA } from "@repo/ha";
-import { mdiPlus, mdiMinus, mdiPower, mdiAlert } from "@mdi/js";
+import { mdiPlus, mdiMinus, mdiAlert, mdiThermostat } from "@mdi/js";
 import Icon from "@mdi/react";
 import classNames from "classnames";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 
 interface ThermostatProps {
   entityId: string;
@@ -12,157 +12,125 @@ interface ThermostatProps {
 export const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
   const { connection } = useHA();
-  const [targetTemp, setTargetTemp] = useState<number>(
-    entity.attributes.temperature
-  );
-  // Get temperature color based on current temperature
-  const getTemperatureColor = useCallback((temp: number) => {
-    if (temp >= 25) return "text-red-500";
-    if (temp >= 20) return "text-orange-500";
-    if (temp >= 15) return "text-yellow-500";
-    if (temp >= 10) return "text-blue-400";
+  const [targetTemp, setTargetTemp] = useState<number>(0);
+
+  useEffect(() => {
+    if (entity?.attributes?.temperature != null) {
+      setTargetTemp(entity.attributes.temperature);
+    }
+  }, [entity?.attributes?.temperature]);
+
+  const currentTemp: number = entity?.attributes?.current_temperature ?? 0;
+
+  const tempColorClass = useMemo(() => {
+    if (currentTemp >= 25) return "text-red-500";
+    if (currentTemp >= 20) return "text-orange-400";
+    if (currentTemp >= 15) return "text-yellow-400";
+    if (currentTemp >= 10) return "text-blue-400";
     return "text-blue-600";
-  }, []);
+  }, [currentTemp]);
 
-  // Get status color and text
   const statusInfo = useMemo(() => {
-    const isHeating = entity.attributes.hvac_action === "heating";
-    return {
-      text: isHeating ? "HEATING" : "IDLE",
-      color: isHeating
-        ? "text-red-500 bg-red-500/20"
-        : "text-theme-text-secondary bg-theme-secondary/50",
-    };
-  }, [entity.attributes.hvac_action]);
+    const action = entity?.attributes?.hvac_action;
+    if (action === "heating") return { text: "HEATING", color: "text-red-400" };
+    if (action === "cooling") return { text: "COOLING", color: "text-blue-400" };
+    return { text: "IDLE", color: "text-theme-text-muted" };
+  }, [entity?.attributes?.hvac_action]);
 
-  const currentTemp = entity.attributes.current_temperature;
+  const difference = Math.abs(targetTemp - currentTemp);
 
-  const tempColorClasses = getTemperatureColor(currentTemp);
+  const adjustTemp = useCallback(
+    (delta: number) => {
+      setTargetTemp((prev) => {
+        const newTemp = Math.round((prev + delta) * 2) / 2;
+        if (connection && entityId) {
+          connection.sendMessagePromise({
+            type: "call_service",
+            domain: "climate",
+            service: "set_temperature",
+            service_data: { entity_id: entityId, temperature: newTemp },
+          });
+        }
+        return newTemp;
+      });
+    },
+    [entityId, connection]
+  );
 
-  // Handlers for temperature adjustment (you'll need to implement these based on your HA setup)
-  const increaseTemp = useCallback(() => {
-    setTargetTemp((prev) => {
-      const newTemp = prev + 0.5;
-      if (connection) {
-        connection.sendMessagePromise({
-          type: "call_service",
-          domain: "climate",
-          service: "set_temperature",
-          service_data: { entity_id: entityId, temperature: newTemp, hvac_mode: "heat" },
-        });
-      }
-      return newTemp;
-    });
-  }, [entityId, connection]);
-
-  const decreaseTemp = useCallback(() => {
-    setTargetTemp((prev) => {
-      const newTemp = prev - 0.5;
-      if (connection) {
-        connection.sendMessagePromise({
-          type: "call_service",
-          domain: "climate",
-          service: "set_temperature",
-          service_data: { entity_id: entityId, temperature: newTemp, hvac_mode: "heat" },
-        });
-      }
-      return newTemp;
-    });
-  }, [entityId, connection]);
-
-  if (!entity || entity.state === 'unavailable' || entity.state === 'unknown') {
+  if (!entityId) {
     return (
-      <div className="w-full p-6 flex flex-col items-center justify-center bg-red-500/20 border border-red-500/50 text-red-200 rounded-2xl gap-2">
-        <Icon 
-          path={mdiAlert} 
-          className="h-8 w-8 text-red-500" 
-        />
+      <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+        <Icon path={mdiThermostat} className="h-10 w-10 mx-auto mb-2 opacity-40" />
+        Configure Thermostat Entity
+      </div>
+    );
+  }
+
+  if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
+    return (
+      <div className="w-full p-6 flex flex-col items-center justify-center bg-theme-surface border border-theme-error/50 text-theme-error rounded-2xl gap-2">
+        <Icon path={mdiAlert} className="h-8 w-8" />
         <div className="text-center">
-          <div className="text-sm font-medium">Thermostat Entity Not Found</div>
-          <div className="text-xs opacity-80 break-all">{entityId}</div>
+          <div className="text-sm font-medium">Thermostat Unavailable</div>
+          <div className="text-xs opacity-70 break-all">{entityId}</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full p-6 text-center flex flex-col gap-4 text-theme-text bg-gradient-theme rounded-2xl shadow-card shadow-theme-surface">
-      {/* Header */}
-      <div className="flex flex-row items-center justify-between">
-        <div className="text-sm font-medium">
-          {entity.attributes.friendly_name}
-        </div>
+    <div className="w-full p-6 flex flex-col gap-5 text-theme-text bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface">
+      {/* Title */}
+      <div className="text-sm font-semibold text-center leading-tight">
+        {entity.attributes.friendly_name}
       </div>
 
-      {/* Digital Display */}
-      <div className="relative p-6">
-        {/* Current Temperature - Large Display */}
-        <div className="text-center mb-4">
-          <div
-            className={classNames(
-              "text-4xl font-mono font-bold tracking-tight",
-              tempColorClasses
-            )}
-          >
-            {currentTemp}°C
-          </div>
-          <div className="text-xs opacity-60 uppercase tracking-wider mt-1">
-            Current
-          </div>
+      {/* Current Temperature */}
+      <div className="text-center">
+        <div className={classNames("text-5xl font-bold tracking-tight", tempColorClass)}>
+          {currentTemp.toFixed(1)}°C
         </div>
-
-        {/* Target Temperature Controls */}
-        <div className="flex items-center justify-center gap-4">
-          <button
-            onClick={decreaseTemp}
-            className="h-10 w-10 min-w-10 min-h-10 rounded-full bg-theme-secondary hover:bg-theme-primary transition-colors duration-200 flex items-center justify-center hover:scale-105 active:scale-95"
-            aria-label="Decrease target temperature"
-          >
-            <Icon path={mdiMinus} className="h-5 w-5 text-theme-text" />
-          </button>
-
-          <div className="text-center min-w-[80px]">
-            <div className="text-xl font-mono font-semibold">
-              {targetTemp.toFixed(1)}°C
-            </div>
-            <div className="text-xs opacity-60 uppercase tracking-wider">
-              Target
-            </div>
-          </div>
-
-          <button
-            onClick={increaseTemp}
-            className="h-10 w-10 min-w-10 min-h-10 rounded-full bg-theme-secondary hover:bg-theme-primary transition-colors duration-200 flex items-center justify-center hover:scale-105 active:scale-95"
-            aria-label="Increase target temperature"
-          >
-            <Icon path={mdiPlus} className="h-5 w-5 text-theme-text" />
-          </button>
-        </div>
+        <div className="text-[10px] uppercase tracking-widest opacity-50 mt-1">Current</div>
       </div>
 
-      {/* Status Display */}
-      <div className="flex flex-row items-center justify-around">
-        <div className="flex flex-col">
-          <div
-            className={classNames(
-              "text-sm font-medium px-3 py-1 rounded-full",
-              statusInfo.color
-            )}
-          >
+      {/* Target Temperature Controls */}
+      <div className="flex items-center justify-center gap-5">
+        <button
+          onClick={() => adjustTemp(-0.5)}
+          className="h-10 w-10 rounded-full bg-theme-secondary hover:bg-theme-primary/60 transition-colors flex items-center justify-center shrink-0"
+          aria-label="Decrease target temperature"
+        >
+          <Icon path={mdiMinus} className="h-5 w-5 text-theme-text" />
+        </button>
+
+        <div className="text-center min-w-[80px]">
+          <div className="text-xl font-semibold">{targetTemp.toFixed(1)}°C</div>
+          <div className="text-[10px] uppercase tracking-widest opacity-50">Target</div>
+        </div>
+
+        <button
+          onClick={() => adjustTemp(0.5)}
+          className="h-10 w-10 rounded-full bg-theme-secondary hover:bg-theme-primary/60 transition-colors flex items-center justify-center shrink-0"
+          aria-label="Increase target temperature"
+        >
+          <Icon path={mdiPlus} className="h-5 w-5 text-theme-text" />
+        </button>
+      </div>
+
+      {/* Status Row */}
+      <div className="flex flex-row items-center justify-around border-t border-theme-border pt-4">
+        <div className="flex flex-col items-center gap-1">
+          <div className={classNames("text-sm font-semibold", statusInfo.color)}>
             {statusInfo.text}
           </div>
-          <div className="text-xs opacity-50 uppercase tracking-wider mt-1">
-            Status
-          </div>
+          <div className="text-[10px] uppercase tracking-widest opacity-50">Status</div>
         </div>
 
-        <div className="flex flex-col">
-          <div className="text-lg font-semibold">
-            {Math.abs(targetTemp - currentTemp).toFixed(1)}°
-          </div>
-          <div className="text-xs opacity-50 uppercase tracking-wider">
-            {targetTemp > currentTemp ? "To Heat" : "Difference"}
-          </div>
+        <div className="w-px h-8 bg-theme-border" />
+
+        <div className="flex flex-col items-center gap-1">
+          <div className="text-sm font-semibold">{difference.toFixed(1)}°</div>
+          <div className="text-[10px] uppercase tracking-widest opacity-50">Difference</div>
         </div>
       </div>
     </div>

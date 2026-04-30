@@ -5,6 +5,8 @@ import { BinarySensorConfig } from "@repo/ui/components/BinarySensor/BinarySenso
 import { EntitiesCardConfig } from "@repo/ui/components/EntitiesCard/EntitiesCard.config";
 import { GraphCardConfig } from "@repo/ui/components/GraphCard/GraphCard.config";
 import { ClockConfig } from "@repo/ui/components/Clock/Clock.config";
+import { ThermostatConfig } from "@repo/ui/components/Thermostat/Thermostat.config";
+import { WeatherConfig } from "@repo/ui/components/Weather/Weather.config";
 import { Config } from "@measured/puck";
 import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
 import { cn } from "@heroui/react";
@@ -17,6 +19,8 @@ type Components = {
   GraphCard: {};
   Clock: {};
   Grid: {};
+  Thermostat: {};
+  Weather: {};
 };
 
 const GAP_OPTIONS = [
@@ -204,6 +208,8 @@ export const PuckConfig: Config<Components> = {
     GraphCard: GraphCardConfig,
     Clock: ClockConfig,
     Grid: GridConfig,
+    Thermostat: ThermostatConfig,
+    Weather: WeatherConfig,
   },
   categories: {
     layout: {
@@ -218,6 +224,9 @@ export const PuckConfig: Config<Components> = {
         "BinarySensor",
         "EntitiesCard",
         "GraphCard",
+        "Thermostat",
+        "Weather",
+        "Alarm",
       ],
     },
   },
