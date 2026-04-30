@@ -87,8 +87,8 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
   return (
     <Skeleton isLoaded={isEntityReady} className="w-full h-auto rounded-2xl">
       {showNotAvailable ? (
-        <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center justify-center p-6 bg-red-500/20 border border-red-500/50 text-red-200 rounded-2xl h-40 gap-2">
-          <Icon path={mdiAlert} className="h-8 w-8 text-red-500" />
+        <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center justify-center p-6 bg-theme-surface border border-theme-border text-theme-error rounded-2xl h-40 gap-2">
+          <Icon path={mdiAlert} className="h-8 w-8 text-theme-error" />
           <div className="text-center">
             <div className="text-sm font-medium">Sensor not available</div>
             <div className="text-xs opacity-80 break-all">{entityId}</div>
@@ -111,22 +111,17 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
           {showStatistics && (
             <div className="flex flex-row w-full justify-between px-3 pb-2">
               <div className="flex flex-col items-center">
-                <div className="text-xs text-white/70 font-medium">Min</div>
-                <div className="text-sm font-bold text-white">
+                <div className="text-xs text-theme-text-secondary font-medium">Min</div>
+                <div className="text-sm font-bold text-theme-text">
                   {statistics.min !== null
                     ? `${statistics.min.toFixed(2)} ${unit}`
                     : "--"}
                 </div>
-                {/* {statistics.minTime && (
-                <div className="text-xs text-white/60">
-                  {statistics.minTime.toLocaleTimeString()}
-                </div>
-              )} */}
               </div>
 
               <div className="flex flex-col items-center">
-                <div className="text-xs text-white/70 font-medium">Avg</div>
-                <div className="text-sm font-bold text-white">
+                <div className="text-xs text-theme-text-secondary font-medium">Avg</div>
+                <div className="text-sm font-bold text-theme-text">
                   {statistics.avg !== null
                     ? `${statistics.avg.toFixed(2)} ${unit}`
                     : "--"}
@@ -134,17 +129,12 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
               </div>
 
               <div className="flex flex-col items-center">
-                <div className="text-xs text-white/70 font-medium">Max</div>
-                <div className="text-sm font-bold text-white">
+                <div className="text-xs text-theme-text-secondary font-medium">Max</div>
+                <div className="text-sm font-bold text-theme-text">
                   {statistics.max !== null
                     ? `${statistics.max.toFixed(2)} ${unit}`
                     : "--"}
                 </div>
-                {/* {statistics.maxTime && (
-                <div className="text-xs text-white/60">
-                  {statistics.maxTime.toLocaleTimeString()}
-                </div>
-              )} */}
               </div>
             </div>
           )}

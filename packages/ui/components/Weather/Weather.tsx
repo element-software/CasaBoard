@@ -126,7 +126,7 @@ export const Weather = ({
 
   if (!entityId) {
     return (
-      <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+      <div className="p-4 border-2 border-dashed border-theme-border rounded-lg text-center text-theme-text-muted">
         <Icon path={mdiCloud} className="h-10 w-10 mx-auto mb-2 opacity-40" />
         Configure Weather Entity
       </div>

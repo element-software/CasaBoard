@@ -75,7 +75,7 @@ export const Alarm = ({
 
   if (!entityId)
     return (
-      <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+      <div className="p-4 border-2 border-dashed border-theme-border rounded-lg text-center text-theme-text-muted">
         Configure Alarm Entity
       </div>
     );

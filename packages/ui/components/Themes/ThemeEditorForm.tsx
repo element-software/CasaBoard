@@ -97,7 +97,7 @@ export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
             </section>
           ))}
         </div>
-        <div className="w-full lg:w-80 shrink-0">
+        <div className="w-full lg:w-96 shrink-0">
           <ThemeScope style={previewStyle} className="rounded-xl sticky top-4">
             <ThemeFixturePreview />
           </ThemeScope>

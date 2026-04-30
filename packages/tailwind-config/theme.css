@@ -232,3 +232,7 @@
 .bg-theme-background-secondary {
   background-color: var(--theme-surface);
 }
+
+.text-theme-text-on-primary {
+  color: var(--theme-text-on-primary);
+}
