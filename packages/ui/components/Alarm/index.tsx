@@ -6,6 +6,7 @@ import EntityIcon from "../Shared/util/EntityIcon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
+import { AlarmConfirmPopup } from "./AlarmConfirmPopup";
 
 export type AlarmAction =
   | "alarm_disarm"
@@ -48,6 +49,7 @@ export const Alarm = ({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
   const [pendingAction, setPendingAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
+  const [confirmAction, setConfirmAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
 
   // Clear pending once HA reflects the new state, with a 30s safety fallback.
   useEffect(() => {
@@ -70,7 +72,7 @@ export const Alarm = ({
   }, [entity?.state]);
 
   const callAction = useCallback(
-    (action: AlarmAction) => {
+    (action: AlarmAction, enteredCode?: string) => {
       console.log("[Alarm] callAction:", action, "| connection:", !!connection, "| entityId:", entityId);
       if (!connection || !entityId || action === "none") {
         console.warn("[Alarm] callAction aborted — missing connection, entityId, or action is none");
@@ -78,7 +80,8 @@ export const Alarm = ({
       }
       setPendingAction(action as Exclude<AlarmAction, "none">);
       const service_data: Record<string, any> = { entity_id: entityId };
-      if (code) service_data.code = code;
+      const codeToUse = enteredCode ?? code;
+      if (codeToUse) service_data.code = codeToUse;
       console.log("[Alarm] sending call_service:", { domain: "alarm_control_panel", service: action, service_data });
       connection.sendMessagePromise({
         type: "call_service",
@@ -95,23 +98,33 @@ export const Alarm = ({
     [connection, entityId, code]
   );
 
+  const openConfirm = useCallback((action: AlarmAction) => {
+    if (action === "none" || pendingAction) return;
+    setConfirmAction(action as Exclude<AlarmAction, "none">);
+  }, [pendingAction]);
+
+  const handleConfirmed = useCallback((enteredCode?: string) => {
+    setConfirmAction(null);
+    if (confirmAction) callAction(confirmAction, enteredCode);
+  }, [confirmAction, callAction]);
+
   const handlePointerDown = useCallback(() => {
     if (pendingAction) return;
     didLongPress.current = false;
     if (longPressAction && longPressAction !== "none") {
       timerRef.current = setTimeout(() => {
         didLongPress.current = true;
-        callAction(longPressAction);
+        openConfirm(longPressAction);
       }, LONG_PRESS_MS);
     }
-  }, [longPressAction, callAction, pendingAction]);
+  }, [longPressAction, openConfirm, pendingAction]);
 
   const handlePointerUp = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!didLongPress.current && !pendingAction) {
-      callAction(tapAction ?? "none");
+      openConfirm(tapAction ?? "none");
     }
-  }, [tapAction, callAction, pendingAction]);
+  }, [tapAction, openConfirm, pendingAction]);
 
   const handlePointerLeave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -136,6 +149,13 @@ export const Alarm = ({
     .join(" ") ?? "";
 
   return (
+    <>
+    <AlarmConfirmPopup
+      action={confirmAction}
+      isOpen={confirmAction !== null}
+      onClose={() => setConfirmAction(null)}
+      onConfirm={handleConfirmed}
+    />
     <Skeleton isLoaded={isLoaded} className="w-full h-14 rounded-xl">
       {showNotAvailable ? (
         <div className="rounded-xl p-3 flex items-center gap-3 opacity-50">
@@ -179,5 +199,6 @@ export const Alarm = ({
         <div className="rounded-xl p-3 opacity-0" />
       )}
     </Skeleton>
+    </>
   );
 };
