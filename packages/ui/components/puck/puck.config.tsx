@@ -147,7 +147,7 @@ function RootCanvas(props: any) {
   return (
     <div
       className={cn(
-        "w-full mx-auto flex min-h-0",
+        "w-full flex min-h-0 [&>div]:w-full",
         directionClassMap[layoutDirection] ?? "flex-col",
         layoutGap,
         layoutPadding,
