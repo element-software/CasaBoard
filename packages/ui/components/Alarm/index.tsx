@@ -5,7 +5,7 @@ import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
 import { AlarmUtils } from "@repo/utils";
 import EntityIcon from "../Shared/util/EntityIcon";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type AlarmAction =
   | "disarm"
@@ -44,18 +44,39 @@ export const Alarm = ({
   const { connection } = useHA();
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
   const [pendingAction, setPendingAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
 
+  // Clear pending once HA reflects the new state, with a 30s safety fallback.
+  useEffect(() => {
+    if (!pendingAction) return;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setPendingAction(null), 30_000);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [pendingAction]);
+
+  useEffect(() => {
+    if (pendingAction) setPendingAction(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entity?.state]);
+
   const callAction = useCallback(
     (action: AlarmAction) => {
-      if (!entityId || action === "none") return;
+      if (!connection || !entityId || action === "none") return;
       setPendingAction(action as Exclude<AlarmAction, "none">);
-      new Promise<void>((resolve) => setTimeout(resolve, 4000)).then(() => {
-        setPendingAction(null);
+      const service_data: Record<string, any> = { entity_id: entityId };
+      if (code) service_data.code = code;
+      connection.sendMessagePromise({
+        type: "call_service",
+        domain: "alarm_control_panel",
+        service: action,
+        service_data,
       });
     },
-    [entityId]
+    [connection, entityId, code]
   );
 
   const handlePointerDown = useCallback(() => {
