@@ -73,17 +73,44 @@ const itemsClassMap: Record<string, string> = {
   baseline: "items-baseline",
 };
 
-const directionClassMap: Record<string, string> = {
-  column: "flex-col",
-  row: "flex-row",
-  "column-reverse": "flex-col-reverse",
-  "row-reverse": "flex-row-reverse",
+// [&>div]: variants — target Puck's single wrapper div so flex layout applies
+// to the component container, not the outer root div (which only has one child).
+const innerDirectionClassMap: Record<string, string> = {
+  column: "[&>div]:flex-col",
+  row: "[&>div]:flex-row",
+  "column-reverse": "[&>div]:flex-col-reverse",
+  "row-reverse": "[&>div]:flex-row-reverse",
 };
 
-const wrapClassMap: Record<string, string> = {
-  nowrap: "flex-nowrap",
-  wrap: "flex-wrap",
-  "wrap-reverse": "flex-wrap-reverse",
+const innerGapClassMap: Record<string, string> = {
+  "gap-0": "[&>div]:gap-0",
+  "gap-2": "[&>div]:gap-2",
+  "gap-4": "[&>div]:gap-4",
+  "gap-6": "[&>div]:gap-6",
+  "gap-8": "[&>div]:gap-8",
+};
+
+const innerWrapClassMap: Record<string, string> = {
+  nowrap: "[&>div]:flex-nowrap",
+  wrap: "[&>div]:flex-wrap",
+  "wrap-reverse": "[&>div]:flex-wrap-reverse",
+};
+
+const innerJustifyClassMap: Record<string, string> = {
+  "justify-start": "[&>div]:justify-start",
+  "justify-center": "[&>div]:justify-center",
+  "justify-end": "[&>div]:justify-end",
+  "justify-between": "[&>div]:justify-between",
+  "justify-around": "[&>div]:justify-around",
+  "justify-evenly": "[&>div]:justify-evenly",
+};
+
+const innerItemsClassMap: Record<string, string> = {
+  "items-start": "[&>div]:items-start",
+  "items-center": "[&>div]:items-center",
+  "items-end": "[&>div]:items-end",
+  "items-stretch": "[&>div]:items-stretch",
+  "items-baseline": "[&>div]:items-baseline",
 };
 
 const ITEMS_ONLY = new Set([
@@ -147,13 +174,14 @@ function RootCanvas(props: any) {
   return (
     <div
       className={cn(
-        "w-full flex min-h-0 [&>div]:w-full",
-        directionClassMap[layoutDirection] ?? "flex-col",
-        layoutGap,
+        "w-full min-h-0",
         layoutPadding,
-        wrapClassMap[layoutWrap] ?? "flex-nowrap",
-        justify,
-        items
+        "[&>div]:w-full [&>div]:flex",
+        innerDirectionClassMap[layoutDirection] ?? "[&>div]:flex-col",
+        innerGapClassMap[layoutGap] ?? "[&>div]:gap-4",
+        innerWrapClassMap[layoutWrap] ?? "[&>div]:flex-nowrap",
+        innerJustifyClassMap[justify] ?? "[&>div]:justify-start",
+        innerItemsClassMap[items] ?? "[&>div]:items-stretch",
       )}
     >
       {children}

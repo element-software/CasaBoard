@@ -8,12 +8,12 @@ import EntityIcon from "../Shared/util/EntityIcon";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type AlarmAction =
-  | "disarm"
-  | "arm_home"
-  | "arm_away"
-  | "arm_night"
-  | "arm_vacation"
-  | "trigger"
+  | "alarm_disarm"
+  | "alarm_arm_home"
+  | "alarm_arm_away"
+  | "alarm_arm_night"
+  | "alarm_arm_vacation"
+  | "alarm_trigger"
   | "none";
 
 export interface AlarmProps {
@@ -26,12 +26,12 @@ export interface AlarmProps {
 const LONG_PRESS_MS = 600;
 
 const ACTION_LABEL: Record<Exclude<AlarmAction, "none">, string> = {
-  disarm: "Disarming",
-  arm_home: "Arming Home",
-  arm_away: "Arming Away",
-  arm_night: "Arming Night",
-  arm_vacation: "Arming Vacation",
-  trigger: "Triggering",
+  alarm_disarm: "Disarming",
+  alarm_arm_home: "Arming Home",
+  alarm_arm_away: "Arming Away",
+  alarm_arm_night: "Arming Night",
+  alarm_arm_vacation: "Arming Vacation",
+  alarm_trigger: "Triggering",
 };
 
 export const Alarm = ({

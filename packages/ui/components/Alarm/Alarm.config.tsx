@@ -8,7 +8,7 @@ const ACTION_OPTIONS = [
   { label: "Disarm", value: "disarm" },
   { label: "Arm Home", value: "arm_home" },
   { label: "Arm Away", value: "arm_away" },
-  { label: "Arm Night", value: "arm_night" },
+  { label: "Arm Night", value: "alarm_arm_night" },
   { label: "Arm Vacation", value: "arm_vacation" },
   { label: "Trigger", value: "trigger" },
 ];
