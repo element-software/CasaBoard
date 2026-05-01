@@ -19,9 +19,10 @@ import {
   mdiWeatherLightningRainy,
   mdiWeatherSunnyAlert,
   mdiCloud,
-  mdiAlert,
 } from "@mdi/js";
 import classNames from "classnames";
+import { Skeleton } from "@heroui/react";
+import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
 interface ForecastItem {
   datetime: string;
@@ -82,6 +83,7 @@ export const Weather = ({
 }: WeatherProps) => {
   const entity = useEntity(entityId);
   const { connection } = useHA();
+  const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
   const [forecast, setForecast] = useState<ForecastItem[]>([]);
 
   useEffect(() => {
@@ -133,80 +135,82 @@ export const Weather = ({
     );
   }
 
-  if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
-    return (
-      <div className="w-full p-6 flex flex-col items-center justify-center bg-theme-surface border border-theme-error/50 text-theme-error rounded-2xl gap-2">
-        <Icon path={mdiAlert} className="h-8 w-8" />
-        <div className="text-center">
-          <div className="text-sm font-medium">Weather Unavailable</div>
-          <div className="text-xs opacity-70 break-all">{entityId}</div>
-        </div>
-      </div>
-    );
-  }
-
-  const condition = entity.state;
-  const currentTemp: number = entity.attributes?.temperature ?? 0;
+  const condition = isEntityReady ? entity!.state : "";
+  const currentTemp: number = entity?.attributes?.temperature ?? 0;
   const conditionIcon = getWeatherIcon(condition);
   const visibleForecast = forecast.slice(0, forecastCount);
 
   return (
-    <div className="w-full p-6 flex flex-col gap-4 text-theme-text bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface">
-      {/* Current Conditions */}
-      <div className="flex items-center gap-3">
-        <Icon
-          path={conditionIcon}
-          className="h-10 w-10 text-theme-primary shrink-0"
-          aria-hidden="true"
-        />
-        <div>
-          <div className="text-xl font-semibold">
-            {currentTemp.toFixed(1)}°,{" "}
-            <span className="text-theme-text-secondary font-normal">
-              {formatCondition(condition)}
-            </span>
+    <Skeleton isLoaded={isLoaded} className="w-full rounded-2xl">
+      {showNotAvailable ? (
+        <div className="w-full p-4 flex items-center gap-3 bg-theme-surface border border-theme-border rounded-2xl opacity-50">
+          <Icon path={mdiCloud} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
+          <div className="flex flex-col min-w-0">
+            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
+            <p className="text-xs text-theme-text-muted">Unavailable</p>
           </div>
-          {entity.attributes?.friendly_name && (
-            <div className="text-xs text-theme-text-muted">
-              {entity.attributes.friendly_name}
-            </div>
-          )}
         </div>
-      </div>
-
-      {/* Forecast Grid */}
-      {visibleForecast.length > 0 && (
-        <div
-          className={classNames("grid gap-2 border-t border-theme-border pt-4", {
-            "grid-cols-2": forecastCount === 2,
-            "grid-cols-3": forecastCount === 3,
-            "grid-cols-4": forecastCount === 4,
-            "grid-cols-5": forecastCount >= 5,
-          })}
-        >
-          {visibleForecast.map((item, i) => (
-            <div key={i} className="flex flex-col items-center gap-1 text-center">
-              <div className="text-xs font-medium text-theme-text-secondary">
-                {formatForecastDay(item.datetime)}
+      ) : isEntityReady ? (
+        <div className="w-full p-6 flex flex-col gap-4 text-theme-text bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface">
+          {/* Current Conditions */}
+          <div className="flex items-center gap-3">
+            <Icon
+              path={conditionIcon}
+              className="h-10 w-10 text-theme-primary shrink-0"
+              aria-hidden="true"
+            />
+            <div>
+              <div className="text-xl font-semibold">
+                {currentTemp.toFixed(1)}°,{" "}
+                <span className="text-theme-text-secondary font-normal">
+                  {formatCondition(condition)}
+                </span>
               </div>
-              <div className="text-[10px] text-theme-text-muted">
-                {formatForecastTime(item.datetime)}
-              </div>
-              <Icon
-                path={getWeatherIcon(item.condition)}
-                className="h-6 w-6 text-theme-primary"
-                aria-hidden="true"
-              />
-              <div className="text-xs font-semibold">{item.temperature.toFixed(1)}°</div>
-              {item.templow != null && (
-                <div className="text-[10px] text-theme-text-muted">
-                  {item.templow.toFixed(1)}°
+              {entity!.attributes?.friendly_name && (
+                <div className="text-xs text-theme-text-muted">
+                  {entity!.attributes.friendly_name}
                 </div>
               )}
             </div>
-          ))}
+          </div>
+
+          {/* Forecast Grid */}
+          {visibleForecast.length > 0 && (
+            <div
+              className={classNames("grid gap-2 border-t border-theme-border pt-4", {
+                "grid-cols-2": forecastCount === 2,
+                "grid-cols-3": forecastCount === 3,
+                "grid-cols-4": forecastCount === 4,
+                "grid-cols-5": forecastCount >= 5,
+              })}
+            >
+              {visibleForecast.map((item, i) => (
+                <div key={i} className="flex flex-col items-center gap-1 text-center">
+                  <div className="text-xs font-medium text-theme-text-secondary">
+                    {formatForecastDay(item.datetime)}
+                  </div>
+                  <div className="text-[10px] text-theme-text-muted">
+                    {formatForecastTime(item.datetime)}
+                  </div>
+                  <Icon
+                    path={getWeatherIcon(item.condition)}
+                    className="h-6 w-6 text-theme-primary"
+                    aria-hidden="true"
+                  />
+                  <div className="text-xs font-semibold">{item.temperature.toFixed(1)}°</div>
+                  {item.templow != null && (
+                    <div className="text-[10px] text-theme-text-muted">
+                      {item.templow.toFixed(1)}°
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      ) : (
+        <div className="rounded-2xl p-3 opacity-0" />
       )}
-    </div>
+    </Skeleton>
   );
 };

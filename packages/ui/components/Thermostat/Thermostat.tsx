@@ -1,9 +1,11 @@
 "use client";
 import { useEntity, useHA } from "@repo/ha";
-import { mdiPlus, mdiMinus, mdiAlert, mdiThermostat } from "@mdi/js";
+import { mdiPlus, mdiMinus, mdiThermostat } from "@mdi/js";
 import Icon from "@mdi/react";
 import classNames from "classnames";
 import { useCallback, useMemo, useState, useEffect } from "react";
+import { Skeleton } from "@heroui/react";
+import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
 interface ThermostatProps {
   entityId: string;
@@ -12,6 +14,7 @@ interface ThermostatProps {
 export const Thermostat = ({ entityId }: ThermostatProps) => {
   const entity = useEntity(entityId);
   const { connection } = useHA();
+  const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
   const [targetTemp, setTargetTemp] = useState<number>(0);
 
   useEffect(() => {
@@ -66,19 +69,17 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
     );
   }
 
-  if (!entity || entity.state === "unavailable" || entity.state === "unknown") {
-    return (
-      <div className="w-full p-6 flex flex-col items-center justify-center bg-theme-surface border border-theme-error/50 text-theme-error rounded-2xl gap-2">
-        <Icon path={mdiAlert} className="h-8 w-8" />
-        <div className="text-center">
-          <div className="text-sm font-medium">Thermostat Unavailable</div>
-          <div className="text-xs opacity-70 break-all">{entityId}</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
+    <Skeleton isLoaded={isLoaded} className="w-full rounded-2xl">
+      {showNotAvailable ? (
+        <div className="w-full p-4 flex items-center gap-3 bg-theme-surface border border-theme-border rounded-2xl opacity-50">
+          <Icon path={mdiThermostat} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
+          <div className="flex flex-col min-w-0">
+            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
+            <p className="text-xs text-theme-text-muted">Unavailable</p>
+          </div>
+        </div>
+      ) : isEntityReady ? (
     <div className="w-full p-6 flex flex-col gap-5 text-theme-text bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface">
       {/* Title */}
       <div className="text-sm font-semibold text-center leading-tight">
@@ -134,5 +135,9 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
         </div>
       </div>
     </div>
+      ) : (
+        <div className="rounded-2xl p-3 opacity-0" />
+      )}
+    </Skeleton>
   );
 };

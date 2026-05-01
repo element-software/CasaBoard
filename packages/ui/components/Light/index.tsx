@@ -1,7 +1,7 @@
 "use client";
 import { Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
-import { mdiAlert, mdiLightbulb } from "@mdi/js";
+import { mdiLightbulb } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { useEntity } from "@repo/ha";
 import { useLightLoading, useLightController } from "./useLight";
@@ -58,9 +58,12 @@ export const Light = ({
   return (
     <Skeleton isLoaded={isLoaded} className="w-full h-16 rounded-xl">
       {showNotAvailable ? (
-        <div className="border-2 border-dashed border-theme-border rounded-xl p-3 text-center text-theme-text-muted">
-          <Icon path={mdiAlert} className="h-8 w-8 mx-auto mb-1 text-theme-error" />
-          <p className="text-xs">Light not available</p>
+        <div className="rounded-xl p-3 flex items-center gap-3 opacity-50">
+          <Icon path={mdiLightbulb} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
+          <div className="flex flex-col min-w-0">
+            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
+            <p className="text-xs text-theme-text-muted">Unavailable</p>
+          </div>
         </div>
       ) : isEntityReady ? (
         <div
@@ -107,10 +110,7 @@ export const Light = ({
           </div>
         </div>
       ) : (
-        <div className="border-2 border-dashed border-theme-border rounded-xl p-3 text-center text-theme-text-muted">
-          <Icon path={mdiLightbulb} className="h-8 w-8 mx-auto mb-1 opacity-40" />
-          <p className="text-xs">Loading light...</p>
-        </div>
+        <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
       )}
     </Skeleton>
   );

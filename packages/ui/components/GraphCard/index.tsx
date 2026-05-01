@@ -87,11 +87,11 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
   return (
     <Skeleton isLoaded={isEntityReady} className="w-full h-auto rounded-2xl">
       {showNotAvailable ? (
-        <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center justify-center p-6 bg-theme-surface border border-theme-border text-theme-error rounded-2xl h-40 gap-2">
-          <Icon path={mdiAlert} className="h-8 w-8 text-theme-error" />
+        <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center justify-center p-6 bg-theme-surface border border-theme-border rounded-2xl h-40 gap-2 opacity-50">
+          <Icon path={mdiAlert} className="h-8 w-8 text-theme-text-muted" />
           <div className="text-center">
-            <div className="text-sm font-medium">Sensor not available</div>
-            <div className="text-xs opacity-80 break-all">{entityId}</div>
+            <div className="text-sm font-medium text-theme-text-muted">Unavailable</div>
+            <div className="text-xs text-theme-text-muted break-all">{entityId}</div>
           </div>
         </div>
       ) : (
