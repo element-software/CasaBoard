@@ -5,7 +5,7 @@ import Icon from "@mdi/react";
 import { mdiShieldAlert } from "@mdi/js";
 import { AlarmUtils } from "@repo/utils";
 import EntityIcon from "../Shared/util/EntityIcon";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 
 export type AlarmAction =
   | "disarm"
@@ -25,6 +25,15 @@ export interface AlarmProps {
 
 const LONG_PRESS_MS = 600;
 
+const ACTION_LABEL: Record<Exclude<AlarmAction, "none">, string> = {
+  disarm: "Disarming",
+  arm_home: "Arming Home",
+  arm_away: "Arming Away",
+  arm_night: "Arming Night",
+  arm_vacation: "Arming Vacation",
+  trigger: "Triggering",
+};
+
 export const Alarm = ({
   entityId,
   tapAction = "none",
@@ -36,23 +45,21 @@ export const Alarm = ({
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+  const [pendingAction, setPendingAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
 
   const callAction = useCallback(
     (action: AlarmAction) => {
-      if (!connection || !entityId || action === "none") return;
-      const service_data: Record<string, any> = { entity_id: entityId };
-      if (code) service_data.code = code;
-      connection.sendMessagePromise({
-        type: "call_service",
-        domain: "alarm_control_panel",
-        service: action,
-        service_data,
+      if (!entityId || action === "none") return;
+      setPendingAction(action as Exclude<AlarmAction, "none">);
+      new Promise<void>((resolve) => setTimeout(resolve, 4000)).then(() => {
+        setPendingAction(null);
       });
     },
-    [connection, entityId, code]
+    [entityId]
   );
 
   const handlePointerDown = useCallback(() => {
+    if (pendingAction) return;
     didLongPress.current = false;
     if (longPressAction && longPressAction !== "none") {
       timerRef.current = setTimeout(() => {
@@ -60,14 +67,14 @@ export const Alarm = ({
         callAction(longPressAction);
       }, LONG_PRESS_MS);
     }
-  }, [longPressAction, callAction]);
+  }, [longPressAction, callAction, pendingAction]);
 
   const handlePointerUp = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    if (!didLongPress.current) {
+    if (!didLongPress.current && !pendingAction) {
       callAction(tapAction ?? "none");
     }
-  }, [tapAction, callAction]);
+  }, [tapAction, callAction, pendingAction]);
 
   const handlePointerLeave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -89,8 +96,9 @@ export const Alarm = ({
     );
 
   const isInteractive =
-    (tapAction && tapAction !== "none") ||
-    (longPressAction && longPressAction !== "none");
+    !pendingAction &&
+    ((tapAction && tapAction !== "none") ||
+      (longPressAction && longPressAction !== "none"));
 
   const stateLabel = entity.state
     .split("_")
@@ -110,13 +118,19 @@ export const Alarm = ({
       onPointerLeave={isInteractive ? handlePointerLeave : undefined}
     >
       <div className="p-3 flex items-center gap-3">
-        <EntityIcon entity={entity} className="h-8 w-8 flex-shrink-0" />
+        {pendingAction ? (
+          <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center">
+            <div className="h-5 w-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+          </div>
+        ) : (
+          <EntityIcon entity={entity} className="h-8 w-8 flex-shrink-0" />
+        )}
         <div className="flex flex-col flex-1 min-w-0">
           <h3 className="text-sm font-semibold capitalize truncate text-theme-text">
             {entity.attributes?.friendly_name || entityId}
           </h3>
           <div className="text-xs font-medium opacity-80 text-theme-text">
-            {stateLabel}
+            {pendingAction ? `${ACTION_LABEL[pendingAction]}…` : stateLabel}
           </div>
         </div>
       </div>
