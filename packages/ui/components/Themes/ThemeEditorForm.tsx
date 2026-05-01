@@ -53,6 +53,7 @@ export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
         <div className="flex-1 space-y-6">
           <div className="flex flex-wrap items-end gap-3">
             <Input
+              id={`te-${theme.id}-name`}
               label="Theme name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -85,6 +86,7 @@ export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
                       onChange={(e) => setToken(key, e.target.value)}
                     />
                     <Input
+                      id={`te-${theme.id}-token-${key}`}
                       size="sm"
                       label={themeTokenLabel(key)}
                       value={tokens[key] ?? ""}

@@ -12,6 +12,7 @@ export const THEME_TOKEN_KEYS = [
   "text-secondary",
   "text-muted",
   "text-on-primary",
+  "text-on",
   "primary",
   "secondary",
   "accent",
@@ -69,6 +70,7 @@ export const DEFAULT_DARK_THEME_TOKENS: ResolvedThemeTokens = {
   "text-secondary": "#a3a3a3",
   "text-muted": "#6b7280",
   "text-on-primary": "#ffffff",
+  "text-on": "#ffffff",
   primary: "#8b5cf6",
   secondary: "#333dfe",
   accent: "#bb37fc",
@@ -129,6 +131,7 @@ export interface UpdateThemeInput {
 const THEME_TOKEN_LABEL_OVERRIDES: Partial<Record<ThemeTokenKey, string>> = {
   "page-background": "Page background",
   background: "Sidebar / drawers background",
+  "text-on": "Light on-state text",
 };
 
 /** Human-readable label for a token in the theme editor and preview. */
@@ -207,6 +210,7 @@ export const THEME_EDITOR_GROUPS: {
       "entity-off-muted",
       "entity-unavailable",
       "entity-unknown",
+      "text-on",
     ],
   },
   {

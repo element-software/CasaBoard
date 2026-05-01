@@ -110,7 +110,7 @@ export function ThemeFixturePreview() {
         <div className="grid grid-cols-2 gap-2">
           <div
             className="rounded-xl p-3 flex items-center gap-2"
-            style={{ backgroundColor: "var(--theme-primary)", color: "var(--theme-text-on-primary)" }}
+            style={{ backgroundColor: "var(--theme-primary)", color: "var(--theme-text-on)" }}
           >
             {/* lightbulb icon */}
             <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="currentColor">

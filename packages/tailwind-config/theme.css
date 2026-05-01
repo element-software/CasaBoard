@@ -13,6 +13,7 @@
   --theme-text-secondary: #a3a3a3;
   --theme-text-muted: #6b7280;
   --theme-text-on-primary: #ffffff;
+  --theme-text-on: #ffffff;
 
   --theme-primary: #8b5cf6;
   --theme-secondary: #333dfe;
@@ -73,6 +74,7 @@
   --theme-text-secondary: #64748b;
   --theme-text-muted: #94a3b8;
   --theme-text-on-primary: #ffffff;
+  --theme-text-on: #ffffff;
 
   --theme-primary: #7c3aed;
   --theme-secondary: #4338ca;
@@ -235,4 +237,8 @@
 
 .text-theme-text-on-primary {
   color: var(--theme-text-on-primary);
+}
+
+.text-theme-text-on {
+  color: var(--theme-text-on);
 }

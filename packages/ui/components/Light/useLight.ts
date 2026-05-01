@@ -129,6 +129,7 @@ export function useLightController(entity: any, entityId: string, options: UseLi
           brightnessPercentage + 2,
           100
         )}%, var(--theme-card-background) 100%)`,
+        color: "var(--theme-text-on)",
       };
     }
     return undefined;

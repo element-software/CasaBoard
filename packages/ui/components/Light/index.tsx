@@ -52,7 +52,7 @@ export const Light = ({
 
   const onStyle: React.CSSProperties = {
     backgroundColor: "var(--theme-primary)",
-    color: "var(--theme-text-on-primary)",
+    color: "var(--theme-text-on)",
   };
 
   return (

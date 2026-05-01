@@ -1,6 +1,6 @@
 import { getTheme } from "@repo/lib/actions/themeActions";
-import { ThemeEditorForm } from "@repo/ui/components/Themes/ThemeEditorForm";
 import { notFound } from "next/navigation";
+import { ThemeEditorFormClient } from "./ThemeEditorFormClient";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export default async function ThemeEditPage({ params }: Props) {
   const { id } = await params;
   try {
     const theme = await getTheme(id);
-    return <ThemeEditorForm theme={theme} />;
+    return <ThemeEditorFormClient theme={theme} />;
   } catch {
     notFound();
   }
