@@ -51,29 +51,44 @@ export const Alarm = ({
   // Clear pending once HA reflects the new state, with a 30s safety fallback.
   useEffect(() => {
     if (!pendingAction) return;
+    console.log("[Alarm] pendingAction set:", pendingAction, "— starting 30s fallback");
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setPendingAction(null), 30_000);
+    timeoutRef.current = setTimeout(() => {
+      console.log("[Alarm] 30s fallback fired — clearing pendingAction");
+      setPendingAction(null);
+    }, 30_000);
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [pendingAction]);
 
   useEffect(() => {
+    console.log("[Alarm] entity.state changed:", entity?.state, "| pendingAction:", pendingAction);
     if (pendingAction) setPendingAction(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entity?.state]);
 
   const callAction = useCallback(
     (action: AlarmAction) => {
-      if (!connection || !entityId || action === "none") return;
+      console.log("[Alarm] callAction:", action, "| connection:", !!connection, "| entityId:", entityId);
+      if (!connection || !entityId || action === "none") {
+        console.warn("[Alarm] callAction aborted — missing connection, entityId, or action is none");
+        return;
+      }
       setPendingAction(action as Exclude<AlarmAction, "none">);
       const service_data: Record<string, any> = { entity_id: entityId };
       if (code) service_data.code = code;
+      console.log("[Alarm] sending call_service:", { domain: "alarm_control_panel", service: action, service_data });
       connection.sendMessagePromise({
         type: "call_service",
         domain: "alarm_control_panel",
         service: action,
         service_data,
+      }).then((res: any) => {
+        console.log("[Alarm] call_service response:", res);
+      }).catch((err: any) => {
+        console.error("[Alarm] call_service error:", err);
+        setPendingAction(null);
       });
     },
     [connection, entityId, code]
