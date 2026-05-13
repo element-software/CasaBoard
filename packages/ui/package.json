@@ -30,7 +30,7 @@
     "@repo/types": "*",
     "@repo/config": "*",
     "@tailwindcss/postcss": "^4.1.13",
-    "next": "15.5.7",
+    "next": "15.5.18",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "victory": "^37.3.6"
