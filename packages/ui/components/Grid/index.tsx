@@ -97,8 +97,8 @@ export const GridRender = (props: GridProps) => {
     if (!Slot) return null;
 
     return (
-      <div key={key} className="flex flex-col w-full min-w-0">
-        <Slot />
+      <div key={key} className="flex flex-col w-full h-full min-w-0 min-h-0">
+        <Slot className="flex flex-col flex-1 h-full min-h-0 w-full [&>*]:flex [&>*]:flex-col [&>*]:flex-1 [&>*]:min-h-0 [&>*]:w-full" />
       </div>
     );
   };

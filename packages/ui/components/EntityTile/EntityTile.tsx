@@ -75,7 +75,11 @@ function GenericToggleTile({ entityId, tileLayout }: EntityTileProps) {
         entityId={entityId}
         onToggle={handleToggle}
       />
-      <Skeleton isLoaded={isLoaded} className="w-full rounded-xl">
+      <Skeleton
+        isLoaded={isLoaded}
+        className="flex h-full w-full flex-col rounded-xl"
+        classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+      >
         {showNotAvailable ? (
           <CardShell status="unavailable" tileLayout={tileLayout}>
             <IconBubble

@@ -227,7 +227,11 @@ export const Weather = ({
   const visibleForecast = forecast.slice(0, forecastCount);
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full rounded-[1.75rem]">
+    <Skeleton
+      isLoaded={isLoaded}
+      className="flex h-full w-full flex-col rounded-[1.75rem]"
+      classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+    >
       {showNotAvailable ? (
         <div className="weather-hk weather-hk--unavailable">
           <div className="weather-hk__current">

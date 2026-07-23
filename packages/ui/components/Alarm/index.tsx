@@ -184,7 +184,11 @@ export const Alarm = ({
         onClose={() => setConfirmAction(null)}
         onConfirm={handleConfirmed}
       />
-      <Skeleton isLoaded={isLoaded} className="w-full rounded-[1.75rem]">
+      <Skeleton
+        isLoaded={isLoaded}
+        className="flex h-full w-full flex-col rounded-[1.75rem]"
+        classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+      >
         {showNotAvailable ? (
           <div className="alarm-hk alarm-hk--unavailable">
             <div className="alarm-hk__icon" aria-hidden>

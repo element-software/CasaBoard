@@ -186,7 +186,11 @@ function RootCanvas(props: any) {
       className={cn(
         "w-full min-h-0",
         layoutPadding,
-        "[&>div]:w-full [&>div]:flex",
+        // Stretch Puck's dropzone; when cross-axis is stretch, make each child a
+        // full-height flex column so inner cards can fill their cell.
+        "[&>div]:w-full [&>div]:flex [&>div>*]:min-h-0 [&>div>*]:w-full [&>div>*]:min-w-0",
+        items === "items-stretch" &&
+          "[&>div>*]:flex [&>div>*]:h-full [&>div>*]:flex-col",
         innerDirectionClassMap[layoutDirection] ?? "[&>div]:flex-col",
         innerGapClassMap[layoutGap] ?? "[&>div]:gap-4",
         innerWrapClassMap[layoutWrap] ?? "[&>div]:flex-nowrap",

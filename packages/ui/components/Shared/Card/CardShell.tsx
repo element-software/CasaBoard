@@ -47,7 +47,7 @@ export function CardShell({
       data-tile-layout={tileLayout}
       className={classNames(
         "card-shell",
-        "w-full overflow-hidden select-none transition-all duration-200",
+        "w-full h-full overflow-hidden select-none transition-all duration-200",
         interactive && "card-shell--interactive cursor-pointer hover:brightness-110",
         status === "unavailable" && "opacity-50",
         className

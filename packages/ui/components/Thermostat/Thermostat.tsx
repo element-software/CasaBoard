@@ -91,7 +91,11 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
   }
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full rounded-[1.75rem]">
+    <Skeleton
+      isLoaded={isLoaded}
+      className="flex h-full w-full flex-col rounded-[1.75rem]"
+      classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+    >
       {showNotAvailable ? (
         <div className="thermostat-hk thermostat-hk--unavailable">
           <div className="thermostat-hk__icon" aria-hidden>
