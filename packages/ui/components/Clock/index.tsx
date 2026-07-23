@@ -12,21 +12,26 @@ const Clock = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const hours = time.getHours().toString().padStart(2, "0");
-  const minutes = time.getMinutes().toString().padStart(2, "0");
+  const timeLabel = time.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const dateLabel = time.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <div className="w-full pt-1 pb-2 text-left text-theme-text">
-      <div className="text-5xl font-semibold tracking-tight tabular-nums">
-        {hours}:{minutes}
+      <div className="text-5xl font-bold tracking-tight tabular-nums leading-none">
+        {timeLabel}
       </div>
-      <div className="text-sm text-theme-text-secondary mt-1">
-        {time.toLocaleDateString("en-US", {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })}
+      <div className="text-base text-theme-text-secondary mt-1.5 font-medium">
+        {dateLabel}
       </div>
     </div>
   );

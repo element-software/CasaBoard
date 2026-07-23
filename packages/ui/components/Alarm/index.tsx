@@ -174,7 +174,7 @@ export const Alarm = ({
 
   const statusLine = pendingAction
     ? `${ACTION_LABEL[pendingAction]}…`
-    : `${status.mode} · ${status.detail}`;
+    : `${status.mode} • ${status.detail}`;
 
   return (
     <>

@@ -63,58 +63,51 @@ export function Rooms({ title = "Rooms", rooms = [] }: RoomsProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
       {title && (
-        <h2 className="text-xl font-bold text-theme-text tracking-tight">
+        <h2 className="text-2xl font-bold text-theme-text tracking-tight">
           {title}
         </h2>
       )}
-      <div className="flex flex-col gap-3">
-        {rooms.length === 0 && (
-          <p className="text-sm text-theme-text-muted py-4">
-            Add rooms in the editor and select which entities appear in each.
-          </p>
-        )}
-        {rooms.map((room, index) => {
-          const key = room.id || `room-${index}`;
-          const count = (room.entities || []).filter((e) => e?.id).length;
-          return (
-            <CardShell
-              key={key}
-              interactive
-              className="bg-theme-card-background"
-              onClick={() => openRoom(key)}
-            >
-              <div className="flex flex-col gap-3 w-full">
-                <div className="flex flex-row items-center justify-between w-full">
-                  <h3 className="text-base font-semibold text-theme-text">
-                    {room.name || "Room"}
-                  </h3>
-                  <span className="inline-flex items-center gap-0.5 text-sm text-theme-text-secondary">
-                    {count} accessor{count === 1 ? "y" : "ies"}
-                    <Icon path={mdiChevronRight} className="h-4 w-4" />
-                  </span>
-                </div>
-                {count > 0 && (
-                  <div className="flex flex-col divide-y divide-theme-divider">
-                    {(room.entities || [])
-                      .filter((e) => e?.id)
-                      .slice(0, 6)
-                      .map((e) => (
-                        <div
-                          key={e.id}
-                          className="py-1"
-                          onClick={(ev) => ev.stopPropagation()}
-                          onPointerDown={(ev) => ev.stopPropagation()}
-                        >
+      {rooms.length === 0 ? (
+        <p className="text-sm text-theme-text-muted py-4">
+          Add rooms in the editor and select which entities appear in each.
+        </p>
+      ) : (
+        <CardShell className="bg-theme-card !p-0 overflow-hidden">
+          <div className="flex flex-col divide-y divide-theme-divider px-5">
+            {rooms.map((room, index) => {
+              const key = room.id || `room-${index}`;
+              const entities = (room.entities || []).filter((e) => e?.id);
+              const count = entities.length;
+              return (
+                <div key={key} className="py-4 first:pt-5 last:pb-5">
+                  <button
+                    type="button"
+                    onClick={() => openRoom(key)}
+                    className="flex w-full flex-row items-center justify-between gap-3 text-left"
+                  >
+                    <h3 className="text-lg font-bold text-theme-text">
+                      {room.name || "Room"}
+                    </h3>
+                    <span className="inline-flex items-center gap-0.5 text-sm text-theme-text-secondary shrink-0">
+                      {count} accessor{count === 1 ? "y" : "ies"}
+                      <Icon path={mdiChevronRight} className="h-4 w-4" />
+                    </span>
+                  </button>
+                  {count > 0 && (
+                    <div className="mt-1 flex flex-col">
+                      {entities.slice(0, 6).map((e) => (
+                        <div key={e.id}>
                           <EntityTile entityId={e.id} tileLayout="row" />
                         </div>
                       ))}
-                  </div>
-                )}
-              </div>
-            </CardShell>
-          );
-        })}
-      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardShell>
+      )}
     </div>
   );
 }

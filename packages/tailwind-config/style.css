@@ -74,11 +74,13 @@
 
 /* ---- HomeKit ----
    Square tiles: icon top-left in frosted circle, name + state at bottom.
-   On (light/switch) = warm yellow→mustard diagonal gradient with white type;
-   Off = near-black card. */
+   Light on = solid warm gold with white type; off = white card with muted icon.
+   Switch on = white card with blue icon bubble + blue status (Apple Home plug).
+   Room rows stay flat (no gold fill) with status on the right. */
 [data-casaboard-style="homekit"] .card-shell {
   background-color: var(--theme-card-background);
   color: var(--theme-text);
+  box-shadow: var(--style-shadow, none);
 }
 
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"] {
@@ -91,41 +93,44 @@
 
 [data-casaboard-style="homekit"] .card-shell[data-domain="binary_sensor"],
 [data-casaboard-style="homekit"] .card-shell[data-card-state="off"]:not([data-domain="climate"]) {
-  background-color: var(--theme-entity-off);
+  background-color: var(--theme-card-background);
   background-image: none;
   color: var(--theme-text);
 }
 
-/* Warm yellow on-state — matches Home accessory tile mockup */
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="light"],
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="switch"] {
+/* Solid gold on-state for lights only — matches Home accessory tile mockup */
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="light"] {
   background-color: var(--theme-domain-light-on, var(--theme-entity-on));
-  background-image: linear-gradient(
-    145deg,
-    var(--theme-domain-light-on, var(--theme-entity-on)) 0%,
-    color-mix(
-        in srgb,
-        var(--theme-domain-light-on, var(--theme-entity-on)) 55%,
-        #ff9f0a
-      )
-      100%
-  );
-  color: var(--theme-text-on);
-}
-
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="climate"] {
-  background-color: var(--theme-entity-on);
   background-image: none;
   color: var(--theme-text-on);
 }
 
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"]:not([data-domain]) {
-  background-color: var(--theme-entity-on);
-  background-image: linear-gradient(
-    145deg,
-    var(--theme-entity-on) 0%,
-    color-mix(in srgb, var(--theme-entity-on) 55%, #ff9f0a) 100%
-  );
+/* Switches / plugs stay white when on; blue icon + status */
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="switch"] {
+  background-color: var(--theme-card-background);
+  background-image: none;
+  color: var(--theme-text);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="switch"] .icon-bubble {
+  background-color: var(--theme-domain-switch-on, var(--theme-info));
+  color: #ffffff;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="switch"] .icon-bubble-secondary {
+  color: var(--theme-domain-switch-on, var(--theme-info));
+  opacity: 1;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="climate"] {
+  background-color: var(--theme-card-background);
+  background-image: none;
+  color: var(--theme-text);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"]:not([data-domain]) {
+  background-color: var(--theme-domain-light-on, var(--theme-entity-on));
+  background-image: none;
   color: var(--theme-text-on);
 }
 
@@ -149,7 +154,7 @@
 }
 
 [data-casaboard-style="homekit"] .icon-bubble {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(60, 60, 67, 0.08);
   border-radius: 9999px;
   width: 2.75rem;
   height: 2.75rem;
@@ -161,14 +166,20 @@
   fill: currentColor;
 }
 
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"] .icon-bubble {
-  background-color: rgba(255, 255, 255, 0.25);
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="light"] .icon-bubble,
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"]:not([data-domain]) .icon-bubble {
+  background-color: rgba(255, 255, 255, 0.28);
   color: var(--theme-text-on);
 }
 
 [data-casaboard-style="homekit"] .card-shell[data-card-state="off"] .icon-bubble {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--theme-text);
+  background-color: rgba(60, 60, 67, 0.08);
+  color: var(--theme-text-secondary);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="off"] .icon-bubble-secondary {
+  color: var(--theme-text-secondary);
+  opacity: 1;
 }
 
 [data-casaboard-style="homekit"] .icon-bubble-label {
@@ -196,6 +207,11 @@
   color: inherit;
 }
 
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"][data-card-state="on"][data-domain="light"] .icon-bubble-secondary {
+  color: rgba(255, 255, 255, 0.88);
+  opacity: 1;
+}
+
 [data-casaboard-style="homekit"] .card-shell--interactive:active {
   transform: scale(0.97);
   transition: transform 0.12s ease;
@@ -203,7 +219,7 @@
 
 /* HomeKit thermostat row (icon · labels · stacked +/-) */
 .thermostat-hk {
-  --thermostat-bg: #f8f8f9;
+  --thermostat-bg: #ffffff;
   --thermostat-title: #1c1c1e;
   --thermostat-accent: #e29933;
   --thermostat-icon-bg: #fdeee4;
@@ -218,6 +234,7 @@
   border-radius: 1.75rem;
   background-color: var(--thermostat-bg);
   color: var(--thermostat-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
 }
 
@@ -311,7 +328,7 @@
 
 /* HomeKit security / alarm row */
 .alarm-hk {
-  --alarm-bg: #f2f2f7;
+  --alarm-bg: #ffffff;
   --alarm-title: #1c1c1e;
   --alarm-accent: #34c759;
   --alarm-icon-bg: rgba(52, 199, 89, 0.16);
@@ -325,6 +342,7 @@
   border-radius: 1.75rem;
   background-color: var(--alarm-bg);
   color: var(--alarm-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   user-select: none;
 }
@@ -424,7 +442,7 @@
 
 /* HomeKit weather card (current · 5-day forecast) */
 .weather-hk {
-  --weather-bg: #f7f8f9;
+  --weather-bg: #ffffff;
   --weather-title: #1c1c1e;
   --weather-muted: #8e8e93;
   --weather-precip: #7b8db0;
@@ -436,6 +454,7 @@
   border-radius: 1.75rem;
   background-color: var(--weather-bg);
   color: var(--weather-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
 }
 
@@ -763,11 +782,24 @@
   cursor: not-allowed;
 }
 
-/* Compact / list variant for room rows */
+/* Compact / list variant for room rows — flat rows, status on the right */
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] {
   aspect-ratio: auto;
   min-height: 0;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: var(--theme-text);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"][data-domain="light"],
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"][data-domain="switch"],
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"]:not([data-domain]) {
+  background-color: transparent;
+  background-image: none;
+  color: var(--theme-text);
 }
 
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-row {
@@ -775,16 +807,54 @@
   align-items: center;
   text-align: left;
   gap: 0.75rem;
+  height: auto;
 }
 
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble {
   width: 2.25rem;
   height: 2.25rem;
+  background-color: rgba(60, 60, 67, 0.08);
+  color: var(--theme-text-secondary);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"][data-domain="switch"] .icon-bubble {
+  background-color: var(--theme-domain-switch-on, var(--theme-info));
+  color: #ffffff;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"][data-domain="light"] .icon-bubble {
+  background-color: rgba(60, 60, 67, 0.08);
+  color: var(--theme-text);
 }
 
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-label {
   margin-top: 0;
   flex: 1 1 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-label h3 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-secondary {
+  flex-shrink: 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  opacity: 1;
+  color: var(--theme-text);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="off"] .icon-bubble-secondary {
+  color: var(--theme-text-secondary);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"][data-card-state="on"][data-domain="switch"] .icon-bubble-secondary {
+  color: var(--theme-domain-switch-on, var(--theme-info));
 }
 
 /* ---- 3D ---- */

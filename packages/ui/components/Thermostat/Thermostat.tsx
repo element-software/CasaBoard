@@ -114,7 +114,7 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
               {entity.attributes?.friendly_name || "Thermostat"}
             </div>
             <div className="thermostat-hk__status">
-              {modeLabel} · {displayTemp}°
+              {modeLabel} • {displayTemp}°
             </div>
           </div>
 

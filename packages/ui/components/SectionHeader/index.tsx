@@ -7,7 +7,7 @@ export function SectionHeader({
   title?: string;
 }) {
   return (
-    <h2 className="text-xl font-bold text-theme-text tracking-tight w-full">
+    <h2 className="text-2xl font-bold text-theme-text tracking-tight w-full">
       {title}
     </h2>
   );

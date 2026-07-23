@@ -9,6 +9,7 @@ import {
   mdiCctv,
   mdiChartBar,
   mdiCircle,
+  mdiChevronRight,
 } from "@mdi/js";
 import classNames from "classnames";
 
@@ -52,34 +53,34 @@ export function SidebarNav({ items }: SidebarNavProps) {
         ];
 
   return (
-    <nav className="flex flex-col gap-1 w-full" aria-label="Dashboard">
+    <nav className="flex flex-col gap-1.5 w-full mt-2" aria-label="Dashboard">
       {navItems.map((item) => {
         const href = `/dashboard/${item.pageSlug}`;
         const active =
           pathname === href ||
           pathname?.endsWith(`/dashboard/${item.pageSlug}`);
         const path = resolveIcon(item.icon, item.pageSlug);
+        const showChevron = item.pageSlug === "media";
 
         return (
           <Link
             key={item.pageSlug}
             href={href}
             className={classNames(
-              "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+              "flex items-center gap-3 rounded-2xl px-3.5 py-3 text-[15px] font-semibold transition-colors",
               active
-                ? "bg-theme-interactive-active text-theme-text"
+                ? "bg-theme-interactive-active text-theme-text-on"
                 : "text-theme-text-secondary hover:bg-theme-interactive-hover hover:text-theme-text"
             )}
           >
-            <span
-              className={classNames(
-                "flex h-8 w-8 items-center justify-center rounded-lg",
-                active ? "bg-theme-text text-theme-page-background" : "bg-theme-interactive-hover"
-              )}
-            >
-              <Icon path={path} className="h-4 w-4" />
-            </span>
-            {item.label}
+            <Icon path={path} className="h-5 w-5 shrink-0 opacity-90" />
+            <span className="flex-1 truncate">{item.label}</span>
+            {showChevron && !active && (
+              <Icon
+                path={mdiChevronRight}
+                className="h-4 w-4 shrink-0 opacity-50"
+              />
+            )}
           </Link>
         );
       })}
