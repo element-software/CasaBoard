@@ -177,12 +177,32 @@
   background-color: var(--theme-alarm-triggered);
 }
 
+.bg-theme-interactive-hover {
+  background-color: var(--theme-interactive-hover);
+}
+
+.bg-theme-interactive-active {
+  background-color: var(--theme-interactive-active);
+}
+
+.bg-theme-interactive-inactive {
+  background-color: var(--theme-interactive-inactive);
+}
+
 .hover\:bg-theme-interactive-hover:hover {
   background-color: var(--theme-interactive-hover);
 }
 
+.hover\:text-theme-text:hover {
+  color: var(--theme-text);
+}
+
 .active\:bg-theme-interactive-active:active {
   background-color: var(--theme-interactive-active);
+}
+
+.active\:text-theme-text-on:active {
+  color: var(--theme-text-on);
 }
 
 .bg-theme-background-secondary {
