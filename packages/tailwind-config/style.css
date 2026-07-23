@@ -71,6 +71,11 @@
   height: 2.75rem;
 }
 
+[data-casaboard-style="homekit"] .icon-bubble-label {
+  width: 100%;
+  text-align: center;
+}
+
 /* ---- 3D ---- */
 [data-casaboard-style="3d"] .card-shell {
   background-image: linear-gradient(

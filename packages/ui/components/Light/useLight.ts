@@ -124,11 +124,10 @@ export function useLightController(entity: any, entityId: string, options: UseLi
 
   const cardStyle = useMemo<React.CSSProperties | undefined>(() => {
     if (dimmer && isOn) {
+      const fillEnd = Math.max(0, brightnessPercentage - 6);
+      const fadeEnd = Math.min(brightnessPercentage + 6, 100);
       return {
-        background: `linear-gradient(to right, var(--theme-slider-active) 0%, var(--theme-slider-active) ${brightnessPercentage}%, var(--theme-card-background) ${Math.min(
-          brightnessPercentage + 2,
-          100
-        )}%, var(--theme-card-background) 100%)`,
+        background: `linear-gradient(to right, var(--theme-slider-active) 0%, var(--theme-slider-active) ${fillEnd}%, var(--theme-card-background) ${fadeEnd}%, var(--theme-card-background) 100%)`,
         color: "var(--theme-text-on)",
       };
     }

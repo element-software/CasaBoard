@@ -6,6 +6,8 @@ describe('Clock', () => {
   it('should render the component successfully', () => {
     const { getByText } = render(<Clock />);
 
-    expect(getByText(new Date().toLocaleTimeString().slice(0,5))).toBeInTheDocument();
+    const now = new Date();
+    const expected = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    expect(getByText(expected)).toBeInTheDocument();
   });
 });
