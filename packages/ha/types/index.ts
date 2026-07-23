@@ -12,6 +12,7 @@ export type EntityDomain =
   | "sensor"
   | "binary_sensor"
   | "climate"
+  | "camera"
   | "media_player"
   | "lock"
   | "fan"

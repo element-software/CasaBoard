@@ -25,11 +25,13 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
+    "@repo/config": "*",
+    "@repo/ha": "*",
     "@repo/hooks": "*",
     "@repo/lib": "*",
     "@repo/types": "*",
-    "@repo/config": "*",
     "@tailwindcss/postcss": "^4.1.13",
+    "hls.js": "^1.6.16",
     "next": "15.5.18",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

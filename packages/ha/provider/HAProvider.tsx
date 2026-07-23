@@ -7,6 +7,8 @@ import { HAConnection } from "@repo/types/ha";
 
 export interface HAContextType {
   connection: Connection | null;
+  auth: Auth | null;
+  hassUrl: string | null;
   connected: boolean;
   entities: { [entityId: string]: any };
   getEntity: (entityId: string) => any | undefined;
@@ -22,6 +24,8 @@ const HAContext = createContext<HAContextType>({
   getEntity: () => undefined,
   getAllEntities: () => [],
   connection: null,
+  auth: null,
+  hassUrl: null,
   error: null,
   loading: true,
   retry: () => {},
@@ -35,6 +39,7 @@ export interface HAProviderProps {
 
 export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fallback = null }) => {
   const [connection, setConnection] = useState<Connection | null>(null);
+  const [auth, setAuth] = useState<Auth | null>(null);
   const [entities, setEntities] = useState<{ [entityId: string]: any }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -42,18 +47,15 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
 
   const run = async () => {
     let unsubscribe: (() => void) | undefined;
-    let activeConnection: Connection | null = null;
-    let activeAuth: Auth | null = null;
 
     setLoading(true);
     setError(null);
     try {
       clientLogger.info('HAProvider', `connecting to Home Assistant at ${haInstance.hass_url}`);
-      const { connection, auth } = await connect({ haInstance });
-      clientLogger.info('HAProvider', 'connected to Home Assistant', connection);
-      activeConnection = connection;
-      activeAuth = auth;
+      const { connection: activeConnection, auth: activeAuth } = await connect({ haInstance });
+      clientLogger.info('HAProvider', 'connected to Home Assistant', activeConnection);
       setConnection(activeConnection);
+      setAuth(activeAuth);
 
       // Initial states
       const initial = await getStates(activeConnection);
@@ -72,6 +74,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     } catch (e: any) {
       setError(e);
       setConnection(null);
+      setAuth(null);
       setEntities({});
       setLoading(false);
       clientLogger.error('HAProvider', 'error', e);
@@ -92,6 +95,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     return () => {
       if (unsubscribe) unsubscribe();
       setConnection(null);
+      setAuth(null);
       setEntities({});
     };
   }, [haInstance.hass_url, retryCount]);
@@ -107,6 +111,8 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     <HAContext.Provider
       value={{
         connection,
+        auth,
+        hassUrl: haInstance.hass_url,
         connected: Boolean(connection),
         entities,
         getEntity: getEntityById,
