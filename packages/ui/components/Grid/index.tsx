@@ -44,8 +44,8 @@ export const GridRender = (props: GridProps) => {
   const {
     columns_sm = 2,
     columns_md = 3,
-    columns_lg = 4,
-    columns_xl = 5,
+    columns_lg = 5,
+    columns_xl = 6,
     gap = "gap-4",
     alignX = "start",
     alignY = "stretch",
