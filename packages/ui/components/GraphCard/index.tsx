@@ -12,18 +12,6 @@ interface GraphCardProps {
 }
 
 const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
-  // Early return for missing entityId - match Light's configure pattern
-  if (!entityId) {
-    return (
-      <Card className="p-4 border-2 border-dashed">
-        <CardBody className="text-center">
-          <Icon path={mdiAlert} className="h-12 w-12 mx-auto mb-2" />
-          <p>Configure Sensor Entity</p>
-        </CardBody>
-      </Card>
-    );
-  }
-
   const entity = useEntity(entityId);
   const { history, loading } = useEntityHistory(
     entityId,
@@ -83,6 +71,17 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
     "loading:",
     loading
   );
+
+  if (!entityId) {
+    return (
+      <Card className="p-4 border-2 border-dashed">
+        <CardBody className="text-center">
+          <Icon path={mdiAlert} className="h-12 w-12 mx-auto mb-2" />
+          <p>Configure Sensor Entity</p>
+        </CardBody>
+      </Card>
+    );
+  }
 
   return (
     <Skeleton isLoaded={isEntityReady} className="w-full h-auto rounded-2xl">

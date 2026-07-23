@@ -2,9 +2,7 @@
 import { useState, useTransition } from "react";
 import { SidebarActions } from "@repo/lib";
 import { Sidebar } from "@repo/types/sidebar";
-import { Entitlements } from "@repo/types/subscription";
 import Link from "next/link";
-import { PlanLockCard } from "../Shared/util/PlanLockOverlay";
 import Icon from "@mdi/react";
 import {
   mdiPlus,
@@ -28,7 +26,7 @@ import {
   DropdownItem,
   cn,
 } from "@heroui/react";
-import { useMergedHAInstances } from "@repo/hooks";
+import { useHAConnection } from "@repo/hooks";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
@@ -36,8 +34,6 @@ interface SidebarManagementProps {
   initialSidebars?: Sidebar[];
   initialError?: string | null;
   compact?: boolean;
-  entitlements: Entitlements;
-  lockedSidebarIds?: string[];
 }
 
 export const SidebarManagement = ({
@@ -46,29 +42,13 @@ export const SidebarManagement = ({
   initialSidebars = [],
   initialError = null,
   compact = false,
-  entitlements,
-  lockedSidebarIds = [],
 }: SidebarManagementProps) => {
-  const lockedSet = new Set(lockedSidebarIds);
-  const { instances: haInstances } = useMergedHAInstances(entitlements);
+  const { connection } = useHAConnection();
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
 
-  // Helper functions for entitlements
-  const canCreateSidebar = (currentCount: number) => {
-    if (!entitlements?.active) return false;
-    return (
-      entitlements.maxSidebars === -1 ||
-      currentCount < entitlements.maxSidebars
-    );
-  };
-
-  const getRemainingSidebars = (currentCount: number) => {
-    if (!entitlements?.active) return 0;
-    if (entitlements.maxSidebars === -1) return Infinity;
-    return Math.max(0, entitlements.maxSidebars - currentCount);
-  };
+  const canCreateSidebar = () => true;
 
   const handleDeleteSidebar = async (slug: string, sidebarName: string) => {
     if (
@@ -139,7 +119,7 @@ export const SidebarManagement = ({
           <h3 className="text-lg font-semibold text-theme-text mb-2">
             No sidebars yet
           </h3>
-          {!haInstances?.length ? (
+          {!connection ? (
             <>
             <p className="text-theme-text-secondary mb-4">
               You need to have at least one Home Assistant instance to create a sidebar.
@@ -163,7 +143,7 @@ export const SidebarManagement = ({
               href="/setup/sidebars/create"
               color="primary"
               startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-              isDisabled={!canCreateSidebar(sidebars.length)}
+              isDisabled={!canCreateSidebar()}
             >
               Create Sidebar
             </Button>
@@ -202,7 +182,7 @@ export const SidebarManagement = ({
           color="primary"
           size="sm"
           startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-          isDisabled={!canCreateSidebar(sidebars.length)}
+          isDisabled={!canCreateSidebar()}
         >
           {compact ? "New" : "New Sidebar"}
         </Button>
@@ -214,10 +194,7 @@ export const SidebarManagement = ({
           compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 gap-3"
         )}
       >
-        {displaySidebars.map((sidebar) =>
-          lockedSet.has(sidebar.id) ? (
-            <PlanLockCard key={sidebar.id} name={sidebar.name} compact={compact} />
-          ) : (
+        {displaySidebars.map((sidebar) => (
           <Card key={sidebar.id} className="hover:shadow-md transition-shadow">
             <CardBody className={cn(compact ? "p-3" : "p-4")}>
               <div
@@ -333,8 +310,7 @@ export const SidebarManagement = ({
               </div>
             </CardBody>
           </Card>
-          )
-        )}
+        ))}
       </div>
 
       {/* Footer Info */}
@@ -348,44 +324,6 @@ export const SidebarManagement = ({
           >
             And {sidebars.length - maxDisplaySidebars} more sidebars
           </p>
-        </div>
-      )}
-
-      {/* Usage Info */}
-      {entitlements && entitlements.maxSidebars !== -1 && (
-        <div
-          className={cn(
-            compact
-              ? "text-center"
-              : "bg-theme-background-secondary rounded-lg p-4"
-          )}
-        >
-          {compact ? (
-            <span className="text-xs text-theme-text-secondary">
-              {sidebars.length}/{entitlements.maxSidebars} sidebars
-              {getRemainingSidebars(sidebars.length) === 0 && " • Limit reached"}
-              {getRemainingSidebars(sidebars.length) > 0 &&
-                getRemainingSidebars(sidebars.length) <= 2 &&
-                ` • ${getRemainingSidebars(sidebars.length)} remaining`}
-            </span>
-          ) : (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-theme-text-secondary">
-                Sidebars used: {sidebars.length} / {entitlements.maxSidebars}
-              </span>
-              {getRemainingSidebars(sidebars.length) === 0 && (
-                <Chip size="sm" color="warning" variant="flat">
-                  Limit reached
-                </Chip>
-              )}
-              {getRemainingSidebars(sidebars.length) > 0 &&
-                getRemainingSidebars(sidebars.length) <= 2 && (
-                  <Chip size="sm" color="warning" variant="flat">
-                    {getRemainingSidebars(sidebars.length)} remaining
-                  </Chip>
-                )}
-            </div>
-          )}
         </div>
       )}
 

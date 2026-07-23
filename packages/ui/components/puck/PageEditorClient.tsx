@@ -1,15 +1,14 @@
 import type { Data } from "@measured/puck";
 import type { ThemeTokens } from "@repo/types/theme";
 import PageEditorBody from "./PageEditorBody";
-import { SubscriptionService } from "@repo/lib";
 import { listThemes } from "@repo/lib/actions/themeActions";
+import { HAConnectionActions } from "@repo/lib";
 
 type ThemePickerOption = { id: string; name: string };
 
 type PageEditorClientProps = {
   initialData?: Data;
   pageId?: string | null;
-  userId?: string | null;
   initialPublished?: boolean;
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
@@ -26,9 +25,9 @@ export default async function PageEditorClient({
   initialThemeId,
   initialThemeOverrides,
 }: PageEditorClientProps) {
-  const [entitlements, themes] = await Promise.all([
-    SubscriptionService.getEntitlementsForCurrentUser(),
+  const [themes, haConnection] = await Promise.all([
     listThemes(),
+    HAConnectionActions.getHAConnection(),
   ]);
 
   const themePickerThemes: ThemePickerOption[] = themes.map((t) => ({
@@ -43,7 +42,6 @@ export default async function PageEditorClient({
 
   return (
     <PageEditorBody
-      entitlements={entitlements}
       initialData={initialData}
       pageId={pageId}
       initialPublished={initialPublished}
@@ -53,6 +51,7 @@ export default async function PageEditorClient({
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
       initialThemeOverrides={initialThemeOverrides}
+      haConnection={haConnection}
     />
   );
 }

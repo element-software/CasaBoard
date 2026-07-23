@@ -8,7 +8,6 @@ export type PublicOgRouteKey =
   | "contact"
   | "cookies"
   | "docs"
-  | "pricing"
   | "privacy"
   | "security"
   | "terms";
@@ -30,15 +29,15 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
   home: {
     path: "/",
     metadata: {
-      title: "CasaBoard — Smart Home Dashboard",
+      title: "CasaBoard — Self-Hosted Home Assistant Dashboards",
       description:
-        "Privacy-first Home Assistant dashboards — local credentials by default, optional cloud sync on paid plans.",
+        "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
     },
     og: {
       title: "CasaBoard",
       description:
-        "Privacy-first Home Assistant dashboards — local credentials by default, optional cloud sync on paid plans.",
-      alt: "CasaBoard — Smart Home Dashboard",
+        "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
+      alt: "CasaBoard — Self-Hosted Home Assistant Dashboards",
     },
   },
   about: {
@@ -46,11 +45,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "About — CasaBoard",
       description:
-        "A modern dashboard builder for Home Assistant — drag-and-drop editor, responsive layouts, privacy-first by default.",
+        "A self-hosted, open-source dashboard builder for Home Assistant — drag-and-drop editor, your data never leaves your network.",
     },
     og: {
       title: "About CasaBoard",
-      description: "Modern dashboards for Home Assistant — beautiful, responsive, privacy-first.",
+      description: "Self-hosted dashboards for Home Assistant — beautiful, responsive, open source.",
       alt: "About CasaBoard — smart home dashboards",
     },
   },
@@ -59,7 +58,7 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Contact — CasaBoard",
       description:
-        "Questions, feedback, or just want to say hello? Reach the CasaBoard team — we read every message.",
+        "Questions, feedback, or found a bug? Reach out or open an issue on the CasaBoard GitHub repository.",
     },
     og: {
       title: "Contact",
@@ -72,11 +71,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Cookie Policy — CasaBoard",
       description:
-        "How CasaBoard uses cookies — essential sign-in cookies, optional analytics, and how you control them.",
+        "How this documentation site uses cookies. The CasaBoard app itself is self-hosted and sets none.",
     },
     og: {
       title: "Cookie Policy",
-      description: "Essential cookies and opt-in analytics — you stay in control.",
+      description: "No cookies, no analytics — on this docs site or in the app.",
       alt: "CasaBoard cookie policy",
     },
   },
@@ -85,25 +84,12 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Documentation — CasaBoard",
       description:
-        "Guides for CasaBoard — dashboards, Home Assistant connections, editor tips, and troubleshooting.",
+        "Guides for CasaBoard — Docker install, the HACS Lovelace panel, connecting Home Assistant, and troubleshooting.",
     },
     og: {
       title: "Documentation",
-      description: "Everything you need to get started with CasaBoard.",
+      description: "Everything you need to self-host CasaBoard.",
       alt: "CasaBoard documentation",
-    },
-  },
-  pricing: {
-    path: "/pricing",
-    metadata: {
-      title: "Pricing — CasaBoard",
-      description:
-        "Simple pricing for CasaBoard — free tier and paid plans. Upgrade or cancel anytime.",
-    },
-    og: {
-      title: "Pricing",
-      description: "Simple, honest plans — upgrade or cancel anytime.",
-      alt: "CasaBoard pricing",
     },
   },
   privacy: {
@@ -111,11 +97,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Privacy Policy — CasaBoard",
       description:
-        "What CasaBoard collects, how we use it, and how we keep your Home Assistant credentials local by default.",
+        "CasaBoard is self-hosted software. We don't run a hosted service and collect no data from your installation.",
     },
     og: {
       title: "Privacy Policy",
-      description: "Minimal data, opt-in analytics — your HA credentials never touch our servers.",
+      description: "Self-hosted software — your data stays on your own infrastructure.",
       alt: "CasaBoard privacy policy",
     },
   },
@@ -124,25 +110,25 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Security — CasaBoard",
       description:
-        "How CasaBoard protects your account and data — local credentials, optional cloud sync, and clear boundaries.",
+        "How CasaBoard handles your Home Assistant credentials and dashboard data on your own server.",
     },
     og: {
       title: "Security",
-      description: "Privacy-first by design — local credentials, clear data boundaries.",
-      alt: "CasaBoard security and privacy",
+      description: "Self-hosted by design — your credentials and data never leave your server.",
+      alt: "CasaBoard security overview",
     },
   },
   terms: {
     path: "/terms",
     metadata: {
-      title: "Terms of Service — CasaBoard",
+      title: "Terms — CasaBoard",
       description:
-        "CasaBoard terms of service — development period, plans, data, and what to expect at launch.",
+        "CasaBoard is free, open-source software provided as-is. No account, no subscription, no warranty.",
     },
     og: {
-      title: "Terms of Service",
-      description: "What to expect while CasaBoard is in active development.",
-      alt: "CasaBoard terms of service",
+      title: "Terms",
+      description: "Free, open-source software, provided as-is.",
+      alt: "CasaBoard terms",
     },
   },
 };

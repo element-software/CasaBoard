@@ -6,8 +6,7 @@
     ".": "./index.ts",
     "./*": "./*.{ts,tsx}",
     "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts",
-    "./actions/themeActions": "./actions/themeActions.ts",
-    "./utils/planEmulation": "./utils/planEmulation.ts"
+    "./actions/themeActions": "./actions/themeActions.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -26,8 +25,6 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@measured/puck": "^0.20.2",
-    "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.57.2",
     "@tailwindcss/postcss": "^4.1.13",
     "@uiw/react-color": "^2.8.0",
     "classnames": "^2.5.1",

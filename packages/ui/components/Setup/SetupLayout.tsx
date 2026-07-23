@@ -8,18 +8,16 @@ import { Breadcrumbs } from "../Breadcrumbs";
 import { Footer } from "../Shared/Footer";
 
 interface SetupLayoutProps {
-  user: any;
   children: React.ReactNode;
 }
 
-export const SetupLayout = ({ user, children }: SetupLayoutProps) => {
+export const SetupLayout = ({ children }: SetupLayoutProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="flex min-h-screen overflow-x-hidden">
       <SetupSidebar
-        user={user}
         className="fixed hidden md:flex"
         isOpen={isOpen}
         onClose={onClose}

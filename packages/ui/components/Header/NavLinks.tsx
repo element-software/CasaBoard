@@ -1,6 +1,6 @@
 import { LinkService } from "@repo/lib";
 import Icon from "@mdi/react";
-import { mdiBookOpen, mdiCurrencyGbp, mdiEmail, mdiInformation, mdiLogin, mdiShield } from "@mdi/js";
+import { mdiBookOpen, mdiEmail, mdiInformation, mdiShield } from "@mdi/js";
 export interface NavLink {
   href: string;
   label: string;
@@ -33,23 +33,8 @@ export const getPublicLinks = (): NavLink[] => [
     external: true,
     icon: <Icon path={mdiEmail} className="w-4 h-4" />,
   },
-  {
-    href: LinkService.crossAppHref("public", "/pricing"),
-    label: "Pricing",
-    icon: <Icon path={mdiCurrencyGbp} className="w-4 h-4" />,
-  },
-  {
-    href: LinkService.crossAppHref("app", "/auth/login"),
-    label: "Login",
-    icon: <Icon path={mdiLogin} className="w-4 h-4" />,
-  },
 ];
 
 export const getPrivateLinks = (): NavLink[] => [
   { href: LinkService.crossAppHref("app", "/setup"), label: "Setup" },
-  { href: LinkService.crossAppHref("app", "/auth/profile"), label: "Profile" },
-  {
-    href: LinkService.crossAppHref("app", "/auth/profile/billing"),
-    label: "Billing",
-  },
 ];

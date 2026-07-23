@@ -8,7 +8,6 @@ export interface Page {
   slug: string;
   puck_data: Data;
   published: boolean;
-  user_id: string;
   sidebar_id?: string | null;
   sidebar?: Sidebar;
   theme_id?: string | null;

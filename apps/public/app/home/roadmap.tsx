@@ -7,7 +7,7 @@ import {
   mdiRocket,
   mdiChartLine,
   mdiPalette,
-  mdiLogin,
+  mdiDocker,
   mdiMonitor,
   mdiFileExportOutline,
 } from "@mdi/js";
@@ -29,7 +29,7 @@ const roadmapItems: RoadmapItem[] = [
     id: "core-dashboard",
     title: "Core Dashboard",
     description:
-      "Core dashboard with entity cards, widgets, and local-first authentication",
+      "Core dashboard with entity cards, widgets, and a drag-and-drop editor",
     status: "completed",
     quarter: "Q4 2025",
     icon: mdiCheckCircle,
@@ -43,37 +43,37 @@ const roadmapItems: RoadmapItem[] = [
     icon: mdiPalette,
   },
   {
+    id: "self-hosted",
+    title: "Self-Hosted Release",
+    description: "Docker packaging and a HACS Lovelace panel to embed CasaBoard in the HA sidebar",
+    status: "completed",
+    quarter: "Q3 2026",
+    icon: mdiDocker,
+  },
+  {
     id: "advanced-widgets",
     title: "Advanced Widgets",
     description: "More component types, advanced graphs, and charts",
     status: "in-progress",
-    quarter: "Q2 2026",
+    quarter: "Q3 2026",
     icon: mdiChartLine,
-  },
-  {
-    id: "login",
-    title: "More Login Methods",
-    description: "Support for additional login providers — GitHub, Apple, and more",
-    status: "planned",
-    quarter: "Q2 2026",
-    icon: mdiLogin,
   },
   {
     id: "kiosk-mode",
     title: "Kiosk & Display Mode",
     description:
-      "Fullscreen display mode for dedicated tablets and wall-mounted screens — set up credentials once per device",
+      "Fullscreen display mode for dedicated tablets and wall-mounted screens",
     status: "planned",
-    quarter: "Q3 2026",
+    quarter: "Q4 2026",
     icon: mdiMonitor,
   },
   {
     id: "import-export",
     title: "Dashboard Import & Export",
     description:
-      "Export your dashboard layout as a file and import it on another device — no cloud required",
+      "Export your dashboard layout as a file and import it on another instance",
     status: "planned",
-    quarter: "Q3 2026",
+    quarter: "Q4 2026",
     icon: mdiFileExportOutline,
   },
 ];

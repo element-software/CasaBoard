@@ -4,10 +4,8 @@ import Link from "next/link";
 import {
   mdiCookieOutline,
   mdiShieldCheckOutline,
-  mdiGoogleAnalytics,
   mdiEmail,
   mdiCheckCircle,
-  mdiCloseCircle,
 } from "@mdi/js";
 import { metadataForRoute } from "../lib/og/content";
 
@@ -22,30 +20,6 @@ function SectionLabel({ n, label }: { n: string; label: string }) {
     </div>
   );
 }
-
-const cookieTable = [
-  {
-    name: "supabase-auth-token",
-    type: "Essential",
-    purpose: "Keeps you signed in. Required for the app to function.",
-    duration: "Session / persistent",
-    canReject: false,
-  },
-  {
-    name: "cookie-consent",
-    type: "Essential",
-    purpose: "Stores your cookie preference so we don't ask every visit.",
-    duration: "1 year",
-    canReject: false,
-  },
-  {
-    name: "Analytics cookies",
-    type: "Analytics",
-    purpose: "Anonymous usage statistics — page views, errors, performance. Opt-in only.",
-    duration: "Up to 2 years",
-    canReject: true,
-  },
-];
 
 export default function CookiesPage() {
   return (
@@ -79,14 +53,13 @@ export default function CookiesPage() {
             Cookie Policy
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            CasaBoard uses a small number of cookies. Essential ones keep you signed in.
-            Analytics are strictly opt-in — you control them.
+            CasaBoard the application sets no cookies at all — there&apos;s no login session to
+            track. This page covers the docs site (casaboard.dev) only.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { icon: mdiShieldCheckOutline, label: "Essential only by default" },
-              { icon: mdiGoogleAnalytics, label: "Analytics opt-in" },
-              { icon: mdiCheckCircle, label: "No tracking or ads" },
+              { icon: mdiShieldCheckOutline, label: "No cookies in the app" },
+              { icon: mdiCheckCircle, label: "No analytics or tracking" },
             ].map((badge) => (
               <div
                 key={badge.label}
@@ -103,87 +76,31 @@ export default function CookiesPage() {
       {/* ── Content ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
 
-        {/* 01 · Cookies we use */}
+        {/* 01 · The app vs. the docs site */}
         <section>
-          <SectionLabel n="01" label="Cookies we use" />
-          <div className="space-y-3">
-            {cookieTable.map((cookie) => (
-              <div key={cookie.name} className="bg-white border border-slate-100 rounded-2xl p-5">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-3">
-                    <code className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">
-                      {cookie.name}
-                    </code>
-                    <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        cookie.type === "Essential"
-                          ? "bg-slate-100 text-slate-600"
-                          : "bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {cookie.type}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {cookie.canReject ? (
-                      <>
-                        <Icon path={mdiCheckCircle} className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-xs text-emerald-600 font-medium">Can opt out</span>
-                      </>
-                    ) : (
-                      <>
-                        <Icon path={mdiCloseCircle} className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-xs text-slate-400">Required</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm text-slate-600 mb-2">{cookie.purpose}</p>
-                <p className="text-xs text-slate-400">Duration: {cookie.duration}</p>
-              </div>
-            ))}
-          </div>
+          <SectionLabel n="01" label="The app vs. this website" />
+          <p className="text-slate-600 text-sm leading-relaxed">
+            CasaBoard the self-hosted application has no login and sets no cookies. This policy
+            applies only to <strong>casaboard.dev</strong>, the documentation and project website
+            you&apos;re currently viewing, which sets no cookies and uses no analytics either.
+          </p>
         </section>
 
         {/* 02 · What we don't use */}
         <section>
-          <SectionLabel n="02" label="What we don't use" />
+          <SectionLabel n="02" label="What this site doesn't use" />
           <div className="border-l-4 border-emerald-200 pl-6 space-y-3">
             {[
               "No advertising or retargeting cookies",
               "No third-party tracking pixels",
               "No cross-site tracking",
               "No fingerprinting or device identification",
-              "No cookies that persist Home Assistant credentials",
             ].map((item) => (
               <div key={item} className="flex items-center gap-2.5 text-sm text-slate-600">
                 <Icon path={mdiCheckCircle} className="w-4 h-4 text-emerald-500 shrink-0" />
                 {item}
               </div>
             ))}
-          </div>
-        </section>
-
-        {/* 03 · Managing consent */}
-        <section>
-          <SectionLabel n="03" label="Managing your consent" />
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">First visit</p>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                On your first visit, a consent banner lets you accept or decline analytics cookies.
-                Essential cookies are always active — they&apos;re required for sign-in and basic
-                functionality.
-              </p>
-            </div>
-            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">Changing your mind</p>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                To reset your cookie preference, clear your browser&apos;s local storage for{" "}
-                <code className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">casaboard.app</code>.
-                The consent banner will reappear on your next visit.
-              </p>
-            </div>
           </div>
         </section>
 
@@ -196,16 +113,9 @@ export default function CookiesPage() {
             <div className="flex-1">
               <h2 className="text-lg font-bold text-slate-900 mb-1">Cookie questions?</h2>
               <p className="text-slate-500 text-sm mb-5">
-                If you have questions about how cookies are used, contact us directly.
+                If you have questions about how this website is built, get in touch.
               </p>
               <div className="flex flex-wrap gap-3">
-                <a
-                  href="mailto:support@casaboard.dev"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
-                >
-                  <Icon path={mdiEmail} className="w-4 h-4" />
-                  support@casaboard.dev
-                </a>
                 <Link
                   href="/privacy"
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all"
@@ -216,7 +126,7 @@ export default function CookiesPage() {
             </div>
           </div>
           <p className="text-xs text-slate-400 mt-6 pt-5 border-t border-slate-200">
-            Last reviewed April 2026.
+            Last reviewed July 2026.
           </p>
         </section>
 

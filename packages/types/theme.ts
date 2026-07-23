@@ -111,7 +111,6 @@ export const DEFAULT_DARK_THEME_TOKENS: ResolvedThemeTokens = {
 
 export interface Theme {
   id: string;
-  user_id: string;
   name: string;
   tokens: ThemeTokens;
   created_at: string;

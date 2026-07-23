@@ -6,10 +6,7 @@ import Image from "next/image";
 import { MobileHeader } from "@repo/ui/components/Header/MobileHeader";
 import { useState, useEffect } from "react";
 import { useConfiguration } from "@/components/Shared/util/ConfigurationProvider";
-import { SupabaseClient } from "@repo/lib";
-import { useRouter } from "next/navigation";
 import { SidebarConfig } from "@repo/config";
-import { clientLogger } from "@repo/lib";
 
 interface ConfigurableSidebarProps {
   children: React.ReactNode;
@@ -21,8 +18,6 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { config } = useConfiguration();
-  const supabase = SupabaseClient.createClient();
-  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -74,15 +69,6 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
     };
   }, [isMobileMenuOpen]);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push('/auth/login');
-    } catch (error) {
-      clientLogger.error('ConfigurableSidebar', 'Error signing out', error);
-    }
-  };
-
   const SidebarContent = () => (
     <div className="flex flex-col gap-y-5 overflow-y-auto p-8 pb-4 h-full">
       {sidebarConfig?.showClock && (
@@ -111,18 +97,6 @@ export const ConfigurableSidebar = ({ children, fallbackConfig, currentPage }: C
         </div>
       )}
       
-      {/* Theme switch and logout for desktop */}
-      <div className="mt-auto pt-4 border-t border-theme-border space-y-3">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center px-3 py-2 text-sm font-medium text-theme-text hover:bg-theme-secondary rounded-md transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Sign Out
-        </button>
-      </div>
     </div>
   );
 

@@ -36,7 +36,6 @@ type PuckEditorClientProps = {
   initialData?: Data;
   itemId?: string | null;
   initialPublished?: boolean;
-  haInstances?: { id: string; name: string; hass_url: string }[];
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
   maxItemsPerDashboard?: number;
@@ -80,7 +79,6 @@ export default function PuckEditorClient({
   initialData,
   itemId,
   initialPublished = false,
-  haInstances = [],
   sidebars = [],
   initialSlug,
   maxItemsPerDashboard = -1,
@@ -112,7 +110,6 @@ export default function PuckEditorClient({
   const [settings, setSettings] = useState<{
     title: string;
     slug: string;
-    haInstanceId?: string | null;
     sidebarId?: string | null;
     themeId: string | null;
     themeOverridesJson: string;
@@ -123,8 +120,6 @@ export default function PuckEditorClient({
         (props.title as string) ||
         `New ${type === "page" ? "Page" : "Sidebar"}`,
       slug: initialSlug || (props.slug as string) || `new-${type}`,
-      haInstanceId:
-        (props.haInstanceId as string) || haInstances[0]?.id || undefined,
       sidebarId: (props.sidebarId as string | null) || null,
       themeId: initialThemeId ?? null,
       themeOverridesJson: JSON.stringify(initialThemeOverrides ?? {}, null, 2),
@@ -367,7 +362,6 @@ export default function PuckEditorClient({
           ...prev.root.props,
           title: settings.title,
           slug: newSlug,
-          haInstanceId: settings.haInstanceId,
           sidebarId: settings.sidebarId,
         },
       },
@@ -507,27 +501,6 @@ export default function PuckEditorClient({
                 description="URL-friendly version of the name"
                 isDisabled={isExistingItem}
               />
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Home Assistant Instance
-                </label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={settings.haInstanceId || ""}
-                  onChange={(e) =>
-                    setSettings((prev) => ({
-                      ...prev,
-                      haInstanceId: e.target.value,
-                    }))
-                  }
-                >
-                  {haInstances.map((instance) => (
-                    <option key={instance.id} value={instance.id}>
-                      {instance.name} ({instance.hass_url})
-                    </option>
-                  ))}
-                </select>
-              </div>
               {type === "page" && sidebars.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium mb-2">

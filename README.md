@@ -1,11 +1,23 @@
-# CasaBoard Turbo Monorepo
+# CasaBoard
 
-A multi-app monorepo for CasaBoard, a cloud‑hosted smart‑home dashboard for Home Assistant. A DaaS (dashboard-as-a-service) for Home Assistant.
+An open-source, self-hosted dashboard builder for Home Assistant. Build custom dashboards with a drag-and-drop editor (Puck), connect it to your own Home Assistant instance, and run the whole thing yourself with Docker — no account, no cloud, no login.
+
+## Run it
+
+```bash
+docker compose up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000). On first run you'll be redirected to connect to your Home Assistant instance; once connected, start building dashboards.
+
+Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`) lives in `./data`, bind-mounted into the container — back that directory up.
+
+To embed CasaBoard in the Home Assistant sidebar, see [`hacs-panel/README.md`](hacs-panel/README.md).
 
 ## Apps
 
-- `apps/app` – Dashboard that requires authentication (Next.js App Router)
-- `apps/public` – Marketing site / public landing (Next.js App Router)
+- `apps/app` – The dashboard builder (Next.js App Router). This is what runs in the Docker image.
+- `apps/public` – Documentation / project site (Next.js App Router, not part of the Docker image)
 
 ## Packages
 
@@ -13,8 +25,9 @@ A multi-app monorepo for CasaBoard, a cloud‑hosted smart‑home dashboard for 
 - `packages/config` – Various config items
 - `packages/utils` – Entity utils (lights, binary sensors, icons)
 - `packages/hooks` – Shared hooks (theme, pages, etc.)
-- `packages/lib` – Services, Supabase clients, actions, encryption
+- `packages/lib` – Actions, services, and the flat-JSON-file persistence layer (`packages/lib/store`)
 - `packages/types` – Shared TypeScript types
+- `hacs-panel` – A HACS-installable Home Assistant sidebar panel that iframes the running CasaBoard container
 
 ## Local Development
 
@@ -39,16 +52,10 @@ npm run dev --workspace=public
 
 ## Environment
 
-Place environment variables per app:
+- `DATA_DIR` – where `apps/app` stores its JSON data files. Defaults to `./data`; the Docker image sets it to `/data`.
+- `PORT` – optional, defaults to `3000`.
 
-- `apps/app/.env.local`
-  - `NEXT_PUBLIC_SUPABASE_URL`
-  - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
-  - `SUPABASE_SECRET_KEY`
-  - `GOOGLE_CLIENT_ID`
-  - `GOOGLE_CLIENT_SECRET`
-
-Public app typically needs none (marketing only).
+`apps/public` (docs site) needs no environment variables beyond an optional `RESEND_API_KEY` for the contact form.
 
 ## Tailwind CSS v4
 
@@ -81,7 +88,7 @@ Shared Tailwind + PostCSS lives in `packages/tailwind-config`. Each app:
 npm run build
 ```
 
-Currently deployed to Vercel. The CasaBoard app is available at [https://app.casaboard.dev](https://app.casaboard.dev) and the marketing website is at [https://casaboard.dev](https://casaboard.dev).
+For production, build and run the Docker image directly (`docker compose up -d` does this for you) — see the root `Dockerfile`. Only `apps/app` is containerized; `apps/public` is docs and can be hosted separately (or not at all) if you're just running the tool.
 
 ## Scripts
 

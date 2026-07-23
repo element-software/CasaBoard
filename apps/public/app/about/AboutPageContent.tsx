@@ -4,10 +4,9 @@ import Link from "next/link";
 import Icon from "@mdi/react";
 import {
   mdiHomeAssistant,
-  mdiGrid,
   mdiShieldCheck,
   mdiDrag,
-  mdiDevices,
+  mdiDocker,
   mdiEye,
   mdiCloudOffOutline,
   mdiArrowRight,
@@ -29,10 +28,10 @@ export default function AboutPageContent() {
           </div>
           <div className="space-y-4 text-slate-600 leading-relaxed">
             <p>
-              CasaBoard lets you design beautiful, fully custom smart home dashboards with a drag-and-drop editor — no coding required. Connect directly to your Home Assistant instance and display live entity data on any screen.
+              CasaBoard lets you design beautiful, fully custom smart home dashboards with a drag-and-drop editor — no coding required. It runs as a self-hosted Docker container alongside your own Home Assistant, and displays live entity data on any screen.
             </p>
             <p>
-              Unlike built-in HA dashboards, CasaBoard pages are shareable URLs. Embed them in a kiosk browser on your wall display, open them on a tablet in the kitchen, or share a read-only view with family.
+              CasaBoard pages are URLs served from your own server. Embed them in a kiosk browser on your wall display, open them on a tablet in the kitchen, or embed the whole app in the Home Assistant sidebar with the HACS panel.
             </p>
           </div>
         </div>
@@ -63,25 +62,25 @@ export default function AboutPageContent() {
               desc: "CasaBoard connects via the HA WebSocket API — the same protocol the native dashboard uses. Entity state updates appear in real time as they happen in your home.",
             },
             {
-              icon: mdiDevices,
+              icon: mdiDocker,
               iconBg: "bg-indigo-50",
               iconColor: "text-indigo-600",
-              title: "Multi-instance & multi-page",
-              desc: "Manage multiple HA instances (e.g. home + office) and create unlimited pages. Assign different HA connections per page and switch between them instantly.",
+              title: "Self-hosted with Docker",
+              desc: "Run CasaBoard with a single docker-compose file, right next to your Home Assistant instance. No account, no cloud, no ongoing cost.",
             },
             {
               icon: mdiEye,
               iconBg: "bg-emerald-50",
               iconColor: "text-emerald-600",
-              title: "Shareable live pages",
-              desc: "Every page gets a public URL at /view/your-slug. Set it to Live and open it anywhere — no login required for display-only views.",
+              title: "Unlimited pages, no login",
+              desc: "Create as many dashboard pages as you like. There's no per-user gate — anyone who can reach the app on your network can view and edit dashboards.",
             },
             {
               icon: mdiShieldCheck,
               iconBg: "bg-green-50",
               iconColor: "text-green-600",
-              title: "Privacy-first by architecture",
-              desc: "HA OAuth tokens are encrypted with AES-GCM in your browser and stored locally — never sent to CasaBoard servers. You control what stays where.",
+              title: "Nothing leaves your server",
+              desc: "Dashboards, sidebars, themes, and your Home Assistant connection are stored as local files on the machine running the container — never sent to a third party.",
             },
           ].map((f) => (
             <div key={f.title} className="group flex items-start gap-5 p-5 bg-white border border-slate-100 rounded-2xl hover:border-violet-100 hover:shadow-sm transition-all">
@@ -113,18 +112,19 @@ export default function AboutPageContent() {
             </div>
             <div>
               <p className="text-violet-300 text-xs font-bold uppercase tracking-widest">Our privacy commitment</p>
-              <h2 className="text-xl font-bold text-white leading-tight">Local-first, always</h2>
+              <h2 className="text-xl font-bold text-white leading-tight">Self-hosted, always</h2>
             </div>
           </div>
           <p className="text-slate-300 leading-relaxed mb-6 max-w-xl">
-            Your smart home data is personal. By default, CasaBoard stores nothing about your Home Assistant on our servers. OAuth tokens live encrypted in your browser. Optional cloud sync (paid plans) can persist your HA URL for multi-device convenience — but tokens stay local regardless.
+            Your smart home data is personal. There are no CasaBoard servers in the picture at all —
+            the app and its data live entirely on the machine you run it on.
           </p>
           <ul className="space-y-2.5">
             {[
-              "HA OAuth tokens encrypted with AES-GCM in browser storage",
-              "No proxy — your browser talks directly to Home Assistant",
-              "Optional cloud sync stores URL only, never credentials",
-              "Supabase Row Level Security on all stored dashboard data",
+              "Home Assistant connection stored as a local file on your server",
+              "No proxy — CasaBoard talks directly to your Home Assistant instance",
+              "No account, no cloud sync, nothing sent to a third party",
+              "Dashboards, sidebars, and themes stored as JSON files you can back up yourself",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">
                 <Icon path={mdiCheckCircle} className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -152,10 +152,10 @@ export default function AboutPageContent() {
           <div className="hidden sm:block absolute top-6 left-6 right-6 h-px bg-gradient-to-r from-violet-100 via-violet-200 to-violet-100" />
           <div className="grid sm:grid-cols-4 gap-6">
             {[
-              { n: "01", title: "Sign in", desc: "Login with Google — no password to create or remember." },
-              { n: "02", title: "Connect HA", desc: "Enter your HA URL and authorise via OAuth in the browser." },
+              { n: "01", title: "Run with Docker", desc: "docker compose up -d — no account to create, no signup." },
+              { n: "02", title: "Connect HA", desc: "Enter your HA URL and authorise the connection once." },
               { n: "03", title: "Build pages", desc: "Drag components onto the canvas, link them to entities." },
-              { n: "04", title: "Display anywhere", desc: "Open the live URL on any screen — phone, tablet, or TV." },
+              { n: "04", title: "Display anywhere", desc: "Open the URL on any screen — phone, tablet, TV, or the HA sidebar." },
             ].map((step) => (
               <div key={step.n} className="relative flex flex-col items-start sm:items-center sm:text-center">
                 <div className="w-12 h-12 bg-white border-2 border-violet-200 rounded-full flex items-center justify-center mb-4 relative z-10">
@@ -182,10 +182,10 @@ export default function AboutPageContent() {
             <Icon path={mdiArrowRight} className="w-4 h-4" />
           </Link>
           <Link
-            href="/pricing"
+            href="/security"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all"
           >
-            View pricing
+            Read the security overview
           </Link>
         </div>
       </section>

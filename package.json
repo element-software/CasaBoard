@@ -22,8 +22,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "@next/third-parties": "^15.5.3",
-    "@vercel/analytics": "^1.5.0",
     "next": "15.5.18"
   }
 }

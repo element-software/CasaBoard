@@ -5,7 +5,6 @@ export interface Sidebar {
   name: string;
   slug: string;
   puck_data: Data;
-  user_id: string;
   theme_id?: string | null;
   created_at: string;
   updated_at: string;

@@ -1,4 +1,3 @@
-import { AnalyticsWrapper } from "@repo/ui/components/Shared/util/AnalyticsWrapper";
 import { Footer } from "@repo/ui/components/Shared/Footer/index";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -9,7 +8,7 @@ import { cn } from "@heroui/react";
 export const metadata = {
   title: "CasaBoard — Smart Home Dashboard",
   description:
-    "Privacy-first Home Assistant dashboards. Credentials stay local by default; optional cloud sync on paid plans.",
+    "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
   metadataBase: new URL("https://casaboard.dev"),
   icons: {
     icon: "/icon.svg",
@@ -18,7 +17,7 @@ export const metadata = {
   openGraph: {
     title: "CasaBoard — Smart Home Dashboard",
     description:
-      "Privacy-first Home Assistant dashboards. Local by default; optional cloud sync for subscribers.",
+      "Free, open-source, self-hosted dashboard builder for Home Assistant.",
     url: "https://casaboard.dev",
     siteName: "CasaBoard",
     type: "website",
@@ -27,7 +26,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "CasaBoard — Smart Home Dashboard",
     description:
-      "Privacy-first Home Assistant dashboards. Local credentials by default; optional cloud sync.",
+      "Free, open-source, self-hosted dashboard builder for Home Assistant.",
   },
 };
 
@@ -46,7 +45,6 @@ export default async function PublicLayout({
           inter.className
         )}
       >
-        <AnalyticsWrapper gaId="G-4N9M4MTHP1" />
         <Providers>
           <Header />
           <main className="min-h-screen flex-1 -mt-32">{children}</main>

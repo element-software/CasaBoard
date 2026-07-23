@@ -1,17 +1,17 @@
 "use client";
 import Icon from "@mdi/react";
-import { mdiDrag, mdiEye, mdiGoogle, mdiHomeAssistant } from "@mdi/js";
+import { mdiDrag, mdiEye, mdiDocker, mdiHomeAssistant } from "@mdi/js";
 
 const steps = [
   {
-    title: "Sign Up",
-    description: "Create an account with your Google account for secure authentication",
-    icon: mdiGoogle,
+    title: "Run with Docker",
+    description: "docker compose up -d — CasaBoard starts serving on your network, no account needed",
+    icon: mdiDocker,
   },
   {
     title: "Connect HA",
     description:
-      "Sign in to Home Assistant from your browser. Tokens stay encrypted locally by default; optional paid cloud sync can store your HA URL if you want the same setup on every device.",
+      "Point it at your Home Assistant instance and authorise once. The connection is stored locally, on the same server.",
     icon: mdiHomeAssistant,
   },
   {
@@ -21,7 +21,7 @@ const steps = [
   },
   {
     title: "Enjoy",
-    description: "Access your beautiful dashboard from anywhere",
+    description: "Access your dashboard from any device on your network, or embed it in HA via the HACS panel",
     icon: mdiEye,
   },
 ];

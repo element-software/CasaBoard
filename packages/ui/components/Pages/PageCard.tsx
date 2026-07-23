@@ -14,7 +14,6 @@ import Icon from "@mdi/react";
 import {
   mdiWeb,
   mdiClock,
-  mdiHomeAssistant,
   mdiEye,
   mdiPencil,
   mdiDotsVertical,
@@ -25,7 +24,6 @@ import {
   mdiEyeOutline,
 } from "@mdi/js";
 import Link from "next/link";
-import { PlanLockCard } from "../Shared/util/PlanLockOverlay";
 
 export const PageCard = ({
   page,
@@ -33,20 +31,13 @@ export const PageCard = ({
   onTogglePublished,
   onDelete,
   isPending,
-  locked = false,
 }: {
   page: Page;
   compact: boolean;
   onTogglePublished: (slug: string, published: boolean) => void;
   onDelete: (slug: string, name: string) => void;
   isPending: boolean;
-  locked?: boolean;
 }) => {
-  if (locked) {
-    return (
-      <PlanLockCard name={page.name} compact={compact} />
-    );
-  }
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -108,18 +99,6 @@ export const PageCard = ({
                   <Icon path={mdiClock} className="w-4 h-4 flex-shrink-0" />
                   <span className="text-xs">
                     Updated {formatDate(page.updated_at)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Icon
-                    path={mdiHomeAssistant}
-                    className="w-4 h-4 flex-shrink-0"
-                  />
-                  <span className="text-xs">
-                    {(page.puck_data?.root?.props as { haInstanceId?: string } | undefined)
-                      ?.haInstanceId
-                      ? "HA linked"
-                      : "No HA instance in page settings"}
                   </span>
                 </div>
               </div>
