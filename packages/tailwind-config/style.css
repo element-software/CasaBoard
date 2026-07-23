@@ -219,7 +219,7 @@
   transition: transform 0.12s ease;
 }
 
-/* HomeKit thermostat row (icon · labels · stacked +/-) */
+/* HomeKit thermostat — horizontal (sidebar) / vertical (main grid) */
 .thermostat-hk {
   --thermostat-bg: #ffffff;
   --thermostat-title: #1c1c1e;
@@ -227,19 +227,33 @@
   --thermostat-icon-bg: #fdeee4;
   --thermostat-btn-bg: #efeef0;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.875rem;
   width: 100%;
   height: 100%;
   flex: 1 1 auto;
-  min-height: 4.5rem;
-  padding: 0.75rem 0.75rem 0.75rem 1rem;
   border-radius: 1.75rem;
   background-color: var(--thermostat-bg);
   color: var(--thermostat-title);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
+}
+
+/* Compact row: icon · labels · stacked +/- (sidebar) */
+.thermostat-hk--horizontal {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  min-height: 5rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+}
+
+/* Spaced stack: icon above labels, controls below (main grid) */
+.thermostat-hk--vertical {
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 8.5rem;
+  padding: 1.125rem 1rem 1rem;
 }
 
 .thermostat-hk--empty,
@@ -266,6 +280,11 @@
   color: var(--thermostat-accent);
 }
 
+.thermostat-hk--vertical .thermostat-hk__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
 .thermostat-hk__ring {
   display: block;
   width: 1.25rem;
@@ -275,12 +294,24 @@
   box-sizing: border-box;
 }
 
+.thermostat-hk--vertical .thermostat-hk__ring {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .thermostat-hk__labels {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+}
+
+.thermostat-hk--vertical .thermostat-hk__labels {
+  flex: 0 0 auto;
+  align-items: center;
+  text-align: center;
+  width: 100%;
 }
 
 .thermostat-hk__title {
@@ -292,6 +323,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.thermostat-hk--vertical .thermostat-hk__title {
+  white-space: normal;
+  font-size: 1.0625rem;
 }
 
 .thermostat-hk__status {
@@ -301,11 +338,68 @@
   color: var(--thermostat-accent);
 }
 
+.thermostat-hk__temps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-top: 0.125rem;
+}
+
+.thermostat-hk--vertical .thermostat-hk__temps {
+  justify-content: center;
+  margin-top: 0.25rem;
+  gap: 0.5rem;
+}
+
+.thermostat-hk__temp {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--thermostat-title);
+  letter-spacing: -0.01em;
+}
+
+.thermostat-hk--vertical .thermostat-hk__temp {
+  font-size: 0.9375rem;
+}
+
+.thermostat-hk__temp--target {
+  color: var(--thermostat-accent);
+}
+
+.thermostat-hk__temp-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #8e8e93;
+}
+
+.thermostat-hk__temp-sep {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #c7c7cc;
+  line-height: 1;
+}
+
 .thermostat-hk__controls {
   display: flex;
+  flex-shrink: 0;
+}
+
+.thermostat-hk--horizontal .thermostat-hk__controls {
   flex-direction: column;
   gap: 0.375rem;
-  flex-shrink: 0;
+}
+
+.thermostat-hk--vertical .thermostat-hk__controls {
+  flex-direction: row;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .thermostat-hk__btn {
@@ -320,6 +414,12 @@
   color: var(--thermostat-title);
   cursor: pointer;
   transition: background-color 0.15s ease;
+}
+
+.thermostat-hk--vertical .thermostat-hk__btn {
+  flex: 1;
+  height: 2.25rem;
+  border-radius: 0.75rem;
 }
 
 .thermostat-hk__btn:hover {

@@ -26,9 +26,20 @@ export const ThermostatConfig = {
         />
       ),
     },
+    orientation: {
+      type: "select",
+      label: "Orientation",
+      description:
+        "Horizontal is compact for sidebars; vertical is more spaced for the main grid",
+      options: [
+        { label: "Horizontal", value: "horizontal" },
+        { label: "Vertical", value: "vertical" },
+      ],
+    },
   },
   defaultProps: {
     entityId: "",
+    orientation: "horizontal",
   },
   render: (props: any) => <Thermostat {...props} />,
 };
