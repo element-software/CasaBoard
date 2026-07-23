@@ -10,6 +10,7 @@ import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 import type { HAConnection } from "@repo/types/ha";
 import type { Data } from "@measured/puck";
 import type { ThemeTokens } from "@repo/types/theme";
+import type { StyleId } from "@repo/types/style";
 
 type ThemePickerOption = { id: string; name: string };
 
@@ -25,6 +26,7 @@ type PageEditorBodyProps = {
   themeLibrary?: ThemeLibraryEntry[];
   initialThemeId?: string | null;
   initialThemeOverrides?: ThemeTokens | null;
+  initialStyleId?: StyleId | null;
   haConnection?: HAConnection | null;
 };
 
@@ -38,6 +40,7 @@ export default function PageEditorBody({
   themeLibrary = [],
   initialThemeId,
   initialThemeOverrides,
+  initialStyleId,
   haConnection = null,
 }: PageEditorBodyProps) {
   const editor = (
@@ -52,6 +55,7 @@ export default function PageEditorBody({
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
       initialThemeOverrides={initialThemeOverrides}
+      initialStyleId={initialStyleId}
       onCreateItem={createPageEditorAction}
       onUpdateItem={updatePageEditorAction}
       onPublishItem={publishPageEditorAction}

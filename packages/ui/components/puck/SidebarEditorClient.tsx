@@ -1,4 +1,5 @@
 import type { Data } from "@measured/puck";
+import type { StyleId } from "@repo/types/style";
 import SidebarEditorBody from "./SidebarEditorBody";
 import { listThemes } from "@repo/lib/actions/themeActions";
 import { HAConnectionActions } from "@repo/lib";
@@ -11,6 +12,7 @@ type SidebarEditorClientProps = {
   initialPublished?: boolean;
   initialSlug?: string;
   initialThemeId?: string | null;
+  initialStyleId?: StyleId | null;
 };
 
 export default async function SidebarEditorClient({
@@ -19,6 +21,7 @@ export default async function SidebarEditorClient({
   initialPublished = true,
   initialSlug,
   initialThemeId,
+  initialStyleId,
 }: SidebarEditorClientProps) {
   const [themes, haConnection] = await Promise.all([
     listThemes(),
@@ -44,6 +47,7 @@ export default async function SidebarEditorClient({
       themePickerThemes={themePickerThemes}
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
+      initialStyleId={initialStyleId}
       haConnection={haConnection}
     />
   );

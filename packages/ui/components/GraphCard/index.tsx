@@ -4,6 +4,7 @@ import Icon from "@mdi/react";
 import { mdiAlert } from "@mdi/js";
 import { Card, CardBody, Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
+import { CardShell, IconBubble } from "../Shared/Card";
 import { useMemo } from "react";
 
 interface GraphCardProps {
@@ -86,17 +87,17 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
   return (
     <Skeleton isLoaded={isEntityReady} className="w-full h-auto rounded-2xl">
       {showNotAvailable ? (
-        <div className="col-span-1 relative overflow-hidden w-full flex flex-col items-center justify-center p-6 bg-theme-surface border border-theme-border rounded-2xl h-40 gap-2 opacity-50">
-          <Icon path={mdiAlert} className="h-8 w-8 text-theme-text-muted" />
-          <div className="text-center">
-            <div className="text-sm font-medium text-theme-text-muted">Unavailable</div>
-            <div className="text-xs text-theme-text-muted break-all">{entityId}</div>
-          </div>
-        </div>
+        <CardShell status="unavailable" className="col-span-1 h-40 flex items-center justify-center">
+          <IconBubble
+            icon={<Icon path={mdiAlert} className="h-8 w-8 text-theme-text-muted" />}
+            label={<span className="text-theme-text-muted">Unavailable</span>}
+            secondary={<span className="text-theme-text-muted break-all">{entityId}</span>}
+          />
+        </CardShell>
       ) : (
-        <div className="col-span-1 relative overflow-hidden w-full flex flex-col bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface">
+        <CardShell className="col-span-1 flex flex-col bg-theme-card text-theme-text">
           {/* Header */}
-          <div className="flex flex-row w-full items-center justify-between p-3">
+          <div className="flex flex-row w-full items-center justify-between">
             <div className="text-xs font-bold">
               {entity?.attributes?.friendly_name || entityId}
             </div>
@@ -108,7 +109,7 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
 
           {/* Statistics */}
           {showStatistics && (
-            <div className="flex flex-row w-full justify-between px-3 pb-2">
+            <div className="flex flex-row w-full justify-between pb-2 pt-3">
               <div className="flex flex-col items-center">
                 <div className="text-xs text-theme-text-secondary font-medium">Min</div>
                 <div className="text-sm font-bold text-theme-text">
@@ -143,7 +144,7 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
             data={{ entityHistory: history, unit }}
             className="overflow-hidden"
           />
-        </div>
+        </CardShell>
       )}
     </Skeleton>
   );

@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import Popup from "../Popup";
 import { Entity } from "@repo/types/shared";
 import EntityCard from "./EntityCard";
+import { CardShell } from "../Shared/Card";
 import { useHA } from "@repo/ha";
 
 interface EntitiesCardProps {
@@ -55,9 +56,9 @@ const EntitiesCard = ({
   const normalizedCols = columns < 1 || columns > 10 ? 4 : columns;
 
   return (
-    <div
+    <CardShell
       className={classNames(
-        "relative overflow-hidden w-full flex flex-col space-y-2 p-6 cursor-pointer bg-gradient-to-br-theme text-theme-text rounded-2xl shadow-card shadow-theme-surface col-span-1",
+        "flex flex-col space-y-2 cursor-pointer bg-theme-card text-theme-text col-span-1",
         {
           "items-start justify-between": title,
           "items-center justify-center": !title,
@@ -164,7 +165,7 @@ const EntitiesCard = ({
           />
         ))}
       </div>
-    </div>
+    </CardShell>
   );
 };
 

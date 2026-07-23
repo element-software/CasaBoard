@@ -3,6 +3,7 @@ import { Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiLightbulb } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
+import { CardShell, IconBubble } from "../Shared/Card";
 import { useEntity } from "@repo/ha";
 import { useLightLoading, useLightController } from "./useLight";
 
@@ -56,59 +57,55 @@ export const Light = ({
   };
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full h-16 rounded-xl">
+    <Skeleton isLoaded={isLoaded} className="w-full min-h-16 rounded-xl">
       {showNotAvailable ? (
-        <div className="rounded-xl p-3 flex items-center gap-3 opacity-50">
-          <Icon path={mdiLightbulb} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
-          <div className="flex flex-col min-w-0">
-            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
-            <p className="text-xs text-theme-text-muted">Unavailable</p>
-          </div>
-        </div>
+        <CardShell status="unavailable">
+          <IconBubble
+            icon={
+              <Icon
+                path={mdiLightbulb}
+                className="h-8 w-8 text-theme-text-muted"
+              />
+            }
+            label={<span className="text-theme-text-muted">{entityId}</span>}
+            secondary={
+              <span className="text-theme-text-muted">Unavailable</span>
+            }
+          />
+        </CardShell>
       ) : isEntityReady ? (
-        <div
+        <CardShell
           key={entity?.entity_id || entityId}
-          className="w-full cursor-pointer transition-all duration-200 hover:brightness-110 select-none rounded-xl overflow-hidden"
+          interactive
+          style={cardStyle ?? (isOn ? onStyle : offStyle)}
           onClick={handleCardClick}
           onMouseMove={dimmer ? handleCardDrag : undefined}
           onMouseDown={dimmer ? handleMouseDown : undefined}
           onMouseUp={dimmer ? handleMouseUp : undefined}
           onMouseLeave={dimmer ? handleMouseLeave : undefined}
-          style={cardStyle ?? (isOn ? onStyle : offStyle)}
         >
-          <div className="p-3 relative overflow-hidden">
-            <div className="flex items-center gap-3 w-full">
-              <EntityIcon
-                entity={entity}
-                className="h-8 w-8 flex-shrink-0"
-              />
-              <div className="flex flex-col flex-1 min-w-0">
-                <h3 className="text-sm font-semibold capitalize truncate">
-                  {entity.attributes?.friendly_name ||
-                    entity.entity_id ||
-                    entityId}
-                </h3>
-                {dimmer && isOn && (
-                  <div className="text-xs font-medium opacity-80">
-                    {brightnessPercentage}%
-                  </div>
-                )}
-              </div>
-            </div>
+          <IconBubble
+            icon={<EntityIcon entity={entity} className="h-8 w-8" />}
+            label={
+              entity.attributes?.friendly_name || entity.entity_id || entityId
+            }
+            secondary={
+              dimmer && isOn ? `${brightnessPercentage}%` : undefined
+            }
+          />
 
-            {dimmer && isOn && (
-              <div
-                className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
-                style={{
-                  width: `${brightnessPercentage}%`,
-                  backgroundColor: "var(--theme-slider-thumb)",
-                  boxShadow: `0 0 4px color-mix(in srgb, var(--theme-slider-thumb) 40%, transparent)`,
-                  maxWidth: "100%",
-                }}
-              />
-            )}
-          </div>
-        </div>
+          {dimmer && isOn && (
+            <div
+              className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
+              style={{
+                width: `${brightnessPercentage}%`,
+                backgroundColor: "var(--theme-slider-thumb)",
+                boxShadow: `0 0 4px color-mix(in srgb, var(--theme-slider-thumb) 40%, transparent)`,
+                maxWidth: "100%",
+              }}
+            />
+          )}
+        </CardShell>
       ) : (
         <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
       )}

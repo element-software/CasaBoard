@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
+import { CardShell, IconBubble } from "../Shared/Card";
 
 interface ThermostatProps {
   entityId: string;
@@ -72,15 +73,22 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
   return (
     <Skeleton isLoaded={isLoaded} className="w-full rounded-2xl">
       {showNotAvailable ? (
-        <div className="w-full p-4 flex items-center gap-3 bg-theme-surface border border-theme-border rounded-2xl opacity-50">
-          <Icon path={mdiThermostat} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
-          <div className="flex flex-col min-w-0">
-            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
-            <p className="text-xs text-theme-text-muted">Unavailable</p>
-          </div>
-        </div>
+        <CardShell status="unavailable">
+          <IconBubble
+            icon={
+              <Icon
+                path={mdiThermostat}
+                className="h-8 w-8 text-theme-text-muted"
+              />
+            }
+            label={<span className="text-theme-text-muted">{entityId}</span>}
+            secondary={
+              <span className="text-theme-text-muted">Unavailable</span>
+            }
+          />
+        </CardShell>
       ) : isEntityReady ? (
-    <div className="w-full p-6 flex flex-col gap-5 text-theme-text bg-gradient-to-br-theme rounded-2xl shadow-card shadow-theme-surface">
+    <CardShell className="flex flex-col gap-5 bg-theme-card text-theme-text">
       {/* Title */}
       <div className="text-sm font-semibold text-center leading-tight">
         {entity.attributes.friendly_name}
@@ -134,7 +142,7 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
           <div className="text-[10px] uppercase tracking-widest opacity-50">Difference</div>
         </div>
       </div>
-    </div>
+    </CardShell>
       ) : (
         <div className="rounded-2xl p-3 opacity-0" />
       )}

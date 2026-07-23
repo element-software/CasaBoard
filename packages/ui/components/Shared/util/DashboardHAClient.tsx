@@ -8,12 +8,17 @@ import { useHAConnection } from "@repo/hooks";
 import { Button, Spinner } from "@heroui/react";
 import NextLink from "next/link";
 import type { CSSProperties } from "react";
+import type { StyleId } from "@repo/types/style";
 
 type DashboardHAClientProps = {
   page: Page;
   pageSlug: string;
   themeMainStyle?: CSSProperties;
   themeSidebarStyle?: CSSProperties;
+  styleMainId?: StyleId;
+  styleMainVars?: CSSProperties;
+  styleSidebarId?: StyleId;
+  styleSidebarVars?: CSSProperties;
 };
 
 export function DashboardHAClient({
@@ -21,6 +26,10 @@ export function DashboardHAClient({
   pageSlug,
   themeMainStyle,
   themeSidebarStyle,
+  styleMainId,
+  styleMainVars,
+  styleSidebarId,
+  styleSidebarVars,
 }: DashboardHAClientProps) {
   const { connection, loading } = useHAConnection();
   const [mounted, setMounted] = useState(false);
@@ -57,6 +66,10 @@ export function DashboardHAClient({
         pageData={page}
         themeMainStyle={themeMainStyle}
         themeSidebarStyle={themeSidebarStyle}
+        styleMainId={styleMainId}
+        styleMainVars={styleMainVars}
+        styleSidebarId={styleSidebarId}
+        styleSidebarVars={styleSidebarVars}
       />
     </HassConnectWrapper>
   );

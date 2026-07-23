@@ -1,4 +1,8 @@
-import { PageActions, resolveDashboardThemeStyles } from "@repo/lib";
+import {
+  PageActions,
+  resolveDashboardThemeStyles,
+  resolveDashboardStyle,
+} from "@repo/lib";
 import { DashboardHAClient } from "@repo/ui/components/Shared/util/DashboardHAClient";
 import { notFound } from "next/navigation";
 
@@ -22,6 +26,7 @@ export default async function ConfigurablePage({ params }: PageProps) {
     }
 
     const themeStyles = await resolveDashboardThemeStyles(pageData);
+    const styleResult = resolveDashboardStyle(pageData);
 
     return (
       <DashboardHAClient
@@ -29,6 +34,10 @@ export default async function ConfigurablePage({ params }: PageProps) {
         pageSlug={page}
         themeMainStyle={themeStyles.main}
         themeSidebarStyle={themeStyles.sidebar}
+        styleMainId={styleResult.mainId}
+        styleMainVars={styleResult.main}
+        styleSidebarId={styleResult.sidebarId}
+        styleSidebarVars={styleResult.sidebar}
       />
     );
   } catch (error) {

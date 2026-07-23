@@ -15,12 +15,17 @@ import Icon from "@mdi/react";
 import { mdiMenu } from "@mdi/js";
 import { useState, useEffect } from "react";
 import { ThemeScope } from "../ThemeScope/ThemeScope";
+import type { StyleId } from "@repo/types/style";
 
 interface PuckRendererProps {
   pageId: string;
   pageData?: Page;
   themeMainStyle?: CSSProperties;
   themeSidebarStyle?: CSSProperties;
+  styleMainId?: StyleId;
+  styleMainVars?: CSSProperties;
+  styleSidebarId?: StyleId;
+  styleSidebarVars?: CSSProperties;
 }
 
 export const PuckRenderer = ({
@@ -28,6 +33,10 @@ export const PuckRenderer = ({
   pageData,
   themeMainStyle,
   themeSidebarStyle,
+  styleMainId,
+  styleMainVars,
+  styleSidebarId,
+  styleSidebarVars,
 }: PuckRendererProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isMobile, setIsMobile] = useState(false);
@@ -52,7 +61,12 @@ export const PuckRenderer = ({
 
   if (!pageData?.puck_data) {
     return (
-      <ThemeScope style={themeMainStyle} className="min-h-screen bg-theme-page-background">
+      <ThemeScope
+        style={themeMainStyle}
+        styleVars={styleMainVars}
+        styleId={styleMainId}
+        className="min-h-screen bg-theme-page-background"
+      >
         <div className="p-8 text-center text-theme-text-secondary">
           <p>This page hasn&apos;t been configured yet.</p>
           <p>Use the setup editor to add components to this page.</p>
@@ -89,6 +103,8 @@ export const PuckRenderer = ({
     return (
       <ThemeScope
         style={themeSidebarStyle}
+        styleVars={styleSidebarVars}
+        styleId={styleSidebarId}
         className="min-w-[300px] max-w-[300px] h-screen p-4 hidden md:block bg-theme-background"
       >
         {renderSidebarPuck()}
@@ -100,10 +116,21 @@ export const PuckRenderer = ({
     if (!hasSidebar) return null;
 
     return (
-      <Drawer isOpen={isOpen} onClose={onClose} placement="left" size="sm">
+      <Drawer
+        isOpen={isOpen}
+        onClose={onClose}
+        placement="left"
+        size="sm"
+        style={themeSidebarStyle}
+        classNames={{ base: "bg-theme-background text-theme-text" }}
+      >
         <DrawerContent>
           <DrawerBody className="p-4 bg-theme-background">
-            <ThemeScope style={themeSidebarStyle}>
+            <ThemeScope
+              style={themeSidebarStyle}
+              styleVars={styleSidebarVars}
+              styleId={styleSidebarId}
+            >
               {renderSidebarPuck()}
             </ThemeScope>
           </DrawerBody>
@@ -132,6 +159,8 @@ export const PuckRenderer = ({
   return (
     <ThemeScope
       style={themeMainStyle}
+      styleVars={styleMainVars}
+      styleId={styleMainId}
       className="min-h-screen bg-theme-page-background text-theme-text"
     >
       <div className="flex flex-col md:flex-row gap-4 relative">

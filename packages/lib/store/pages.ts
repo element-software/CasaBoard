@@ -46,6 +46,7 @@ export async function createPage(data: CreatePageData): Promise<Page> {
     sidebar_id: data.sidebar_id ?? null,
     theme_id: data.theme_id ?? null,
     theme_overrides: data.theme_overrides ?? null,
+    style_id: data.style_id ?? null,
     created_at: now,
     updated_at: now,
   };

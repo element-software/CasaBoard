@@ -45,6 +45,7 @@ export async function createSidebar(
     slug: data.slug,
     puck_data: data.puck_data,
     theme_id: data.theme_id ?? null,
+    style_id: data.style_id ?? null,
     created_at: now,
     updated_at: now,
   };

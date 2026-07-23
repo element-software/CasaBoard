@@ -36,6 +36,10 @@ const Graph = ({ data, className }: GraphCardProps) => {
 
   const unit = data?.unit || "W";
 
+  if (processedData.length === 0) {
+    return null;
+  }
+
   return (
     <div className={className ? `relative ${className}` : "relative"}>
       <svg

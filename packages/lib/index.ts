@@ -8,6 +8,7 @@ export {
   resolvedTokensToCssVars,
   resolveDashboardThemeStyles,
 } from "./theme";
+export { resolveDashboardStyle } from "./style";
 export * as ConfigService from "./services/configService";
 export * as LinkService from "./services/linkService";
 export { createLogger, serverLogger, clientLogger } from "./logger";

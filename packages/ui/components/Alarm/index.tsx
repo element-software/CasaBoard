@@ -1,8 +1,8 @@
 "use client";
 import { useEntity, useHA } from "@repo/ha";
-import classNames from "classnames";
 import { AlarmUtils } from "@repo/utils";
 import EntityIcon from "../Shared/util/EntityIcon";
+import { CardShell, IconBubble } from "../Shared/Card";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
@@ -156,45 +156,53 @@ export const Alarm = ({
       onClose={() => setConfirmAction(null)}
       onConfirm={handleConfirmed}
     />
-    <Skeleton isLoaded={isLoaded} className="w-full h-14 rounded-xl">
+    <Skeleton isLoaded={isLoaded} className="w-full min-h-14 rounded-xl">
       {showNotAvailable ? (
-        <div className="rounded-xl p-3 flex items-center gap-3 opacity-50">
-          <EntityIcon entity={{ entity_id: entityId, state: "unknown", attributes: {} } as any} className="h-8 w-8 shrink-0 text-theme-text-muted" />
-          <div className="flex flex-col min-w-0">
-            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
-            <p className="text-xs text-theme-text-muted">Unavailable</p>
-          </div>
-        </div>
+        <CardShell status="unavailable">
+          <IconBubble
+            icon={
+              <EntityIcon
+                entity={{ entity_id: entityId, state: "unknown", attributes: {} } as any}
+                className="h-8 w-8 text-theme-text-muted"
+              />
+            }
+            label={<span className="text-theme-text-muted">{entityId}</span>}
+            secondary={
+              <span className="text-theme-text-muted">Unavailable</span>
+            }
+          />
+        </CardShell>
       ) : isEntityReady ? (
-        <div
+        <CardShell
           key={entity!.entity_id}
-          className={classNames(
-            "w-full rounded-xl overflow-hidden select-none transition-all duration-200",
-            AlarmUtils.stateClassNameBg(entity as any),
-            { "cursor-pointer hover:brightness-110": isInteractive }
-          )}
+          interactive={isInteractive}
+          className={AlarmUtils.stateClassNameBg(entity as any)}
           onPointerDown={isInteractive ? handlePointerDown : undefined}
           onPointerUp={isInteractive ? handlePointerUp : undefined}
           onPointerLeave={isInteractive ? handlePointerLeave : undefined}
         >
-          <div className="p-3 flex items-center gap-3">
-            {pendingAction ? (
-              <div className="h-8 w-8 shrink-0 flex items-center justify-center">
-                <div className="h-5 w-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-              </div>
-            ) : (
-              <EntityIcon entity={entity!} className="h-8 w-8 shrink-0" />
-            )}
-            <div className="flex flex-col flex-1 min-w-0">
-              <h3 className="text-sm font-semibold capitalize truncate text-theme-text">
+          <IconBubble
+            icon={
+              pendingAction ? (
+                <div className="h-8 w-8 flex items-center justify-center">
+                  <div className="h-5 w-5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                </div>
+              ) : (
+                <EntityIcon entity={entity!} className="h-8 w-8" />
+              )
+            }
+            label={
+              <span className="text-theme-text">
                 {entity!.attributes?.friendly_name || entityId}
-              </h3>
-              <div className="text-xs font-medium opacity-80 text-theme-text">
+              </span>
+            }
+            secondary={
+              <span className="text-theme-text">
                 {pendingAction ? `${ACTION_LABEL[pendingAction]}…` : stateLabel}
-              </div>
-            </div>
-          </div>
-        </div>
+              </span>
+            }
+          />
+        </CardShell>
       ) : (
         <div className="rounded-xl p-3 opacity-0" />
       )}

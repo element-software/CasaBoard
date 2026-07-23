@@ -1,5 +1,6 @@
 import type { Data } from "@measured/puck";
 import type { ThemeTokens } from "@repo/types/theme";
+import type { StyleId } from "@repo/types/style";
 import PageEditorBody from "./PageEditorBody";
 import { listThemes } from "@repo/lib/actions/themeActions";
 import { HAConnectionActions } from "@repo/lib";
@@ -14,6 +15,7 @@ type PageEditorClientProps = {
   initialSlug?: string;
   initialThemeId?: string | null;
   initialThemeOverrides?: ThemeTokens | null;
+  initialStyleId?: StyleId | null;
 };
 
 export default async function PageEditorClient({
@@ -24,6 +26,7 @@ export default async function PageEditorClient({
   initialSlug,
   initialThemeId,
   initialThemeOverrides,
+  initialStyleId,
 }: PageEditorClientProps) {
   const [themes, haConnection] = await Promise.all([
     listThemes(),
@@ -51,6 +54,7 @@ export default async function PageEditorClient({
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
       initialThemeOverrides={initialThemeOverrides}
+      initialStyleId={initialStyleId}
       haConnection={haConnection}
     />
   );
