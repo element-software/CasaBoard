@@ -124,7 +124,7 @@ function PersistentSidebar({
         style={chrome.themeSidebarStyle}
         styleVars={chrome.styleSidebarVars}
         styleId={chrome.styleSidebarId}
-        className="min-w-[300px] max-w-[300px] h-screen p-4 hidden md:block bg-theme-background sticky top-0 self-start"
+        className="min-w-[300px] max-w-[300px] h-full shrink-0 p-4 hidden md:block bg-theme-background overflow-y-auto overscroll-contain"
       >
         <SidebarPuck sidebar={chrome.sidebar} />
       </ThemeScope>
@@ -138,7 +138,7 @@ function PersistentSidebar({
         classNames={{ base: "bg-theme-background text-theme-text" }}
       >
         <DrawerContent>
-          <DrawerBody className="p-4 bg-theme-background">
+          <DrawerBody className="p-4 bg-theme-background overflow-y-auto overscroll-contain">
             <ThemeScope
               style={chrome.themeSidebarStyle}
               styleVars={chrome.styleSidebarVars}
@@ -206,7 +206,7 @@ export function DashboardChromeProvider({ children }: { children: ReactNode }) {
   return (
     <HassConnectWrapper haInstance={connection}>
       <DashboardChromeContext.Provider value={value}>
-        <div className="flex flex-col md:flex-row gap-4 relative min-h-screen">
+        <div className="flex flex-col md:flex-row gap-4 relative h-dvh max-h-dvh overflow-hidden">
           {hasSidebar && chrome ? (
             <PersistentSidebar
               chrome={chrome}
@@ -214,7 +214,7 @@ export function DashboardChromeProvider({ children }: { children: ReactNode }) {
               onClose={onClose}
             />
           ) : null}
-          <div className="w-full grow min-w-0">
+          <div className="w-full grow min-w-0 min-h-0 overflow-y-auto overscroll-contain">
             {hasSidebar ? (
               <div className="md:hidden px-4 pt-4">
                 <Button

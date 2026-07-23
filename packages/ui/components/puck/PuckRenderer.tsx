@@ -59,7 +59,7 @@ export const PuckRenderer = ({
         style={themeMainStyle}
         styleVars={styleMainVars}
         styleId={styleMainId}
-        className="min-h-screen bg-theme-page-background"
+        className="min-h-full bg-theme-page-background"
       >
         <div className="p-8 text-center text-theme-text-secondary">
           <p>This page hasn&apos;t been configured yet.</p>
@@ -74,7 +74,7 @@ export const PuckRenderer = ({
       style={themeMainStyle}
       styleVars={styleMainVars}
       styleId={styleMainId}
-      className="min-h-screen bg-theme-page-background text-theme-text"
+      className="min-h-full bg-theme-page-background text-theme-text"
     >
       <div className="p-4 pt-0 md:pt-4 w-full" key={pageId}>
         <Render config={PuckConfig} data={pageData.puck_data} />
