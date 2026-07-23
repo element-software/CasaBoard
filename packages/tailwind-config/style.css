@@ -58,6 +58,7 @@
 
 .icon-bubble-label {
   min-width: 0;
+  flex: 1;
 }
 
 /* ---- Flat ---- */
@@ -72,8 +73,9 @@
 }
 
 /* ---- HomeKit ----
-   Square tiles: icon top-left in circle, name + state stacked at bottom.
-   On = solid gold/yellow with dark text; Off = near-black card. */
+   Square tiles: icon top-left in frosted circle, name + state at bottom.
+   On (light/switch) = warm yellow→mustard diagonal gradient with white type;
+   Off = near-black card. */
 [data-casaboard-style="homekit"] .card-shell {
   background-color: var(--theme-card-background);
   color: var(--theme-text);
@@ -90,13 +92,27 @@
 [data-casaboard-style="homekit"] .card-shell[data-domain="binary_sensor"],
 [data-casaboard-style="homekit"] .card-shell[data-card-state="off"]:not([data-domain="climate"]) {
   background-color: var(--theme-entity-off);
+  background-image: none;
   color: var(--theme-text);
 }
 
-/* Ensure on-lights keep gold even if off rule above is broader — specificity via domain+on */
-
+/* Warm yellow on-state — matches Home accessory tile mockup */
 [data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="light"],
-[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="switch"],
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="switch"] {
+  background-color: var(--theme-domain-light-on, var(--theme-entity-on));
+  background-image: linear-gradient(
+    145deg,
+    var(--theme-domain-light-on, var(--theme-entity-on)) 0%,
+    color-mix(
+        in srgb,
+        var(--theme-domain-light-on, var(--theme-entity-on)) 55%,
+        #ff9f0a
+      )
+      100%
+  );
+  color: var(--theme-text-on);
+}
+
 [data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="climate"] {
   background-color: var(--theme-entity-on);
   background-image: none;
@@ -105,6 +121,11 @@
 
 [data-casaboard-style="homekit"] .card-shell[data-card-state="on"]:not([data-domain]) {
   background-color: var(--theme-entity-on);
+  background-image: linear-gradient(
+    145deg,
+    var(--theme-entity-on) 0%,
+    color-mix(in srgb, var(--theme-entity-on) 55%, #ff9f0a) 100%
+  );
   color: var(--theme-text-on);
 }
 
@@ -119,11 +140,12 @@
 [data-casaboard-style="homekit"] .icon-bubble-row {
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   text-align: left;
-  gap: 0.75rem;
+  gap: 0;
   height: 100%;
   flex: 1;
+  min-height: 0;
 }
 
 [data-casaboard-style="homekit"] .icon-bubble {
@@ -134,8 +156,13 @@
   color: inherit;
 }
 
+[data-casaboard-style="homekit"] .icon-bubble svg {
+  color: inherit;
+  fill: currentColor;
+}
+
 [data-casaboard-style="homekit"] .card-shell[data-card-state="on"] .icon-bubble {
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: rgba(255, 255, 255, 0.25);
   color: var(--theme-text-on);
 }
 
@@ -148,6 +175,7 @@
   width: 100%;
   text-align: left;
   margin-top: auto;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -155,15 +183,17 @@
 
 [data-casaboard-style="homekit"] .icon-bubble-label h3 {
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
+  color: inherit;
 }
 
 [data-casaboard-style="homekit"] .icon-bubble-label .icon-bubble-secondary {
   font-size: 0.8125rem;
-  font-weight: 500;
-  opacity: 0.85;
+  font-weight: 400;
+  opacity: 0.92;
+  color: inherit;
 }
 
 [data-casaboard-style="homekit"] .card-shell--interactive:active {
@@ -754,6 +784,7 @@
 
 [data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-label {
   margin-top: 0;
+  flex: 1 1 auto;
 }
 
 /* ---- 3D ---- */

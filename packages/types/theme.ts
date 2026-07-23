@@ -57,7 +57,7 @@ export type ThemeTokens = Partial<Record<ThemeTokenKey, string>>;
 
 export type ResolvedThemeTokens = Record<ThemeTokenKey, string>;
 
-/** HomeKit baseline — dark charcoal + gold on-state (matches product mockup). */
+/** HomeKit baseline — dark charcoal + warm yellow on-state with white type. */
 export const DEFAULT_LIGHT_THEME_TOKENS: ResolvedThemeTokens = {
   "page-background": "#111827",
   background: "#111827",
@@ -69,8 +69,8 @@ export const DEFAULT_LIGHT_THEME_TOKENS: ResolvedThemeTokens = {
   "text-primary": "#f0d060",
   "text-secondary": "#a3a3a3",
   "text-muted": "#6b7280",
-  "text-on-primary": "#111827",
-  "text-on": "#111827",
+  "text-on-primary": "#ffffff",
+  "text-on": "#ffffff",
   primary: "#f0d060",
   secondary: "#dbc533",
   accent: "#f0d060",

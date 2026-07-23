@@ -57,8 +57,8 @@ export const STYLE_PRESETS: Record<StyleId, StylePreset> = {
     id: "homekit",
     name: "HomeKit",
     tokens: {
-      radius: "1.75rem",
-      "shell-padding": "1rem",
+      radius: "2.25rem",
+      "shell-padding": "1.125rem",
       shadow: "none",
       blur: "0px",
       "border-width": "0px",

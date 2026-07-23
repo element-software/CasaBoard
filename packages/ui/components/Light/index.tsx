@@ -105,7 +105,7 @@ export const Light = ({
             {...pressHandlers}
           >
             <IconBubble
-              icon={<EntityIcon entity={entity} className="h-6 w-6" />}
+              icon={<EntityIcon entity={entity} className="h-6 w-6 text-current" />}
               label={
                 entity.attributes?.friendly_name || entity.entity_id || entityId
               }

@@ -16,7 +16,7 @@ export function IconBubble({ icon, label, secondary }: IconBubbleProps) {
     <div className="icon-bubble-row">
       <div className="icon-bubble">{icon}</div>
       {(label || secondary) && (
-        <div className="icon-bubble-label flex flex-col flex-1 min-w-0">
+        <div className="icon-bubble-label flex flex-col min-w-0">
           {label && (
             <h3 className="text-sm font-semibold capitalize truncate">
               {label}
