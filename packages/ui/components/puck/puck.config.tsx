@@ -23,7 +23,10 @@ type Components = {
   BinarySensor: {};
   EntitiesCard: {};
   GraphCard: {};
-  Clock: {};
+  Clock: {
+    align: "left" | "center" | "right";
+    hourFormat: "12" | "24" | "auto";
+  };
   Grid: {};
   Thermostat: {};
   Weather: {};

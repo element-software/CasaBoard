@@ -12,16 +12,31 @@ const meta = {
   },
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   tags: ['autodocs'],
-  // More on argTypes: https://storybook.js.org/docs/api/argtypes
   argTypes: {
-    backgroundColor: { control: 'color' },
+    align: {
+      control: 'radio',
+      options: ['left', 'center', 'right'],
+    },
+    hourFormat: {
+      control: 'radio',
+      options: ['auto', '12', '24'],
+    },
   },
 } satisfies Meta<typeof Clock>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
-  
+  args: {
+    align: 'left',
+    hourFormat: 'auto',
+  },
+};
+
+export const Centered12Hour: Story = {
+  args: {
+    align: 'center',
+    hourFormat: '12',
+  },
 };
