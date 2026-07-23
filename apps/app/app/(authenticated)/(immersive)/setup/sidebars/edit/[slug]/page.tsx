@@ -16,10 +16,7 @@ export default async function SidebarEditPage({
 }: SidebarEditPageProps) {
   const { slug } = await params;
 
-  const allSidebars = await SidebarActions.getAllSidebars();
-
-  const sidebar = allSidebars.find((s) => s.slug === slug);
-
+  const sidebar = await SidebarActions.getSidebar(slug).catch(() => null);
   if (!sidebar) {
     notFound();
   }

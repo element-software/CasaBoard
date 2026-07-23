@@ -14,6 +14,18 @@ async function readAll(): Promise<SidebarMap> {
   return readJson<SidebarMap>(FILE, {});
 }
 
+/** Resolve by map key first, then by sidebar.slug (handles key drift). */
+function findSidebarEntry(
+  all: SidebarMap,
+  slug: string
+): { key: string; sidebar: Sidebar } | null {
+  const byKey = all[slug];
+  if (byKey) return { key: slug, sidebar: byKey };
+  const entry = Object.entries(all).find(([, s]) => s.slug === slug);
+  if (!entry) return null;
+  return { key: entry[0], sidebar: entry[1] };
+}
+
 export async function getAllSidebars(): Promise<Sidebar[]> {
   const all = await readAll();
   return Object.values(all).sort((a, b) =>
@@ -23,7 +35,7 @@ export async function getAllSidebars(): Promise<Sidebar[]> {
 
 export async function getSidebar(slug: string): Promise<Sidebar | null> {
   const all = await readAll();
-  return all[slug] ?? null;
+  return findSidebarEntry(all, slug)?.sidebar ?? null;
 }
 
 export async function getSidebarById(id: string): Promise<Sidebar | null> {
@@ -35,7 +47,7 @@ export async function createSidebar(
   data: CreateSidebarData
 ): Promise<Sidebar> {
   const all = await readAll();
-  if (all[data.slug]) {
+  if (findSidebarEntry(all, data.slug)) {
     throw new Error("A sidebar with this slug already exists");
   }
   const now = new Date().toISOString();
@@ -59,20 +71,26 @@ export async function updateSidebar(
   data: UpdateSidebarData
 ): Promise<Sidebar> {
   const all = await readAll();
-  const existing = all[slug];
-  if (!existing) throw new Error("Sidebar not found");
+  const found = findSidebarEntry(all, slug);
+  if (!found) throw new Error("Sidebar not found");
   const updated: Sidebar = {
-    ...existing,
+    ...found.sidebar,
     ...data,
     updated_at: new Date().toISOString(),
   };
-  all[slug] = updated;
+  const newKey = updated.slug;
+  if (found.key !== newKey) {
+    delete all[found.key];
+  }
+  all[newKey] = updated;
   await writeJson(FILE, all);
   return updated;
 }
 
 export async function deleteSidebar(slug: string): Promise<void> {
   const all = await readAll();
-  delete all[slug];
+  const found = findSidebarEntry(all, slug);
+  if (!found) return;
+  delete all[found.key];
   await writeJson(FILE, all);
 }
