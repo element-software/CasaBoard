@@ -41,7 +41,7 @@ export const Popup = ({ open, setOpen, children, className }: PopupProps) => {
       size="2xl"
       classNames={{
         base: classNames(
-          "bg-gradient-to-tl-theme shadow-xl z-50",
+          "bg-theme-surface text-theme-text shadow-xl z-50",
           className
         ),
         closeButton: "hidden", // We'll use our custom close button

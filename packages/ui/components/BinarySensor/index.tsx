@@ -10,10 +10,14 @@ import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
 interface BinarySensorProps {
   entityId: string;
+  tileLayout?: "tile" | "row";
   [key: string]: any;
 }
 
-export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
+export const BinarySensor = ({
+  entityId,
+  tileLayout = "tile",
+}: BinarySensorProps) => {
   const entity = useEntity(entityId);
   const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
 
@@ -27,14 +31,14 @@ export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
   }
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full min-h-16 rounded-xl">
+    <Skeleton isLoaded={isLoaded} className="w-full rounded-xl">
       {showNotAvailable ? (
-        <CardShell status="unavailable">
+        <CardShell status="unavailable" tileLayout={tileLayout}>
           <IconBubble
             icon={
               <Icon
                 path={mdiMotionSensor}
-                className="h-8 w-8 text-theme-text-muted"
+                className="h-6 w-6 text-theme-text-muted"
               />
             }
             label={<span className="text-theme-text-muted">{entityId}</span>}
@@ -46,25 +50,13 @@ export const BinarySensor = ({ entityId, ...props }: BinarySensorProps) => {
       ) : isEntityReady ? (
         <CardShell
           key={entity!.entity_id}
-          style={{
-            backgroundColor: entity!.state === "on" ? "var(--theme-entity-on)" : "var(--theme-entity-off)",
-            color: entity!.state === "on" ? "var(--theme-text-on-primary)" : "var(--theme-text)",
-          }}
+          status="off"
+          tileLayout={tileLayout}
         >
           <IconBubble
-            icon={
-              <EntityIcon
-                entity={entity!}
-                className={`h-8 w-8 ${BinarySensorUtils.stateClassNameIcon(entity as any)}`}
-              />
-            }
+            icon={<EntityIcon entity={entity!} className="h-6 w-6" />}
             label={entity!.attributes.friendly_name}
-            secondary={
-              <span className="inline-flex items-center gap-1">
-                <Icon path={mdiMotionSensor} className="h-3 w-3" />
-                {BinarySensorUtils.renderState(entity as any)}
-              </span>
-            }
+            secondary={BinarySensorUtils.renderState(entity as any)}
           />
         </CardShell>
       ) : (

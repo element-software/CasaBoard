@@ -1,41 +1,54 @@
 "use client";
+import { useState, useCallback } from "react";
 import { Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiLightbulb } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { CardShell, IconBubble } from "../Shared/Card";
 import { useEntity } from "@repo/ha";
+import { useEntityPress } from "@repo/hooks";
 import { useLightLoading, useLightController } from "./useLight";
+import { EntityControlModal } from "../EntityControlModal";
 
 interface LightProps {
   entityId: string;
   dimmer?: boolean;
   temperature?: boolean;
   color?: boolean;
+  tileLayout?: "tile" | "row";
   [key: string]: any;
 }
 
 export const Light = ({
   entityId,
-  dimmer = false,
+  dimmer = true,
   temperature = false,
   color = false,
-  ...props
+  tileLayout = "tile",
 }: LightProps) => {
   const entity = useEntity(entityId);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { isEntityReady, showNotAvailable, isLoaded } = useLightLoading(entity);
 
   const {
     isOn,
     brightnessPercentage,
-    cardStyle,
-    handleCardClick,
-    handleCardDrag,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseLeave,
-  } = useLightController(entity, entityId, { dimmer });
+    canBrightness,
+    canColorTemp,
+    canColor,
+    handleToggle,
+    handleBrightnessChange,
+    debouncedSetTemperature,
+    debouncedSetColor,
+  } = useLightController(entity, entityId);
+
+  const openModal = useCallback(() => setModalOpen(true), []);
+  const pressHandlers = useEntityPress({
+    onTap: handleToggle,
+    onLongPress: openModal,
+    enabled: isEntityReady && !!entity,
+  });
 
   if (!entityId) {
     return (
@@ -46,69 +59,69 @@ export const Light = ({
     );
   }
 
-  const offStyle: React.CSSProperties = {
-    backgroundColor: "var(--theme-entity-off)",
-    color: "var(--theme-text)",
-  };
-
-  const onStyle: React.CSSProperties = {
-    backgroundColor: "var(--theme-primary)",
-    color: "var(--theme-text-on)",
-  };
+  const showBrightness = dimmer && canBrightness;
+  const showTemp = temperature || canColorTemp;
+  const showColor = color || canColor;
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full min-h-16 rounded-xl">
-      {showNotAvailable ? (
-        <CardShell status="unavailable">
-          <IconBubble
-            icon={
-              <Icon
-                path={mdiLightbulb}
-                className="h-8 w-8 text-theme-text-muted"
-              />
-            }
-            label={<span className="text-theme-text-muted">{entityId}</span>}
-            secondary={
-              <span className="text-theme-text-muted">Unavailable</span>
-            }
-          />
-        </CardShell>
-      ) : isEntityReady ? (
-        <CardShell
-          key={entity?.entity_id || entityId}
-          interactive
-          style={cardStyle ?? (isOn ? onStyle : offStyle)}
-          onClick={handleCardClick}
-          onMouseMove={dimmer ? handleCardDrag : undefined}
-          onMouseDown={dimmer ? handleMouseDown : undefined}
-          onMouseUp={dimmer ? handleMouseUp : undefined}
-          onMouseLeave={dimmer ? handleMouseLeave : undefined}
-        >
-          <IconBubble
-            icon={<EntityIcon entity={entity} className="h-8 w-8" />}
-            label={
-              entity.attributes?.friendly_name || entity.entity_id || entityId
-            }
-            secondary={
-              dimmer && isOn ? `${brightnessPercentage}%` : undefined
-            }
-          />
-
-          {dimmer && isOn && (
-            <div
-              className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
-              style={{
-                width: `${brightnessPercentage}%`,
-                backgroundColor: "var(--theme-slider-thumb)",
-                boxShadow: `0 0 4px color-mix(in srgb, var(--theme-slider-thumb) 40%, transparent)`,
-                maxWidth: "100%",
-              }}
+    <>
+      <EntityControlModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        entity={entity}
+        entityId={entityId}
+        showBrightness={showBrightness}
+        showTemperature={showTemp}
+        showColor={showColor}
+        brightnessPercentage={brightnessPercentage}
+        onBrightnessChange={handleBrightnessChange}
+        onTemperatureChange={debouncedSetTemperature}
+        onColorChange={debouncedSetColor}
+        onToggle={handleToggle}
+      />
+      <Skeleton isLoaded={isLoaded} className="w-full rounded-xl">
+        {showNotAvailable ? (
+          <CardShell status="unavailable" domain="light" tileLayout={tileLayout}>
+            <IconBubble
+              icon={
+                <Icon
+                  path={mdiLightbulb}
+                  className="h-8 w-8 text-theme-text-muted"
+                />
+              }
+              label={<span className="text-theme-text-muted">{entityId}</span>}
+              secondary={
+                <span className="text-theme-text-muted">Unavailable</span>
+              }
             />
-          )}
-        </CardShell>
-      ) : (
-        <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
-      )}
-    </Skeleton>
+          </CardShell>
+        ) : isEntityReady ? (
+          <CardShell
+            key={entity?.entity_id || entityId}
+            interactive
+            status={isOn ? "on" : "off"}
+            domain="light"
+            tileLayout={tileLayout}
+            {...pressHandlers}
+          >
+            <IconBubble
+              icon={<EntityIcon entity={entity} className="h-6 w-6" />}
+              label={
+                entity.attributes?.friendly_name || entity.entity_id || entityId
+              }
+              secondary={
+                isOn
+                  ? showBrightness
+                    ? `${brightnessPercentage}%`
+                    : "On"
+                  : "Off"
+              }
+            />
+          </CardShell>
+        ) : (
+          <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
+        )}
+      </Skeleton>
+    </>
   );
 };

@@ -5,6 +5,8 @@ import classNames from "classnames";
 
 export interface CardShellProps {
   status?: "on" | "off" | "unavailable" | "loading";
+  domain?: string;
+  tileLayout?: "tile" | "row";
   interactive?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -12,6 +14,7 @@ export interface CardShellProps {
   onPointerDown?: PointerEventHandler<HTMLDivElement>;
   onPointerUp?: PointerEventHandler<HTMLDivElement>;
   onPointerLeave?: PointerEventHandler<HTMLDivElement>;
+  onPointerCancel?: PointerEventHandler<HTMLDivElement>;
   onMouseMove?: MouseEventHandler<HTMLDivElement>;
   onMouseDown?: MouseEventHandler<HTMLDivElement>;
   onMouseUp?: MouseEventHandler<HTMLDivElement>;
@@ -29,6 +32,8 @@ export interface CardShellProps {
  */
 export function CardShell({
   status,
+  domain,
+  tileLayout,
   interactive,
   className,
   style,
@@ -38,6 +43,8 @@ export function CardShell({
   return (
     <div
       data-card-state={status}
+      data-domain={domain}
+      data-tile-layout={tileLayout}
       className={classNames(
         "card-shell",
         "w-full overflow-hidden select-none transition-all duration-200",

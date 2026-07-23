@@ -44,7 +44,7 @@ export const WeatherConfig = {
   defaultProps: {
     entityId: "",
     forecastType: "daily",
-    forecastCount: 4,
+    forecastCount: 5,
   },
   render: (props: any) => <Weather {...props} />,
 };

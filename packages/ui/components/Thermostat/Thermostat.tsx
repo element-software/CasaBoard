@@ -2,14 +2,34 @@
 import { useEntity, useHA } from "@repo/ha";
 import { mdiPlus, mdiMinus, mdiThermostat } from "@mdi/js";
 import Icon from "@mdi/react";
-import classNames from "classnames";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
-import { CardShell, IconBubble } from "../Shared/Card";
 
 interface ThermostatProps {
   entityId: string;
+}
+
+function formatModeLabel(entity: any): string {
+  const action = entity?.attributes?.hvac_action as string | undefined;
+  const mode = (entity?.state || entity?.attributes?.hvac_mode || "") as string;
+
+  if (action === "heating" || mode === "heat") return "Heat";
+  if (action === "cooling" || mode === "cool") return "Cool";
+  if (action === "drying" || mode === "dry") return "Dry";
+  if (action === "fan" || mode === "fan_only") return "Fan";
+  if (mode === "heat_cool" || mode === "auto") return "Auto";
+  if (mode === "off") return "Off";
+  if (action === "idle") {
+    if (mode === "heat") return "Heat";
+    if (mode === "cool") return "Cool";
+    return "Idle";
+  }
+  if (!mode) return "Climate";
+  return mode
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 export const Thermostat = ({ entityId }: ThermostatProps) => {
@@ -24,29 +44,29 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
     }
   }, [entity?.attributes?.temperature]);
 
-  const currentTemp: number = entity?.attributes?.current_temperature ?? 0;
+  const modeLabel = useMemo(
+    () => (isEntityReady ? formatModeLabel(entity) : ""),
+    [entity, isEntityReady]
+  );
 
-  const tempColorClass = useMemo(() => {
-    if (currentTemp >= 25) return "text-red-500";
-    if (currentTemp >= 20) return "text-orange-400";
-    if (currentTemp >= 15) return "text-yellow-400";
-    if (currentTemp >= 10) return "text-blue-400";
-    return "text-blue-600";
-  }, [currentTemp]);
-
-  const statusInfo = useMemo(() => {
-    const action = entity?.attributes?.hvac_action;
-    if (action === "heating") return { text: "HEATING", color: "text-red-400" };
-    if (action === "cooling") return { text: "COOLING", color: "text-blue-400" };
-    return { text: "IDLE", color: "text-theme-text-muted" };
-  }, [entity?.attributes?.hvac_action]);
-
-  const difference = Math.abs(targetTemp - currentTemp);
+  const displayTemp = useMemo(() => {
+    const t =
+      targetTemp ||
+      entity?.attributes?.temperature ||
+      entity?.attributes?.current_temperature ||
+      0;
+    return Math.round(t);
+  }, [targetTemp, entity?.attributes?.temperature, entity?.attributes?.current_temperature]);
 
   const adjustTemp = useCallback(
     (delta: number) => {
       setTargetTemp((prev) => {
-        const newTemp = Math.round((prev + delta) * 2) / 2;
+        const base =
+          prev ||
+          entity?.attributes?.temperature ||
+          entity?.attributes?.current_temperature ||
+          20;
+        const newTemp = Math.round((base + delta) * 2) / 2;
         if (connection && entityId) {
           connection.sendMessagePromise({
             type: "call_service",
@@ -58,93 +78,67 @@ export const Thermostat = ({ entityId }: ThermostatProps) => {
         return newTemp;
       });
     },
-    [entityId, connection]
+    [entityId, connection, entity?.attributes?.temperature, entity?.attributes?.current_temperature]
   );
 
   if (!entityId) {
     return (
-      <div className="p-4 border-2 border-dashed border-theme-border rounded-lg text-center text-theme-text-muted">
-        <Icon path={mdiThermostat} className="h-10 w-10 mx-auto mb-2 opacity-40" />
-        Configure Thermostat Entity
+      <div className="thermostat-hk thermostat-hk--empty">
+        <Icon path={mdiThermostat} className="h-8 w-8 opacity-40" />
+        <span>Configure Thermostat Entity</span>
       </div>
     );
   }
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full rounded-2xl">
+    <Skeleton isLoaded={isLoaded} className="w-full rounded-[1.75rem]">
       {showNotAvailable ? (
-        <CardShell status="unavailable">
-          <IconBubble
-            icon={
-              <Icon
-                path={mdiThermostat}
-                className="h-8 w-8 text-theme-text-muted"
-              />
-            }
-            label={<span className="text-theme-text-muted">{entityId}</span>}
-            secondary={
-              <span className="text-theme-text-muted">Unavailable</span>
-            }
-          />
-        </CardShell>
-      ) : isEntityReady ? (
-    <CardShell className="flex flex-col gap-5 bg-theme-card text-theme-text">
-      {/* Title */}
-      <div className="text-sm font-semibold text-center leading-tight">
-        {entity.attributes.friendly_name}
-      </div>
-
-      {/* Current Temperature */}
-      <div className="text-center">
-        <div className={classNames("text-5xl font-bold tracking-tight", tempColorClass)}>
-          {currentTemp.toFixed(1)}°C
-        </div>
-        <div className="text-[10px] uppercase tracking-widest opacity-50 mt-1">Current</div>
-      </div>
-
-      {/* Target Temperature Controls */}
-      <div className="flex items-center justify-center gap-5">
-        <button
-          onClick={() => adjustTemp(-0.5)}
-          className="h-10 w-10 rounded-full bg-theme-secondary hover:bg-theme-primary/60 transition-colors flex items-center justify-center shrink-0"
-          aria-label="Decrease target temperature"
-        >
-          <Icon path={mdiMinus} className="h-5 w-5 text-theme-text" />
-        </button>
-
-        <div className="text-center min-w-[80px]">
-          <div className="text-xl font-semibold">{targetTemp.toFixed(1)}°C</div>
-          <div className="text-[10px] uppercase tracking-widest opacity-50">Target</div>
-        </div>
-
-        <button
-          onClick={() => adjustTemp(0.5)}
-          className="h-10 w-10 rounded-full bg-theme-secondary hover:bg-theme-primary/60 transition-colors flex items-center justify-center shrink-0"
-          aria-label="Increase target temperature"
-        >
-          <Icon path={mdiPlus} className="h-5 w-5 text-theme-text" />
-        </button>
-      </div>
-
-      {/* Status Row */}
-      <div className="flex flex-row items-center justify-around border-t border-theme-border pt-4">
-        <div className="flex flex-col items-center gap-1">
-          <div className={classNames("text-sm font-semibold", statusInfo.color)}>
-            {statusInfo.text}
+        <div className="thermostat-hk thermostat-hk--unavailable">
+          <div className="thermostat-hk__icon" aria-hidden>
+            <Icon path={mdiThermostat} className="h-6 w-6" />
           </div>
-          <div className="text-[10px] uppercase tracking-widest opacity-50">Status</div>
+          <div className="thermostat-hk__labels">
+            <div className="thermostat-hk__title">{entityId}</div>
+            <div className="thermostat-hk__status">Unavailable</div>
+          </div>
         </div>
+      ) : isEntityReady ? (
+        <div className="thermostat-hk">
+          <div className="thermostat-hk__icon" aria-hidden>
+            {/* Concentric ring mark matching HomeKit climate glyph */}
+            <span className="thermostat-hk__ring" />
+          </div>
 
-        <div className="w-px h-8 bg-theme-border" />
+          <div className="thermostat-hk__labels">
+            <div className="thermostat-hk__title">
+              {entity.attributes?.friendly_name || "Thermostat"}
+            </div>
+            <div className="thermostat-hk__status">
+              {modeLabel} · {displayTemp}°
+            </div>
+          </div>
 
-        <div className="flex flex-col items-center gap-1">
-          <div className="text-sm font-semibold">{difference.toFixed(1)}°</div>
-          <div className="text-[10px] uppercase tracking-widest opacity-50">Difference</div>
+          <div className="thermostat-hk__controls">
+            <button
+              type="button"
+              className="thermostat-hk__btn"
+              onClick={() => adjustTemp(0.5)}
+              aria-label="Increase target temperature"
+            >
+              <Icon path={mdiPlus} className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="thermostat-hk__btn"
+              onClick={() => adjustTemp(-0.5)}
+              aria-label="Decrease target temperature"
+            >
+              <Icon path={mdiMinus} className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-      </div>
-    </CardShell>
       ) : (
-        <div className="rounded-2xl p-3 opacity-0" />
+        <div className="thermostat-hk opacity-0" />
       )}
     </Skeleton>
   );

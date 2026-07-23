@@ -17,7 +17,7 @@ export interface StylePreset {
   tokens: ResolvedStyleTokens;
 }
 
-export const DEFAULT_STYLE_ID: StyleId = "default";
+export const DEFAULT_STYLE_ID: StyleId = "homekit";
 
 export const STYLE_PRESETS: Record<StyleId, StylePreset> = {
   default: {
@@ -57,7 +57,7 @@ export const STYLE_PRESETS: Record<StyleId, StylePreset> = {
     id: "homekit",
     name: "HomeKit",
     tokens: {
-      radius: "1.25rem",
+      radius: "1.75rem",
       "shell-padding": "1rem",
       shadow: "none",
       blur: "0px",

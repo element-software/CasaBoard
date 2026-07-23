@@ -25,6 +25,21 @@
 
 .card-shell__content {
   position: relative;
+  height: 100%;
+}
+
+/* Domain state colors (all styles) */
+.card-shell[data-card-state="on"][data-domain="light"],
+.card-shell[data-card-state="on"][data-domain="switch"],
+.card-shell[data-card-state="on"][data-domain="climate"] {
+  background-color: var(--theme-domain-light-on, var(--theme-entity-on));
+  color: var(--theme-text-on);
+}
+
+.card-shell[data-card-state="off"][data-domain="light"],
+.card-shell[data-card-state="off"][data-domain="switch"] {
+  background-color: var(--theme-entity-off);
+  color: var(--theme-text);
 }
 
 .icon-bubble-row {
@@ -56,24 +71,689 @@
   background-color: color-mix(in srgb, var(--theme-card-background) 55%, transparent);
 }
 
-/* ---- HomeKit ---- */
+/* ---- HomeKit ----
+   Square tiles: icon top-left in circle, name + state stacked at bottom.
+   On = solid gold/yellow with dark text; Off = near-black card. */
+[data-casaboard-style="homekit"] .card-shell {
+  background-color: var(--theme-card-background);
+  color: var(--theme-text);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="tile"] {
+  min-height: 8.5rem;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.125rem;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-domain="binary_sensor"],
+[data-casaboard-style="homekit"] .card-shell[data-card-state="off"]:not([data-domain="climate"]) {
+  background-color: var(--theme-entity-off);
+  color: var(--theme-text);
+}
+
+/* Ensure on-lights keep gold even if off rule above is broader — specificity via domain+on */
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="light"],
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="switch"],
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"][data-domain="climate"] {
+  background-color: var(--theme-entity-on);
+  background-image: none;
+  color: var(--theme-text-on);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"]:not([data-domain]) {
+  background-color: var(--theme-entity-on);
+  color: var(--theme-text-on);
+}
+
+[data-casaboard-style="homekit"] .card-shell__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
 [data-casaboard-style="homekit"] .icon-bubble-row {
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.375rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+  gap: 0.75rem;
+  height: 100%;
+  flex: 1;
 }
 
 [data-casaboard-style="homekit"] .icon-bubble {
-  background-color: color-mix(in srgb, currentColor 18%, transparent);
+  background-color: rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
   width: 2.75rem;
   height: 2.75rem;
+  color: inherit;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="on"] .icon-bubble {
+  background-color: rgba(0, 0, 0, 0.12);
+  color: var(--theme-text-on);
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-card-state="off"] .icon-bubble {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text);
 }
 
 [data-casaboard-style="homekit"] .icon-bubble-label {
   width: 100%;
+  text-align: left;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+[data-casaboard-style="homekit"] .icon-bubble-label h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+[data-casaboard-style="homekit"] .icon-bubble-label .icon-bubble-secondary {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+[data-casaboard-style="homekit"] .card-shell--interactive:active {
+  transform: scale(0.97);
+  transition: transform 0.12s ease;
+}
+
+/* HomeKit thermostat row (icon · labels · stacked +/-) */
+.thermostat-hk {
+  --thermostat-bg: #f8f8f9;
+  --thermostat-title: #1c1c1e;
+  --thermostat-accent: #e29933;
+  --thermostat-icon-bg: #fdeee4;
+  --thermostat-btn-bg: #efeef0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border-radius: 1.75rem;
+  background-color: var(--thermostat-bg);
+  color: var(--thermostat-title);
+  box-sizing: border-box;
+}
+
+.thermostat-hk--empty,
+.thermostat-hk--unavailable {
+  opacity: 0.7;
+}
+
+.thermostat-hk--empty {
+  justify-content: center;
+  gap: 0.5rem;
+  color: #8e8e93;
+  font-size: 0.875rem;
+}
+
+.thermostat-hk__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background-color: var(--thermostat-icon-bg);
+  color: var(--thermostat-accent);
+}
+
+.thermostat-hk__ring {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 3px solid var(--thermostat-accent);
+  box-sizing: border-box;
+}
+
+.thermostat-hk__labels {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.thermostat-hk__title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--thermostat-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thermostat-hk__status {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--thermostat-accent);
+}
+
+.thermostat-hk__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.thermostat-hk__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.625rem;
+  background-color: var(--thermostat-btn-bg);
+  color: var(--thermostat-title);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.thermostat-hk__btn:hover {
+  background-color: #e5e4e7;
+}
+
+.thermostat-hk__btn:active {
+  transform: scale(0.96);
+}
+
+/* HomeKit security / alarm row */
+.alarm-hk {
+  --alarm-bg: #f2f2f7;
+  --alarm-title: #1c1c1e;
+  --alarm-accent: #34c759;
+  --alarm-icon-bg: rgba(52, 199, 89, 0.16);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  min-height: 4.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 1.75rem;
+  background-color: var(--alarm-bg);
+  color: var(--alarm-title);
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.alarm-hk--armed {
+  --alarm-accent: #ff9f0a;
+  --alarm-icon-bg: rgba(255, 159, 10, 0.16);
+}
+
+.alarm-hk--alert {
+  --alarm-accent: #ff3b30;
+  --alarm-icon-bg: rgba(255, 59, 48, 0.16);
+}
+
+.alarm-hk--pending {
+  --alarm-accent: #8e8e93;
+  --alarm-icon-bg: rgba(142, 142, 147, 0.16);
+}
+
+.alarm-hk--empty,
+.alarm-hk--unavailable {
+  opacity: 0.7;
+  justify-content: center;
+  color: #8e8e93;
+  font-size: 0.875rem;
+}
+
+.alarm-hk--interactive {
+  cursor: pointer;
+}
+
+.alarm-hk--interactive:active {
+  transform: scale(0.98);
+  transition: transform 0.12s ease;
+}
+
+.alarm-hk__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  background-color: var(--alarm-icon-bg);
+  color: var(--alarm-accent);
+}
+
+.alarm-hk__glyph {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.3rem;
+  border: 2.5px solid var(--alarm-accent);
+  box-sizing: border-box;
+}
+
+.alarm-hk__spinner {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 9999px;
+  border: 2.5px solid color-mix(in srgb, var(--alarm-accent) 35%, transparent);
+  border-top-color: var(--alarm-accent);
+  animation: alarm-hk-spin 0.7s linear infinite;
+  box-sizing: border-box;
+}
+
+@keyframes alarm-hk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alarm-hk__labels {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.alarm-hk__title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--alarm-title);
+}
+
+.alarm-hk__status {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--alarm-accent);
+}
+
+/* HomeKit weather card (current · 5-day forecast) */
+.weather-hk {
+  --weather-bg: #f7f8f9;
+  --weather-title: #1c1c1e;
+  --weather-muted: #8e8e93;
+  --weather-precip: #7b8db0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  padding: 1.25rem 1.375rem 1.125rem;
+  border-radius: 1.75rem;
+  background-color: var(--weather-bg);
+  color: var(--weather-title);
+  box-sizing: border-box;
+}
+
+.weather-hk--empty,
+.weather-hk--unavailable {
+  opacity: 0.7;
+}
+
+.weather-hk--empty {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 5rem;
+  color: var(--weather-muted);
+  font-size: 0.875rem;
+}
+
+.weather-hk__current {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.weather-hk__current > svg {
+  flex-shrink: 0;
+}
+
+.weather-hk__now {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  min-width: 0;
+}
+
+.weather-hk__temp {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--weather-title);
+}
+
+.weather-hk__condition {
+  margin-top: 0.25rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--weather-muted);
+}
+
+.weather-hk__forecast {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.weather-hk__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
   text-align: center;
+}
+
+.weather-hk__day-label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #3a3a3c;
+}
+
+.weather-hk__day-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 2.5rem;
+}
+
+.weather-hk__precip {
+  display: block;
+  width: 2px;
+  height: 0.5rem;
+  margin-top: 0.125rem;
+  border-radius: 1px;
+  background-color: var(--weather-precip);
+}
+
+.weather-hk__precip--empty {
+  background-color: transparent;
+}
+
+.weather-hk__day-temp {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--weather-title);
+}
+
+/* HomeKit confirm modal (light, fully opaque) */
+.hk-modal {
+  --hk-modal-bg: #ffffff;
+  --hk-modal-border: #e5e5ea;
+  --hk-modal-title: #1c1c1e;
+  --hk-modal-muted: #8e8e93;
+  --hk-modal-surface: #f2f2f7;
+  --hk-modal-primary: #e6d37b;
+  --hk-modal-danger: #ff3b30;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border: 1px solid var(--hk-modal-border) !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22) !important;
+  color: var(--hk-modal-title);
+  max-width: 22rem;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: hidden;
+}
+
+.hk-modal,
+.hk-modal *,
+.hk-modal__content,
+.hk-modal__body {
+  --heroui-background: #ffffff;
+}
+
+.hk-modal__backdrop {
+  background: rgba(0, 0, 0, 0.72) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.hk-modal__content {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  border-radius: 2rem !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: hidden;
+}
+
+.hk-modal__body {
+  position: relative;
+  padding: 1.5rem 1.25rem 1.25rem !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border-radius: 2rem;
+}
+
+.hk-modal__close {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 9999px;
+  background: var(--hk-modal-surface);
+  color: var(--hk-modal-muted);
+  cursor: pointer;
+}
+
+.hk-modal__close:hover {
+  color: var(--hk-modal-title);
+}
+
+.hk-modal__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.hk-modal__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.375rem;
+  padding: 0 1.25rem;
+}
+
+.hk-modal__eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hk-modal-muted);
+}
+
+.hk-modal__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--hk-modal-title);
+}
+
+.hk-modal__desc {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--hk-modal-muted);
+}
+
+.hk-modal__pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background: var(--hk-modal-surface);
+}
+
+.hk-modal__pin-placeholder {
+  font-size: 0.8125rem;
+  letter-spacing: 0.35em;
+  color: var(--hk-modal-muted);
+  user-select: none;
+}
+
+.hk-modal__pin-dots {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+.hk-modal__pin-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  background: var(--hk-modal-title);
+}
+
+.hk-modal__keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.hk-modal__key {
+  height: 3rem;
+  border: none;
+  border-radius: 1rem;
+  background: var(--hk-modal-surface);
+  color: var(--hk-modal-title);
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.hk-modal__key:active {
+  transform: scale(0.96);
+  background: #e5e5ea;
+}
+
+.hk-modal__actions {
+  display: flex;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.hk-modal__btn {
+  flex: 1;
+  height: 2.75rem;
+  border-radius: 9999px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.hk-modal__btn--cancel {
+  border: 1px solid var(--hk-modal-border);
+  background: transparent;
+  color: var(--hk-modal-title);
+}
+
+.hk-modal__btn--cancel:hover {
+  background: var(--hk-modal-surface);
+}
+
+.hk-modal__btn--primary {
+  border: none;
+  background: var(--hk-modal-primary);
+  color: #1c1c1e;
+}
+
+.hk-modal__btn--primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.hk-modal__btn--danger {
+  background: var(--hk-modal-danger);
+  color: #ffffff;
+}
+
+.hk-modal__btn--disabled,
+.hk-modal__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Compact / list variant for room rows */
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] {
+  aspect-ratio: auto;
+  min-height: 0;
+  padding: 0.75rem 1rem;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-row {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 0.75rem;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+[data-casaboard-style="homekit"] .card-shell[data-tile-layout="row"] .icon-bubble-label {
+  margin-top: 0;
 }
 
 /* ---- 3D ---- */

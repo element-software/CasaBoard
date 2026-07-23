@@ -16,9 +16,18 @@ const Clock = () => {
   const minutes = time.getMinutes().toString().padStart(2, "0");
 
   return (
-    <div className="w-full p-4 pt-0 text-center text-theme-text">
-        <div className="text-6xl tracking-widest">{hours}:{minutes}</div>
-        <div className="text-md text-theme-text-secondary tracking-wider">{time.toDateString()}</div>
+    <div className="w-full pt-1 pb-2 text-left text-theme-text">
+      <div className="text-5xl font-semibold tracking-tight tabular-nums">
+        {hours}:{minutes}
+      </div>
+      <div className="text-sm text-theme-text-secondary mt-1">
+        {time.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
+      </div>
     </div>
   );
 };

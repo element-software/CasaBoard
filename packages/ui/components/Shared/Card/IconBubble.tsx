@@ -23,7 +23,9 @@ export function IconBubble({ icon, label, secondary }: IconBubbleProps) {
             </h3>
           )}
           {secondary && (
-            <div className="text-xs font-medium opacity-80">{secondary}</div>
+            <div className="icon-bubble-secondary text-xs font-medium opacity-80">
+              {secondary}
+            </div>
           )}
         </div>
       )}
