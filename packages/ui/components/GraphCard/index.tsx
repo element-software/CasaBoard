@@ -9,10 +9,21 @@ import { useMemo } from "react";
 
 interface GraphCardProps {
   entityId: string;
+  name?: string;
   showStatistics: boolean;
 }
 
-const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
+function formatSensorValue(value: string | number | null | undefined): string {
+  const num = typeof value === "number" ? value : parseFloat(String(value ?? ""));
+  if (Number.isNaN(num)) return String(value ?? "--");
+  return num.toFixed(2);
+}
+
+const GraphCard = ({
+  entityId,
+  name,
+  showStatistics = false,
+}: GraphCardProps) => {
   const entity = useEntity(entityId);
   const { history, loading } = useEntityHistory(
     entityId,
@@ -97,12 +108,12 @@ const GraphCard = ({ entityId, showStatistics = false }: GraphCardProps) => {
       ) : (
         <CardShell className="col-span-1 flex flex-col bg-theme-card text-theme-text">
           {/* Header */}
-          <div className="flex flex-row w-full items-center justify-between">
-            <div className="text-xs font-bold">
-              {entity?.attributes?.friendly_name || entityId}
+          <div className="flex flex-row w-full items-center justify-between gap-2">
+            <div className="min-w-0 text-xs font-bold">
+              {name?.trim() || entity?.attributes?.friendly_name || entityId}
             </div>
-            <div className="text-xs text-theme-primary font-medium">
-              {entity?.state}
+            <div className="shrink-0 text-xs text-theme-primary font-medium">
+              {formatSensorValue(entity?.state)}
               {unit}
             </div>
           </div>

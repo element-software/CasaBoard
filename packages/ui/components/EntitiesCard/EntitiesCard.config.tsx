@@ -86,7 +86,7 @@ export const EntitiesCardConfig = {
     title: "Entities",
     entities: [],
     columns: 4,
-    showTitles: false,
+    showTitles: true,
     showLastChanged: false,
     showAllOn: false,
   },

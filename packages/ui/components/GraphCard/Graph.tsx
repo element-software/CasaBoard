@@ -75,8 +75,8 @@ const Graph = ({ data, className }: GraphCardProps) => {
         padding={{ top: 20, bottom: 60, left: 60, right: 20 }}
         containerComponent={
           <VictoryVoronoiContainer
-            labels={({ datum }) => 
-              `${Math.round(datum.y)}${unit} at ${datum.x ? new Date(datum.x).toLocaleTimeString() : ''}`
+            labels={({ datum }) =>
+              `${Number(datum.y).toFixed(2)}${unit} at ${datum.x ? new Date(datum.x).toLocaleTimeString() : ""}`
             }
             labelComponent={
               <VictoryTooltip
