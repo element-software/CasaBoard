@@ -26,14 +26,11 @@ Remaining for end-user install: repo must be **public**; merge so GitHub detects
 
 ## 3. Publish pages to a configurable path
 
-Not started. Goal: a published page is immediately reachable at a URL the
-user configures, e.g. `http://homeassistant.local:8123/local/www/dashboard/<page>`
-(HA serves anything under `<config>/www/` at `/local/`).
-
-Needs:
-- A "publish" action per page that writes/syncs the page's static output (or a routable reference) to a configurable target directory — likely the user's mounted HA `www/` folder if CasaBoard has access to it, or serves it locally via `apps/app` under a path HA can iframe/link to.
-- A settings field for the publish path (persisted alongside `ha-connection.json`, `pages.json` etc. in `DATA_DIR`).
-- Decide the actual mechanism: reverse-proxy route in `apps/app` vs. writing files to a bind-mounted HA `www/` directory. The `/local/www/...` URL shape only works if HA is the one serving it, so this likely means CasaBoard needs a documented volume mount into `<config>/www/` — worth confirming against how `hacs-panel` already reaches the container before designing this.
+Done (2026-07-24):
+- Static Vite viewer (`apps/viewer`) baked on publish into `PUBLISH_DIR` (Docker: `/publish`, compose `HA_WWW` → HA `www/casaboard`).
+- Per-page `{slug}/index.html` + `pages/{slug}.json` (theme/style resolved; `hassUrl` only — tokens stay in the browser).
+- Publish settings in `DATA_DIR/publish-settings.json` (Setup → HA Settings).
+- Drafts remain previewable at `/dashboard/[slug]` in the app; only published pages are exported.
 
 ## 4. First-run onboarding
 

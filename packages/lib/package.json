@@ -6,12 +6,13 @@
     ".": "./index.ts",
     "./*": "./*.{ts,tsx}",
     "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts",
-    "./actions/themeActions": "./actions/themeActions.ts"
+    "./actions/themeActions": "./actions/themeActions.ts",
+    "./actions/publishSettingsActions": "./actions/publishSettingsActions.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "test": "tsx --test store/**/*.test.ts"
+    "test": "tsx --test store/**/*.test.ts publish/**/*.test.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -25,6 +26,7 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@measured/puck": "^0.20.2",
+    "@repo/ha": "*",
     "@repo/types": "*",
     "@tailwindcss/postcss": "^4.1.13",
     "@uiw/react-color": "^2.8.0",

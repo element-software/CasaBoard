@@ -30,6 +30,7 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useHAConnection } from "@repo/hooks";
 import { HassConnectWrapper } from "./HassConnectWrapper";
+import { DashboardNavProvider } from "../../DashboardNav/DashboardNavContext";
 
 export type DashboardChromeState = {
   sidebar: Sidebar;
@@ -60,18 +61,20 @@ export function useDashboardChrome() {
  * Registers sidebar chrome for the persistent dashboard shell.
  * Prior chrome is kept on unmount so SPA navigations do not flash an empty sidebar.
  * Same sidebar id/updated_at keeps the previous chrome reference (no remount).
+ * No-ops when rendered outside DashboardChromeProvider (e.g. static viewer).
  */
 export function useRegisterDashboardChrome(
   chrome: DashboardChromeState | null
 ) {
-  const { setChrome } = useDashboardChrome();
+  const ctx = useContext(DashboardChromeContext);
+  const setChrome = ctx?.setChrome;
   const sidebar = chrome?.sidebar;
   const themeSidebarStyle = chrome?.themeSidebarStyle;
   const styleSidebarId = chrome?.styleSidebarId;
   const styleSidebarVars = chrome?.styleSidebarVars;
 
   useLayoutEffect(() => {
-    if (!sidebar?.puck_data) return;
+    if (!setChrome || !sidebar?.puck_data) return;
     setChrome({
       sidebar,
       themeSidebarStyle,
@@ -155,6 +158,7 @@ function PersistentSidebar({
 
 export function DashboardChromeProvider({ children }: { children: ReactNode }) {
   const { connection, loading } = useHAConnection();
+  const pathname = usePathname() ?? "";
   const [mounted, setMounted] = useState(false);
   const [chrome, setChromeState] = useState<DashboardChromeState | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -162,6 +166,11 @@ export function DashboardChromeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const hrefForSlug = useCallback(
+    (slug: string) => `/dashboard/${slug}`,
+    []
+  );
 
   const setChrome = useCallback((next: DashboardChromeState | null) => {
     setChromeState((prev) => {
@@ -204,33 +213,35 @@ export function DashboardChromeProvider({ children }: { children: ReactNode }) {
   const hasSidebar = Boolean(chrome?.sidebar?.puck_data);
 
   return (
-    <HassConnectWrapper haInstance={connection}>
-      <DashboardChromeContext.Provider value={value}>
-        <div className="flex flex-col md:flex-row gap-4 relative h-dvh max-h-dvh overflow-hidden">
-          {hasSidebar && chrome ? (
-            <PersistentSidebar
-              chrome={chrome}
-              isOpen={isOpen}
-              onClose={onClose}
-            />
-          ) : null}
-          <div className="w-full grow min-w-0 min-h-0 overflow-y-auto overscroll-contain">
-            {hasSidebar ? (
-              <div className="md:hidden px-4 pt-4">
-                <Button
-                  isIconOnly
-                  variant="light"
-                  onPress={onOpen}
-                  aria-label="Open sidebar"
-                >
-                  <Icon path={mdiMenu} className="w-5 h-5" />
-                </Button>
-              </div>
+    <DashboardNavProvider hrefForSlug={hrefForSlug} pathname={pathname}>
+      <HassConnectWrapper haInstance={connection}>
+        <DashboardChromeContext.Provider value={value}>
+          <div className="flex flex-col md:flex-row gap-4 relative h-dvh max-h-dvh overflow-hidden">
+            {hasSidebar && chrome ? (
+              <PersistentSidebar
+                chrome={chrome}
+                isOpen={isOpen}
+                onClose={onClose}
+              />
             ) : null}
-            {children}
+            <div className="w-full grow min-w-0 min-h-0 overflow-y-auto overscroll-contain">
+              {hasSidebar ? (
+                <div className="md:hidden px-4 pt-4">
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    onPress={onOpen}
+                    aria-label="Open sidebar"
+                  >
+                    <Icon path={mdiMenu} className="w-5 h-5" />
+                  </Button>
+                </div>
+              ) : null}
+              {children}
+            </div>
           </div>
-        </div>
-      </DashboardChromeContext.Provider>
-    </HassConnectWrapper>
+        </DashboardChromeContext.Provider>
+      </HassConnectWrapper>
+    </DashboardNavProvider>
   );
 }

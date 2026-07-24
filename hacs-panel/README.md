@@ -8,6 +8,19 @@ HACS-installable Home Assistant integration that:
 
 CasaBoard itself still runs as a Docker/Node app. This integration is the HA-native bridge.
 
+## Publish static dashboards under `/local/`
+
+CasaBoard can export published pages into Home Assistant’s `www/` tree so they are reachable at:
+
+`http://homeassistant.local:8123/local/casaboard/<slug>/`
+
+1. Create `<config>/www/casaboard` on the HA host.
+2. Mount it into CasaBoard via compose: `HA_WWW=/path/to/config/www/casaboard`.
+3. In CasaBoard → Setup → HA Settings, set **Publish directory** to `/publish` (Docker default) and **Public base URL** to your `/local/casaboard` URL.
+4. Publish a page in the editor — files appear under that mount.
+
+The static viewer stores HA auth in the browser only (long-lived token). Drafts remain available at the live CasaBoard `/dashboard/<slug>` preview.
+
 ## Install via HACS
 
 1. In HACS, add this GitHub repository as a custom repository (category: **Integration**).

@@ -10,13 +10,29 @@ docker compose up -d
 
 Open [http://localhost:3000](http://localhost:3000). On first run you'll be redirected to connect to your Home Assistant instance; once connected, start building dashboards.
 
-Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`) lives in `./data`, bind-mounted into the container — back that directory up.
+Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`, `publish-settings.json`) lives in `./data`, bind-mounted into the container — back that directory up.
+
+### Publish dashboards to Home Assistant `/local/`
+
+Published pages are exported as static files (shared viewer JS/CSS + per-page JSON/HTML). Mount your HA `www/casaboard` folder into the container:
+
+```bash
+# Example: HA config at /home/pi/homeassistant
+HA_WWW=/home/pi/homeassistant/www/casaboard docker compose up -d
+```
+
+Or set `HA_WWW` in a `.env` next to `docker-compose.yml`. Defaults to `./publish` for local smoke tests.
+
+Then in CasaBoard → Setup → HA Settings, set **Public base URL** to e.g. `http://homeassistant.local:8123/local/casaboard`. Publishing a page writes to that mount; open `…/local/casaboard/<slug>/`. The static viewer asks for a long-lived access token once (browser localStorage only — tokens are never written into `www/`).
+
+Drafts stay previewable in the app at `/dashboard/<slug>`.
 
 To embed CasaBoard in the Home Assistant sidebar (with status sensors), see [`hacs-panel/README.md`](hacs-panel/README.md) — install the `custom_components/casaboard` integration via HACS.
 
 ## Apps
 
 - `apps/app` – The dashboard builder (Next.js App Router). This is what runs in the Docker image.
+- `apps/viewer` – Static dashboard runtime (Vite). Built into the Docker image and copied into `PUBLISH_DIR` on publish.
 - `apps/public` – Documentation / project site (Next.js App Router, not part of the Docker image)
 
 ## Packages
@@ -53,6 +69,9 @@ npm run dev --workspace=public
 ## Environment
 
 - `DATA_DIR` – where `apps/app` stores its JSON data files. Defaults to `./data`; the Docker image sets it to `/data`.
+- `PUBLISH_DIR` – filesystem path for static page exports. Defaults to `./publish`; Docker uses `/publish`.
+- `VIEWER_DIST_DIR` – built viewer assets to copy on publish. Docker sets `/app/viewer-dist`.
+- `HA_WWW` – compose-only host path mounted at `/publish` (point at `<ha-config>/www/casaboard`).
 - `PORT` – optional, defaults to `3000`.
 
 `apps/public` (docs site) needs no environment variables beyond an optional `RESEND_API_KEY` for the contact form.

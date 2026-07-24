@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Icon from "@mdi/react";
 import {
   mdiHome,
@@ -14,6 +12,7 @@ import {
   mdiChevronRight,
 } from "@mdi/js";
 import classNames from "classnames";
+import { useDashboardNav } from "../DashboardNav/DashboardNavContext";
 
 export type SidebarNavItem = {
   label: string;
@@ -47,7 +46,7 @@ function resolveIcon(icon?: string, slug?: string): string {
 }
 
 export function SidebarNav({ items }: SidebarNavProps) {
-  const pathname = usePathname();
+  const { hrefForSlug, pathname } = useDashboardNav();
   const navItems =
     items && items.length > 0
       ? items
@@ -63,19 +62,19 @@ export function SidebarNav({ items }: SidebarNavProps) {
   return (
     <nav className="flex flex-col gap-1.5 w-full mt-2" aria-label="Dashboard">
       {navItems.map((item) => {
-        const href = `/dashboard/${item.pageSlug}`;
+        const href = hrefForSlug(item.pageSlug);
         const active =
           pathname === href ||
-          pathname?.endsWith(`/dashboard/${item.pageSlug}`);
+          pathname.endsWith(`/${item.pageSlug}`) ||
+          pathname.endsWith(`/${item.pageSlug}/`) ||
+          pathname.includes(`/dashboard/${item.pageSlug}`);
         const path = resolveIcon(item.icon, item.pageSlug);
         const showChevron = item.pageSlug === "media";
 
         return (
-          <Link
+          <a
             key={item.pageSlug}
             href={href}
-            prefetch
-            scroll={false}
             aria-current={active ? "page" : undefined}
             className={classNames(
               "group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-[15px] font-semibold cursor-pointer select-none transition-colors duration-150",
@@ -98,7 +97,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
                 className="h-4 w-4 shrink-0 opacity-50 group-hover:opacity-70"
               />
             )}
-          </Link>
+          </a>
         );
       })}
     </nav>

@@ -1,5 +1,6 @@
 import { HAConnectForm } from "@repo/ui/components/HAConnect/HAConnectForm";
-import { HAConnectionActions } from "@repo/lib";
+import { PublishSettingsForm } from "@repo/ui/components/Publish/PublishSettingsForm";
+import { HAConnectionActions, PublishSettingsActions } from "@repo/lib";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant } from "@mdi/js";
 import { CleanAuthUrl } from "./clean-auth-url";
@@ -9,7 +10,10 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function HAConfigPage() {
-  const connection = await HAConnectionActions.getHAConnection();
+  const [connection, publishSettings] = await Promise.all([
+    HAConnectionActions.getHAConnection(),
+    PublishSettingsActions.getPublishSettings(),
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -24,13 +28,16 @@ export default async function HAConfigPage() {
               Home Assistant Configuration
             </h1>
             <p className="text-theme-text-secondary">
-              Configure your Home Assistant connection
+              Configure your Home Assistant connection and static publish path
             </p>
           </div>
         </div>
       </div>
 
-      <HAConnectForm initialConnection={connection} />
+      <div className="space-y-6">
+        <HAConnectForm initialConnection={connection} />
+        <PublishSettingsForm initialSettings={publishSettings} />
+      </div>
       <div className="mt-8 pt-6 border-t border-theme-border">
         <Link
           href="/setup"

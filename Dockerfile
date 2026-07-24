@@ -5,6 +5,7 @@ WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY apps/app/package.json apps/app/package.json
 COPY apps/public/package.json apps/public/package.json
+COPY apps/viewer/package.json apps/viewer/package.json
 COPY packages/ packages/
 RUN npm ci
 
@@ -13,17 +14,21 @@ WORKDIR /repo
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/packages ./packages
 COPY . .
+RUN npm run build --workspace=viewer
 RUN npm run build --workspace=app
 
 FROM base AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV DATA_DIR=/data
+ENV PUBLISH_DIR=/publish
+ENV VIEWER_DIST_DIR=/app/viewer-dist
 ENV PORT=3000
 COPY --from=build /repo/apps/app/.next/standalone ./
 COPY --from=build /repo/apps/app/.next/static ./apps/app/.next/static
 COPY --from=build /repo/apps/app/public ./apps/app/public
+COPY --from=build /repo/apps/viewer/dist ./viewer-dist
 
 EXPOSE 3000
-VOLUME ["/data"]
+VOLUME ["/data", "/publish"]
 CMD ["node", "apps/app/server.js"]

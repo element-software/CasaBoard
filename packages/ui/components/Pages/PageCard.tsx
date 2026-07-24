@@ -22,8 +22,14 @@ import {
   mdiTrashCan,
   mdiEyeOff,
   mdiEyeOutline,
+  mdiContentCopy,
+  mdiOpenInNew,
 } from "@mdi/js";
 import Link from "next/link";
+
+function publicUrlForSlug(base: string, slug: string): string {
+  return `${base.replace(/\/+$/, "")}/${slug}/`;
+}
 
 export const PageCard = ({
   page,
@@ -31,12 +37,14 @@ export const PageCard = ({
   onTogglePublished,
   onDelete,
   isPending,
+  publicBaseUrl = "",
 }: {
   page: Page;
   compact: boolean;
   onTogglePublished: (slug: string, published: boolean) => void;
   onDelete: (slug: string, name: string) => void;
   isPending: boolean;
+  publicBaseUrl?: string;
 }) => {
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -46,6 +54,19 @@ export const PageCard = ({
       minute: "2-digit",
     });
 
+  const publicUrl =
+    page.published && publicBaseUrl
+      ? publicUrlForSlug(publicBaseUrl, page.slug)
+      : null;
+
+  const copyPublicUrl = async () => {
+    if (!publicUrl) return;
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+    } catch {
+      // ignore
+    }
+  };
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardBody className={cn(compact ? "p-3" : "p-4")}>
@@ -106,13 +127,38 @@ export const PageCard = ({
           </div>
 
           <div className="flex items-center gap-1">
+            {publicUrl ? (
+              <>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  title="Copy public /local/ URL"
+                  onPress={copyPublicUrl}
+                >
+                  <Icon path={mdiContentCopy} className="w-4 h-4" />
+                </Button>
+                <Button
+                  as="a"
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  title="Open public URL"
+                >
+                  <Icon path={mdiOpenInNew} className="w-4 h-4" />
+                </Button>
+              </>
+            ) : null}
             <Button
               as={Link}
               href={`/dashboard/${page.slug}`}
               isIconOnly
               size="sm"
               variant="light"
-              title="View page"
+              title="Preview in app"
             >
               <Icon path={mdiEye} className="w-4 h-4" />
             </Button>

@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { Button, Card, CardBody, CardHeader, Chip, Input } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiCheckCircle, mdiAlertCircle, mdiHomeAssistant } from "@mdi/js";
-import { HAConnectionActions } from "@repo/lib";
+import {
+  HAConnectionActions,
+  createServerTokenStore,
+  LinkService,
+} from "@repo/lib";
 import { reauthenticate, useHA } from "@repo/ha";
 import type { HAConnection } from "@repo/types/ha";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
@@ -66,11 +70,21 @@ export function HAConnectForm({ compact = false, initialConnection }: HAConnectF
     });
   };
 
+  const tokenStore = useMemo(() => createServerTokenStore(), []);
+  const redirectUrl = useMemo(
+    () => LinkService.crossAppHrefClient("app", "/setup/ha-config"),
+    []
+  );
+
   const onReconnect = () => {
     if (!connection) return;
     startTransition(async () => {
       try {
-        await reauthenticate({ haInstance: connection });
+        await reauthenticate({
+          haInstance: connection,
+          tokenStore,
+          redirectUrl,
+        });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to re-authenticate");
       }

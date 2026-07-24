@@ -18,6 +18,8 @@ interface PagesManagementProps {
   initialPages?: Page[];
   initialError?: string | null;
   compact?: boolean;
+  /** e.g. http://homeassistant.local:8123/local/casaboard — enables copy public URL */
+  publicBaseUrl?: string;
 }
 
 export const PagesManagement = ({
@@ -26,6 +28,7 @@ export const PagesManagement = ({
   initialPages = [],
   initialError = null,
   compact = false,
+  publicBaseUrl = "",
 }: PagesManagementProps) => {
   const { connection } = useHAConnection();
   const router = useRouter();
@@ -142,6 +145,7 @@ export const PagesManagement = ({
             onTogglePublished={handleTogglePublished}
             onDelete={handleDeletePage}
             isPending={isPending}
+            publicBaseUrl={publicBaseUrl}
           />
         ))}
       </div>

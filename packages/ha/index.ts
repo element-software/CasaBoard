@@ -5,7 +5,13 @@ export { useEntities } from "./hooks/useEntities";
 export { useEntityHistory } from "./hooks/useEntityHistory";
 export type { EntityHistoryPoint } from "./hooks/entityHistory";
 export { toChartDate } from "./hooks/entityHistory";
-export { connect, getEntity, reauthenticate } from "./connection";
+export {
+  connect,
+  getEntity,
+  reauthenticate,
+  createLocalStorageTokenStore,
+} from "./connection";
+export type { HATokenStore, HAConnectProps } from "./connection";
 export {
   CAMERA_FEATURE_STREAM,
   cameraSupportsHls,
