@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { useEntities } from "@repo/ha";
+import { useEntities } from "@casaboard/ha";
 import { Autocomplete, AutocompleteItem, Chip, Button } from "@heroui/react";
 import Icon from "@mdi/react";
 import {

@@ -11,7 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/ha": "*",
+    "@casaboard/ha": "*",
     "@repo/lib": "*",
     "@repo/types": "*"
   },

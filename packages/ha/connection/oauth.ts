@@ -3,7 +3,7 @@ import {
   type AuthData,
   type LoadTokensFunc,
 } from "home-assistant-js-websocket";
-import type { HAConnection } from "@repo/types/ha";
+import type { HAConnection } from "../types";
 import type { HATokenStore } from "./tokenStore";
 import { throwConnectionFailure } from "./errors";
 

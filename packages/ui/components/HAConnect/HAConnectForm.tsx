@@ -17,7 +17,7 @@ import {
   testLongLivedTokenConnection,
   useHA,
   type HAConnectionFailure,
-} from "@repo/ha";
+} from "@casaboard/ha";
 import type { HAConnection } from "@repo/types/ha";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
 

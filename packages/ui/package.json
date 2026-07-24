@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@repo/config": "*",
-    "@repo/ha": "*",
+    "@casaboard/ha": "*",
     "@repo/hooks": "*",
     "@repo/lib": "*",
     "@repo/types": "*",

@@ -37,19 +37,18 @@ Done (2026-07-24):
 Done (2026-07-24):
 - First-run detection via `hasValidHAConnection()` (requires `hass_url` + access token in `ha-connection.json`).
 - Guided wizard at `/onboarding` (immersive) — URL + long-lived token (primary) or OAuth (“Sign in with HA”).
-- Typed connection failures in `@repo/ha` (`invalid_url`, `unreachable`, `invalid_auth`, `ssl`, `https_to_http`, …) with clear per-type copy; retry without reload.
+- Typed connection failures in `@casaboard/ha` (`invalid_url`, `unreachable`, `invalid_auth`, `ssl`, `https_to_http`, …) with clear per-type copy; retry without reload.
 - Setup shell, dashboard preview, and immersive editors redirect to `/onboarding` until configured; disconnect returns there.
 - Settings remain at `/setup/ha-config` after first run (same connection helpers).
 
-## 5. Publish `@repo/ha` as a standalone npm package
+## 5. Publish `@casaboard/ha` as a standalone npm package
 
-Currently `packages/ha` is `"private": true`, workspace-internal only.
-
-Needs:
-- Decide public package name (e.g. `@casaboard/ha`) and drop `private: true`.
-- Add build step (currently exports raw `.ts` via workspace resolution — npm consumers need compiled JS + `.d.ts`, not raw TS).
-- GitHub Packages (or npm) publish workflow — version bump + `npm publish` on release/tag.
-- Trim its `@repo/*` internal deps (`@repo/types`) into something a standalone consumer can install, or inline what's needed.
+Done (2026-07-24):
+- Package renamed `@repo/ha` → `@casaboard/ha` (no longer `private`).
+- Inlined `HAConnection` (dropped `@repo/types` runtime/type dependency).
+- `tsup` build emits ESM + CJS + `.d.ts` into `dist/` (workspace still resolves source `.ts` for monorepo DX; `publishConfig` swaps consumers to `dist/`).
+- `packages/ha/README.md` + MIT `LICENSE` copy for the tarball.
+- Publish workflow: `.github/workflows/publish-ha.yml` on `ha-v*` tags (or workflow_dispatch). Needs repo secret `NPM_TOKEN` for the `@casaboard` npm scope.
 
 ## 6. Strip repo history
 

@@ -7,7 +7,7 @@ import {
   completeOAuthCallback,
   isOAuthCallbackUrl,
   oauthRedirectUrl,
-} from "@repo/ha";
+} from "@casaboard/ha";
 import {
   HAConnectionActions,
   createServerTokenStore,

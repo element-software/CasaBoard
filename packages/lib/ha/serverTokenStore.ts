@@ -1,7 +1,7 @@
 "use client";
 
 import type { AuthData } from "home-assistant-js-websocket";
-import type { HATokenStore } from "@repo/ha";
+import type { HATokenStore } from "@casaboard/ha";
 import {
   getHAAuthData,
   saveHAConnection,

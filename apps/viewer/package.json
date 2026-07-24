@@ -14,7 +14,7 @@
     "@measured/puck": "^0.20.2",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
-    "@repo/ha": "*",
+    "@casaboard/ha": "*",
     "@repo/tailwind-config": "*",
     "@repo/types": "*",
     "@repo/ui": "*",

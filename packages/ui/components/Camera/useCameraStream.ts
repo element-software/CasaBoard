@@ -10,7 +10,7 @@ import {
   getCameraMjpegUrl,
   getCameraPosterUrl,
   useHA,
-} from "@repo/ha";
+} from "@casaboard/ha";
 import { clientLogger } from "@repo/lib";
 
 export type CameraStreamMode = "hls" | "mjpeg" | "idle";

@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo } from "react";
-import { HAProvider, useHA, reauthenticate, oauthRedirectUrl } from "@repo/ha";
+import { HAProvider, useHA, reauthenticate, oauthRedirectUrl } from "@casaboard/ha";
 import { HAConnection } from "@repo/types/ha";
 import { ConnectionErrorIndicator } from "./ConnectionErrorFallback";
 import { createServerTokenStore, clientLogger } from "@repo/lib";

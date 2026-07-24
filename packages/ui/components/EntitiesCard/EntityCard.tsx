@@ -6,7 +6,7 @@ import { mdiDevices } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import { Skeleton } from "@heroui/react";
-import { useEntity, useHA } from "@repo/ha";
+import { useEntity, useHA } from "@casaboard/ha";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 import { CardShell } from "../Shared/Card";
 

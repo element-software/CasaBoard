@@ -8,7 +8,7 @@ import {
   VictoryVoronoiContainer,
 } from "victory";
 import { useId, useMemo } from "react";
-import { toChartDate } from "@repo/ha";
+import { toChartDate } from "@casaboard/ha";
 import classNames from "classnames";
 
 interface GraphCardProps {

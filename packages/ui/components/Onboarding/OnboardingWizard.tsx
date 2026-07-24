@@ -14,7 +14,7 @@ import {
   reauthenticate,
   testLongLivedTokenConnection,
   type HAConnectionFailure,
-} from "@repo/ha";
+} from "@casaboard/ha";
 import {
   HAConnectionActions,
   createServerTokenStore,

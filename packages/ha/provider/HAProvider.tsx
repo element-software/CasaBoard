@@ -13,7 +13,7 @@ import {
   Auth,
 } from "home-assistant-js-websocket";
 import { connect, type HATokenStore } from "../connection";
-import { HAConnection } from "@repo/types/ha";
+import { HAConnection } from "../types";
 
 export interface HAContextType {
   connection: Connection | null;

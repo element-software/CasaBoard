@@ -39,4 +39,4 @@ export {
   joinHassUrl,
 } from "./camera/stream";
 export type { CameraCapabilities, CameraStreamType } from "./camera/stream";
-export type { ConnectResult, EntityDomain, EntityId } from "./types";
+export type { ConnectResult, EntityDomain, EntityId, HAConnection } from "./types";

@@ -1,5 +1,5 @@
 /**
- * Viewer-facing HA surface. Re-exports from @repo/ha plus long-lived token helper.
+ * Viewer-facing HA surface. Re-exports from @casaboard/ha plus long-lived token helper.
  */
 export {
   HAProvider,
@@ -10,4 +10,4 @@ export {
   testLongLivedTokenConnection,
   type HATokenStore,
   type HAConnectionFailure,
-} from "@repo/ha";
+} from "@casaboard/ha";

@@ -1,5 +1,10 @@
 import type { Auth, Connection } from "home-assistant-js-websocket";
 
+/** Minimal HA instance descriptor used across the connection layer. */
+export type HAConnection = {
+  hass_url: string;
+};
+
 export type ConnectResult = {
   connection: Connection;
   auth: Auth;

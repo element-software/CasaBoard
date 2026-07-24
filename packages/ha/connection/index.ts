@@ -1,4 +1,4 @@
-import { ConnectResult, EntityDomain, EntityId } from "../types/index";
+import type { Auth, LoadTokensFunc, SaveTokensFunc } from "home-assistant-js-websocket";
 import {
   getAuth,
   createConnection,
@@ -6,12 +6,7 @@ import {
   ERR_HASS_HOST_REQUIRED,
   ERR_INVALID_AUTH,
 } from "home-assistant-js-websocket";
-import type {
-  Auth,
-  LoadTokensFunc,
-  SaveTokensFunc,
-} from "home-assistant-js-websocket";
-import { HAConnection } from "@repo/types/ha";
+import type { ConnectResult, EntityDomain, EntityId, HAConnection } from "../types";
 import type { HATokenStore } from "./tokenStore";
 import {
   classifyConnectionError,

@@ -59,7 +59,7 @@ export default defineConfig({
         replacement: path.resolve(repoRoot, "packages/ui"),
       },
       {
-        find: "@repo/ha",
+        find: "@casaboard/ha",
         replacement: path.resolve(repoRoot, "packages/ha"),
       },
       {

@@ -10,7 +10,7 @@ import {
   ModalHeader,
   Skeleton,
 } from "@heroui/react";
-import { useEntity } from "@repo/ha";
+import { useEntity } from "@casaboard/ha";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 import { CardShell } from "../Shared/Card";
 import { CameraPlayer } from "./CameraPlayer";
