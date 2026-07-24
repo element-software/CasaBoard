@@ -1,35 +1,42 @@
-# CasaBoard HACS Panel
+# CasaBoard Home Assistant Integration
 
-Embeds your self-hosted [CasaBoard](../README.md) instance in the Home Assistant sidebar.
+HACS-installable Home Assistant integration that:
+
+1. Registers a **sidebar panel** embedding your self-hosted CasaBoard UI
+2. Polls CasaBoard `/api/health` and exposes **sensors** (online, page counts, HA connection)
+3. Provides a **`casaboard.refresh`** service to re-poll on demand
+
+CasaBoard itself still runs as a Docker/Node app. This integration is the HA-native bridge.
 
 ## Install via HACS
 
-1. In HACS, add this repository as a custom repository (category: **Plugin**).
-2. Install "CasaBoard Panel". HACS copies `casaboard-panel.js` into `<config>/www/community/casaboard-panel/`.
+1. In HACS, add this GitHub repository as a custom repository (category: **Integration**).
+2. Install **CasaBoard**, then restart Home Assistant.
+3. Settings → Devices & Services → Add Integration → **CasaBoard**.
+4. Enter the base URL of your running CasaBoard instance (e.g. `http://homeassistant.local:3000` or `http://casaboard:3000` on the HA Docker network).
 
-Alternatively, without HACS: copy `casaboard-panel.js` into `<config>/www/casaboard-panel.js` manually.
+> **Note:** The GitHub repository must be **public** for HACS to fetch it.
 
-## Configure
+## What you get
 
-Add to `configuration.yaml` (adjust `module_url` if you installed manually into `www/` instead of via HACS, and `config.url` to point at wherever your CasaBoard container is reachable):
+| Entity | Meaning |
+| --- | --- |
+| `binary_sensor.casaboard_online` | CasaBoard `/api/health` reachable |
+| `sensor.casaboard_pages` | Total pages |
+| `sensor.casaboard_published_pages` | Published pages |
+| `sensor.casaboard_ha_connection` | Whether CasaBoard has stored HA credentials (`connected` / `disconnected`) |
 
-```yaml
-panel_custom:
-  - name: casaboard-panel
-    sidebar_title: CasaBoard
-    sidebar_icon: mdi:view-dashboard
-    module_url: /hacsfiles/casaboard-panel/casaboard-panel.js
-    config:
-      url: http://homeassistant.local:3000
-```
+Sidebar: a **CasaBoard** entry loads the app in an iframe (title/icon configurable in the integration options).
 
-Restart Home Assistant (or reload). A "CasaBoard" entry appears in the sidebar and opens your dashboard in an iframe.
+Service: `casaboard.refresh` — optional `entry_id` to refresh one config entry.
 
-No login/auth handoff is needed — CasaBoard itself has no login gate, and it holds its own connection to Home Assistant, so the iframe loads straight into your dashboard.
+## Manual install (without HACS)
 
-## Simpler native alternative
+Copy `custom_components/casaboard` into `<config>/custom_components/casaboard`, restart HA, then add the integration from the UI.
 
-Home Assistant also ships a built-in `panel_iframe` integration that does the same iframe-embedding with zero custom code — no HACS install required:
+## Simpler native alternative (panel only)
+
+If you only want the sidebar iframe and no sensors, Home Assistant's built-in `panel_iframe` still works with zero custom code:
 
 ```yaml
 panel_iframe:
@@ -38,5 +45,3 @@ panel_iframe:
     icon: mdi:view-dashboard
     url: http://homeassistant.local:3000
 ```
-
-Use whichever you prefer; the custom panel here exists mainly so CasaBoard has its own HACS-installable entry rather than requiring a YAML edit.

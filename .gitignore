@@ -39,3 +39,5 @@ yarn-error.log*
 *.pem
 
 apps/app/data
+__pycache__/
+*.py[cod]

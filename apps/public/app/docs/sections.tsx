@@ -201,21 +201,16 @@ const HACSPanel: React.FC = () => (
       intro="A small companion panel lets you embed the running CasaBoard app directly in the Home Assistant sidebar, distributed as a custom HACS repository."
     />
 
-    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard panel repository as a custom repository (category: Lovelace / plugin)." />
-    <TimelineStep number={2} title="Install the panel" text="Install 'CasaBoard Panel' from HACS like any other frontend resource." />
-    <TimelineStep number={3} title="Configure the sidebar entry" text="Add a panel_custom entry to your Home Assistant configuration.yaml pointing at your running container's URL." isLast />
+    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard GitHub repository as a custom repository (category: Integration). The repo must be public for HACS to fetch it." />
+    <TimelineStep number={2} title="Install and restart" text="Install 'CasaBoard' from HACS, then restart Home Assistant." />
+    <TimelineStep number={3} title="Add the integration" text="Settings → Devices & Services → Add Integration → CasaBoard. Enter the base URL of your running CasaBoard container (e.g. http://homeassistant.local:3000)." isLast />
 
-    <CodeBlock>{`panel_custom:
-  - name: casaboard-panel
-    sidebar_title: CasaBoard
-    sidebar_icon: mdi:view-dashboard
-    module_url: /hacsfiles/casaboard-panel/casaboard-panel.js
-    config:
-      url: http://homeassistant.local:3000`}</CodeBlock>
+    <CodeBlock>{`# No YAML required — configure in the UI.
+# Optional: call casaboard.refresh to re-poll /api/health.`}</CodeBlock>
 
-    <Callout type="info" title="No extra auth needed">
-      Since CasaBoard has no login of its own, the panel simply embeds it as an iframe — opening the
-      sidebar entry takes you straight to your dashboards.
+    <Callout type="info" title="What the integration provides">
+      A sidebar panel that iframes CasaBoard, plus sensors for online status, page
+      counts, and whether CasaBoard has stored Home Assistant credentials.
     </Callout>
   </div>
 );
