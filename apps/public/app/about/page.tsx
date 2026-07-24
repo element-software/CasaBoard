@@ -36,16 +36,17 @@ export default function AboutPage() {
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
-            A self-hosted dashboard builder for Home Assistant
+            A local-only dashboard builder for Home Assistant
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            Design beautiful, responsive pages with a drag‑and‑drop editor and real‑time controls — free, open source, and running entirely on your own hardware.
+            Design beautiful, responsive pages with a drag‑and‑drop editor — free, MIT-licensed,
+            privacy-first, and running entirely on your own hardware. No account, no tracking.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { icon: mdiGrid, label: "Drag & Drop Editor" },
               { icon: mdiHomeAssistant, label: "Live HA Data" },
-              { icon: mdiDocker, label: "Self-Hosted" },
+              { icon: mdiDocker, label: "Docker or HACS" },
             ].map((badge) => (
               <div
                 key={badge.label}

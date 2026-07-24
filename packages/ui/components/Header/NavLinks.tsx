@@ -1,6 +1,9 @@
 import { LinkService } from "@repo/lib";
 import Icon from "@mdi/react";
-import { mdiBookOpen, mdiEmail, mdiInformation, mdiShield } from "@mdi/js";
+import { mdiBookOpen, mdiEmail, mdiGithub, mdiInformation, mdiShield } from "@mdi/js";
+
+const GITHUB_REPO_URL = "https://github.com/element-software/CasaBoard";
+
 export interface NavLink {
   href: string;
   label: string;
@@ -32,6 +35,12 @@ export const getPublicLinks = (): NavLink[] => [
     label: "Contact",
     external: true,
     icon: <Icon path={mdiEmail} className="w-4 h-4" />,
+  },
+  {
+    href: GITHUB_REPO_URL,
+    label: "GitHub",
+    external: true,
+    icon: <Icon path={mdiGithub} className="w-4 h-4" />,
   },
 ];
 

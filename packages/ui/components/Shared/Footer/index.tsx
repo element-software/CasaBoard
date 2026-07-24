@@ -4,6 +4,8 @@ import Link from "next/link";
 import { LinkService } from "@repo/lib";
 import { CasaBoardLogo } from "../../Logo/index";
 
+const GITHUB_REPO_URL = "https://github.com/element-software/CasaBoard";
+
 export const Footer: React.FC = () => {
   const year = new Date().getFullYear();
   return (
@@ -50,6 +52,15 @@ export const Footer: React.FC = () => {
             </Link>
             <span className="opacity-30">•</span>
             <a
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-theme-text-secondary hover:text-theme-primary"
+            >
+              GitHub
+            </a>
+            <span className="opacity-30">•</span>
+            <a
               href="mailto:support@casaboard.dev"
               className="text-theme-text-secondary hover:text-theme-primary"
             >
@@ -59,7 +70,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="mt-6 text-xs text-theme-text-secondary text-center">
-          © {year} CasaBoard. All rights reserved. Powered by{" "}
+          © {year} CasaBoard. MIT licensed. Free, open source, and self-hosted. Powered by{" "}
           <a
             href="https://element-software.co.uk"
             target="_blank"

@@ -54,13 +54,14 @@ export default function TermsPage() {
             Terms
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            CasaBoard is free, open-source software you run yourself. There&apos;s no CasaBoard
+            CasaBoard is free, MIT-licensed software you run yourself. There&apos;s no CasaBoard
             service to sign up for, so most of the usual SaaS terms simply don&apos;t apply.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { icon: mdiCheckCircle, label: "Free forever" },
-              { icon: mdiShieldCheck, label: "No account required" },
+              { icon: mdiShieldCheck, label: "MIT licensed" },
+              { icon: mdiLightbulbOnOutline, label: "No account required" },
             ].map((badge) => (
               <div
                 key={badge.label}
@@ -82,10 +83,18 @@ export default function TermsPage() {
           <SectionLabel n="01" label="What CasaBoard is" />
           <div className="border-l-4 border-slate-200 pl-6 space-y-4">
             <p className="text-sm text-slate-600 leading-relaxed">
-              CasaBoard is open-source software distributed for you to run on your own
-              infrastructure (via Docker), alongside your own Home Assistant instance. We — the
-              maintainers — do not operate a hosted version of CasaBoard, do not create accounts
-              for you, and have no access to any installation you run.
+              CasaBoard is open-source software distributed under the{" "}
+              <a
+                href="https://github.com/element-software/CasaBoard/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-600 hover:underline"
+              >
+                MIT License
+              </a>
+              {" "}for you to run on your own infrastructure (via Docker Compose), alongside your own
+              Home Assistant instance. We — the maintainers — do not operate a hosted version of
+              CasaBoard, do not create accounts for you, and have no access to any installation you run.
             </p>
           </div>
         </section>
@@ -126,14 +135,31 @@ export default function TermsPage() {
             <div className="space-y-3">
               <p className="text-sm text-slate-700 leading-relaxed">
                 CasaBoard is shaped by the people who use it. We welcome ideas, bug reports, and
-                pull requests through the project&apos;s GitHub repository.
+                pull requests through{" "}
+                <a
+                  href="https://github.com/element-software/CasaBoard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-violet-700 font-medium hover:underline"
+                >
+                  github.com/element-software/CasaBoard
+                </a>
+                .
               </p>
               <div className="flex flex-wrap gap-3 pt-1">
-                <Link
-                  href="/contact"
+                <a
+                  href="https://github.com/element-software/CasaBoard/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
                 >
-                  Share feedback or a feature idea
+                  Open a GitHub issue
+                </a>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-violet-200 text-violet-700 text-sm font-semibold rounded-xl hover:bg-violet-50 transition-colors"
+                >
+                  Contact form
                 </Link>
               </div>
             </div>

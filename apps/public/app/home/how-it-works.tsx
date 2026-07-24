@@ -4,8 +4,9 @@ import { mdiDrag, mdiEye, mdiDocker, mdiHomeAssistant } from "@mdi/js";
 
 const steps = [
   {
-    title: "Run with Docker",
-    description: "docker compose up -d — CasaBoard starts serving on your network, no account needed",
+    title: "Install",
+    description:
+      "docker compose up -d for the app — optionally add the HACS integration to embed it in the HA sidebar",
     icon: mdiDocker,
   },
   {
@@ -16,12 +17,12 @@ const steps = [
   },
   {
     title: "Design",
-    description: "Drag and drop components to build your perfect dashboard",
+    description: "Drag and drop components to build your perfect dashboard — no account, no cloud",
     icon: mdiDrag,
   },
   {
     title: "Enjoy",
-    description: "Access your dashboard from any device on your network, or embed it in HA via the HACS panel",
+    description: "Open dashboards on any device on your network, or from the HA sidebar via HACS",
     icon: mdiEye,
   },
 ];

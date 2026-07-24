@@ -29,15 +29,15 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
   home: {
     path: "/",
     metadata: {
-      title: "CasaBoard — Self-Hosted Home Assistant Dashboards",
+      title: "CasaBoard — Local-Only Home Assistant Dashboards",
       description:
-        "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
+        "Free, MIT-licensed, privacy-first dashboard builder for Home Assistant. Docker Compose or HACS — no account, no tracking.",
     },
     og: {
       title: "CasaBoard",
       description:
-        "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
-      alt: "CasaBoard — Self-Hosted Home Assistant Dashboards",
+        "Free, MIT-licensed, privacy-first dashboards for Home Assistant. Self-hosted via Docker Compose or HACS.",
+      alt: "CasaBoard — Local-Only Home Assistant Dashboards",
     },
   },
   about: {
@@ -45,11 +45,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "About — CasaBoard",
       description:
-        "A self-hosted, open-source dashboard builder for Home Assistant — drag-and-drop editor, your data never leaves your network.",
+        "Local-only, open-source (MIT) dashboard builder for Home Assistant — no account, no cloud, no tracking.",
     },
     og: {
       title: "About CasaBoard",
-      description: "Self-hosted dashboards for Home Assistant — beautiful, responsive, open source.",
+      description: "Privacy-first Home Assistant dashboards — free, MIT-licensed, self-hosted.",
       alt: "About CasaBoard — smart home dashboards",
     },
   },
@@ -58,11 +58,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Contact — CasaBoard",
       description:
-        "Questions, feedback, or found a bug? Reach out or open an issue on the CasaBoard GitHub repository.",
+        "Questions, feedback, or found a bug? Reach out or open an issue on github.com/element-software/CasaBoard.",
     },
     og: {
       title: "Contact",
-      description: "Questions or feedback? We'd love to hear from you.",
+      description: "Questions or feedback? Email us or open a GitHub issue.",
       alt: "Contact CasaBoard",
     },
   },
@@ -71,7 +71,7 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Cookie Policy — CasaBoard",
       description:
-        "How this documentation site uses cookies. The CasaBoard app itself is self-hosted and sets none.",
+        "This site and the CasaBoard app set no cookies and run no analytics.",
     },
     og: {
       title: "Cookie Policy",
@@ -84,11 +84,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Documentation — CasaBoard",
       description:
-        "Guides for CasaBoard — Docker install, the HACS Lovelace panel, connecting Home Assistant, and troubleshooting.",
+        "Install CasaBoard with Docker Compose or HACS, connect Home Assistant, and build dashboards.",
     },
     og: {
       title: "Documentation",
-      description: "Everything you need to self-host CasaBoard.",
+      description: "Docker Compose, HACS, and everything else to self-host CasaBoard.",
       alt: "CasaBoard documentation",
     },
   },
@@ -97,11 +97,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Privacy Policy — CasaBoard",
       description:
-        "CasaBoard is self-hosted software. We don't run a hosted service and collect no data from your installation.",
+        "CasaBoard is local-only software. No hosted service, no analytics, no data collection from your install.",
     },
     og: {
       title: "Privacy Policy",
-      description: "Self-hosted software — your data stays on your own infrastructure.",
+      description: "Local-only software — your data stays on your own infrastructure.",
       alt: "CasaBoard privacy policy",
     },
   },
@@ -123,11 +123,11 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
     metadata: {
       title: "Terms — CasaBoard",
       description:
-        "CasaBoard is free, open-source software provided as-is. No account, no subscription, no warranty.",
+        "CasaBoard is free, MIT-licensed software provided as-is. No account, no subscription, no warranty.",
     },
     og: {
       title: "Terms",
-      description: "Free, open-source software, provided as-is.",
+      description: "Free, MIT-licensed software, provided as-is.",
       alt: "CasaBoard terms",
     },
   },

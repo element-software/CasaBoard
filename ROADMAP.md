@@ -60,12 +60,12 @@ do only when explicitly asked, not as part of this roadmap's other work.
 
 ## 7. Marketing site (`apps/public`) refresh
 
-Update messaging to match the new positioning:
-- Local-only, privacy-first, no tracking, no account.
-- Open source, public GitHub repo, MIT licensed.
-- Free to use.
-- Installable via Docker Compose or HACS.
-- Note: current README already mentions `AnalyticsWrapper` (Vercel Analytics + GA) and a cookie consent flow in `apps/public` — decide whether "no tracking" means ripping that out entirely or keeping it strictly opt-in/consent-gated as it is now.
+Done (2026-07-24):
+- Messaging aligned to local-only / privacy-first / no tracking / no account.
+- Open source on public GitHub (`element-software/CasaBoard`), MIT licensed, free to use.
+- Install paths called out: Docker Compose for the app, HACS for the HA integration/sidebar panel.
+- Tracking decision: **ripped out entirely** — no `AnalyticsWrapper`, no cookie consent, no GA/Vercel Analytics. Docs and legal pages match that stance.
+- Nav/footer/hero/CTA/docs/contact/terms point at the real GitHub repo; footer no longer claims “All rights reserved.”
 
 ---
 

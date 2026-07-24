@@ -177,8 +177,8 @@ const DockerInstall: React.FC = () => (
     <TimelineStep number={2} title="Start the container" text="Run docker compose up -d from the repository root." />
     <TimelineStep number={3} title="Open the app" text="Visit the container's address on port 3000 (e.g. http://localhost:3000 or http://<host-ip>:3000)." isLast />
 
-    <CodeBlock>{`git clone <repository-url>
-cd casaboard
+    <CodeBlock>{`git clone https://github.com/element-software/CasaBoard.git
+cd CasaBoard
 docker compose up -d
 # then open http://localhost:3000`}</CodeBlock>
 
@@ -201,11 +201,14 @@ const HACSPanel: React.FC = () => (
       intro="A small companion panel lets you embed the running CasaBoard app directly in the Home Assistant sidebar, distributed as a custom HACS repository."
     />
 
-    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard GitHub repository as a custom repository (category: Integration). The repo must be public for HACS to fetch it." />
+    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add https://github.com/element-software/CasaBoard as a custom repository (category: Integration)." />
     <TimelineStep number={2} title="Install and restart" text="Install 'CasaBoard' from HACS, then restart Home Assistant." />
     <TimelineStep number={3} title="Add the integration" text="Settings → Devices & Services → Add Integration → CasaBoard. Enter the base URL of your running CasaBoard container (e.g. http://homeassistant.local:3000)." isLast />
 
-    <CodeBlock>{`# No YAML required — configure in the UI.
+    <CodeBlock>{`# Custom repository (HACS → Integrations → ⋮ → Custom repositories)
+# https://github.com/element-software/CasaBoard  ·  category: Integration
+#
+# No YAML required — configure in the UI.
 # Optional: call casaboard.refresh to re-poll /api/health.`}</CodeBlock>
 
     <Callout type="info" title="What the integration provides">
@@ -435,12 +438,27 @@ const Help: React.FC = () => (
     <div className="grid sm:grid-cols-2 gap-4">
       <div className="p-5 bg-white border border-slate-100 shadow-sm rounded-xl">
         <h3 className="font-semibold text-slate-900 mb-1">GitHub Issues</h3>
-        <p className="text-sm text-slate-500 mb-3">Report a bug or ask a question by opening an issue on the project's GitHub repository.</p>
+        <p className="text-sm text-slate-500 mb-3">Report a bug or ask a question on the public repository.</p>
+        <a
+          href="https://github.com/element-software/CasaBoard/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-violet-600 hover:text-violet-700"
+        >
+          github.com/element-software/CasaBoard/issues →
+        </a>
       </div>
       <div className="p-5 bg-white border border-slate-100 shadow-sm rounded-xl">
-        <h3 className="font-semibold text-slate-900 mb-1">Community</h3>
-        <p className="text-sm text-slate-500 mb-3">Join the community to share dashboards, get ideas, and find answers.</p>
-        <span className="text-sm text-slate-400 italic">Coming soon</span>
+        <h3 className="font-semibold text-slate-900 mb-1">Source & license</h3>
+        <p className="text-sm text-slate-500 mb-3">CasaBoard is free and MIT licensed. Browse the code, fork it, or open a pull request.</p>
+        <a
+          href="https://github.com/element-software/CasaBoard"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm font-medium text-violet-600 hover:text-violet-700"
+        >
+          github.com/element-software/CasaBoard →
+        </a>
       </div>
     </div>
 

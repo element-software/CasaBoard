@@ -39,12 +39,21 @@ export default function ContactPage() {
             We&apos;d love to hear from you
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            Have a question, feedback, or just want to say hello? Fill out the form and we&apos;ll get back to you.
+            Have a question or feedback? Use the form below, or open an issue on{" "}
+            <a
+              href="https://github.com/element-software/CasaBoard/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white underline underline-offset-2 hover:text-violet-100"
+            >
+              GitHub
+            </a>
+            {" "}— preferred for bugs.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { icon: mdiClockFast, label: "Quick response" },
-              { icon: mdiHeadset, label: "Friendly support" },
+              { icon: mdiClockFast, label: "No account needed" },
+              { icon: mdiHeadset, label: "Open source support" },
             ].map((badge) => (
               <div
                 key={badge.label}

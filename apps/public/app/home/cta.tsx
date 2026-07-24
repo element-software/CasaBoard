@@ -1,7 +1,8 @@
 "use client"
 import { Button, Link } from "@heroui/react";
 import { Icon } from "@mdi/react";
-import { mdiArrowRight, mdiInformation } from "@mdi/js";
+import { mdiArrowRight, mdiGithub } from "@mdi/js";
+import { GITHUB_REPO_URL } from "../lib/site";
 
 export const CTA = () => {
   return (
@@ -11,8 +12,8 @@ export const CTA = () => {
           Ready to Get Started?
         </h2>
         <p className="text-center text-violet-200 text-lg mb-8 max-w-2xl mx-auto">
-          Join smart home enthusiasts who want powerful dashboards without giving up control.
-          Free, open source, and self-hosted on your own hardware.
+          Free, MIT-licensed, and self-hosted. Install with Docker Compose, optionally
+          embed via HACS — no account, no tracking, no cost.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
@@ -22,17 +23,19 @@ export const CTA = () => {
             href="/docs"
             as={Link}
           >
-            Start Building Now
+            Read the docs
           </Button>
           <Button
             size="lg"
             variant="bordered"
             className="border-white/40 text-white font-semibold px-8 hover:bg-white/10"
-            startContent={<Icon path={mdiInformation} className="w-5 h-5" />}
-            href="/about"
+            startContent={<Icon path={mdiGithub} className="w-5 h-5" />}
+            href={GITHUB_REPO_URL}
             as={Link}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Learn More
+            Star on GitHub
           </Button>
         </div>
       </div>

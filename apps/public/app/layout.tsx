@@ -6,27 +6,27 @@ import { Providers } from "./providers";
 import { cn } from "@heroui/react";
 
 export const metadata = {
-  title: "CasaBoard — Smart Home Dashboard",
+  title: "CasaBoard — Local-Only Home Assistant Dashboards",
   description:
-    "Free, open-source, self-hosted dashboard builder for Home Assistant. Runs on your own hardware via Docker.",
+    "Free, MIT-licensed, privacy-first dashboard builder for Home Assistant. Self-hosted via Docker Compose or HACS — no account, no cloud, no tracking.",
   metadataBase: new URL("https://casaboard.dev"),
   icons: {
     icon: "/icon.svg",
   },
   manifest: "./manifest.webmanifest",
   openGraph: {
-    title: "CasaBoard — Smart Home Dashboard",
+    title: "CasaBoard — Local-Only Home Assistant Dashboards",
     description:
-      "Free, open-source, self-hosted dashboard builder for Home Assistant.",
+      "Free, open-source, privacy-first dashboards for Home Assistant. Docker Compose or HACS — no account, no tracking.",
     url: "https://casaboard.dev",
     siteName: "CasaBoard",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CasaBoard — Smart Home Dashboard",
+    title: "CasaBoard — Local-Only Home Assistant Dashboards",
     description:
-      "Free, open-source, self-hosted dashboard builder for Home Assistant.",
+      "Free, open-source, privacy-first dashboards for Home Assistant. Docker Compose or HACS — no account, no tracking.",
   },
 };
 

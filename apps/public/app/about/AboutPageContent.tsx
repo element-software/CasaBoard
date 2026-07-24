@@ -31,7 +31,16 @@ export default function AboutPageContent() {
               CasaBoard lets you design beautiful, fully custom smart home dashboards with a drag-and-drop editor — no coding required. It runs as a self-hosted Docker container alongside your own Home Assistant, and displays live entity data on any screen.
             </p>
             <p>
-              CasaBoard pages are URLs served from your own server. Embed them in a kiosk browser on your wall display, open them on a tablet in the kitchen, or embed the whole app in the Home Assistant sidebar with the HACS panel.
+              CasaBoard pages are URLs served from your own server. Embed them in a kiosk browser on your wall display, open them on a tablet in the kitchen, or embed the whole app in the Home Assistant sidebar with the HACS integration. Free, MIT-licensed, and open on{" "}
+              <a
+                href="https://github.com/element-software/CasaBoard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-600 hover:underline"
+              >
+                GitHub
+              </a>
+              .
             </p>
           </div>
         </div>
@@ -65,8 +74,8 @@ export default function AboutPageContent() {
               icon: mdiDocker,
               iconBg: "bg-indigo-50",
               iconColor: "text-indigo-600",
-              title: "Self-hosted with Docker",
-              desc: "Run CasaBoard with a single docker-compose file, right next to your Home Assistant instance. No account, no cloud, no ongoing cost.",
+              title: "Docker Compose or HACS",
+              desc: "Run CasaBoard with a single docker-compose file, then optionally install the HACS integration for a Home Assistant sidebar panel. No account, no cloud, no ongoing cost.",
             },
             {
               icon: mdiEye,
@@ -123,7 +132,7 @@ export default function AboutPageContent() {
             {[
               "Home Assistant connection stored as a local file on your server",
               "No proxy — CasaBoard talks directly to your Home Assistant instance",
-              "No account, no cloud sync, nothing sent to a third party",
+              "No account, no cloud sync, no analytics or tracking",
               "Dashboards, sidebars, and themes stored as JSON files you can back up yourself",
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">

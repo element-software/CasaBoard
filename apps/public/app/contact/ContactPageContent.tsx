@@ -52,7 +52,19 @@ export default function ContactPageContent() {
 
   return (
     <div className="py-16 pb-24">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="bg-violet-50 border border-violet-100 rounded-2xl p-5 text-sm text-slate-600">
+          Prefer GitHub?{" "}
+          <a
+            href="https://github.com/element-software/CasaBoard/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-violet-700 hover:underline"
+          >
+            Open an issue
+          </a>{" "}
+          on the public MIT-licensed repo — best for bugs and feature requests.
+        </div>
         {/* Form card */}
         <div className="bg-white border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/60">

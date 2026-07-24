@@ -34,7 +34,8 @@ export const Header = () => {
                     key={link.href}
                     as={Link}
                     href={link.href}
-                    rel={link.external ? "noopener noreferrer" : undefined}
+                    target={link.href.startsWith("http") ? "_blank" : undefined}
+                    rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     variant="light"
                     color="default"
                     size="sm"
@@ -78,8 +79,8 @@ export const Header = () => {
                 key={link.href}
                 as={Link}
                 href={link.href}
-                target={link.external ? "_blank" : undefined}
-                rel={link.external ? "noopener noreferrer" : undefined}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 variant="light"
                 color="default"
                 className="justify-start text-slate-600"
@@ -100,7 +101,7 @@ export const Header = () => {
               </a>
             </div>
             <div className="text-xs text-slate-500 text-center">
-              © {new Date().getFullYear()} CasaBoard. All rights reserved.
+              © {new Date().getFullYear()} CasaBoard. MIT licensed.
             </div>
             <div className="text-xs text-slate-500 text-center">
               Powered by{" "}

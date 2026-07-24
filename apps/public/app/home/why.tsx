@@ -8,6 +8,7 @@ import {
   mdiCodeTags,
   mdiDocker,
   mdiShieldLock,
+  mdiEyeOff,
 } from "@mdi/js";
 
 interface WhyFeature {
@@ -21,11 +22,19 @@ interface WhyFeature {
 const whyFeatures: WhyFeature[] = [
   {
     icon: mdiShieldLock,
-    title: "Self-hosted, always",
+    title: "Local-only, always",
     description:
       "CasaBoard runs on your own hardware. Your Home Assistant connection and dashboard layouts stay on your server — nothing is sent anywhere else.",
     highlight: "Your data, your server",
     color: "success",
+  },
+  {
+    icon: mdiEyeOff,
+    title: "Privacy-first, no tracking",
+    description:
+      "No analytics, no telemetry, no phone-home — in the app or on this site. We don't collect usage data because there's nothing to collect.",
+    highlight: "Zero telemetry",
+    color: "primary",
   },
   {
     icon: mdiCloudOffOutline,
@@ -36,6 +45,14 @@ const whyFeatures: WhyFeature[] = [
     color: "primary",
   },
   {
+    icon: mdiDocker,
+    title: "Docker Compose or HACS",
+    description:
+      "Run the app with one docker compose up, and optionally install the HACS integration to embed CasaBoard in the Home Assistant sidebar.",
+    highlight: "Two install paths",
+    color: "secondary",
+  },
+  {
     icon: mdiDrag,
     title: "Drag & drop editor",
     description:
@@ -44,26 +61,10 @@ const whyFeatures: WhyFeature[] = [
     color: "success",
   },
   {
-    icon: mdiDocker,
-    title: "Runs with Docker",
-    description:
-      "One docker-compose file gets you running. Works alongside any Home Assistant install — Core, Container, OS, or Supervised.",
-    highlight: "docker compose up",
-    color: "secondary",
-  },
-  {
-    icon: mdiPalette,
-    title: "Themeable",
-    description:
-      "Themes, layouts, and visual polish so your dashboards can look and feel like yours.",
-    highlight: "Fully customizable",
-    color: "warning",
-  },
-  {
     icon: mdiCodeTags,
-    title: "Open source",
+    title: "Open source (MIT)",
     description:
-      "The full source is on GitHub. Fork it, contribute, or just read how it works — no black box.",
+      "The full source is on public GitHub under the MIT license. Fork it, contribute, or just read how it works — no black box.",
     highlight: "Free & forkable",
     color: "success",
   },
@@ -81,8 +82,8 @@ export const Why = () => {
             Powerful dashboards, without giving up control
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            Free and open source, by design: your Home Assistant credentials and dashboards
-            never leave the server you run CasaBoard on.
+            Free forever: local-only, privacy-first, and MIT licensed. Your Home Assistant
+            credentials and dashboards never leave the server you run CasaBoard on.
           </p>
         </div>
 
@@ -128,7 +129,7 @@ export const Why = () => {
           <div className="bg-violet-50 border border-violet-100 rounded-2xl p-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                <Icon path={mdiCodeTags} className="w-5 h-5 text-violet-600" />
+                <Icon path={mdiPalette} className="w-5 h-5 text-violet-600" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">
                 No coding experience required

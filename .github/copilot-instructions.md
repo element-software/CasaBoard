@@ -181,12 +181,11 @@ npm run format
 - **Components**: Custom components registered for drag-and-drop page building
 - **Usage**: Import Puck config directly to keep server bundles clean
 
-### Analytics & Consent
+### Privacy
 
-- **Component**: `AnalyticsWrapper` (from `@repo/ui`)
-- **Loads**: Vercel Analytics, Google Analytics (after user consent)
-- **Consent**: `CookieConsent` component stores choice in `localStorage` as `casaboard-cookie-consent`
-- Primarily relevant to `apps/public`; see ROADMAP item 7 for whether to keep/remove
+- Neither `apps/app` nor `apps/public` loads analytics or tracking scripts
+- No cookie consent banner — there are no analytics cookies to consent to
+- Do not reintroduce Vercel Analytics, Google Analytics, or similar without an explicit product decision
 
 ### Event Listener Setup (Development Hack)
 

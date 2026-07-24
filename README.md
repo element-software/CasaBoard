@@ -87,10 +87,9 @@ Shared Tailwind + PostCSS lives in `packages/tailwind-config`. Each app:
 
 - Uses HeroUI Theme Provider and allows configuring the theme in `hero.ts` in the `tailwind-config` package.
 
-## Analytics & Consent
+## Privacy
 
-- `AnalyticsWrapper` loads Vercel Analytics and Google Analytics only after consent.
-- `CookieConsent` (HeroUI modal) persists choice in `localStorage` under `casaboard-cookie-consent`.
+Neither `apps/app` nor `apps/public` ships analytics or tracking. There is no cookie consent banner — the marketing site and the self-hosted app set no analytics cookies.
 
 ## Home Assistant Integration
 
