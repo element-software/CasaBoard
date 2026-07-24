@@ -1,4 +1,4 @@
-import { SidebarActions } from "@repo/lib";
+import { SidebarActions, requireValidHAConnection } from "@repo/lib";
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
 import { notFound } from "next/navigation";
 
@@ -14,6 +14,7 @@ interface SidebarEditPageProps {
 export default async function SidebarEditPage({
   params,
 }: SidebarEditPageProps) {
+  await requireValidHAConnection();
   const { slug } = await params;
 
   const sidebar = await SidebarActions.getSidebar(slug).catch(() => null);

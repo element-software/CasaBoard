@@ -1,4 +1,4 @@
-import { PageActions, SidebarActions } from "@repo/lib";
+import { PageActions, SidebarActions, requireValidHAConnection } from "@repo/lib";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
 import { notFound } from "next/navigation";
 
@@ -12,6 +12,7 @@ interface PageProps {
 }
 
 export default async function PageEdit({ params }: PageProps) {
+  await requireValidHAConnection();
   const { slug } = await params;
 
   const [page, sidebars] = await Promise.all([

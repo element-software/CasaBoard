@@ -1,5 +1,5 @@
 "use client";
-import { useEntity, useHA } from "@repo/ha";
+import { useEntity, useHA } from "@casaboard/ha";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";

@@ -6,7 +6,7 @@ import { mdiDevices } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import { Skeleton } from "@heroui/react";
-import { useEntity, useHA } from "@repo/ha";
+import { useEntity, useHA } from "@casaboard/ha";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 import { CardShell } from "../Shared/Card";
 
@@ -29,7 +29,7 @@ const TOGGLE_DOMAINS = new Set([
 ]);
 
 function statusLabel(
-  entity: NonNullable<ReturnType<typeof useEntity>>,
+  entity: { state?: unknown },
   domain: string
 ): string {
   const state = String(entity.state ?? "");

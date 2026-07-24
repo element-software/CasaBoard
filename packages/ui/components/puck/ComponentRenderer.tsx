@@ -47,7 +47,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({
 
     case "sensor":
       const sensorConfig = config as SensorConfig;
-      return <GraphCard entityId={sensorConfig.id} />;
+      return <GraphCard entityId={sensorConfig.id} showStatistics={false} />;
 
     case "entities_card":
       const entitiesCardConfig = config as EntitiesCardConfig;

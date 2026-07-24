@@ -6,7 +6,7 @@ import { useCallback, useState } from "react";
 import Popup from "../Popup";
 import { Entity } from "@repo/types/shared";
 import EntityCard from "./EntityCard";
-import { useHA } from "@repo/ha";
+import { useHA } from "@casaboard/ha";
 
 interface EntitiesCardProps {
   title: string;

@@ -2,12 +2,12 @@
 
 import { Light } from "../Light";
 import { Switch } from "../Switch";
-import { useEntity } from "@repo/ha";
+import { useEntity } from "@casaboard/ha";
 import { Skeleton } from "@heroui/react";
 import { useCallback, useState } from "react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 import { useEntityPress } from "@repo/hooks";
-import { useHA } from "@repo/ha";
+import { useHA } from "@casaboard/ha";
 import { CardShell, IconBubble } from "../Shared/Card";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { EntityControlModal } from "../EntityControlModal";

@@ -1,5 +1,5 @@
 "use client";
-import { useEntity, useHA } from "@repo/ha";
+import { useEntity, useHA } from "@casaboard/ha";
 import { Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiPower } from "@mdi/js";

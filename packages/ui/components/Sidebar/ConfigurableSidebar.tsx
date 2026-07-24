@@ -1,5 +1,5 @@
 "use client";
-import { useEntity } from "@repo/ha";
+import { useEntity } from "@casaboard/ha";
 import Clock from "@repo/ui/components/Clock/index";
 import Thermostat from "@repo/ui/components/Thermostat/index";
 import Image from "next/image";

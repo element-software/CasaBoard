@@ -1,9 +1,19 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { clientLogger } from "@repo/lib";
-import { Connection, getStates, subscribeEntities, Auth } from "home-assistant-js-websocket";
-import { connect } from "../connection";
-import { HAConnection } from "@repo/types/ha";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import {
+  Connection,
+  getStates,
+  subscribeEntities,
+  Auth,
+} from "home-assistant-js-websocket";
+import { connect, type HATokenStore } from "../connection";
+import { HAConnection } from "../types";
 
 export interface HAContextType {
   connection: Connection | null;
@@ -33,11 +43,18 @@ const HAContext = createContext<HAContextType>({
 
 export interface HAProviderProps {
   haInstance: HAConnection;
+  tokenStore: HATokenStore;
+  redirectUrl?: string;
   children: ReactNode;
   fallback?: ReactNode;
 }
 
-export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fallback = null }) => {
+export const HAProvider: React.FC<HAProviderProps> = ({
+  haInstance,
+  tokenStore,
+  redirectUrl,
+  children,
+}) => {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [auth, setAuth] = useState<Auth | null>(null);
   const [entities, setEntities] = useState<{ [entityId: string]: any }>({});
@@ -51,13 +68,14 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     setLoading(true);
     setError(null);
     try {
-      clientLogger.info('HAProvider', `connecting to Home Assistant at ${haInstance.hass_url}`);
-      const { connection: activeConnection, auth: activeAuth } = await connect({ haInstance });
-      clientLogger.info('HAProvider', 'connected to Home Assistant', activeConnection);
+      const { connection: activeConnection, auth: activeAuth } = await connect({
+        haInstance,
+        tokenStore,
+        redirectUrl,
+      });
       setConnection(activeConnection);
       setAuth(activeAuth);
 
-      // Initial states
       const initial = await getStates(activeConnection);
       const initialMap = initial.reduce((acc: any, s: any) => {
         acc[s.entity_id] = s;
@@ -65,19 +83,26 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
       }, {} as Record<string, any>);
       setEntities(initialMap);
 
-      // Live updates
       unsubscribe = subscribeEntities(activeConnection, (ents) => {
         setEntities(ents as any);
       });
 
       setLoading(false);
     } catch (e: any) {
-      setError(e);
+      const classified =
+        e instanceof Error
+          ? e
+          : new Error(
+              typeof e?.message === "string"
+                ? e.message
+                : "Home Assistant connection failed"
+            );
+      // Preserve typed HAConnectionError when thrown from connect()
+      setError(classified);
       setConnection(null);
       setAuth(null);
       setEntities({});
       setLoading(false);
-      clientLogger.error('HAProvider', 'error', e);
     }
 
     return unsubscribe;
@@ -98,13 +123,14 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
       setAuth(null);
       setEntities({});
     };
-  }, [haInstance.hass_url, retryCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect on url / retry / token store identity
+  }, [haInstance.hass_url, retryCount, tokenStore, redirectUrl]);
 
   const getEntityById = (entityId: string) => entities[entityId];
   const getAllEntities = () => Object.values(entities);
 
   const retry = () => {
-    setRetryCount(prev => prev + 1);
+    setRetryCount((prev) => prev + 1);
   };
 
   return (

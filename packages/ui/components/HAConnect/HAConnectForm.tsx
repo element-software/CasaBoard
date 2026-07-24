@@ -1,13 +1,35 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Button, Card, CardBody, CardHeader, Chip, Input } from "@heroui/react";
+import { useState, useTransition, useMemo, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Card, CardBody, CardHeader, Chip, Input, Tab, Tabs } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiCheckCircle, mdiAlertCircle, mdiHomeAssistant } from "@mdi/js";
-import { HAConnectionActions } from "@repo/lib";
-import { reauthenticate, useHA } from "@repo/ha";
+import {
+  HAConnectionActions,
+  createServerTokenStore,
+} from "@repo/lib";
+import {
+  classifyConnectionError,
+  normalizeHassUrl,
+  oauthRedirectUrl,
+  reauthenticate,
+  testLongLivedTokenConnection,
+  useHA,
+  type HAConnectionFailure,
+} from "@casaboard/ha";
 import type { HAConnection } from "@repo/types/ha";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
+
+function useIsOAuthCallback(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("auth_callback"),
+    () => false
+  );
+}
 
 function ConnectionStatus({ haInstance }: { haInstance: HAConnection }) {
   const { connected, entities } = useHA();
@@ -34,26 +56,73 @@ function ConnectionStatus({ haInstance }: { haInstance: HAConnection }) {
   );
 }
 
+function FailureBanner({ failure }: { failure: HAConnectionFailure }) {
+  return (
+    <div
+      role="alert"
+      className="p-3 bg-red-100 border border-red-300 rounded text-red-700 text-sm"
+      data-failure-code={failure.code}
+    >
+      {failure.message}
+    </div>
+  );
+}
+
 export interface HAConnectFormProps {
   compact?: boolean;
   initialConnection: HAConnection | null;
 }
 
 export function HAConnectForm({ compact = false, initialConnection }: HAConnectFormProps) {
+  const router = useRouter();
+  // Avoid racing CleanAuthUrl: don't open a second getAuth while the code is exchanged.
+  const oauthReturning = useIsOAuthCallback();
   const [hassUrl, setHassUrl] = useState(initialConnection?.hass_url ?? "");
+  const [token, setToken] = useState("");
+  const [method, setMethod] = useState<"token" | "oauth">("token");
   const [connection, setConnection] = useState<HAConnection | null>(initialConnection);
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<HAConnectionFailure | null>(null);
 
-  const onConnect = () => {
-    setError(null);
-    const formattedUrl = `http://${hassUrl}`;
+  const tokenStore = useMemo(() => createServerTokenStore(), []);
+  const redirectUrl = useMemo(() => oauthRedirectUrl("/setup/ha-config"), []);
+
+  const onConnectWithToken = () => {
+    setFailure(null);
     startTransition(async () => {
+      const result = await testLongLivedTokenConnection(hassUrl, token);
+      if (!result.ok) {
+        setFailure(result.failure);
+        return;
+      }
       try {
-        await HAConnectionActions.saveHAConnection(formattedUrl, null);
-        setConnection({ hass_url: formattedUrl });
+        await HAConnectionActions.saveHAConnection(result.hassUrl, result.auth);
+        setConnection({ hass_url: result.hassUrl });
+        setToken("");
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to save connection");
+        setFailure(classifyConnectionError(e));
+      }
+    });
+  };
+
+  const onConnectWithOAuth = () => {
+    setFailure(null);
+    startTransition(async () => {
+      const normalized = normalizeHassUrl(hassUrl);
+      if (!normalized.ok) {
+        setFailure(normalized.failure);
+        return;
+      }
+      try {
+        await HAConnectionActions.saveHAConnection(normalized.url, null);
+        setConnection({ hass_url: normalized.url });
+        await reauthenticate({
+          haInstance: { hass_url: normalized.url },
+          tokenStore,
+          redirectUrl,
+        });
+      } catch (e) {
+        setFailure(classifyConnectionError(e));
       }
     });
   };
@@ -63,6 +132,9 @@ export function HAConnectForm({ compact = false, initialConnection }: HAConnectF
       await HAConnectionActions.clearHAConnection();
       setConnection(null);
       setHassUrl("");
+      setToken("");
+      router.replace("/onboarding");
+      router.refresh();
     });
   };
 
@@ -70,9 +142,13 @@ export function HAConnectForm({ compact = false, initialConnection }: HAConnectF
     if (!connection) return;
     startTransition(async () => {
       try {
-        await reauthenticate({ haInstance: connection });
+        await reauthenticate({
+          haInstance: connection,
+          tokenStore,
+          redirectUrl,
+        });
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to re-authenticate");
+        setFailure(classifyConnectionError(e));
       }
     });
   };
@@ -93,32 +169,69 @@ export function HAConnectForm({ compact = false, initialConnection }: HAConnectF
         </div>
       </CardHeader>
       <CardBody className="space-y-4">
-        {error && (
-          <div className="p-3 bg-red-100 border border-red-300 rounded text-red-700 text-sm">
-            {error}
-          </div>
-        )}
+        {failure && <FailureBanner failure={failure} />}
 
         {!connection ? (
           <div className="grid gap-3">
             <Input
               label="Home Assistant URL"
               value={hassUrl}
-              onChange={(e) => setHassUrl(e.target.value)}
-              description="e.g. your-domain.com, homeassistant.local:8123, or 192.168.1.x:8123 — protocol optional, defaults to http:// if omitted"
-              placeholder="your-domain.com or 192.168.1.x:8123"
+              onValueChange={(v) => {
+                setHassUrl(v);
+                setFailure(null);
+              }}
+              description="e.g. homeassistant.local:8123 — protocol optional, defaults to http://"
+              placeholder="homeassistant.local:8123"
             />
-            <div className="flex justify-end">
-              <Button
-                color="primary"
-                onPress={onConnect}
-                isDisabled={!hassUrl}
-                isLoading={isPending}
-              >
-                Connect
-              </Button>
-            </div>
+            <Tabs
+              selectedKey={method}
+              onSelectionChange={(key) => {
+                setMethod(key as "token" | "oauth");
+                setFailure(null);
+              }}
+              aria-label="Authentication method"
+              classNames={{ panel: "pt-2" }}
+            >
+              <Tab key="token" title="Access token">
+                <div className="grid gap-3">
+                  <Input
+                    label="Long-lived access token"
+                    type="password"
+                    value={token}
+                    onValueChange={(v) => {
+                      setToken(v);
+                      setFailure(null);
+                    }}
+                    description="HA → Profile → Long-lived access tokens"
+                  />
+                  <div className="flex justify-end">
+                    <Button
+                      color="primary"
+                      onPress={onConnectWithToken}
+                      isDisabled={!hassUrl.trim() || !token.trim()}
+                      isLoading={isPending}
+                    >
+                      Connect
+                    </Button>
+                  </div>
+                </div>
+              </Tab>
+              <Tab key="oauth" title="Sign in with HA">
+                <div className="flex justify-end">
+                  <Button
+                    color="primary"
+                    onPress={onConnectWithOAuth}
+                    isDisabled={!hassUrl.trim()}
+                    isLoading={isPending}
+                  >
+                    Continue to Home Assistant
+                  </Button>
+                </div>
+              </Tab>
+            </Tabs>
           </div>
+        ) : oauthReturning ? (
+          <p className="text-sm text-foreground-500">Completing sign-in…</p>
         ) : (
           <HassConnectWrapper haInstance={connection}>
             <div className="flex items-center justify-between gap-4 flex-wrap">

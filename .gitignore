@@ -27,7 +27,7 @@ coverage
 out/
 build
 dist
-
+/publish/
 
 # Debug
 npm-debug.log*
@@ -38,6 +38,6 @@ yarn-error.log*
 .DS_Store
 *.pem
 
-apps/app/data
+apps/app/data/**/*
 __pycache__/
 *.py[cod]

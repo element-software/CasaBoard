@@ -1,23 +1,46 @@
-import { ConnectResult, EntityDomain, EntityId } from "../types/index";
-import { serverLogger, HAConnectionActions } from "@repo/lib";
-import { LinkService } from "@repo/lib";
+import type { Auth, LoadTokensFunc, SaveTokensFunc } from "home-assistant-js-websocket";
 import {
   getAuth,
   createConnection,
+  createLongLivedTokenAuth,
   ERR_HASS_HOST_REQUIRED,
   ERR_INVALID_AUTH,
 } from "home-assistant-js-websocket";
-import type {
-  Auth,
-  AuthData,
-  Connection,
-  LoadTokensFunc,
-  SaveTokensFunc,
-} from "home-assistant-js-websocket";
-import { HAConnection } from "@repo/types/ha";
+import type { ConnectResult, EntityDomain, EntityId, HAConnection } from "../types";
+import type { HATokenStore } from "./tokenStore";
+import {
+  classifyConnectionError,
+  haConnectionFailure,
+  throwConnectionFailure,
+} from "./errors";
+
+export type { HATokenStore } from "./tokenStore";
+export { createLocalStorageTokenStore } from "./tokenStore";
+export {
+  classifyConnectionError,
+  haConnectionFailure,
+  HAConnectionError,
+  throwConnectionFailure,
+  type HAConnectionFailure,
+  type HAConnectionFailureCode,
+} from "./errors";
+export { normalizeHassUrl, type NormalizeHassUrlResult } from "./normalizeUrl";
+export {
+  testLongLivedTokenConnection,
+  type TestLongLivedTokenResult,
+} from "./testConnection";
+export {
+  completeOAuthCallback,
+  isOAuthCallbackUrl,
+  oauthRedirectUrl,
+} from "./oauth";
 
 export interface HAConnectProps {
   haInstance: HAConnection;
+  /** Required: how to persist HA OAuth / long-lived tokens. */
+  tokenStore: HATokenStore;
+  /** OAuth redirect target after Home Assistant auth. */
+  redirectUrl?: string;
 }
 
 function normalizeNameToSlug(name: string): string {
@@ -41,7 +64,7 @@ function buildEntityId(name: string, domain: EntityDomain): EntityId {
 export async function getEntity(
   name: string,
   domain: EntityDomain,
-  connection: Connection
+  connection: import("home-assistant-js-websocket").Connection
 ): Promise<any> {
   const entityId = buildEntityId(name, domain);
   const states = (await connection.sendMessagePromise({
@@ -53,82 +76,80 @@ export async function getEntity(
   return states.find((s) => s.entity_id === entityId) ?? null;
 }
 
-function makeSaveTokens(hass_url: string): SaveTokensFunc {
-  return async (data: AuthData | null) => {
-    await HAConnectionActions.saveHAConnection(hass_url, data);
+function buildAuthOptions(
+  haInstance: HAConnection,
+  tokenStore: HATokenStore,
+  redirectUrl?: string
+) {
+  const saveTokens: SaveTokensFunc = tokenStore.saveTokens(haInstance.hass_url);
+  const loadTokens: LoadTokensFunc = tokenStore.loadTokens;
+  return {
+    hassUrl: haInstance.hass_url,
+    saveTokens,
+    loadTokens,
+    ...(redirectUrl ? { redirectUrl } : {}),
   };
-}
-
-async function loadTokens(): Promise<AuthData | null> {
-  return HAConnectionActions.getHAAuthData();
 }
 
 export async function connect({
   haInstance,
+  tokenStore,
+  redirectUrl,
 }: HAConnectProps): Promise<ConnectResult> {
   let auth: Auth | undefined;
-  let connection: Connection | undefined;
+  let connection: import("home-assistant-js-websocket").Connection | undefined;
 
-  const getAuthOptions = {
-    hassUrl: haInstance.hass_url,
-    saveTokens: makeSaveTokens(haInstance.hass_url),
-    loadTokens: loadTokens as unknown as LoadTokensFunc,
-    redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
-  };
+  const stored = (await Promise.resolve(tokenStore.loadTokens())) ?? null;
+  const longLivedToken = stored?.access_token;
+  if (longLivedToken && !stored?.refresh_token) {
+    auth = createLongLivedTokenAuth(haInstance.hass_url, longLivedToken);
+    connection = await createConnection({ auth });
+    return { connection, auth };
+  }
 
-  // Try to get auth, retry if invalid or host required
+  const getAuthOptions = buildAuthOptions(haInstance, tokenStore, redirectUrl);
+
   try {
     auth = await getAuth(getAuthOptions);
-    serverLogger.info("connect", "got auth", auth);
   } catch (err) {
-    serverLogger.warn("connect", "getAuth error", err);
     if (err === ERR_INVALID_AUTH || err === ERR_HASS_HOST_REQUIRED) {
       try {
         auth = await getAuth(getAuthOptions);
-        serverLogger.info("connect", "retried getAuth", auth);
       } catch (err2) {
-        serverLogger.error("connect", "getAuth failed after retry", err2);
-        throw new Error(`Home Assistant auth failed: ${err2}`);
+        throwConnectionFailure(err2);
       }
     } else {
-      throw new Error(`Home Assistant auth failed: ${err}`);
+      throwConnectionFailure(err);
     }
   }
 
-  // Try to create connection
   try {
-    if (!auth) throw new Error("No auth available for connection");
+    if (!auth) throwConnectionFailure(haConnectionFailure("unknown"));
     connection = await createConnection({ auth });
   } catch (err) {
-    serverLogger.error("connect", "createConnection error", err);
-    throw new Error(`Home Assistant connection failed: ${err}`);
+    throwConnectionFailure(err);
   }
 
   return { connection, auth };
 }
 
 /**
- * Re-authenticates the single Home Assistant connection.
- * Forces a fresh OAuth flow instead of reusing the stored token, but keeps
- * the stored hass_url so the flow resumes automatically after redirect-back.
+ * Re-authenticates the Home Assistant connection.
+ * Forces a fresh OAuth flow instead of reusing the stored token.
  */
 export async function reauthenticate({
   haInstance,
+  tokenStore,
+  redirectUrl,
 }: HAConnectProps): Promise<void> {
-  let auth: Auth | undefined;
-
   const getAuthOptions = {
-    hassUrl: haInstance.hass_url,
-    saveTokens: makeSaveTokens(haInstance.hass_url),
-    loadTokens: (async () => null) as unknown as LoadTokensFunc,
-    redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
+    ...buildAuthOptions(haInstance, tokenStore, redirectUrl),
+    loadTokens: (async () => null) as LoadTokensFunc,
   };
 
   try {
-    auth = await getAuth(getAuthOptions);
-    serverLogger.info("reauthenticate", "got new auth");
+    await getAuth(getAuthOptions);
   } catch (err) {
-    serverLogger.error("reauthenticate", "getAuth error", err);
-    throw new Error(`Home Assistant re-authentication failed: ${err}`);
+    throwConnectionFailure(err);
   }
 }

@@ -5,7 +5,7 @@ import Icon from "@mdi/react";
 import { mdiLightbulb } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { CardShell, IconBubble } from "../Shared/Card";
-import { useEntity } from "@repo/ha";
+import { useEntity } from "@casaboard/ha";
 import { useEntityPress } from "@repo/hooks";
 import { useLightLoading, useLightController } from "./useLight";
 import { EntityControlModal } from "../EntityControlModal";

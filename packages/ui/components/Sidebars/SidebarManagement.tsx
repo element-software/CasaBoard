@@ -126,11 +126,11 @@ export const SidebarManagement = ({
             </p>
             <Button
               as={Link}
-              href="/setup/ha-config"
+              href="/onboarding"
               color="primary"
               startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
             >
-              Add Home Assistant Instance
+              Connect Home Assistant
             </Button>
             </>
           ) : (

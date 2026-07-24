@@ -8,7 +8,7 @@ import {
   VictoryVoronoiContainer,
 } from "victory";
 import { useId, useMemo } from "react";
-import { toChartDate } from "@repo/ha";
+import { toChartDate } from "@casaboard/ha";
 import classNames from "classnames";
 
 interface GraphCardProps {
@@ -55,7 +55,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
   }, [data?.entityHistory]);
 
   const domainY = useMemo(
-    () => yDomainFor(processedData.map((d) => d.y)),
+    () => yDomainFor(processedData.map((d: { y: number }) => d.y)),
     [processedData]
   );
 

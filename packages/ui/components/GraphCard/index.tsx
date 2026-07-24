@@ -1,4 +1,4 @@
-import { useEntity, useEntityHistory } from "@repo/ha";
+import { useEntity, useEntityHistory } from "@casaboard/ha";
 import Graph from "./Graph";
 import Icon from "@mdi/react";
 import { mdiAlert } from "@mdi/js";

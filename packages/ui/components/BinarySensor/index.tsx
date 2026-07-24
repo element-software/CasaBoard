@@ -4,7 +4,7 @@ import { mdiMotionSensor } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import { CardShell, IconBubble } from "../Shared/Card";
-import { useEntity } from "@repo/ha";
+import { useEntity } from "@casaboard/ha";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
