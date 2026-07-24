@@ -69,7 +69,9 @@ jobs:
           category: plugin
           # brands/images: optional for a custom (non-default-store) repo.
           # hacsjson: ignored while the repo is private — HACS fetches hacs.json
-          # from raw.githubusercontent.com without auth. Remove `hacsjson` from
-          # ignore once the repo is public (see ROADMAP item 2 / item 6).
-          ignore: brands images hacsjson
+          # from raw.githubusercontent.com without auth. Remove once public.
+          # license: GitHub only reports license metadata from the default
+          # branch; the validate-layout job checks LICENSE is present. Remove
+          # once this lands on main.
+          ignore: brands images hacsjson license
           comment: false

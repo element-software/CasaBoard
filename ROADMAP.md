@@ -23,7 +23,7 @@ Done (2026-07-24):
 - Corrected install docs to use `/hacsfiles/CasaBoard/casaboard-panel.js` (matches the GitHub repo name).
 - Repo topics/description updated for HACS discoverability.
 
-Remaining for end-user install: HACS only works with **public** GitHub repos. This repo is still private — make it public (coordinate with item 6 / history rewrite) and then drop `hacsjson` from the workflow `ignore` list so the official action validates the manifest over the network.
+Remaining for end-user install: HACS only works with **public** GitHub repos. This repo is still private — make it public (coordinate with item 6 / history rewrite), merge so GitHub detects `LICENSE` on the default branch, then drop `hacsjson` and `license` from the workflow `ignore` list.
 
 ## 3. Publish pages to a configurable path
 
