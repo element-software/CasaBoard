@@ -11,7 +11,7 @@
           "scan_interval": "Status poll interval (seconds)"
         },
         "data_description": {
-          "url": "Base URL of CasaBoard, e.g. http://homeassistant.local:3000 or http://casaboard:3000 on the HA Docker network."
+          "url": "Base URL of your running CasaBoard instance, including port if needed."
         }
       }
     },

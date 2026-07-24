@@ -82,9 +82,9 @@ jobs:
         with:
           category: integration
           # brands: default-store requirement; skip for custom repo until brands PR.
-          # hacsjson: ignored while the repo is private (raw.githubusercontent.com).
+          # hacsjson / integration_manifest: ignored while private (raw.githubusercontent.com).
           # license: GitHub only reports license from the default branch.
-          ignore: brands images hacsjson license
+          ignore: brands images hacsjson license integration_manifest
           comment: false
 
   validate-hassfest:
