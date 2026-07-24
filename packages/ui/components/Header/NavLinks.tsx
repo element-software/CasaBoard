@@ -35,6 +35,6 @@ export const getPublicLinks = (): NavLink[] => [
   },
 ];
 
-export const getPrivateLinks = (): NavLink[] => [
+export const getAppLinks = (): NavLink[] => [
   { href: LinkService.crossAppHref("app", "/setup"), label: "Setup" },
 ];

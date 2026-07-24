@@ -11,10 +11,9 @@ export interface CasaBoardLogoProps {
  * CasaBoard Logo Component
  *
  * Usage examples:
- * - Header: <CasaBoardLogo variant="dark" size="small" />
- * - Login page: <CasaBoardLogo size="large" variant="light" stacked={true} />
- * - Icon only: <CasaBoardLogo iconOnly={true} size="small" />
- * - Dark theme: <CasaBoardLogo variant="dark" size="medium" />
+ * - Header: <CasaBoardLogo size="small" />
+ * - Large: <CasaBoardLogo size="large" />
+ * - Medium (default): <CasaBoardLogo size="medium" />
  */
 
 const url =

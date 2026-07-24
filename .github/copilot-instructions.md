@@ -2,18 +2,19 @@
 
 ## Project Overview
 
-CasaBoard is a **cloud-hosted smart-home dashboard for Home Assistant**, delivered as DaaS (Dashboard-as-a-Service). This is a **Turbo monorepo** with ~196 TypeScript/TSX files containing:
+CasaBoard is an **open-source, self-hosted dashboard builder for Home Assistant**.
+This is a **Turbo monorepo** with TypeScript/TSX apps and shared packages:
 
 - **2 Next.js 15+ apps** (App Router) with React 19
-- **10 shared packages** for UI components, utilities, types, and services
-- **Total size**: ~790MB with dependencies
+- **Shared packages** for UI components, HA integration, utilities, types, and local persistence
+- No account, no cloud auth, no multi-tenant SaaS layer — data lives as JSON under `DATA_DIR`
 
 **Technology Stack:**
 
-- **Runtime**: Node 18+ (tested with v20.19.5), npm 10+ (tested with v10.8.2)
+- **Runtime**: Node 18+ (tested with v20), npm 10+
 - **Framework**: Next.js 15.5+ with Turbopack
 - **UI**: HeroUI components, Tailwind CSS v4, Material & Hero Icons
-- **State/Auth**: Supabase (authentication, database)
+- **Persistence**: Flat JSON files via `@repo/lib/store` (no database)
 - **Page Builder**: Puck editor (@measured/puck)
 - **Home Assistant**: home-assistant-js-websocket library
 - **Build Tool**: Turbo (monorepo orchestration)
@@ -23,21 +24,22 @@ CasaBoard is a **cloud-hosted smart-home dashboard for Home Assistant**, deliver
 
 ### Apps (`/apps`)
 
-- **`apps/app`** - Main authenticated dashboard (port 3000)
-  - Routes: `/(authenticated)`, `/auth`, `/setup`, `/config`, `/dashboard/[page]`
-  - Environment: `.env.local` (Supabase keys, Google OAuth)
-  - Middleware: Custom auth protection via `@repo/lib/SupabaseMiddleware`
-- **`apps/public`** - Marketing/landing site (port 3001)
-  - No environment variables needed (marketing only)
+- **`apps/app`** - Dashboard builder (port 3000); this is what the Docker image runs
+  - Routes: `/(header)/setup/*`, `/(immersive)/setup/*`, `/dashboard/[page]`, `/api/pages`
+  - Environment: optional `DATA_DIR`, `PORT`; HA connection stored in `DATA_DIR/ha-connection.json`
+  - No auth middleware — local-only, no login gate
+- **`apps/public`** - Documentation / project site (port 3001); not part of the Docker image
+  - Optional `RESEND_API_KEY` for the contact form only
+  - Must not depend on `apps/app` at build or runtime (shared `@repo/*` packages only)
 
 ### Packages (`/packages`)
 
-- **`ui`** - 72 component files (HeroUI, Puck, shared widgets)
+- **`ui`** - Shared UI components (HeroUI, Puck, shared widgets)
   - Components: Clock, Light, Toggle, Switch, Alarm, Sidebars, GraphCard, EntityAutocomplete, Puck editor configs
-- **`lib`** - Services, Supabase clients, actions, encryption, logging
-  - Services: subscriptionService, billingService
-  - Actions: pageActions, haInstanceActions (CRUD with plan limit checks)
-- **`types`** - Shared TypeScript types (ha.ts, page.ts, subscription.ts, user.ts, etc.)
+- **`lib`** - Actions, services, JSON-file store, theme/style helpers, logging
+  - Actions: pageActions, sidebarActions, themeActions, haConnectionActions
+  - Services: configService, linkService (cross-origin hrefs between app and public)
+- **`types`** - Shared TypeScript types (ha.ts, page.ts, sidebar.ts, theme.ts, style.ts, shared.ts)
 - **`hooks`** - Shared React hooks (theme, pages, etc.)
 - **`utils`** - Entity utilities (lights, binary sensors, icons, alarm, tools)
 - **`ha`** - Home Assistant websocket integration
@@ -45,7 +47,6 @@ CasaBoard is a **cloud-hosted smart-home dashboard for Home Assistant**, deliver
 - **`eslint-config`** - ESLint flat configs (base.js, next.js, react-internal.js)
 - **`typescript-config`** - Shared TypeScript config (base.json)
 - **`config`** - Miscellaneous config exports
-- **`middleware.ts`** - Reusable auth middleware logic (also exists in `apps/app`)
 
 ### Configuration Files (Root)
 
@@ -139,21 +140,15 @@ npm run format
 
 ## Environment Setup
 
-### Required for `apps/app` (.env.local)
+### Optional for `apps/app`
 
-Create `apps/app/.env.local` with:
+- `DATA_DIR` – JSON data directory (defaults to `./data`; Docker uses `/data`)
+- `PORT` – defaults to `3000`
+- `NEXT_PUBLIC_APP_ORIGIN` / `NEXT_PUBLIC_PUBLIC_ORIGIN` – optional cross-app link origins
 
-```
-NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=<your-key>
-SUPABASE_SECRET_KEY=<your-secret>
-GOOGLE_CLIENT_ID=<your-google-client-id>
-GOOGLE_CLIENT_SECRET=<your-google-client-secret>
-```
+### Optional for `apps/public`
 
-### Required for `apps/public`
-
-**None** - marketing site runs without environment variables.
+- `RESEND_API_KEY` – contact form email delivery
 
 ### Turbo Environment
 
@@ -174,14 +169,11 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
   - Each app has `postcss.config.js` re-exporting `@repo/tailwind-config/postcss`
   - `@source` globs in CSS include that app's files + `packages/ui`
 
-### Authentication & Middleware
+### Auth model
 
-- **Primary middleware**: `apps/app/middleware.ts`
-  - Protects routes: `/setup`, `/config`, `/api/pages`, top-level authenticated routes
-  - Uses `@repo/lib/SupabaseMiddleware.createClient` for auth state
-  - Redirects unauthenticated users to `/auth/login?redirectTo=<path>`
-- **Secondary middleware**: `packages/middleware.ts` (similar logic, may be legacy)
-- **Session refresh**: Middleware refreshes Supabase session for Server Components
+- CasaBoard itself has **no user accounts and no auth middleware**
+- Home Assistant OAuth / long-lived tokens live in `packages/ha` + `ha-connection.json`
+- Do not reintroduce SaaS-era login, billing, or multi-tenant gates
 
 ### Puck Page Editor
 
@@ -194,6 +186,7 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 - **Component**: `AnalyticsWrapper` (from `@repo/ui`)
 - **Loads**: Vercel Analytics, Google Analytics (after user consent)
 - **Consent**: `CookieConsent` component stores choice in `localStorage` as `casaboard-cookie-consent`
+- Primarily relevant to `apps/public`; see ROADMAP item 7 for whether to keep/remove
 
 ### Event Listener Setup (Development Hack)
 
@@ -259,7 +252,7 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 **App configs:**
 
-- `apps/app/next.config.js`, `apps/app/middleware.ts`, `apps/app/tsconfig.json`, `apps/app/postcss.config.js`
+- `apps/app/next.config.js`, `apps/app/tsconfig.json`, `apps/app/postcss.config.js`
   - **Note**: No eslint.config.js in apps/app (uses `next lint` which prompts for setup)
 - `apps/public/next.config.js`, `apps/public/eslint.config.js`, `apps/public/tsconfig.json`, `apps/public/postcss.config.js`
 
@@ -271,10 +264,10 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 **Key source files:**
 
-- `apps/app/app/layout.tsx` (root layout, font import, AnalyticsWrapper)
-- `apps/app/middleware.ts` (auth protection logic)
+- `apps/app/app/layout.tsx` (root layout)
 - `packages/ui/components/puck/puck.config.tsx` (Puck editor config)
-- `packages/lib/index.ts` (exports services, Supabase clients)
+- `packages/lib/index.ts` (exports actions, services, store helpers)
+- `packages/ha/connection/index.ts` (Home Assistant connect / reauthenticate)
 
 ## Instructions for Agents
 
@@ -284,5 +277,5 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 - **Expect type-checking issues** in packages without tsconfig.json; this is a known limitation.
 - **Be aware of network dependencies** (Google Fonts) when building.
 - **Use Turbo workspace filtering** for single-app development: `--workspace=app` or `--workspace=public`.
-- **Check for environment variables** if the app behaves unexpectedly (Supabase, Google OAuth).
-- **Consult the README** for high-level context; this file provides operational details.
+- **Do not assume Supabase, Stripe, login, or billing** — those are removed SaaS leftovers.
+- **Consult the README and ROADMAP** for product positioning and remaining work.

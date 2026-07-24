@@ -9,10 +9,10 @@ Mostly in place already:
 - `Dockerfile` + `docker-compose.yml` build and run `apps/app` standalone, data bind-mounted to `./data`.
 - README already states no-account/no-cloud/no-login.
 
-Remaining cleanup:
-- Route groups still named `(authenticated)` under `apps/app/app/` — a leftover from the SaaS version. Rename/flatten now that there's no auth gate, so the routing doesn't imply a login flow that doesn't exist.
-- Audit `packages/lib`, `packages/types`, and API routes for any other SaaS-era naming or dead code (multi-tenant assumptions, auth checks that always pass, etc.).
-- Confirm `apps/public` has zero build/runtime dependency on `apps/app` (it's already excluded from the Docker image per the README, just needs verifying).
+Done (2026-07-24):
+- Flattened `(authenticated)` route group → `(header)`, `(immersive)`, `dashboard` live directly under `apps/app/app/`.
+- Removed dead SaaS-era `Profile` type (`packages/types/user.ts`), Login/billing breadcrumb leftovers, Stripe env in `apps/public`, and stale Supabase/auth docs.
+- Confirmed `apps/public` has no package or import dependency on `apps/app` (shared `@repo/*` only; Docker builds only `apps/app`).
 
 ## 2. HACS install
 

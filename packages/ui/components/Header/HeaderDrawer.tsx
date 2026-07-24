@@ -8,7 +8,7 @@ import {
   DrawerFooter,
 } from "@heroui/react";
 import Link from "next/link";
-import { getPublicLinks, getPrivateLinks } from "./NavLinks";
+import { getPublicLinks, getAppLinks } from "./NavLinks";
 interface HeaderDrawerProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,7 +21,7 @@ export function HeaderDrawer({
   isPublic,
 }: HeaderDrawerProps) {
   const publicLinks = getPublicLinks();
-  const privateLinks = getPrivateLinks();
+  const appLinks = getAppLinks();
 
   return (
     <Drawer
@@ -49,22 +49,19 @@ export function HeaderDrawer({
               {link.label}
             </Button>
           ))}
-          {!isPublic && (
-            <>
-              {privateLinks.map((link) => (
-                <Button
-                  key={link.href}
-                  as={Link}
-                  href={link.href}
-                  variant="light"
-                  className="justify-start text-theme-text"
-                  onPress={() => onOpenChange(false)}
-                >
-                  {link.label}
-                </Button>
-              ))}
-            </>
-          )}
+          {!isPublic &&
+            appLinks.map((link) => (
+              <Button
+                key={link.href}
+                as={Link}
+                href={link.href}
+                variant="light"
+                className="justify-start text-theme-text"
+                onPress={() => onOpenChange(false)}
+              >
+                {link.label}
+              </Button>
+            ))}
         </DrawerBody>
         <DrawerFooter />
       </DrawerContent>

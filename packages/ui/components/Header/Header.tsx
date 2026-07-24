@@ -29,35 +29,20 @@ export const Header = () => {
               </div>
               {/* Desktop Navigation */}
               <div className="hidden sm:flex items-center gap-1">
-                {getPublicLinks().map((link: NavLink) =>
-                  link.label === "Login" ? (
-                    <Button
-                      key={link.href}
-                      as={Link}
-                      href={link.href}
-                      color="primary"
-                      variant="solid"
-                      size="sm"
-                      className="font-medium ml-2"
-                      startContent={link.icon}
-                    >
-                      {link.label}
-                    </Button>
-                  ) : (
-                    <Button
-                      key={link.href}
-                      as={Link}
-                      href={link.href}
-                      rel={link.external ? "noopener noreferrer" : undefined}
-                      variant="light"
-                      color="default"
-                      size="sm"
-                      className="text-slate-600 hover:text-slate-900 font-medium"
-                    >
-                      {link.label}
-                    </Button>
-                  )
-                )}
+                {getPublicLinks().map((link: NavLink) => (
+                  <Button
+                    key={link.href}
+                    as={Link}
+                    href={link.href}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    variant="light"
+                    color="default"
+                    size="sm"
+                    className="text-slate-600 hover:text-slate-900 font-medium"
+                  >
+                    {link.label}
+                  </Button>
+                ))}
               </div>
               {/* Mobile Menu Button */}
               <Button
@@ -95,9 +80,9 @@ export const Header = () => {
                 href={link.href}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
-                variant={link.label === "Login" ? "solid" : "light"}
-                color={link.label === "Login" ? "primary" : "default"}
-                className={link.label === "Login" ? "justify-start font-medium" : "justify-start text-slate-600"}
+                variant="light"
+                color="default"
+                className="justify-start text-slate-600"
                 startContent={link.icon}
                 onPress={() => setIsDrawerOpen(false)}
               >

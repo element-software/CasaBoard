@@ -23,11 +23,9 @@ export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps)
     const labelMap: Record<string, string> = {
       setup: "Setup",
       pages: "Pages",
+      sidebars: "Sidebars",
+      themes: "Themes",
       "ha-config": "HA Configuration",
-      auth: "Authentication",
-      login: "Login",
-      billing: "Billing",
-      profile: "Profile",
       about: "About",
       create: "Create",
       edit: "Edit",
@@ -42,7 +40,6 @@ export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps)
     let acc = "";
     for (let i = 0; i < segments.length; i++) {
       const seg = decodeURIComponent(segments[i]);
-      console.log("seg:", seg);
 
       // Special case: edit/<slug> -> "Edit <Slug>"
       if (seg === "edit" && i + 1 < segments.length) {
@@ -76,18 +73,15 @@ export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps)
       <div className="max-w-7xl w-full mx-auto pt-4.5 pb-2 md:pt-4 md:pb-4 flex items-center gap-2">
         {startContent && <div className="md:hidden">{startContent}</div>}
         <HeroBreadcrumbs className="text-sm">
-          {breadcrumbItems.map((item, index) => {
-            if (item.href !== "/auth")
-              return (
-                <BreadcrumbItem key={`${item.label}-${index}`}>
-                  {item.href ? (
-                    <Link href={item.href}>{item.label}</Link>
-                  ) : (
-                    item.label
-                  )}
-                </BreadcrumbItem>
-              );
-          })}
+          {breadcrumbItems.map((item, index) => (
+            <BreadcrumbItem key={`${item.label}-${index}`}>
+              {item.href ? (
+                <Link href={item.href}>{item.label}</Link>
+              ) : (
+                item.label
+              )}
+            </BreadcrumbItem>
+          ))}
         </HeroBreadcrumbs>
       </div>
     </Skeleton>
