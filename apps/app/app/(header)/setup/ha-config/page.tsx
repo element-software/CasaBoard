@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { HAConnectForm } from "@repo/ui/components/HAConnect/HAConnectForm";
 import { PublishSettingsForm } from "@repo/ui/components/Publish/PublishSettingsForm";
 import { HAConnectionActions, PublishSettingsActions } from "@repo/lib";
@@ -17,7 +18,9 @@ export default async function HAConfigPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <CleanAuthUrl />
+      <Suspense fallback={null}>
+        <CleanAuthUrl />
+      </Suspense>
       <div className="mb-8">
         <div className="flex items-center mb-4">
           <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-4">
@@ -35,7 +38,9 @@ export default async function HAConfigPage() {
       </div>
 
       <div className="space-y-6">
-        <HAConnectForm initialConnection={connection} />
+        <Suspense fallback={null}>
+          <HAConnectForm initialConnection={connection} />
+        </Suspense>
         <PublishSettingsForm initialSettings={publishSettings} />
       </div>
       <div className="mt-8 pt-6 border-t border-theme-border">

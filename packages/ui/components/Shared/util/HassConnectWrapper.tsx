@@ -1,13 +1,9 @@
 "use client";
 import React, { useMemo } from "react";
-import { HAProvider, useHA, reauthenticate } from "@repo/ha";
+import { HAProvider, useHA, reauthenticate, oauthRedirectUrl } from "@repo/ha";
 import { HAConnection } from "@repo/types/ha";
 import { ConnectionErrorIndicator } from "./ConnectionErrorFallback";
-import {
-  createServerTokenStore,
-  LinkService,
-  clientLogger,
-} from "@repo/lib";
+import { createServerTokenStore, clientLogger } from "@repo/lib";
 
 interface HassConnectWrapperProps {
   children: React.ReactNode;
@@ -20,10 +16,7 @@ const HassConnectWrapperContent = ({
 }: HassConnectWrapperProps) => {
   const { error, loading, retry } = useHA();
   const tokenStore = useMemo(() => createServerTokenStore(), []);
-  const redirectUrl = useMemo(
-    () => LinkService.crossAppHrefClient("app", "/setup/ha-config"),
-    []
-  );
+  const redirectUrl = useMemo(() => oauthRedirectUrl("/setup/ha-config"), []);
 
   const handleReauthenticate = async () => {
     try {
@@ -66,10 +59,7 @@ export const HassConnectWrapper = ({
   haInstance,
 }: HassConnectWrapperProps) => {
   const tokenStore = useMemo(() => createServerTokenStore(), []);
-  const redirectUrl = useMemo(
-    () => LinkService.crossAppHrefClient("app", "/setup/ha-config"),
-    []
-  );
+  const redirectUrl = useMemo(() => oauthRedirectUrl("/setup/ha-config"), []);
 
   return (
     <HAProvider

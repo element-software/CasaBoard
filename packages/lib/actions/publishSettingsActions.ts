@@ -6,8 +6,6 @@ import {
   type PublishSettings,
 } from "../store/publishSettings";
 
-export type { PublishSettings };
-
 export async function getPublishSettings(): Promise<PublishSettings> {
   return readPublishSettings();
 }

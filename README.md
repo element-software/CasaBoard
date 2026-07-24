@@ -8,7 +8,7 @@ An open-source, self-hosted dashboard builder for Home Assistant. Build custom d
 docker compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000). On first run you'll be redirected to connect to your Home Assistant instance; once connected, start building dashboards.
+Open [http://localhost:3000](http://localhost:3000). On first run you'll be guided through connecting to Home Assistant (URL + long-lived access token, or sign-in with HA); once connected, start building dashboards.
 
 Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`, `publish-settings.json`) lives in `./data`, bind-mounted into the container — back that directory up.
 

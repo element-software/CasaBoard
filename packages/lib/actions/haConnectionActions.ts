@@ -14,6 +14,12 @@ export async function getHAAuthData(): Promise<AuthData | null> {
   return stored?.auth ?? null;
 }
 
+/** True when URL + access token are persisted (first-run complete). */
+export async function hasValidHAConnection(): Promise<boolean> {
+  const stored = await readHAConnection();
+  return Boolean(stored?.hass_url && stored?.auth?.access_token);
+}
+
 export async function saveHAConnection(
   hass_url: string,
   auth: AuthData | null

@@ -40,7 +40,7 @@ export const PagesManagement = ({
 
   const handleCreatePage = () => {
     if (!connection) {
-      router.push("/setup/ha-config");
+      router.push("/onboarding");
     } else {
       window.location.href = "/setup/pages/create";
     }

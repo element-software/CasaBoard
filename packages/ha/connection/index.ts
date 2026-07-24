@@ -13,9 +13,32 @@ import type {
 } from "home-assistant-js-websocket";
 import { HAConnection } from "@repo/types/ha";
 import type { HATokenStore } from "./tokenStore";
+import {
+  classifyConnectionError,
+  haConnectionFailure,
+  throwConnectionFailure,
+} from "./errors";
 
 export type { HATokenStore } from "./tokenStore";
 export { createLocalStorageTokenStore } from "./tokenStore";
+export {
+  classifyConnectionError,
+  haConnectionFailure,
+  HAConnectionError,
+  throwConnectionFailure,
+  type HAConnectionFailure,
+  type HAConnectionFailureCode,
+} from "./errors";
+export { normalizeHassUrl, type NormalizeHassUrlResult } from "./normalizeUrl";
+export {
+  testLongLivedTokenConnection,
+  type TestLongLivedTokenResult,
+} from "./testConnection";
+export {
+  completeOAuthCallback,
+  isOAuthCallbackUrl,
+  oauthRedirectUrl,
+} from "./oauth";
 
 export interface HAConnectProps {
   haInstance: HAConnection;
@@ -98,18 +121,18 @@ export async function connect({
       try {
         auth = await getAuth(getAuthOptions);
       } catch (err2) {
-        throw new Error(`Home Assistant auth failed: ${err2}`);
+        throwConnectionFailure(err2);
       }
     } else {
-      throw new Error(`Home Assistant auth failed: ${err}`);
+      throwConnectionFailure(err);
     }
   }
 
   try {
-    if (!auth) throw new Error("No auth available for connection");
+    if (!auth) throwConnectionFailure(haConnectionFailure("unknown"));
     connection = await createConnection({ auth });
   } catch (err) {
-    throw new Error(`Home Assistant connection failed: ${err}`);
+    throwConnectionFailure(err);
   }
 
   return { connection, auth };
@@ -132,6 +155,6 @@ export async function reauthenticate({
   try {
     await getAuth(getAuthOptions);
   } catch (err) {
-    throw new Error(`Home Assistant re-authentication failed: ${err}`);
+    throwConnectionFailure(err);
   }
 }

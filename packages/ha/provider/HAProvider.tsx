@@ -89,7 +89,16 @@ export const HAProvider: React.FC<HAProviderProps> = ({
 
       setLoading(false);
     } catch (e: any) {
-      setError(e);
+      const classified =
+        e instanceof Error
+          ? e
+          : new Error(
+              typeof e?.message === "string"
+                ? e.message
+                : "Home Assistant connection failed"
+            );
+      // Preserve typed HAConnectionError when thrown from connect()
+      setError(classified);
       setConnection(null);
       setAuth(null);
       setEntities({});

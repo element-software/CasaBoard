@@ -6,10 +6,8 @@ export {
   useHA,
   createLocalStorageTokenStore,
   connect,
+  classifyConnectionError,
+  testLongLivedTokenConnection,
   type HATokenStore,
+  type HAConnectionFailure,
 } from "@repo/ha";
-
-export {
-  createLongLivedTokenAuth,
-  createConnection,
-} from "home-assistant-js-websocket";

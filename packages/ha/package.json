@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "test": "tsx --test camera/**/*.test.ts hooks/**/*.test.ts"
+    "test": "tsx --test camera/**/*.test.ts hooks/**/*.test.ts connection/**/*.test.ts"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

@@ -29,13 +29,13 @@ export const EmptyState = ({
             You need to have at least one Home Assistant instance to create a
             page.
           </p>
-          <Link href="/setup/ha-config">
+          <Link href="/onboarding">
             <Button
               color="primary"
               size="lg"
               startContent={<Icon path={mdiPlus} className="w-5 h-5" />}
             >
-              Add Home Assistant Instance
+              Connect Home Assistant
             </Button>
           </Link>
         </>

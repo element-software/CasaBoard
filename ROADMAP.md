@@ -34,15 +34,12 @@ Done (2026-07-24):
 
 ## 4. First-run onboarding
 
-Not started — no onboarding flow currently exists (`setup/ha-config` exists as a
-settings page, not a guided first-run journey).
-
-Needs:
-- Detect first run (no valid `ha-connection.json`) and redirect into a setup wizard rather than a bare settings form.
-- Connection step: URL + long-lived access token (or OAuth, matching whatever `packages/ha/connection` already supports).
-- Graceful failure handling: wrong URL, unreachable host, invalid/expired token, HA SSL cert issues — surface a clear error per failure type, not a generic one.
-- Retry loop: let the user re-enter credentials without a page reload/restart.
-- Reuse `packages/ha` connection logic rather than building a second connection path for onboarding vs. settings.
+Done (2026-07-24):
+- First-run detection via `hasValidHAConnection()` (requires `hass_url` + access token in `ha-connection.json`).
+- Guided wizard at `/onboarding` (immersive) — URL + long-lived token (primary) or OAuth (“Sign in with HA”).
+- Typed connection failures in `@repo/ha` (`invalid_url`, `unreachable`, `invalid_auth`, `ssl`, `https_to_http`, …) with clear per-type copy; retry without reload.
+- Setup shell, dashboard preview, and immersive editors redirect to `/onboarding` until configured; disconnect returns there.
+- Settings remain at `/setup/ha-config` after first run (same connection helpers).
 
 ## 5. Publish `@repo/ha` as a standalone npm package
 

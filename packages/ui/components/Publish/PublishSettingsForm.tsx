@@ -4,10 +4,8 @@ import { useState, useTransition } from "react";
 import { Button, Card, CardBody, CardHeader, Input } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiFolderUpload } from "@mdi/js";
-import {
-  savePublishSettings,
-  type PublishSettings,
-} from "@repo/lib/actions/publishSettingsActions";
+import { savePublishSettings } from "@repo/lib/actions/publishSettingsActions";
+import type { PublishSettings } from "@repo/lib";
 
 export function PublishSettingsForm({
   initialSettings,

@@ -10,8 +10,24 @@ export {
   getEntity,
   reauthenticate,
   createLocalStorageTokenStore,
+  classifyConnectionError,
+  haConnectionFailure,
+  HAConnectionError,
+  throwConnectionFailure,
+  normalizeHassUrl,
+  testLongLivedTokenConnection,
+  completeOAuthCallback,
+  isOAuthCallbackUrl,
+  oauthRedirectUrl,
 } from "./connection";
-export type { HATokenStore, HAConnectProps } from "./connection";
+export type {
+  HATokenStore,
+  HAConnectProps,
+  HAConnectionFailure,
+  HAConnectionFailureCode,
+  NormalizeHassUrlResult,
+  TestLongLivedTokenResult,
+} from "./connection";
 export {
   CAMERA_FEATURE_STREAM,
   cameraSupportsHls,

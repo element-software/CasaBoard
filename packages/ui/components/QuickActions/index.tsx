@@ -67,7 +67,7 @@ export const QuickActions = () => {
 
   const handleActionClick = (action: QuickAction) => {
     if (action.disabled) {
-      if (action.href === '/setup/pages/create') router.push('/setup/ha-config');
+      if (action.href === '/setup/pages/create') router.push('/onboarding');
       return;
     }
     router.push(action.href);

@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import type { AuthData } from "home-assistant-js-websocket";
 import {
-  createConnection,
-  createLongLivedTokenAuth,
+  classifyConnectionError,
+  testLongLivedTokenConnection,
+  type HAConnectionFailure,
   type HATokenStore,
 } from "./ha";
 
@@ -24,7 +24,7 @@ export function ViewerConnectForm({
 }: Props) {
   const [hassUrl, setHassUrl] = useState(initialUrl);
   const [token, setToken] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [failure, setFailure] = useState<HAConnectionFailure | null>(null);
   const [pending, setPending] = useState(false);
 
   const saveTokens = useMemo(
@@ -33,30 +33,18 @@ export function ViewerConnectForm({
   );
 
   const onSubmit = async () => {
-    setError(null);
+    setFailure(null);
     setPending(true);
     try {
-      const url = hassUrl.replace(/\/+$/, "");
-      const auth = createLongLivedTokenAuth(url, token.trim());
-      const connection = await createConnection({ auth });
-      connection.close();
-
-      const data: AuthData = {
-        hassUrl: url,
-        clientId: "",
-        expires: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000,
-        expires_in: 10 * 365 * 24 * 60 * 60,
-        refresh_token: "",
-        access_token: token.trim(),
-      };
-      await Promise.resolve(saveTokens(data));
+      const result = await testLongLivedTokenConnection(hassUrl, token);
+      if (!result.ok) {
+        setFailure(result.failure);
+        return;
+      }
+      await Promise.resolve(saveTokens(result.auth));
       onConnected();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to connect with that token"
-      );
+      setFailure(classifyConnectionError(err));
     } finally {
       setPending(false);
     }
@@ -76,9 +64,13 @@ export function ViewerConnectForm({
           </p>
         </div>
 
-        {error ? (
-          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
-            {error}
+        {failure ? (
+          <div
+            className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800"
+            data-failure-code={failure.code}
+            role="alert"
+          >
+            {failure.message}
           </div>
         ) : null}
 

@@ -122,7 +122,9 @@ export const ConnectionErrorIndicator: React.FC<
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
                 <div className="flex flex-col gap-2">
                   <span className="text-xs text-red-500 uppercase tracking-wider font-semibold">
-                    Error Details
+                    {"code" in error && typeof (error as { code?: unknown }).code === "string"
+                      ? String((error as { code: string }).code).replaceAll("_", " ")
+                      : "Error Details"}
                   </span>
                   <p className="text-xs text-red-400 font-mono break-all">
                     {error.message || "Unknown error occurred"}
@@ -139,19 +141,19 @@ export const ConnectionErrorIndicator: React.FC<
               <ul className="space-y-1 text-xs text-theme-text-secondary">
                 <li className="flex gap-2">
                   <span className="text-primary font-bold min-w-4">•</span>
-                  <span>Your Home Assistant instance is offline</span>
+                  <span>Wrong Home Assistant URL or the host is offline</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary font-bold min-w-4">•</span>
-                  <span>Authentication credentials have expired</span>
+                  <span>Long-lived token is invalid, revoked, or expired</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary font-bold min-w-4">•</span>
-                  <span>Network connectivity issue</span>
+                  <span>SSL certificate problem on an https:// HA URL</span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary font-bold min-w-4">•</span>
-                  <span>Firewall or proxy blocking the connection</span>
+                  <span>Network / firewall blocking this browser from HA</span>
                 </li>
               </ul>
             </div>
