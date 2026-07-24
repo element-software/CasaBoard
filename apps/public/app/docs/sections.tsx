@@ -201,7 +201,7 @@ const HACSPanel: React.FC = () => (
       intro="A small companion panel lets you embed the running CasaBoard app directly in the Home Assistant sidebar, distributed as a custom HACS repository."
     />
 
-    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard panel repository as a custom repository (category: Lovelace / plugin)." />
+    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard GitHub repository as a custom repository (category: Dashboard / plugin). The repo must be public for HACS to fetch it." />
     <TimelineStep number={2} title="Install the panel" text="Install 'CasaBoard Panel' from HACS like any other frontend resource." />
     <TimelineStep number={3} title="Configure the sidebar entry" text="Add a panel_custom entry to your Home Assistant configuration.yaml pointing at your running container's URL." isLast />
 
@@ -209,7 +209,7 @@ const HACSPanel: React.FC = () => (
   - name: casaboard-panel
     sidebar_title: CasaBoard
     sidebar_icon: mdi:view-dashboard
-    module_url: /hacsfiles/casaboard-panel/casaboard-panel.js
+    module_url: /hacsfiles/CasaBoard/casaboard-panel.js
     config:
       url: http://homeassistant.local:3000`}</CodeBlock>
 

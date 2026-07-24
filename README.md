@@ -27,7 +27,7 @@ To embed CasaBoard in the Home Assistant sidebar, see [`hacs-panel/README.md`](h
 - `packages/hooks` – Shared hooks (theme, pages, etc.)
 - `packages/lib` – Actions, services, and the flat-JSON-file persistence layer (`packages/lib/store`)
 - `packages/types` – Shared TypeScript types
-- `hacs-panel` – A HACS-installable Home Assistant sidebar panel that iframes the running CasaBoard container
+- `dist/casaboard-panel.js` – HACS-installable Home Assistant sidebar panel that iframes the running CasaBoard container (see [`hacs-panel/README.md`](hacs-panel/README.md))
 
 ## Local Development
 

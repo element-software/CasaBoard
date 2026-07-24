@@ -16,7 +16,13 @@ Done (2026-07-24):
 
 ## 2. HACS install
 
-Already exists: `hacs-panel/` ships `casaboard-panel.js` + `hacs.json`, installable as a custom HACS repo, iframes the running container into the HA sidebar. Verify it still passes HACS validation (`hacs.json` schema, repo topics) before calling this done.
+Done (2026-07-24):
+- Moved `hacs.json` to the repo root (HACS requires it there) and `casaboard-panel.js` to `dist/` (HACS plugin layout).
+- Added `.github/workflows/validate-hacs.yml` (`hacs/action`, category `plugin`).
+- Corrected install docs to use `/hacsfiles/CasaBoard/casaboard-panel.js` (matches the GitHub repo name).
+- Repo topics/description updated for HACS discoverability.
+
+Note: HACS only works with **public** GitHub repos. This repo is still private — end-user HACS install is blocked until the repo is made public (coordinate with item 6 / history rewrite if needed).
 
 ## 3. Publish pages to a configurable path
 

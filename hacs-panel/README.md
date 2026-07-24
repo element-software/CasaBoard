@@ -2,12 +2,16 @@
 
 Embeds your self-hosted [CasaBoard](../README.md) instance in the Home Assistant sidebar.
 
+The panel lives at [`dist/casaboard-panel.js`](../dist/casaboard-panel.js). Root [`hacs.json`](../hacs.json) tells HACS how to install it from this repository.
+
 ## Install via HACS
 
-1. In HACS, add this repository as a custom repository (category: **Plugin**).
-2. Install "CasaBoard Panel". HACS copies `casaboard-panel.js` into `<config>/www/community/casaboard-panel/`.
+1. In HACS, add this GitHub repository as a custom repository (category: **Dashboard** / plugin).
+2. Install **CasaBoard Panel**. HACS copies `casaboard-panel.js` into `<config>/www/community/CasaBoard/`.
 
-Alternatively, without HACS: copy `casaboard-panel.js` into `<config>/www/casaboard-panel.js` manually.
+Alternatively, without HACS: copy `dist/casaboard-panel.js` into `<config>/www/casaboard-panel.js` manually.
+
+> **Note:** The GitHub repository must be **public** for HACS to fetch it. Private repos are not supported by HACS.
 
 ## Configure
 
@@ -18,7 +22,7 @@ panel_custom:
   - name: casaboard-panel
     sidebar_title: CasaBoard
     sidebar_icon: mdi:view-dashboard
-    module_url: /hacsfiles/casaboard-panel/casaboard-panel.js
+    module_url: /hacsfiles/CasaBoard/casaboard-panel.js
     config:
       url: http://homeassistant.local:3000
 ```
