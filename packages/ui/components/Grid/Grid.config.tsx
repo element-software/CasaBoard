@@ -56,10 +56,10 @@ export const GridConfig = {
     ...slots,
   },
   defaultProps: {
-    columns_sm: 1, // 1 column on mobile for better UX
-    columns_md: 2, // 2 columns on tablet
-    columns_lg: 3, // 3 columns on desktop
-    columns_xl: 4, // 4 columns on large desktop
+    columns_sm: 2, // 2 columns on mobile
+    columns_md: 3, // 3 columns on tablet
+    columns_lg: 5, // denser desktop so square tiles stay compact
+    columns_xl: 6, // large desktop
     gap: "gap-4",
     alignX: "start",
     alignY: "stretch",

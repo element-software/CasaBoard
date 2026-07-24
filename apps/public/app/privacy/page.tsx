@@ -5,10 +5,8 @@ import {
   mdiShieldAccount,
   mdiEyeOff,
   mdiCheckCircle,
-  mdiCookie,
   mdiEmail,
-  mdiGoogleAnalytics,
-  mdiDatabaseOutline,
+  mdiFolderOutline,
 } from "@mdi/js";
 import { metadataForRoute } from "../lib/og/content";
 
@@ -65,14 +63,14 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            We collect the minimum data needed to run CasaBoard. Analytics are opt-in. Your
-            Home Assistant credentials never touch our servers.
+            CasaBoard is self-hosted software. We don&apos;t run a hosted service, so we don&apos;t
+            collect any data from your installation, and this docs site collects nothing either.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { icon: mdiEyeOff, label: "Minimal collection" },
+              { icon: mdiEyeOff, label: "No app-side collection" },
               { icon: mdiCheckCircle, label: "Never sold" },
-              { icon: mdiCookie, label: "Cookie consent" },
+              { icon: mdiEyeOff, label: "No analytics anywhere" },
             ].map((badge) => (
               <div
                 key={badge.label}
@@ -96,51 +94,48 @@ export default function PrivacyPage() {
             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 bg-white border border-slate-200 rounded-xl flex items-center justify-center">
-                  <Icon path={mdiGoogleAnalytics} className="w-4 h-4 text-slate-500" />
+                  <Icon path={mdiEyeOff} className="w-4 h-4 text-slate-500" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Analytics</p>
-                  <p className="text-xs text-slate-400">Opt-in only</p>
+                  <p className="font-semibold text-slate-900 text-sm">This docs site</p>
+                  <p className="text-xs text-slate-400">casaboard.dev only</p>
                 </div>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                If you accept the cookie consent, we collect anonymous usage statistics to understand
-                how the product is used and where things go wrong.
+                This marketing/documentation site runs no analytics and sets no cookies. It has
+                nothing to do with any CasaBoard instance you run.
               </p>
               <ul className="space-y-2">
-                <CheckItem>Anonymous page views and navigation events</CheckItem>
-                <CheckItem>General performance metrics</CheckItem>
-                <CheckItem>Error and crash reports (scrubbed of personal data)</CheckItem>
+                <CheckItem>No page-view or navigation tracking</CheckItem>
+                <CheckItem>No accounts, no forms other than the contact page</CheckItem>
               </ul>
             </div>
 
             <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 bg-white border border-slate-200 rounded-xl flex items-center justify-center">
-                  <Icon path={mdiDatabaseOutline} className="w-4 h-4 text-slate-500" />
+                  <Icon path={mdiFolderOutline} className="w-4 h-4 text-slate-500" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 text-sm">Account data</p>
-                  <p className="text-xs text-slate-400">Required to run the service</p>
+                  <p className="font-semibold text-slate-900 text-sm">Your CasaBoard install</p>
+                  <p className="text-xs text-slate-400">Runs on your own server</p>
                 </div>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                When you sign up, we store the minimum needed to manage your account and dashboards.
+                We collect nothing from it. There&apos;s no telemetry, no phone-home, and no account
+                to create. Everything it stores lives in local JSON files on your machine:
               </p>
               <ul className="space-y-2">
-                <CheckItem>Email address and basic profile (from OAuth sign-in)</CheckItem>
-                <CheckItem>Dashboard and page layouts you create</CheckItem>
-                <CheckItem>Subscription and billing status</CheckItem>
-                <CheckItem>HA instance name + URL (paid cloud sync only, opt-in)</CheckItem>
+                <CheckItem>Dashboard, sidebar, and theme layouts you create</CheckItem>
+                <CheckItem>Your Home Assistant connection details</CheckItem>
               </ul>
             </div>
           </div>
 
           <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
             <p className="text-sm text-amber-800">
-              <strong>Home Assistant credentials are not included.</strong> Your HA OAuth tokens are
-              encrypted and stored only in your browser. They are never transmitted to or stored on
-              CasaBoard servers. See our{" "}
+              <strong>Home Assistant credentials are never sent to us.</strong> They&apos;re stored
+              only in a local file on the server running the container. See our{" "}
               <Link href="/security" className="text-violet-600 hover:underline font-medium">
                 Security page
               </Link>{" "}
@@ -149,89 +144,26 @@ export default function PrivacyPage() {
           </div>
         </section>
 
-        {/* 02 · How we use it */}
+        {/* 02 · Third parties */}
         <section>
-          <SectionLabel n="02" label="How we use your data" />
-          <div className="border-l-4 border-slate-200 pl-6 space-y-4">
-            <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">Product improvement</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Anonymous analytics (if you opt in) help us understand which features are used and
-                where errors occur. This is never linked to your identity.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">Running the service</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Account and dashboard data is used to provide CasaBoard. We do not use it for
-                advertising, profiling, or sell it to third parties.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900 text-sm mb-1">Service communications</h3>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                We may email you about significant changes to the service, billing, or security. You
-                can opt out of product update emails at any time.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 03 · Third parties */}
-        <section>
-          <SectionLabel n="03" label="Third-party services" />
-          <p className="text-slate-600 text-sm leading-relaxed mb-6">
-            CasaBoard is built on a small set of third-party services. Each handles data under their
-            own privacy policies:
+          <SectionLabel n="02" label="Third-party services" />
+          <p className="text-slate-600 text-sm leading-relaxed">
+            The CasaBoard application itself has no third-party service dependencies at runtime —
+            no database provider, no auth provider, no billing provider. It talks only to the
+            Home Assistant instance you point it at.
           </p>
-          <div className="space-y-3">
-            {[
-              {
-                name: "Supabase",
-                role: "Database, authentication, and session management",
-                note: "Account data and dashboard layouts are stored here. Protected by Row Level Security.",
-              },
-              {
-                name: "Stripe",
-                role: "Payment processing",
-                note: "Handles all billing. CasaBoard does not store full card numbers or payment details.",
-              },
-              {
-                name: "Google OAuth",
-                role: "Sign-in provider",
-                note: "Used for account creation and login. We receive your email and basic profile only.",
-              },
-            ].map((svc) => (
-              <div key={svc.name} className="flex gap-4 p-4 bg-white border border-slate-100 rounded-xl">
-                <div className="w-1 bg-slate-200 rounded-full shrink-0" />
-                <div>
-                  <p className="font-semibold text-slate-900 text-sm">{svc.name}</p>
-                  <p className="text-xs text-slate-400 mb-1">{svc.role}</p>
-                  <p className="text-sm text-slate-600">{svc.note}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
-        {/* 04 · Your choices */}
+        {/* 03 · Your choices */}
         <section>
-          <SectionLabel n="04" label="Your choices" />
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">Analytics cookies</p>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Accept or reject analytics at any time via the cookie consent banner. To reset your
-                choice, clear your browser&apos;s local storage for this domain.
-              </p>
-            </div>
-            <div className="p-5 bg-white border border-slate-100 rounded-2xl">
-              <p className="font-semibold text-slate-900 text-sm mb-2">Account deletion</p>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                You can request deletion of your account and all associated data by emailing us.
-                Dashboard layouts, billing records, and optional cloud sync rows will be removed.
-              </p>
-            </div>
+          <SectionLabel n="03" label="Your choices" />
+          <div className="p-5 bg-white border border-slate-100 rounded-2xl">
+            <p className="font-semibold text-slate-900 text-sm mb-2">Your data, your backups</p>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Because everything is stored as local files under your control, deleting or backing
+              up your data is a filesystem operation on the volume you mounted — no request to us
+              required.
+            </p>
           </div>
         </section>
 
@@ -244,20 +176,18 @@ export default function PrivacyPage() {
             <div className="flex-1">
               <h2 className="text-lg font-bold text-slate-900 mb-1">Privacy questions</h2>
               <p className="text-slate-500 text-sm mb-5">
-                If you have questions about how your data is handled, or would like to request
-                deletion, contact us directly.
+                If you have questions about this docs site or the project, get in touch.
               </p>
-              <a
-                href="mailto:support@casaboard.dev"
+              <Link
+                href="/contact"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
               >
-                <Icon path={mdiEmail} className="w-4 h-4" />
-                support@casaboard.dev
-              </a>
+                Contact form
+              </Link>
             </div>
           </div>
           <p className="text-xs text-slate-400 mt-6 pt-5 border-t border-slate-200">
-            Last reviewed April 2026. This policy is updated when our data practices change.
+            Last reviewed July 2026.
           </p>
         </section>
 

@@ -1,23 +1,19 @@
+"use server";
+
 import type { CSSProperties } from "react";
 import type { Page } from "@repo/types/page";
-import { createClient } from "../supabase/server";
+import { getThemeById } from "../store/themes";
 import { mergeThemeLayers, resolvedTokensToCssVars } from "./merge";
 import { sanitizeThemeTokens } from "./validate";
 
 export async function resolveDashboardThemeStyles(
   page: Page
 ): Promise<{ main: CSSProperties; sidebar: CSSProperties }> {
-  const supabase = await createClient();
-
   let themeLayer: Record<string, string> = {};
   if (page.theme_id) {
-    const { data } = await supabase
-      .from("themes")
-      .select("tokens")
-      .eq("id", page.theme_id)
-      .maybeSingle();
-    if (data?.tokens) {
-      themeLayer = sanitizeThemeTokens(data.tokens) as Record<string, string>;
+    const theme = await getThemeById(page.theme_id);
+    if (theme?.tokens) {
+      themeLayer = sanitizeThemeTokens(theme.tokens) as Record<string, string>;
     }
   }
 
@@ -29,14 +25,10 @@ export async function resolveDashboardThemeStyles(
 
   let sidebarResolved = mainResolved;
   if (page.sidebar?.theme_id) {
-    const { data: sb } = await supabase
-      .from("themes")
-      .select("tokens")
-      .eq("id", page.sidebar.theme_id)
-      .maybeSingle();
-    if (sb?.tokens) {
+    const sidebarTheme = await getThemeById(page.sidebar.theme_id);
+    if (sidebarTheme?.tokens) {
       sidebarResolved = mergeThemeLayers(
-        sanitizeThemeTokens(sb.tokens) as Record<string, string>
+        sanitizeThemeTokens(sidebarTheme.tokens) as Record<string, string>
       );
     } else {
       sidebarResolved = mergeThemeLayers();

@@ -2,12 +2,11 @@
 import { useState, useTransition } from "react";
 import { PageActions } from "@repo/lib";
 import { Page } from "@repo/types/page";
-import { Entitlements } from "@repo/types/subscription";
 import Link from "next/link";
-import { useMergedHAInstances } from "@repo/hooks";
+import { useHAConnection } from "@repo/hooks";
 import Icon from "@mdi/react";
 import { mdiPlus, mdiWeb } from "@mdi/js";
-import { Button, Chip, cn } from "@heroui/react";
+import { Button, cn } from "@heroui/react";
 import { ErrorState } from "./ErrorState";
 import { EmptyState } from "./EmptyState";
 import { PageCard } from "./PageCard";
@@ -19,8 +18,6 @@ interface PagesManagementProps {
   initialPages?: Page[];
   initialError?: string | null;
   compact?: boolean;
-  entitlements: Entitlements;
-  lockedPageIds?: string[];
 }
 
 export const PagesManagement = ({
@@ -29,30 +26,17 @@ export const PagesManagement = ({
   initialPages = [],
   initialError = null,
   compact = false,
-  entitlements,
-  lockedPageIds = [],
 }: PagesManagementProps) => {
-  const lockedSet = new Set(lockedPageIds);
-  const { instances: haInstances } = useMergedHAInstances(entitlements);
+  const { connection } = useHAConnection();
   const router = useRouter();
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
 
-  // Helper functions
-  const canCreateDashboard = (currentCount: number) =>
-    entitlements?.active &&
-    (entitlements.maxDashboards === -1 ||
-      currentCount < entitlements.maxDashboards) && haInstances.length > 0;
-
-  const getRemainingDashboards = (currentCount: number) => {
-    if (!entitlements?.active || entitlements.maxDashboards === -1)
-      return Infinity;
-    return Math.max(0, entitlements.maxDashboards - currentCount);
-  };
+  const canCreateDashboard = () => !!connection;
 
   const handleCreatePage = () => {
-    if (haInstances.length === 0) {
+    if (!connection) {
       router.push("/setup/ha-config");
     } else {
       window.location.href = "/setup/pages/create";
@@ -100,7 +84,6 @@ export const PagesManagement = ({
   };
 
   const maxDisplayPages = compact ? 3 : 6;
-  // Always show all pages (including locked ones) so users know they exist.
   const displayPages = showAllPages ? pages : pages.slice(0, Math.max(maxDisplayPages, pages.length));
 
   // Early returns for error and empty states
@@ -108,12 +91,10 @@ export const PagesManagement = ({
   if (pages.length === 0)
     return (
       <EmptyState
-        canCreate={canCreateDashboard(0)}
+        canCreate={canCreateDashboard()}
         onCreate={handleCreatePage}
       />
     );
-
-  const remaining = getRemainingDashboards(pages.length);
 
   return (
     <div className="space-y-4">
@@ -140,7 +121,7 @@ export const PagesManagement = ({
           color="primary"
           size="sm"
           startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
-          isDisabled={!canCreateDashboard(pages.length)}
+          isDisabled={!canCreateDashboard()}
           onPress={handleCreatePage}
         >
           {compact ? "New" : "New Page"}
@@ -161,7 +142,6 @@ export const PagesManagement = ({
             onTogglePublished={handleTogglePublished}
             onDelete={handleDeletePage}
             isPending={isPending}
-            locked={lockedSet.has(page.id)}
           />
         ))}
       </div>
@@ -177,49 +157,6 @@ export const PagesManagement = ({
           >
             And {pages.length - maxDisplayPages} more pages
           </p>
-        </div>
-      )}
-
-      {/* Usage Info */}
-      {entitlements?.maxDashboards !== -1 && (
-        <div
-          className={cn(
-            compact
-              ? "text-center"
-              : "bg-theme-background-secondary rounded-lg p-4"
-          )}
-        >
-          {compact ? (
-            <span className="text-xs text-theme-text-secondary inline-flex items-center gap-2 flex-wrap justify-center">
-              {pages.length}/{entitlements.maxDashboards} pages
-              {remaining === 0 && " • Limit reached"}
-              {remaining > 0 && remaining <= 2 && ` • ${remaining} remaining`}
-              {remaining === 0 && (
-                <Link
-                  href="/auth/profile/billing"
-                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-violet-600 text-white text-xs font-medium hover:bg-violet-700 transition-colors"
-                >
-                  Upgrade now
-                </Link>
-              )}
-            </span>
-          ) : (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-theme-text-secondary">
-                Pages used: {pages.length} / {entitlements.maxDashboards}
-              </span>
-              {remaining === 0 && (
-                <Chip size="sm" color="warning" variant="flat">
-                  Limit reached
-                </Chip>
-              )}
-              {remaining > 0 && remaining <= 2 && (
-                <Chip size="sm" color="warning" variant="flat">
-                  {remaining} remaining
-                </Chip>
-              )}
-            </div>
-          )}
         </div>
       )}
 

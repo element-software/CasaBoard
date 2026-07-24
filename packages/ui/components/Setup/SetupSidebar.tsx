@@ -9,7 +9,6 @@ import {
   DrawerContent,
   DrawerBody,
 } from "@heroui/react";
-import { SupabaseClient } from "@repo/lib";
 import Icon from "@mdi/react";
 import {
   mdiViewDashboard,
@@ -19,11 +18,8 @@ import {
   mdiChevronDown,
   mdiChevronRight,
   mdiChevronLeft,
-  mdiAccount,
   mdiInformation,
   mdiBookOpen,
-  mdiCreditCard,
-  mdiLogout,
   mdiPaletteSwatch,
 } from "@mdi/js";
 import { cn } from "@heroui/react";
@@ -47,7 +43,6 @@ interface NavSection {
 
 interface SetupSidebarProps {
   className?: string;
-  user: any;
   isOpen?: boolean;
   onClose?: () => void;
   isCollapsed?: boolean;
@@ -56,7 +51,6 @@ interface SetupSidebarProps {
 
 export const SetupSidebar = ({
   className,
-  user,
   isOpen = false,
   onClose,
   isCollapsed = false,
@@ -89,15 +83,6 @@ export const SetupSidebar = ({
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 
-  const handleLogout = async () => {
-    const supabase = SupabaseClient.createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
-  };
-
-  const userInitial = (user?.email as string | undefined)?.[0]?.toUpperCase() ?? "?";
-  const userEmail = (user?.email as string | undefined) ?? "";
-
   const navigationSections: NavSection[] = [
     {
       id: "dashboard",
@@ -121,9 +106,7 @@ export const SetupSidebar = ({
       title: "Manage",
       icon: mdiCog,
       items: [
-        { title: "HA Instances", href: "/setup/ha-config", icon: mdiHome },
-        { title: "Billing", href: "/auth/profile/billing", icon: mdiCreditCard },
-        { title: "Profile", href: "/auth/profile", icon: mdiAccount },
+        { title: "Home Assistant", href: "/setup/ha-config", icon: mdiHome },
       ],
     },
   ];
@@ -282,22 +265,6 @@ export const SetupSidebar = ({
         ))}
       </div>
 
-      {/* User footer */}
-      <div className="px-3 py-3 border-t border-slate-100">
-        <div className="flex items-center gap-2 min-w-0 px-1">
-          <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-semibold flex-shrink-0 select-none">
-            {userInitial}
-          </div>
-          <span className="flex-1 text-xs text-slate-500 truncate min-w-0">{userEmail}</span>
-          <button
-            onClick={handleLogout}
-            title="Sign out"
-            className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all duration-150 flex-shrink-0"
-          >
-            <Icon path={mdiLogout} className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
     </div>
   );
 
@@ -325,24 +292,8 @@ export const SetupSidebar = ({
         ))}
       </div>
 
-      {/* Collapsed footer: avatar, sign out, expand */}
+      {/* Collapsed footer: expand toggle */}
       <div className="py-2 border-t border-slate-100 w-full flex flex-col items-center gap-1">
-        <div className="relative group">
-          <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-semibold select-none cursor-default">
-            {userInitial}
-          </div>
-          <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[100] shadow-xl">
-            {userEmail}
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900" />
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          title="Sign out"
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all duration-150"
-        >
-          <Icon path={mdiLogout} className="w-3.5 h-3.5" />
-        </button>
         <button
           onClick={onToggleCollapse}
           title="Expand sidebar"

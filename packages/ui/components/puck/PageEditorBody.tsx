@@ -7,18 +7,16 @@ import {
   updatePageEditorAction,
 } from "./pageEditorActions";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
-import { useMergedHAInstances } from "@repo/hooks";
-import type { Entitlements } from "@repo/types/subscription";
+import type { HAConnection } from "@repo/types/ha";
 import type { Data } from "@measured/puck";
 import type { ThemeTokens } from "@repo/types/theme";
-import { Spinner } from "@heroui/react";
+import type { StyleId } from "@repo/types/style";
 
 type ThemePickerOption = { id: string; name: string };
 
 type ThemeLibraryEntry = { id: string; tokens: ThemeTokens };
 
 type PageEditorBodyProps = {
-  entitlements: Entitlements;
   initialData?: Data;
   pageId?: string | null;
   initialPublished?: boolean;
@@ -28,10 +26,11 @@ type PageEditorBodyProps = {
   themeLibrary?: ThemeLibraryEntry[];
   initialThemeId?: string | null;
   initialThemeOverrides?: ThemeTokens | null;
+  initialStyleId?: StyleId | null;
+  haConnection?: HAConnection | null;
 };
 
 export default function PageEditorBody({
-  entitlements,
   initialData,
   pageId,
   initialPublished = false,
@@ -41,28 +40,22 @@ export default function PageEditorBody({
   themeLibrary = [],
   initialThemeId,
   initialThemeOverrides,
+  initialStyleId,
+  haConnection = null,
 }: PageEditorBodyProps) {
-  const { instances, loading } = useMergedHAInstances(entitlements);
-
-  const haId =
-    (initialData?.root?.props as { haInstanceId?: string } | undefined)
-      ?.haInstanceId ?? instances[0]?.id;
-  const activeHa = instances.find((i) => i.id === haId) ?? instances[0];
-
   const editor = (
     <PuckEditorClient
       type="page"
       initialData={initialData}
       itemId={pageId}
       initialPublished={initialPublished}
-      haInstances={instances}
       sidebars={sidebars}
       initialSlug={initialSlug}
       themePickerThemes={themePickerThemes}
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
       initialThemeOverrides={initialThemeOverrides}
-      maxItemsPerDashboard={entitlements.maxItemsPerDashboard}
+      initialStyleId={initialStyleId}
       onCreateItem={createPageEditorAction}
       onUpdateItem={updatePageEditorAction}
       onPublishItem={publishPageEditorAction}
@@ -72,16 +65,8 @@ export default function PageEditorBody({
     />
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center p-12">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (activeHa) {
-    return <HassConnectWrapper haInstance={activeHa}>{editor}</HassConnectWrapper>;
+  if (haConnection) {
+    return <HassConnectWrapper haInstance={haConnection}>{editor}</HassConnectWrapper>;
   }
 
   return editor;

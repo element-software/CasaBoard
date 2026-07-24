@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import AboutPageContent from "./AboutPageContent";
 import Icon from "@mdi/react";
-import { mdiInformation, mdiGrid, mdiHomeAssistant, mdiShieldCheck } from "@mdi/js";
+import { mdiInformation, mdiGrid, mdiHomeAssistant, mdiDocker } from "@mdi/js";
 import { metadataForRoute } from "../lib/og/content";
 
 export const dynamic = "force-dynamic";
@@ -36,16 +36,16 @@ export default function AboutPage() {
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
-            A modern dashboard builder for Home Assistant
+            A self-hosted dashboard builder for Home Assistant
           </h1>
           <p className="text-violet-200/80 text-lg max-w-2xl mx-auto mb-10">
-            Design beautiful, responsive pages with a drag‑and‑drop editor and real‑time controls — privacy-first by default.
+            Design beautiful, responsive pages with a drag‑and‑drop editor and real‑time controls — free, open source, and running entirely on your own hardware.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               { icon: mdiGrid, label: "Drag & Drop Editor" },
               { icon: mdiHomeAssistant, label: "Live HA Data" },
-              { icon: mdiShieldCheck, label: "Privacy-first" },
+              { icon: mdiDocker, label: "Self-Hosted" },
             ].map((badge) => (
               <div
                 key={badge.label}

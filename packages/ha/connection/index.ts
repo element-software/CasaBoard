@@ -1,26 +1,23 @@
 import { ConnectResult, EntityDomain, EntityId } from "../types/index";
-import { serverLogger } from "@repo/lib";
-import { makeSaveTokens, loadTokensFromLocalStorage } from "./browserToken";
+import { serverLogger, HAConnectionActions } from "@repo/lib";
 import { LinkService } from "@repo/lib";
 import {
   getAuth,
   createConnection,
   ERR_HASS_HOST_REQUIRED,
   ERR_INVALID_AUTH,
-  ERR_CANNOT_CONNECT,
 } from "home-assistant-js-websocket";
 import type {
   Auth,
   AuthData,
   Connection,
   LoadTokensFunc,
+  SaveTokensFunc,
 } from "home-assistant-js-websocket";
-import { HAInstance } from "@repo/types/ha";
+import { HAConnection } from "@repo/types/ha";
 
 export interface HAConnectProps {
-  haInstance: HAInstance;
-  /** Supabase user ID — required for browser-side token encryption. */
-  userId: string;
+  haInstance: HAConnection;
 }
 
 function normalizeNameToSlug(name: string): string {
@@ -56,26 +53,30 @@ export async function getEntity(
   return states.find((s) => s.entity_id === entityId) ?? null;
 }
 
+function makeSaveTokens(hass_url: string): SaveTokensFunc {
+  return async (data: AuthData | null) => {
+    await HAConnectionActions.saveHAConnection(hass_url, data);
+  };
+}
+
+async function loadTokens(): Promise<AuthData | null> {
+  return HAConnectionActions.getHAAuthData();
+}
+
 export async function connect({
   haInstance,
-  userId,
 }: HAConnectProps): Promise<ConnectResult> {
   let auth: Auth | undefined;
   let connection: Connection | undefined;
 
-  const loadTokens = async () => {
-    serverLogger.info("loadTokens wrapper", "haInstance", haInstance);
-    return loadTokensFromLocalStorage(haInstance.id, userId) as unknown as AuthData;
-  };
-
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: makeSaveTokens(haInstance.id, userId),
+    saveTokens: makeSaveTokens(haInstance.hass_url),
     loadTokens: loadTokens as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
 
-  // Try to get auth, retry if invalid or host requiredS
+  // Try to get auth, retry if invalid or host required
   try {
     auth = await getAuth(getAuthOptions);
     serverLogger.info("connect", "got auth", auth);
@@ -98,10 +99,6 @@ export async function connect({
   try {
     if (!auth) throw new Error("No auth available for connection");
     connection = await createConnection({ auth });
-    // Optionally add connection event logging
-    // connection.addEventListener("ready", () => serverLogger.info('connect', 'HA connection ready'));
-    // connection.addEventListener("disconnected", () => serverLogger.info('connect', 'HA connection disconnected'));
-    // connection.addEventListener("reconnect-error", () => serverLogger.warn('connect', 'HA connection reconnect error'));
   } catch (err) {
     serverLogger.error("connect", "createConnection error", err);
     throw new Error(`Home Assistant connection failed: ${err}`);
@@ -109,40 +106,29 @@ export async function connect({
 
   return { connection, auth };
 }
+
 /**
- * Initiates re-authentication for an existing Home Assistant instance
- * This clears the old token and starts a fresh OAuth flow
+ * Re-authenticates the single Home Assistant connection.
+ * Forces a fresh OAuth flow instead of reusing the stored token, but keeps
+ * the stored hass_url so the flow resumes automatically after redirect-back.
  */
-export async function reauthenticateInstance({
+export async function reauthenticate({
   haInstance,
-  userId,
 }: HAConnectProps): Promise<void> {
-  // Clear browser-stored token to force a fresh auth flow
-  const { clearTokensFromLocalStorage } = await import("./browserToken");
-  clearTokensFromLocalStorage(haInstance.id);
-  serverLogger.info("reauthenticateInstance", "cleared local token", haInstance.id);
-
-  // Initiate fresh auth flow
   let auth: Auth | undefined;
-
-  const loadTokens = async () => {
-    serverLogger.info("reauthenticateInstance.loadTokens", "returning null to force fresh auth");
-    return null; // Return null to force fresh OAuth flow
-  };
 
   const getAuthOptions = {
     hassUrl: haInstance.hass_url,
-    saveTokens: makeSaveTokens(haInstance.id, userId),
-    loadTokens: loadTokens as unknown as LoadTokensFunc,
+    saveTokens: makeSaveTokens(haInstance.hass_url),
+    loadTokens: (async () => null) as unknown as LoadTokensFunc,
     redirectUrl: LinkService.crossAppHrefClient("app", "/setup/ha-config"),
   };
 
   try {
     auth = await getAuth(getAuthOptions);
-    serverLogger.info("reauthenticateInstance", "got new auth");
-    // The redirect should happen via getAuth
+    serverLogger.info("reauthenticate", "got new auth");
   } catch (err) {
-    serverLogger.error("reauthenticateInstance", "getAuth error", err);
+    serverLogger.error("reauthenticate", "getAuth error", err);
     throw new Error(`Home Assistant re-authentication failed: ${err}`);
   }
 }

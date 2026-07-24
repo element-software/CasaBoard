@@ -57,7 +57,59 @@ export type ThemeTokens = Partial<Record<ThemeTokenKey, string>>;
 
 export type ResolvedThemeTokens = Record<ThemeTokenKey, string>;
 
-/** Baseline dark dashboard tokens (matches historical theme.css :root). */
+/** HomeKit Gold baseline — iOS light surfaces + warm gold light on-state. */
+export const DEFAULT_LIGHT_THEME_TOKENS: ResolvedThemeTokens = {
+  "page-background": "#f2f2f7",
+  background: "#f2f2f7",
+  surface: "#ffffff",
+  elevated: "#ffffff",
+  border: "#e5e5ea",
+  divider: "#e5e5ea",
+  text: "#1c1c1e",
+  "text-primary": "#f2c94c",
+  "text-secondary": "#8e8e93",
+  "text-muted": "#aeaeb2",
+  "text-on-primary": "#ffffff",
+  "text-on": "#ffffff",
+  primary: "#f2c94c",
+  secondary: "#e6b93d",
+  accent: "#f2c94c",
+  success: "#34c759",
+  warning: "#ff9f0a",
+  error: "#ff3b30",
+  info: "#007aff",
+  "card-background": "#ffffff",
+  "card-border": "#e5e5ea",
+  "card-hover": "#f9f9fb",
+  "entity-on": "#f2c94c",
+  "entity-off": "#ffffff",
+  "entity-on-muted": "#e6b93d",
+  "entity-off-muted": "#e5e5ea",
+  "entity-unavailable": "#ff3b30",
+  "entity-unknown": "#8e8e93",
+  "alarm-armed": "#ff9f0a",
+  "alarm-disarmed": "#34c759",
+  "alarm-triggered": "#ff3b30",
+  "button-primary": "#f2c94c",
+  "button-secondary": "#efeef0",
+  "button-success": "#34c759",
+  "button-warning": "#ff9f0a",
+  "button-error": "#ff3b30",
+  "slider-track": "#e5e5ea",
+  "slider-thumb": "#f2c94c",
+  "slider-active": "#f2c94c",
+  "interactive-hover": "#e5e5ea",
+  "interactive-active": "#1c1c1e",
+  "interactive-inactive": "#f2f2f7",
+  "focus-ring": "#007aff",
+  "disabled-foreground": "#aeaeb2",
+  "disabled-background": "#f2f2f7",
+  "chart-line": "#f2c94c",
+  "chart-fill": "#f2c94c",
+  "chart-grid": "#e5e5ea",
+};
+
+/** Historical dark purple tokens — available for custom themes. */
 export const DEFAULT_DARK_THEME_TOKENS: ResolvedThemeTokens = {
   "page-background": "#111827",
   background: "#111827",
@@ -111,7 +163,6 @@ export const DEFAULT_DARK_THEME_TOKENS: ResolvedThemeTokens = {
 
 export interface Theme {
   id: string;
-  user_id: string;
   name: string;
   tokens: ThemeTokens;
   created_at: string;

@@ -1,7 +1,6 @@
 "use client";
 import { Button, Chip, Link } from "@heroui/react";
 import { Icon } from "@mdi/react";
-import { LinkService } from "@repo/lib";
 import { mdiArrowRight } from "@mdi/js";
 
 export const Hero = () => {
@@ -13,7 +12,7 @@ export const Hero = () => {
           className="bg-violet-100 text-violet-700 font-medium px-2"
           size="sm"
         >
-          Privacy-first · Local by default
+          Free & open source · Self-hosted
         </Chip>
       </div>
       <h1 className="text-6xl md:text-7xl font-bold mb-6 tracking-tight">
@@ -25,18 +24,18 @@ export const Hero = () => {
         Beautiful smart home dashboards for Home Assistant
       </p>
       <p className="text-lg text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-        Build drag-and-drop dashboards with your credentials staying on your device by default.
-        Optional cloud sync available on paid plans.
+        Build drag-and-drop dashboards with a visual editor, run it on your own hardware with
+        Docker, and connect it to your own Home Assistant instance. No account, no cloud, no cost.
       </p>
       <p className="text-xs pb-8 text-slate-400 max-w-xl mx-auto">
-        Free plan available — no credit card required. Paid plans unlock more dashboards, sidebars, and cloud sync.
+        100% free and open source — run it yourself in a couple of minutes.
       </p>
       <Button
         size="lg"
         color="primary"
         className="font-semibold px-8 shadow-lg shadow-violet-200"
         endContent={<Icon path={mdiArrowRight} className="w-5 h-5" />}
-        href={LinkService.crossAppHref("app", "/auth/login")}
+        href="/docs"
         as={Link}
       >
         Get Started

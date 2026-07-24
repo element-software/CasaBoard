@@ -1,11 +1,7 @@
-import { AnalyticsWrapper } from "@repo/ui/components/Shared/util/AnalyticsWrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import { cn } from "@heroui/react";
-import { getCurrentAuthUser } from "@repo/lib";
-import { User } from "@supabase/supabase-js";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,21 +19,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-
-  let user: User | undefined = undefined;
-
-  try {
-    user = await getCurrentAuthUser();
-  } catch (error) {
-    console.error(error);
-  }
-
   return (
     <html lang="en" className="light">
-      <Script async src="https://js.stripe.com/v3/pricing-table.js"></Script>
       <body className={cn("bg-white",inter.className)}>
         {children}
-        <AnalyticsWrapper gaId="G-P2JEHMNT4C" user={user} />
       </body>
     </html>
   );

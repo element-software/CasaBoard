@@ -1,30 +1,61 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDebouncedSlider } from "@repo/hooks/useDebounce";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 
 export interface UseLightControllerOptions {
-  dimmer: boolean;
+  /** @deprecated Prefer modal brightness; drag fill kept optional. */
+  dimmer?: boolean;
 }
 
 export function useLightLoading(entity: any, timeoutMs: number = 10000) {
   return useEntityLoading(entity, { timeoutMs });
 }
 
-export function useLightController(entity: any, entityId: string, options: UseLightControllerOptions) {
-  const { dimmer } = options;
+function supportsFeature(entity: any, bit: number): boolean {
+  const features = entity?.attributes?.supported_features ?? 0;
+  return (features & bit) === bit;
+}
 
-  // Local drag state
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
+/** HA light supported_features bits */
+const SUPPORT_BRIGHTNESS = 1;
+const SUPPORT_COLOR_TEMP = 2;
+const SUPPORT_COLOR = 16; // SUPPORT_COLOR / hs / rgb varies; 16 is COLOR historically in some versions — also check attrs
 
-  // Derived state
+export function useLightController(entity: any, entityId: string, _options: UseLightControllerOptions = {}) {
   const entityBrightness: number = entity?.attributes?.brightness || 0;
-  const currentBrightness: number = entityBrightness;
-  const brightnessPercentage: number = Math.round((currentBrightness / 255) * 100);
+  const brightnessPercentage: number = Math.round((entityBrightness / 255) * 100);
   const isOn: boolean = entity?.state === "on";
 
-  // Immediate service calls
+  const canBrightness = useMemo(() => {
+    if (!entity) return false;
+    if (entity.attributes?.brightness != null) return true;
+    return supportsFeature(entity, SUPPORT_BRIGHTNESS);
+  }, [entity]);
+
+  const canColorTemp = useMemo(() => {
+    if (!entity) return false;
+    if (
+      entity.attributes?.color_temp_kelvin != null ||
+      entity.attributes?.min_color_temp_kelvin != null
+    ) {
+      return true;
+    }
+    return supportsFeature(entity, SUPPORT_COLOR_TEMP);
+  }, [entity]);
+
+  const canColor = useMemo(() => {
+    if (!entity) return false;
+    if (entity.attributes?.rgb_color != null || entity.attributes?.hs_color != null) {
+      return true;
+    }
+    const modes: string[] | undefined = entity.attributes?.supported_color_modes;
+    if (modes?.some((m) => ["hs", "rgb", "rgbw", "rgbww", "xy"].includes(m))) {
+      return true;
+    }
+    return supportsFeature(entity, SUPPORT_COLOR);
+  }, [entity]);
+
   const setBrightnessImmediate = useCallback(
     (value: number) => {
       entity?.callService?.("turn_on", { brightness: value });
@@ -52,7 +83,6 @@ export function useLightController(entity: any, entityId: string, options: UseLi
     [entity]
   );
 
-  // Debounced handlers for slider actions
   const debouncedSetBrightness = useDebouncedSlider(setBrightnessImmediate, 150);
   const debouncedSetTemperature = useDebouncedSlider(setTemperatureImmediate, 150);
   const debouncedSetColor = useDebouncedSlider(setColorImmediate, 150);
@@ -61,96 +91,23 @@ export function useLightController(entity: any, entityId: string, options: UseLi
     (value: number) => {
       debouncedSetBrightness(value);
     },
-    [debouncedSetBrightness, entityId]
+    [debouncedSetBrightness]
   );
 
-  const handleCardClick = useCallback(() => {
-    if (entity && !isDragging && !hasDragged) {
-      entity?.toggle?.();
-    }
-  }, [entity, isDragging, hasDragged]);
-
-  const handleCardDrag = useCallback(
-    (e: React.MouseEvent) => {
-      if (!dimmer || !isOn || !isDragging) return;
-      e.preventDefault();
-      e.stopPropagation();
-      setHasDragged(true);
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-      const brightness = Math.round((percentage / 100) * 255);
-      handleBrightnessChange(brightness);
-    },
-    [dimmer, isOn, isDragging, handleBrightnessChange]
-  );
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (dimmer && isOn) {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDragging(true);
-        handleCardDrag(e);
-      }
-    },
-    [dimmer, isOn, handleCardDrag]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    setTimeout(() => setHasDragged(false), 100);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsDragging(false);
-    setTimeout(() => setHasDragged(false), 100);
-  }, []);
-
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      setIsDragging(false);
-      setTimeout(() => setHasDragged(false), 100);
-    };
-    if (isDragging) {
-      document.addEventListener("mouseup", handleGlobalMouseUp);
-      document.addEventListener("mouseleave", handleGlobalMouseUp);
-    }
-    return () => {
-      document.removeEventListener("mouseup", handleGlobalMouseUp);
-      document.removeEventListener("mouseleave", handleGlobalMouseUp);
-    };
-  }, [isDragging]);
-
-  const cardStyle = useMemo<React.CSSProperties | undefined>(() => {
-    if (dimmer && isOn) {
-      return {
-        background: `linear-gradient(to right, var(--theme-slider-active) 0%, var(--theme-slider-active) ${brightnessPercentage}%, var(--theme-card-background) ${Math.min(
-          brightnessPercentage + 2,
-          100
-        )}%, var(--theme-card-background) 100%)`,
-        color: "var(--theme-text-on)",
-      };
-    }
-    return undefined;
-  }, [dimmer, isOn, brightnessPercentage]);
+  const handleToggle = useCallback(() => {
+    entity?.toggle?.();
+  }, [entity]);
 
   return {
-    // state
     isOn,
     brightnessPercentage,
-    // styles
-    cardStyle,
-    // interactions
-    handleCardClick,
-    handleCardDrag,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseLeave,
-    // expose unused debounced setters for future UI extensions
+    canBrightness,
+    canColorTemp,
+    canColor,
+    handleToggle,
+    handleBrightnessChange,
     debouncedSetTemperature,
     debouncedSetColor,
+    entityId,
   };
 }
-
-

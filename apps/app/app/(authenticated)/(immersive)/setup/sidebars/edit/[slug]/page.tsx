@@ -1,6 +1,6 @@
-import { SidebarActions, SubscriptionService, getLockedIds } from "@repo/lib";
+import { SidebarActions } from "@repo/lib";
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -16,30 +16,19 @@ export default async function SidebarEditPage({
 }: SidebarEditPageProps) {
   const { slug } = await params;
 
-  const [allSidebars, entitlements] = await Promise.all([
-    SidebarActions.getAllSidebars(),
-    SubscriptionService.getEntitlementsForCurrentUser(),
-  ]);
-
-  const sidebar = allSidebars.find((s) => s.slug === slug);
-
+  const sidebar = await SidebarActions.getSidebar(slug).catch(() => null);
   if (!sidebar) {
     notFound();
-  }
-
-  const lockedIds = new Set(getLockedIds(allSidebars, entitlements.maxSidebars));
-  if (lockedIds.has(sidebar.id)) {
-    redirect("/auth/profile/billing");
   }
 
   return (
     <SidebarEditorClient
       initialData={sidebar.puck_data}
       sidebarId={sidebar.id}
-      userId={sidebar.user_id}
       initialPublished={true}
       initialSlug={sidebar.slug}
       initialThemeId={sidebar.theme_id ?? null}
+      initialStyleId={sidebar.style_id ?? null}
     />
   );
 }

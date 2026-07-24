@@ -26,6 +26,12 @@ export const GraphCardConfig = {
         />
       ),
     },
+    name: {
+      type: "text",
+      label: "Display Name",
+      description:
+        "Optional custom name. Leave blank to use the entity friendly name.",
+    },
     showStatistics: {
       type: "radio",
       label: "Show Statistics",
@@ -38,7 +44,14 @@ export const GraphCardConfig = {
   },
   defaultProps: {
     entityId: "",
+    name: "",
     showStatistics: false,
   },
-  render: (props: any) =>  <GraphCard {...props} showStatistics={props.showStatistics} />
+  render: (props: any) => (
+    <GraphCard
+      {...props}
+      name={props.name}
+      showStatistics={props.showStatistics}
+    />
+  ),
 };  

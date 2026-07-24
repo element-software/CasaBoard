@@ -2,8 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { DashboardConfig } from '@repo/config';
 import { dashboardConfig as defaultConfig } from '@repo/config';
-import { getCurrentAuthUser, PageActions, clientLogger } from '@repo/lib';
-import { SupabaseClient } from '@repo/lib';
+import { PageActions, clientLogger } from '@repo/lib';
 
 interface ConfigurationContextType {
   config: DashboardConfig;
@@ -34,35 +33,25 @@ export const ConfigurationProvider: React.FC<ConfigurationProviderProps> = ({
   initialConfig = defaultConfig 
 }) => {
   const [config, setConfig] = useState<DashboardConfig>(initialConfig);
-  const supabase = SupabaseClient.createClient();
 
   const updateConfig = async (newConfig: DashboardConfig) => {
     setConfig(newConfig);
-    
-    // Save to Supabase if user is authenticated
-    try {
-      const user = await getCurrentAuthUser();
-      if (user) {
-        // Update pages in Supabase
-        for (const [slug, pageConfig] of Object.entries(newConfig.pages)) {
-          try {
-            await PageActions.updatePage(slug, {
-              name: pageConfig.title?.value || slug,
-              puck_data: pageConfig.puckData
-            });
-          } catch (error) {
-            clientLogger.warn('ConfigurationProvider', `Failed to update page ${slug}`, error);
-          }
-        }
+
+    for (const [slug, pageConfig] of Object.entries(newConfig.pages)) {
+      try {
+        await PageActions.updatePage(slug, {
+          name: pageConfig.title?.value || slug,
+          puck_data: pageConfig.puckData
+        });
+      } catch (error) {
+        clientLogger.warn('ConfigurationProvider', `Failed to update page ${slug}`, error);
       }
-    } catch (error) {
-      clientLogger.warn('ConfigurationProvider', 'Failed to save configuration to Supabase', error);
     }
   };
 
   const resetConfig = async () => {
     setConfig(defaultConfig);
-    // Note: We don't delete pages from Supabase on reset, just reset the local config
+    // Note: We don't delete pages on reset, just reset the local config
   };
 
   const saveConfig = (): string => {

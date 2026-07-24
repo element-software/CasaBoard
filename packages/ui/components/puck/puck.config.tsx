@@ -1,5 +1,6 @@
 "use client";
 import { LightConfig } from "@repo/ui/components/Light/Light.config";
+import { SwitchConfig } from "@repo/ui/components/Switch/Switch.config";
 import { AlarmConfig } from "@repo/ui/components/Alarm/Alarm.config";
 import { BinarySensorConfig } from "@repo/ui/components/BinarySensor/BinarySensor.config";
 import { EntitiesCardConfig } from "@repo/ui/components/EntitiesCard/EntitiesCard.config";
@@ -7,20 +8,34 @@ import { GraphCardConfig } from "@repo/ui/components/GraphCard/GraphCard.config"
 import { ClockConfig } from "@repo/ui/components/Clock/Clock.config";
 import { ThermostatConfig } from "@repo/ui/components/Thermostat/Thermostat.config";
 import { WeatherConfig } from "@repo/ui/components/Weather/Weather.config";
+import { CameraConfig } from "@repo/ui/components/Camera/Camera.config";
+import { RoomsConfig } from "@repo/ui/components/Rooms/Rooms.config";
+import { SidebarNavConfig } from "@repo/ui/components/SidebarNav/SidebarNav.config";
+import { PagePlaceholderConfig } from "@repo/ui/components/PagePlaceholder/PagePlaceholder.config";
+import { SectionHeaderConfig } from "@repo/ui/components/SectionHeader/SectionHeader.config";
 import { Config } from "@measured/puck";
 import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
 import { cn } from "@heroui/react";
 
 type Components = {
   Light: {};
+  Switch: {};
   Alarm: {};
   BinarySensor: {};
   EntitiesCard: {};
   GraphCard: {};
-  Clock: {};
+  Clock: {
+    align: "left" | "center" | "right";
+    hourFormat: "12" | "24" | "auto";
+  };
   Grid: {};
   Thermostat: {};
   Weather: {};
+  Camera: {};
+  Rooms: {};
+  SidebarNav: {};
+  PagePlaceholder: {};
+  SectionHeader: {};
 };
 
 const GAP_OPTIONS = [
@@ -176,7 +191,11 @@ function RootCanvas(props: any) {
       className={cn(
         "w-full min-h-0",
         layoutPadding,
-        "[&>div]:w-full [&>div]:flex",
+        // Stretch Puck's dropzone; when cross-axis is stretch, make each child a
+        // full-height flex column so inner cards can fill their cell.
+        "[&>div]:w-full [&>div]:flex [&>div>*]:min-h-0 [&>div>*]:w-full [&>div>*]:min-w-0",
+        items === "items-stretch" &&
+          "[&>div>*]:flex [&>div>*]:h-full [&>div>*]:flex-col",
         innerDirectionClassMap[layoutDirection] ?? "[&>div]:flex-col",
         innerGapClassMap[layoutGap] ?? "[&>div]:gap-4",
         innerWrapClassMap[layoutWrap] ?? "[&>div]:flex-nowrap",
@@ -246,6 +265,7 @@ export const PuckConfig: Config<Components> = {
   },
   components: {
     Light: LightConfig,
+    Switch: SwitchConfig,
     Alarm: AlarmConfig,
     BinarySensor: BinarySensorConfig,
     EntitiesCard: EntitiesCardConfig,
@@ -254,22 +274,33 @@ export const PuckConfig: Config<Components> = {
     Grid: GridConfig,
     Thermostat: ThermostatConfig,
     Weather: WeatherConfig,
+    Camera: CameraConfig,
+    Rooms: RoomsConfig,
+    SidebarNav: SidebarNavConfig,
+    PagePlaceholder: PagePlaceholderConfig,
+    SectionHeader: SectionHeaderConfig,
   },
   categories: {
     layout: {
       title: "Layout",
-      components: ["Grid"],
+      components: ["Grid", "SectionHeader", "PagePlaceholder", "Rooms"],
+    },
+    navigation: {
+      title: "Navigation",
+      components: ["SidebarNav"],
     },
     entities: {
       title: "Entities",
       components: [
         "Light",
+        "Switch",
         "Clock",
         "BinarySensor",
         "EntitiesCard",
         "GraphCard",
         "Thermostat",
         "Weather",
+        "Camera",
         "Alarm",
       ],
     },

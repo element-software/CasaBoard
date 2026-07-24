@@ -1,4 +1,2 @@
 export * from "./pageActions";
-export * from "./haInstanceActions";
-
-
+export * from "./haConnectionActions";

@@ -28,8 +28,8 @@ export const LightConfig = {
     },
     dimmer: {
       type: "radio",
-      label: "Dimmer Control",
-      description: "Enable brightness control with drag interaction",
+      label: "Brightness in modal",
+      description: "Show brightness slider in the long-press control modal",
       options: [
         { value: true, label: "Enabled" },
         { value: false, label: "Disabled" },
@@ -38,6 +38,7 @@ export const LightConfig = {
     temperature: {
       type: "radio",
       label: "Temperature Control",
+      description: "Show color temperature in the long-press modal",
       options: [
         { value: true, label: "Enabled" },
         { value: false, label: "Disabled" },
@@ -46,6 +47,7 @@ export const LightConfig = {
     color: {
       type: "radio",
       label: "Color Control",
+      description: "Show color picker in the long-press modal",
       options: [
         { value: true, label: "Enabled" },
         { value: false, label: "Disabled" },
@@ -55,8 +57,8 @@ export const LightConfig = {
   defaultProps: {
     entityId: "",
     dimmer: true,
-    temperature: false,
-    color: false,
+    temperature: true,
+    color: true,
   },
   render: (props: any) => <Light {...props} />,
 };

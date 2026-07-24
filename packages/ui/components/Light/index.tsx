@@ -1,40 +1,54 @@
 "use client";
+import { useState, useCallback } from "react";
 import { Skeleton } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiLightbulb } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
+import { CardShell, IconBubble } from "../Shared/Card";
 import { useEntity } from "@repo/ha";
+import { useEntityPress } from "@repo/hooks";
 import { useLightLoading, useLightController } from "./useLight";
+import { EntityControlModal } from "../EntityControlModal";
 
 interface LightProps {
   entityId: string;
   dimmer?: boolean;
   temperature?: boolean;
   color?: boolean;
+  tileLayout?: "tile" | "row";
   [key: string]: any;
 }
 
 export const Light = ({
   entityId,
-  dimmer = false,
+  dimmer = true,
   temperature = false,
   color = false,
-  ...props
+  tileLayout = "tile",
 }: LightProps) => {
   const entity = useEntity(entityId);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { isEntityReady, showNotAvailable, isLoaded } = useLightLoading(entity);
 
   const {
     isOn,
     brightnessPercentage,
-    cardStyle,
-    handleCardClick,
-    handleCardDrag,
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseLeave,
-  } = useLightController(entity, entityId, { dimmer });
+    canBrightness,
+    canColorTemp,
+    canColor,
+    handleToggle,
+    handleBrightnessChange,
+    debouncedSetTemperature,
+    debouncedSetColor,
+  } = useLightController(entity, entityId);
+
+  const openModal = useCallback(() => setModalOpen(true), []);
+  const pressHandlers = useEntityPress({
+    onTap: handleToggle,
+    onLongPress: openModal,
+    enabled: isEntityReady && !!entity,
+  });
 
   if (!entityId) {
     return (
@@ -45,73 +59,73 @@ export const Light = ({
     );
   }
 
-  const offStyle: React.CSSProperties = {
-    backgroundColor: "var(--theme-entity-off)",
-    color: "var(--theme-text)",
-  };
-
-  const onStyle: React.CSSProperties = {
-    backgroundColor: "var(--theme-primary)",
-    color: "var(--theme-text-on)",
-  };
+  const showBrightness = dimmer && canBrightness;
+  const showTemp = temperature || canColorTemp;
+  const showColor = color || canColor;
 
   return (
-    <Skeleton isLoaded={isLoaded} className="w-full h-16 rounded-xl">
-      {showNotAvailable ? (
-        <div className="rounded-xl p-3 flex items-center gap-3 opacity-50">
-          <Icon path={mdiLightbulb} className="h-8 w-8 flex-shrink-0 text-theme-text-muted" />
-          <div className="flex flex-col min-w-0">
-            <p className="text-sm font-semibold text-theme-text-muted truncate">{entityId}</p>
-            <p className="text-xs text-theme-text-muted">Unavailable</p>
-          </div>
-        </div>
-      ) : isEntityReady ? (
-        <div
-          key={entity?.entity_id || entityId}
-          className="w-full cursor-pointer transition-all duration-200 hover:brightness-110 select-none rounded-xl overflow-hidden"
-          onClick={handleCardClick}
-          onMouseMove={dimmer ? handleCardDrag : undefined}
-          onMouseDown={dimmer ? handleMouseDown : undefined}
-          onMouseUp={dimmer ? handleMouseUp : undefined}
-          onMouseLeave={dimmer ? handleMouseLeave : undefined}
-          style={cardStyle ?? (isOn ? onStyle : offStyle)}
-        >
-          <div className="p-3 relative overflow-hidden">
-            <div className="flex items-center gap-3 w-full">
-              <EntityIcon
-                entity={entity}
-                className="h-8 w-8 flex-shrink-0"
-              />
-              <div className="flex flex-col flex-1 min-w-0">
-                <h3 className="text-sm font-semibold capitalize truncate">
-                  {entity.attributes?.friendly_name ||
-                    entity.entity_id ||
-                    entityId}
-                </h3>
-                {dimmer && isOn && (
-                  <div className="text-xs font-medium opacity-80">
-                    {brightnessPercentage}%
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {dimmer && isOn && (
-              <div
-                className="absolute bottom-0 left-0 h-0.5 rounded-b-lg"
-                style={{
-                  width: `${brightnessPercentage}%`,
-                  backgroundColor: "var(--theme-slider-thumb)",
-                  boxShadow: `0 0 4px color-mix(in srgb, var(--theme-slider-thumb) 40%, transparent)`,
-                  maxWidth: "100%",
-                }}
-              />
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
-      )}
-    </Skeleton>
+    <>
+      <EntityControlModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        entity={entity}
+        entityId={entityId}
+        showBrightness={showBrightness}
+        showTemperature={showTemp}
+        showColor={showColor}
+        brightnessPercentage={brightnessPercentage}
+        onBrightnessChange={handleBrightnessChange}
+        onTemperatureChange={debouncedSetTemperature}
+        onColorChange={debouncedSetColor}
+        onToggle={handleToggle}
+      />
+      <Skeleton
+        isLoaded={isLoaded}
+        className="flex h-full w-full flex-col rounded-xl"
+        classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+      >
+        {showNotAvailable ? (
+          <CardShell status="unavailable" domain="light" tileLayout={tileLayout}>
+            <IconBubble
+              icon={
+                <Icon
+                  path={mdiLightbulb}
+                  className="h-8 w-8 text-theme-text-muted"
+                />
+              }
+              label={<span className="text-theme-text-muted">{entityId}</span>}
+              secondary={
+                <span className="text-theme-text-muted">Unavailable</span>
+              }
+            />
+          </CardShell>
+        ) : isEntityReady ? (
+          <CardShell
+            key={entity?.entity_id || entityId}
+            interactive
+            status={isOn ? "on" : "off"}
+            domain="light"
+            tileLayout={tileLayout}
+            {...pressHandlers}
+          >
+            <IconBubble
+              icon={<EntityIcon entity={entity} className="h-6 w-6 text-current" />}
+              label={
+                entity.attributes?.friendly_name || entity.entity_id || entityId
+              }
+              secondary={
+                isOn
+                  ? showBrightness
+                    ? `${brightnessPercentage}%`
+                    : "On"
+                  : "Off"
+              }
+            />
+          </CardShell>
+        ) : (
+          <div className="rounded-xl p-3 text-center text-theme-text-muted opacity-0" />
+        )}
+      </Skeleton>
+    </>
   );
 };

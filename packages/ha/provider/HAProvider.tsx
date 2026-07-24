@@ -1,12 +1,14 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
-import { clientLogger, SupabaseClient } from "@repo/lib";
-import { Connection, getStates, subscribeEntities, Auth, ERR_INVALID_AUTH } from "home-assistant-js-websocket";
-import { connect } from "../connection"; // Import your connect logic
-import { HAInstance } from "@repo/types/ha";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { clientLogger } from "@repo/lib";
+import { Connection, getStates, subscribeEntities, Auth } from "home-assistant-js-websocket";
+import { connect } from "../connection";
+import { HAConnection } from "@repo/types/ha";
 
 export interface HAContextType {
   connection: Connection | null;
+  auth: Auth | null;
+  hassUrl: string | null;
   connected: boolean;
   entities: { [entityId: string]: any };
   getEntity: (entityId: string) => any | undefined;
@@ -22,53 +24,38 @@ const HAContext = createContext<HAContextType>({
   getEntity: () => undefined,
   getAllEntities: () => [],
   connection: null,
+  auth: null,
+  hassUrl: null,
   error: null,
   loading: true,
   retry: () => {},
 });
 
 export interface HAProviderProps {
-  haInstance: HAInstance;
+  haInstance: HAConnection;
   children: ReactNode;
   fallback?: ReactNode;
 }
 
 export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fallback = null }) => {
   const [connection, setConnection] = useState<Connection | null>(null);
+  const [auth, setAuth] = useState<Auth | null>(null);
   const [entities, setEntities] = useState<{ [entityId: string]: any }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [userId, setUserId] = useState<string>("");
 
-  // Resolve the Supabase user ID on mount (browser-side only)
-  useEffect(() => {
-    const supabase = SupabaseClient.createClient();
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (error || !data.user?.id) {
-        clientLogger.error('HAProvider', 'Could not resolve user ID — HA connection aborted', error);
-        setError(new Error('Unable to verify your session. Please refresh the page.'));
-        setLoading(false);
-        return;
-      }
-      setUserId(data.user.id);
-    });
-  }, []);
-
-  const run = async (resolvedUserId: string) => {
+  const run = async () => {
     let unsubscribe: (() => void) | undefined;
-    let activeConnection: Connection | null = null;
-    let activeAuth: Auth | null = null;
 
     setLoading(true);
     setError(null);
     try {
       clientLogger.info('HAProvider', `connecting to Home Assistant at ${haInstance.hass_url}`);
-      const { connection, auth } = await connect({ haInstance, userId: resolvedUserId });
-      clientLogger.info('HAProvider', 'connected to Home Assistant', connection);
-      activeConnection = connection;
-      activeAuth = auth;
+      const { connection: activeConnection, auth: activeAuth } = await connect({ haInstance });
+      clientLogger.info('HAProvider', 'connected to Home Assistant', activeConnection);
       setConnection(activeConnection);
+      setAuth(activeAuth);
 
       // Initial states
       const initial = await getStates(activeConnection);
@@ -87,6 +74,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     } catch (e: any) {
       setError(e);
       setConnection(null);
+      setAuth(null);
       setEntities({});
       setLoading(false);
       clientLogger.error('HAProvider', 'error', e);
@@ -96,13 +84,10 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
   };
 
   useEffect(() => {
-    // Wait until userId is resolved before connecting
-    if (!userId) return;
-
     let unsubscribe: (() => void) | undefined;
 
     const executeRun = async () => {
-      unsubscribe = await run(userId);
+      unsubscribe = await run();
     };
 
     executeRun();
@@ -110,13 +95,14 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     return () => {
       if (unsubscribe) unsubscribe();
       setConnection(null);
+      setAuth(null);
       setEntities({});
     };
-  }, [haInstance.hass_url, retryCount, userId]);
+  }, [haInstance.hass_url, retryCount]);
 
   const getEntityById = (entityId: string) => entities[entityId];
   const getAllEntities = () => Object.values(entities);
-  
+
   const retry = () => {
     setRetryCount(prev => prev + 1);
   };
@@ -125,6 +111,8 @@ export const HAProvider: React.FC<HAProviderProps> = ({ haInstance, children, fa
     <HAContext.Provider
       value={{
         connection,
+        auth,
+        hassUrl: haInstance.hass_url,
         connected: Boolean(connection),
         entities,
         getEntity: getEntityById,

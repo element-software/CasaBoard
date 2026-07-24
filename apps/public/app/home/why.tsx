@@ -1,16 +1,14 @@
 "use client";
-import { Button, Card, CardBody, Chip } from "@heroui/react";
+import { Card, CardBody, Chip } from "@heroui/react";
 import Icon from "@mdi/react";
 import {
-  mdiCloudOutline,
+  mdiCloudOffOutline,
   mdiDrag,
   mdiPalette,
   mdiCodeTags,
-  mdiAccountGroup,
+  mdiDocker,
   mdiShieldLock,
-  mdiShield,
 } from "@mdi/js";
-import Link from "next/link";
 
 interface WhyFeature {
   icon: string;
@@ -18,27 +16,23 @@ interface WhyFeature {
   description: string;
   highlight: string;
   color: "primary" | "secondary" | "success" | "warning" | "danger";
-  cta?: {
-    text: string;
-    href: string;
-  };
 }
 
 const whyFeatures: WhyFeature[] = [
   {
     icon: mdiShieldLock,
-    title: "Privacy-first & local",
+    title: "Self-hosted, always",
     description:
-      "By default your Home Assistant URL and OAuth tokens stay in your browser—encrypted—not on our servers. You stay in control of what leaves your device.",
-    highlight: "Local by default",
+      "CasaBoard runs on your own hardware. Your Home Assistant connection and dashboard layouts stay on your server — nothing is sent anywhere else.",
+    highlight: "Your data, your server",
     color: "success",
   },
   {
-    icon: mdiCloudOutline,
-    title: "Optional cloud sync",
+    icon: mdiCloudOffOutline,
+    title: "No account, no cloud",
     description:
-      "On paid plans you can opt in to store your Home Assistant URL in the cloud so the same instance details follow you across browsers and devices. Tokens still stay local.",
-    highlight: "You choose",
+      "There's no sign-up, no login, and no subscription. Anyone who can reach the app on your network can open and edit dashboards.",
+    highlight: "Nothing to sign up for",
     color: "primary",
   },
   {
@@ -50,32 +44,28 @@ const whyFeatures: WhyFeature[] = [
     color: "success",
   },
   {
-    icon: mdiAccountGroup,
-    title: "Community-driven",
+    icon: mdiDocker,
+    title: "Runs with Docker",
     description:
-      "Features and improvements are shaped by feedback from people who use CasaBoard every day.",
-    highlight: "User-powered",
+      "One docker-compose file gets you running. Works alongside any Home Assistant install — Core, Container, OS, or Supervised.",
+    highlight: "docker compose up",
     color: "secondary",
   },
   {
     icon: mdiPalette,
-    title: "Advanced theming",
+    title: "Themeable",
     description:
-      "Themes, layouts, and visual polish—roadmapped so your dashboards can look and feel like yours.",
+      "Themes, layouts, and visual polish so your dashboards can look and feel like yours.",
     highlight: "Fully customizable",
     color: "warning",
   },
   {
-    icon: mdiShield,
-    title: "Secure connections",
+    icon: mdiCodeTags,
+    title: "Open source",
     description:
-      "Industry-standard encryption for tokens in the browser and secure OAuth with Home Assistant. Read how we approach security end to end.",
-    highlight: "Built to protect",
+      "The full source is on GitHub. Fork it, contribute, or just read how it works — no black box.",
+    highlight: "Free & forkable",
     color: "success",
-    cta: {
-      text: "Security",
-      href: "/security",
-    },
   },
 ];
 
@@ -88,11 +78,11 @@ export const Why = () => {
             Why CasaBoard
           </p>
           <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-            Powerful dashboards, without the trade-offs
+            Powerful dashboards, without giving up control
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-            Privacy-first by design: Home Assistant credentials stay local unless you
-            explicitly opt into cloud sync.
+            Free and open source, by design: your Home Assistant credentials and dashboards
+            never leave the server you run CasaBoard on.
           </p>
         </div>
 
@@ -128,18 +118,6 @@ export const Why = () => {
                   >
                     {feature.highlight}
                   </Chip>
-                  {feature.cta && (
-                    <Button
-                      as={Link}
-                      color="primary"
-                      variant="light"
-                      size="sm"
-                      className="mt-2"
-                      href={feature.cta.href}
-                    >
-                      {feature.cta.text}
-                    </Button>
-                  )}
                 </div>
               </CardBody>
             </Card>
@@ -158,8 +136,8 @@ export const Why = () => {
             </div>
             <p className="text-slate-500 text-base max-w-2xl mx-auto">
               CasaBoard is for everyone—from power users to newcomers. An intuitive
-              drag-and-drop interface helps you create polished dashboards while your
-              Home Assistant credentials stay under your control.
+              drag-and-drop interface helps you create polished dashboards, entirely on
+              infrastructure you control.
             </p>
           </div>
         </div>

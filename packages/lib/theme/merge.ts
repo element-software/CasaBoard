@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import {
-  DEFAULT_DARK_THEME_TOKENS,
+  DEFAULT_LIGHT_THEME_TOKENS,
   type ResolvedThemeTokens,
   type ThemeTokens,
 } from "@repo/types/theme";
@@ -9,7 +9,7 @@ import { sanitizeThemeTokens } from "./validate";
 export function mergeThemeLayers(
   ...layers: ThemeTokens[]
 ): ResolvedThemeTokens {
-  const base: ResolvedThemeTokens = { ...DEFAULT_DARK_THEME_TOKENS };
+  const base: ResolvedThemeTokens = { ...DEFAULT_LIGHT_THEME_TOKENS };
   for (const layer of layers) {
     const clean = sanitizeThemeTokens(layer);
     for (const key of Object.keys(clean) as (keyof ResolvedThemeTokens)[]) {

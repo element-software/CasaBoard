@@ -1,23 +1,113 @@
-import { useCallback } from "react";
+"use client";
+
+import { useCallback, type ReactNode } from "react";
+import Icon from "@mdi/react";
+import { mdiDevices } from "@mdi/js";
 import EntityIcon from "../Shared/util/EntityIcon";
 import { BinarySensorUtils } from "@repo/utils";
 import { Skeleton } from "@heroui/react";
 import { useEntity, useHA } from "@repo/ha";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
+import { CardShell } from "../Shared/Card";
 
 interface EntityCardProps {
   entityId: string;
-  icon: string;
+  icon?: string;
   showTitle?: boolean;
   showState?: boolean;
   showLastChanged?: boolean;
   disableClick?: boolean;
 }
 
+const TOGGLE_DOMAINS = new Set([
+  "light",
+  "switch",
+  "fan",
+  "input_boolean",
+  "cover",
+  "lock",
+]);
+
+function statusLabel(
+  entity: NonNullable<ReturnType<typeof useEntity>>,
+  domain: string
+): string {
+  const state = String(entity.state ?? "");
+
+  if (domain === "binary_sensor") {
+    const rendered = BinarySensorUtils.renderState(entity as any);
+    if (rendered !== "Unknown") return rendered;
+  }
+
+  if (domain === "cover") {
+    if (state === "open") return "Open";
+    if (state === "closed") return "Closed";
+    if (state === "opening") return "Opening";
+    if (state === "closing") return "Closing";
+  }
+
+  if (domain === "lock") {
+    if (state === "locked") return "Locked";
+    if (state === "unlocked") return "Unlocked";
+  }
+
+  if (state === "on") return "On";
+  if (state === "off") return "Off";
+  if (state === "home") return "Home";
+  if (state === "not_home") return "Away";
+  if (state === "open") return "Open";
+  if (state === "closed") return "Closed";
+
+  return state || "Unknown";
+}
+
+function formatLastChanged(lastChanged: string): string {
+  return new Date(lastChanged).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function EntityTileContent({
+  icon,
+  label,
+  status,
+  detail,
+}: {
+  icon: ReactNode;
+  label?: ReactNode;
+  status: ReactNode;
+  detail?: ReactNode;
+}) {
+  return (
+    <div className="flex h-full min-h-0 w-full flex-col">
+      <div className="flex w-full items-center justify-between gap-2">
+        <div className="icon-bubble shrink-0">{icon}</div>
+        <div className="icon-bubble-secondary min-w-0 flex-1 text-right text-xs font-medium leading-snug">
+          {status}
+        </div>
+      </div>
+      {(label || detail) && (
+        <div className="mt-auto flex min-w-0 flex-col gap-0.5">
+          {label && (
+            <h3 className="truncate text-sm font-semibold capitalize leading-tight">
+              {label}
+            </h3>
+          )}
+          {detail && (
+            <div className="icon-bubble-secondary text-[10px] font-medium leading-snug break-words hyphens-none">
+              {detail}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const EntityCard = ({
   entityId,
-  icon,
-  showTitle = false,
+  showTitle = true,
   disableClick = false,
   showState = false,
   showLastChanged = false,
@@ -25,55 +115,105 @@ const EntityCard = ({
   const { connection } = useHA();
   const entity = useEntity(entityId);
   const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
+  const domain = entityId?.split(".")[0] ?? "";
+  const isOn =
+    entity?.state === "on" ||
+    entity?.state === "home" ||
+    entity?.state === "open";
+  const canToggle = !disableClick && TOGGLE_DOMAINS.has(domain);
 
-  const toggleLighting = useCallback(
-    async (entities: string) => {
-      if (disableClick || !connection) return;
-      const service = entity?.state === "on" ? "turn_off" : "turn_on";
+  const handleToggle = useCallback(async () => {
+    if (!canToggle || !connection || !entity) return;
+
+    try {
+      if (domain === "cover") {
+        await connection.sendMessagePromise({
+          type: "call_service",
+          domain,
+          service: entity.state === "open" ? "close_cover" : "open_cover",
+          service_data: { entity_id: entity.entity_id },
+        });
+        return;
+      }
+
+      if (domain === "lock") {
+        await connection.sendMessagePromise({
+          type: "call_service",
+          domain,
+          service: entity.state === "unlocked" || entity.state === "on" ? "lock" : "unlock",
+          service_data: { entity_id: entity.entity_id },
+        });
+        return;
+      }
+
       await connection.sendMessagePromise({
         type: "call_service",
-        domain: "light",
-        service,
-        service_data: { entity_id: entities },
+        domain,
+        service: entity.state === "on" ? "turn_off" : "turn_on",
+        service_data: { entity_id: entity.entity_id },
       });
-    },
-    [connection, disableClick, entity?.state]
-  );
+    } catch {
+      /* non-toggleable or failed call — tile still shows state */
+    }
+  }, [canToggle, connection, domain, entity]);
+
+  if (!entityId) return null;
 
   return (
-    <Skeleton isLoaded={isLoaded} className="rounded-lg">
+    <Skeleton
+      isLoaded={isLoaded}
+      className="flex h-full w-full flex-col rounded-xl"
+      classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
+    >
       {showNotAvailable ? (
-        <div
-          key={entityId}
-          className="flex flex-col items-center gap-2 text-center p-2 rounded-lg opacity-50"
+        <CardShell
+          status="unavailable"
+          domain={domain || undefined}
+          tileLayout="tile"
+          className="!p-3.5"
         >
-          <div className="h-6 w-6 rounded-full bg-theme-border" />
-          {showTitle && (
-            <div className="text-[10px] text-theme-text-muted break-all">{entityId}</div>
-          )}
-        </div>
+          <EntityTileContent
+            icon={
+              <Icon
+                path={mdiDevices}
+                className="h-6 w-6 text-theme-text-muted"
+              />
+            }
+            label={<span className="text-theme-text-muted">{entityId}</span>}
+            status={<span className="text-theme-text-muted">Unavailable</span>}
+          />
+        </CardShell>
       ) : isEntityReady ? (
-        <div
-          onClick={() => toggleLighting(entityId)}
-          className="flex flex-col items-center gap-2 text-center"
+        <CardShell
+          interactive={canToggle}
+          status={isOn ? "on" : "off"}
+          domain={domain || undefined}
+          tileLayout="tile"
+          className="!p-3.5"
+          onClick={canToggle ? handleToggle : undefined}
         >
-          <EntityIcon entity={entity!} size="h-8 w-8" />
-          {showTitle && (
-            <div className="text-xs">{entity!.attributes.friendly_name}</div>
-          )}
-          {showState && (
-            <div className="text-xs text-theme-secondary m-0 -mt-2">
-              {BinarySensorUtils.renderState(entity as any)}
-            </div>
-          )}
-          {showLastChanged && (
-            <p className="text-[10px] text-theme-secondary">
-              Last Changed {new Date(entity!.last_changed).toLocaleTimeString()}
-            </p>
-          )}
-        </div>
+          <EntityTileContent
+            icon={
+              <EntityIcon entity={entity!} className="h-6 w-6 text-current" />
+            }
+            label={
+              showTitle
+                ? entity!.attributes?.friendly_name || entity!.entity_id
+                : undefined
+            }
+            status={statusLabel(entity!, domain)}
+            detail={
+              showLastChanged && entity!.last_changed ? (
+                <span className="flex flex-col">
+                  <span>Last changed</span>
+                  <span>{formatLastChanged(entity!.last_changed)}</span>
+                </span>
+              ) : undefined
+            }
+          />
+        </CardShell>
       ) : (
-        <div className="h-8 w-8 rounded-lg opacity-0" />
+        <div className="rounded-xl p-3 opacity-0" />
       )}
     </Skeleton>
   );

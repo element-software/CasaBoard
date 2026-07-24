@@ -1,5 +1,5 @@
-export { useEntitlements, useEntitlementCheck } from './useEntitlements';
-export { useMergedHAInstances } from './useMergedHAInstances';
+export { useHAConnection } from './useHAConnection';
 export { useDebounce } from './useDebounce';
 export { usePages } from './usePages';
 export { useEntityLoading } from './useEntityLoading';
+export { useEntityPress } from './useEntityPress';

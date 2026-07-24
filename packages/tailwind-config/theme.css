@@ -1,114 +1,68 @@
 /* Theme CSS Custom Properties — defaults; dashboard may override via ThemeScope */
 
 :root {
-  --theme-page-background: #111827;
-  --theme-background: #111827;
-  --theme-surface: #120a1f;
-  --theme-elevated: #1e0c35;
-  --theme-border: #bb37fc;
-  --theme-divider: #1e0c35;
-
-  --theme-text: #f9fafb;
-  --theme-text-primary: #8b5cf6;
-  --theme-text-secondary: #a3a3a3;
-  --theme-text-muted: #6b7280;
-  --theme-text-on-primary: #ffffff;
-  --theme-text-on: #ffffff;
-
-  --theme-primary: #8b5cf6;
-  --theme-secondary: #333dfe;
-  --theme-accent: #bb37fc;
-
-  --theme-success: #10b981;
-  --theme-warning: #f59e0b;
-  --theme-error: #ef4444;
-  --theme-info: #3b82f6;
-
-  --theme-card-background: #120a1f;
-  --theme-card-border: #1e0c35;
-  --theme-card-hover: #1e0c35;
-
-  --theme-entity-on: #8b5cf6;
-  --theme-entity-off: #1e0c35;
-  --theme-entity-on-muted: #5b21b6;
-  --theme-entity-off-muted: #374151;
-  --theme-entity-unavailable: #ef4444;
-  --theme-entity-unknown: #8b5cf6;
-
-  --theme-alarm-armed: #7c3aed;
-  --theme-alarm-disarmed: #374151;
-  --theme-alarm-triggered: #ef4444;
-
-  --theme-button-primary: #8b5cf6;
-  --theme-button-secondary: #1e0c35;
-  --theme-button-success: #8b5cf6;
-  --theme-button-warning: #8b5cf6;
-  --theme-button-error: #ef4444;
-
-  --theme-slider-track: #1e0c35;
-  --theme-slider-thumb: #8b5cf6;
-  --theme-slider-active: #8b5cf6;
-
-  --theme-interactive-hover: #1e0c35;
-  --theme-interactive-active: #2d1b4e;
-  --theme-interactive-inactive: #374151;
-  --theme-focus-ring: #8b5cf6;
-  --theme-disabled-foreground: #6b7280;
-  --theme-disabled-background: #1f2937;
-
-  --theme-chart-line: #8b5cf6;
-  --theme-chart-fill: #8b5cf6;
-  --theme-chart-grid: #374151;
-}
-
-.light {
-  --theme-page-background: #ffffff;
-  --theme-background: #ffffff;
-  --theme-surface: #f8f7ff;
+  --theme-page-background: #f2f2f7;
+  --theme-background: #f2f2f7;
+  --theme-surface: #ffffff;
   --theme-elevated: #ffffff;
-  --theme-border: #e2e8f0;
-  --theme-divider: #f1f5f9;
+  --theme-border: #e5e5ea;
+  --theme-divider: #e5e5ea;
 
-  --theme-text: #0f0a23;
-  --theme-text-primary: #7c3aed;
-  --theme-text-secondary: #64748b;
-  --theme-text-muted: #94a3b8;
+  --theme-text: #1c1c1e;
+  --theme-text-primary: #f2c94c;
+  --theme-text-secondary: #8e8e93;
+  --theme-text-muted: #aeaeb2;
   --theme-text-on-primary: #ffffff;
   --theme-text-on: #ffffff;
 
-  --theme-primary: #7c3aed;
-  --theme-secondary: #4338ca;
-  --theme-accent: #7c3aed;
+  --theme-primary: #f2c94c;
+  --theme-secondary: #e6b93d;
+  --theme-accent: #f2c94c;
+
+  --theme-success: #34c759;
+  --theme-warning: #ff9f0a;
+  --theme-error: #ff3b30;
+  --theme-info: #007aff;
 
   --theme-card-background: #ffffff;
-  --theme-card-border: #f1f5f9;
-  --theme-card-hover: #f8f7ff;
+  --theme-card-border: #e5e5ea;
+  --theme-card-hover: #f9f9fb;
 
-  --theme-entity-on: #7c3aed;
-  --theme-entity-off: #e2e8f0;
-  --theme-entity-on-muted: #c4b5fd;
-  --theme-entity-off-muted: #cbd5e1;
-  --theme-entity-unavailable: #ef4444;
-  --theme-entity-unknown: #7c3aed;
+  --theme-entity-on: #f2c94c;
+  --theme-entity-off: #ffffff;
+  --theme-entity-on-muted: #e6b93d;
+  --theme-entity-off-muted: #e5e5ea;
+  --theme-entity-unavailable: #ff3b30;
+  --theme-entity-unknown: #8e8e93;
 
-  --theme-alarm-armed: #7c3aed;
-  --theme-alarm-disarmed: #cbd5e1;
-  --theme-alarm-triggered: #ef4444;
+  --theme-alarm-armed: #ff9f0a;
+  --theme-alarm-disarmed: #34c759;
+  --theme-alarm-triggered: #ff3b30;
 
-  --theme-slider-track: #e2e8f0;
-  --theme-slider-thumb: #7c3aed;
-  --theme-slider-active: #7c3aed;
+  --theme-button-primary: #f2c94c;
+  --theme-button-secondary: #efeef0;
+  --theme-button-success: #34c759;
+  --theme-button-warning: #ff9f0a;
+  --theme-button-error: #ff3b30;
 
-  --theme-interactive-hover: #f1f5f9;
-  --theme-interactive-active: #e9d5ff;
-  --theme-interactive-inactive: #e2e8f0;
-  --theme-focus-ring: #7c3aed;
-  --theme-disabled-foreground: #94a3b8;
-  --theme-disabled-background: #f1f5f9;
+  --theme-slider-track: #e5e5ea;
+  --theme-slider-thumb: #f2c94c;
+  --theme-slider-active: #f2c94c;
 
-  --theme-chart-line: #7c3aed;
-  --theme-chart-fill: #7c3aed;
-  --theme-chart-grid: #e2e8f0;
+  --theme-interactive-hover: #e5e5ea;
+  --theme-interactive-active: #1c1c1e;
+  --theme-interactive-inactive: #f2f2f7;
+  --theme-focus-ring: #007aff;
+  --theme-disabled-foreground: #aeaeb2;
+  --theme-disabled-background: #f2f2f7;
+
+  --theme-chart-line: #f2c94c;
+  --theme-chart-fill: #f2c94c;
+  --theme-chart-grid: #e5e5ea;
+
+  --theme-domain-light-on: #f2c94c;
+  --theme-domain-switch-on: #007aff;
+  --theme-domain-climate-on: #e29933;
 }
 
 .bg-theme-page-background {
@@ -223,12 +177,32 @@
   background-color: var(--theme-alarm-triggered);
 }
 
+.bg-theme-interactive-hover {
+  background-color: var(--theme-interactive-hover);
+}
+
+.bg-theme-interactive-active {
+  background-color: var(--theme-interactive-active);
+}
+
+.bg-theme-interactive-inactive {
+  background-color: var(--theme-interactive-inactive);
+}
+
 .hover\:bg-theme-interactive-hover:hover {
   background-color: var(--theme-interactive-hover);
 }
 
+.hover\:text-theme-text:hover {
+  color: var(--theme-text);
+}
+
 .active\:bg-theme-interactive-active:active {
   background-color: var(--theme-interactive-active);
+}
+
+.active\:text-theme-text-on:active {
+  color: var(--theme-text-on);
 }
 
 .bg-theme-background-secondary {

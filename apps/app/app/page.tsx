@@ -1,13 +1,9 @@
-import { Header } from "@repo/ui/components/Header/Header";
-import Home from "./components/home";
-import { Footer } from "@repo/ui/components/Shared/Footer/index";
+import { redirect } from "next/navigation";
+import { HAConnectionActions } from "@repo/lib";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  return (
-    <>
-      <Header />
-      <Home />
-      <Footer />
-    </>
-  );
+  const connection = await HAConnectionActions.getHAConnection();
+  redirect(connection ? "/setup" : "/setup/ha-config");
 }

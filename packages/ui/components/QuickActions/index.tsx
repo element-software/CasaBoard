@@ -6,14 +6,12 @@ import {
   mdiPlus,
   mdiWeb,
   mdiHomeAssistant,
-  mdiCreditCard,
   mdiAlertCircle,
   mdiArrowRight,
   mdiPaletteSwatch,
 } from '@mdi/js';
 import { cn } from '@heroui/react';
-import type { Entitlements } from '@repo/types/subscription';
-import { useMergedHAInstances } from '@repo/hooks';
+import { useHAConnection } from '@repo/hooks';
 
 interface QuickAction {
   href: string;
@@ -26,13 +24,9 @@ interface QuickAction {
   disabledReason?: string;
 }
 
-export interface QuickActionsProps {
-  entitlements: Entitlements;
-}
-
-export const QuickActions = ({ entitlements }: QuickActionsProps) => {
+export const QuickActions = () => {
   const router = useRouter();
-  const { instances: haInstances } = useMergedHAInstances(entitlements);
+  const { connection } = useHAConnection();
 
   const quickActions: QuickAction[] = [
     {
@@ -42,8 +36,8 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
       description: 'Build a new dashboard page',
       gradient: 'from-violet-500 to-purple-600',
       hoverBg: 'hover:bg-violet-50',
-      disabled: haInstances.length === 0,
-      disabledReason: 'Add a Home Assistant instance first',
+      disabled: !connection,
+      disabledReason: 'Connect Home Assistant first',
     },
     {
       href: '/setup/pages',
@@ -68,14 +62,6 @@ export const QuickActions = ({ entitlements }: QuickActionsProps) => {
       description: 'Configure Home Assistant',
       gradient: 'from-teal-500 to-emerald-600',
       hoverBg: 'hover:bg-teal-50',
-    },
-    {
-      href: '/auth/profile/billing',
-      icon: mdiCreditCard,
-      title: 'Billing',
-      description: 'Manage your subscription',
-      gradient: 'from-amber-500 to-orange-500',
-      hoverBg: 'hover:bg-amber-50',
     },
   ];
 

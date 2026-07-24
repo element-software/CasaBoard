@@ -3,14 +3,29 @@
 import {
   VictoryChart,
   VictoryArea,
+  VictoryAxis,
   VictoryTooltip,
   VictoryVoronoiContainer,
 } from "victory";
 import { useId, useMemo } from "react";
+import { toChartDate } from "@repo/ha";
+import classNames from "classnames";
 
 interface GraphCardProps {
   data: any;
   className?: string;
+}
+
+function yDomainFor(values: number[]): [number, number] {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [0, 1];
+  if (min === max) {
+    const pad = Math.abs(min) * 0.05 || 1;
+    return [min - pad, max + pad];
+  }
+  const pad = (max - min) * 0.12;
+  return [min - pad, max + pad];
 }
 
 const Graph = ({ data, className }: GraphCardProps) => {
@@ -24,20 +39,39 @@ const Graph = ({ data, className }: GraphCardProps) => {
     if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
       return [];
     }
-    return data.entityHistory.map((item: any) => {
-      const y = String(item.s);
-      const time = item.lu || item.last_updated || item.last_changed;
-      return {
-        y: parseFloat(y) || 0,
-        x: time ? new Date(time) : new Date(),
-      };
-    });
+    return data.entityHistory
+      .map((item: any) => {
+        const y = parseFloat(String(item.s ?? item.state ?? ""));
+        if (!Number.isFinite(y)) return null;
+        const time = item.lu || item.last_updated || item.last_changed;
+        return {
+          y,
+          x: toChartDate(time),
+        };
+      })
+      .filter((p: { y: number; x: Date } | null): p is { y: number; x: Date } =>
+        p != null
+      );
   }, [data?.entityHistory]);
+
+  const domainY = useMemo(
+    () => yDomainFor(processedData.map((d) => d.y)),
+    [processedData]
+  );
 
   const unit = data?.unit || "W";
 
+  if (processedData.length < 2) {
+    return null;
+  }
+
   return (
-    <div className={className ? `relative ${className}` : "relative"}>
+    <div
+      className={classNames(
+        "relative w-full overflow-hidden leading-none",
+        className
+      )}
+    >
       <svg
         width={0}
         height={0}
@@ -50,64 +84,77 @@ const Graph = ({ data, className }: GraphCardProps) => {
             <stop
               offset="0%"
               stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.6}
-            />
-            <stop
-              offset="50%"
-              stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.3}
+              stopOpacity={0.55}
             />
             <stop
               offset="100%"
               stopColor="var(--theme-chart-fill)"
-              stopOpacity={0.1}
+              stopOpacity={0.05}
             />
           </linearGradient>
         </defs>
       </svg>
       <VictoryChart
-        height={450}
-        width={1920}
-        padding={{ top: 20, bottom: 60, left: 60, right: 20 }}
+        height={160}
+        width={640}
+        padding={{ top: 6, bottom: 0, left: 0, right: 0 }}
+        domain={{ y: domainY }}
+        style={{
+          parent: {
+            width: "100%",
+            height: "100%",
+            display: "block",
+          },
+        }}
         containerComponent={
           <VictoryVoronoiContainer
-            labels={({ datum }) => 
-              `${Math.round(datum.y)}${unit} at ${datum.x ? new Date(datum.x).toLocaleTimeString() : ''}`
+            labels={({ datum }) =>
+              `${Number(datum.y).toFixed(2)}${unit} at ${datum.x ? new Date(datum.x).toLocaleTimeString() : ""}`
             }
             labelComponent={
               <VictoryTooltip
                 flyoutStyle={{
                   fill: "rgba(0, 0, 0, 0.9)",
                   stroke: "white",
-                  strokeWidth: 2,
+                  strokeWidth: 1,
                 }}
                 style={{
                   fill: "white",
-                  fontSize: 40,
+                  fontSize: 14,
                   fontWeight: 600,
                 }}
+                constrainToVisibleArea
               />
             }
           />
         }
-        theme={{
-          axis: {
-            style: {
-              //axis: { stroke: "white", strokeWidth: 2 },
-              ticks: { stroke: "white", strokeWidth: 1 },
-              tickLabels: { fill: "transparent", fontSize: 48, fontWeight: 600, fontFamily: "Inter" },
-              grid: { stroke: "transparent" },
-              //axisLabel: { fill: "white", fontSize: 48, fontWeight: 700, fontFamily: "Inter" },
-            },
-          },
-        }}
       >
+        <VictoryAxis
+          style={{
+            axis: { stroke: "transparent" },
+            ticks: { stroke: "transparent" },
+            tickLabels: { fill: "transparent", fontSize: 0 },
+            grid: { stroke: "transparent" },
+          }}
+        />
+        <VictoryAxis
+          dependentAxis
+          style={{
+            axis: { stroke: "transparent" },
+            ticks: { stroke: "transparent" },
+            tickLabels: { fill: "transparent", fontSize: 0 },
+            grid: { stroke: "transparent" },
+          }}
+        />
         <VictoryArea
           data={processedData}
+          interpolation="monotoneX"
+          // Baseline at zoomed domain min — default y0=0 flattens high-range sensors (W, V)
+          y0={() => domainY[0]}
           style={{
             data: {
               fill: `url(#${gradientId})`,
-              fillOpacity: 0.4,
+              fillOpacity: 1,
               stroke: "var(--theme-chart-line)",
               strokeWidth: 2,
               strokeLinecap: "round",

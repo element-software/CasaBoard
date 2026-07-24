@@ -2,7 +2,8 @@
 
 import Icon from "@mdi/react";
 import {
-  mdiGoogle,
+  mdiDocker,
+  mdiPuzzleOutline,
   mdiHomeAssistant,
   mdiGrid,
   mdiDrag,
@@ -122,6 +123,12 @@ const CheckList = ({ items }: { items: string[] }) => (
   </ul>
 );
 
+const CodeBlock = ({ children }: { children: string }) => (
+  <pre className="my-4 p-4 bg-slate-900 rounded-xl overflow-x-auto text-xs leading-relaxed text-slate-100">
+    <code>{children}</code>
+  </pre>
+);
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 
 const QuickStart: React.FC = () => (
@@ -132,47 +139,83 @@ const QuickStart: React.FC = () => (
       iconColor="text-amber-500"
       label="Introduction"
       title="Quick Start Guide"
-      intro="Get your CasaBoard dashboard up and running in under 10 minutes. Follow these four steps to go from zero to a working smart home dashboard."
+      intro="Get your CasaBoard dashboard up and running in under 10 minutes. Follow these three steps to go from zero to a working smart home dashboard — no account, no sign-up."
     />
 
     <div className="mb-8">
-      <TimelineStep number={1} title="Login with Google" text="Head to casaboard.dev and click 'Login'. Sign in using your Google account — this creates your CasaBoard profile and keeps your account secure." />
-      <TimelineStep number={2} title="Connect Home Assistant" text="Navigate to Setup → HA Instances and enter your Home Assistant URL (e.g. https://homeassistant.local:8123). You'll be redirected to authorise CasaBoard." />
-      <TimelineStep number={3} title="Create your first page" text="Go to Setup → Pages and click 'New Page'. Give it a name like 'Living Room' and open the drag-and-drop editor to start building." isLast />
+      <TimelineStep number={1} title="Run CasaBoard with Docker" text="Clone the repository, run docker compose up -d, and open the app on the port it exposes (default 3000)." />
+      <TimelineStep number={2} title="Connect Home Assistant" text="On first run you're taken straight to the connection screen — enter your Home Assistant URL and authorise once." />
+      <TimelineStep number={3} title="Create your first page" text="Go to Pages and click 'New Page'. Give it a name like 'Living Room' and open the drag-and-drop editor to start building." isLast />
     </div>
 
-    <Callout type="success" title="Privacy-first by default">
-      Your Home Assistant tokens are encrypted in your browser and never sent to CasaBoard servers. You're in full control.
+    <Callout type="success" title="Free and self-hosted">
+      There's no account, no subscription, and no data leaving your server. CasaBoard runs entirely on infrastructure you control.
     </Callout>
 
     <Callout type="info" title="What you'll need">
       <CheckList items={[
         "A running Home Assistant instance (local or remote)",
         "Your HA instance URL (e.g. https://ha.yourname.com)",
-        "A Google account for login",
+        "Docker and Docker Compose installed on the machine that will run CasaBoard",
       ]} />
     </Callout>
   </div>
 );
 
-const GoogleOAuth: React.FC = () => (
+const DockerInstall: React.FC = () => (
   <div>
     <SectionHeading
-      icon={mdiGoogle}
+      icon={mdiDocker}
       iconBg="bg-blue-50"
       iconColor="text-blue-500"
-      label="Authentication"
-      title="Google OAuth Login"
-      intro="CasaBoard uses Google OAuth for secure authentication. No passwords to remember — your Google account handles identity."
+      label="Installation"
+      title="Installing with Docker"
+      intro="CasaBoard ships as a single Docker image with a docker-compose.yml at the root of the repository. It works alongside any Home Assistant installation — Core, Container, OS, or Supervised."
     />
 
-    <TimelineStep number={1} title="Navigate to the login page" text='Go to the CasaBoard login page and click "Continue with Google".' />
-    <TimelineStep number={2} title="Select your Google account" text="Choose the Google account you want associated with CasaBoard. This becomes your primary identity for the dashboard." />
-    <TimelineStep number={3} title="Review permissions" text="CasaBoard only requests basic profile info (name and email). It does not request access to your Google Drive, Gmail, or any other Google services." />
-    <TimelineStep number={4} title="You're in" text="Once authenticated, you'll land on the Setup dashboard and can start configuring your Home Assistant connection." isLast />
+    <TimelineStep number={1} title="Clone the repository" text="Get the source onto the machine that will run CasaBoard (this can be the same host as Home Assistant, or a different one on the same network)." />
+    <TimelineStep number={2} title="Start the container" text="Run docker compose up -d from the repository root." />
+    <TimelineStep number={3} title="Open the app" text="Visit the container's address on port 3000 (e.g. http://localhost:3000 or http://<host-ip>:3000)." isLast />
 
-    <Callout type="info" title="Session management">
-      Sessions are managed by Supabase Auth using industry-standard JWT tokens with automatic refresh. You stay logged in until you explicitly sign out.
+    <CodeBlock>{`git clone <repository-url>
+cd casaboard
+docker compose up -d
+# then open http://localhost:3000`}</CodeBlock>
+
+    <Callout type="info" title="Persistent data">
+      Dashboards, sidebars, themes, and your Home Assistant connection are stored as JSON files under
+      the ./data folder, mounted into the container as a volume. Back this folder up to back up
+      everything.
+    </Callout>
+  </div>
+);
+
+const HACSPanel: React.FC = () => (
+  <div>
+    <SectionHeading
+      icon={mdiPuzzleOutline}
+      iconBg="bg-purple-50"
+      iconColor="text-purple-600"
+      label="Installation"
+      title="Installing the HACS Panel"
+      intro="A small companion panel lets you embed the running CasaBoard app directly in the Home Assistant sidebar, distributed as a custom HACS repository."
+    />
+
+    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add the CasaBoard panel repository as a custom repository (category: Lovelace / plugin)." />
+    <TimelineStep number={2} title="Install the panel" text="Install 'CasaBoard Panel' from HACS like any other frontend resource." />
+    <TimelineStep number={3} title="Configure the sidebar entry" text="Add a panel_custom entry to your Home Assistant configuration.yaml pointing at your running container's URL." isLast />
+
+    <CodeBlock>{`panel_custom:
+  - name: casaboard-panel
+    sidebar_title: CasaBoard
+    sidebar_icon: mdi:view-dashboard
+    module_url: /hacsfiles/casaboard-panel/casaboard-panel.js
+    config:
+      url: http://homeassistant.local:3000`}</CodeBlock>
+
+    <Callout type="info" title="No extra auth needed">
+      Since CasaBoard has no login of its own, the panel simply embeds it as an iframe — opening the
+      sidebar entry takes you straight to your dashboards.
     </Callout>
   </div>
 );
@@ -185,20 +228,51 @@ const HAConnection: React.FC = () => (
       iconColor="text-cyan-600"
       label="Setup"
       title="Home Assistant Connection"
-      intro="Connect your Home Assistant instance to CasaBoard. The connection happens directly in your browser — your tokens never touch CasaBoard's servers."
+      intro="CasaBoard connects to exactly one Home Assistant instance — the one you configure on first run. The connection is stored as a local file alongside the rest of your data."
     />
 
     <TimelineStep number={1} title="Find your HA URL" text="Locate your Home Assistant base URL. This is typically something like https://homeassistant.local:8123 for local installs, or https://ha.yourdomain.com for remote access." />
-    <TimelineStep number={2} title="Add the instance" text='Go to Setup → HA Instances and enter your URL in the "Add Instance" field. Give it a display name (e.g. "Home").' />
-    <TimelineStep number={3} title="Authorise CasaBoard" text="You'll be redirected to your Home Assistant login screen. Sign in and approve the CasaBoard connection. You'll be sent back automatically." isLast />
+    <TimelineStep number={2} title="Authorise the connection" text="On first run, CasaBoard redirects you to your Home Assistant login screen. Sign in and approve the connection — you'll be sent back automatically." isLast />
 
-    <Callout type="info" title="Multiple instances">
-      You can connect multiple Home Assistant instances (e.g. home + holiday home) and assign different ones to different dashboard pages.
+    <Callout type="warning" title="Re-authorising">
+      If you ever need to point CasaBoard at a different Home Assistant instance, or the stored
+      connection expires, use the reconnect option on the connection screen to run through
+      authorisation again.
     </Callout>
+  </div>
+);
 
-    <Callout type="warning" title="Tokens stay local">
-      OAuth tokens are encrypted with AES-GCM in your browser and stored in local storage only. If you clear browser data or switch devices, you'll need to re-authorise HA.
-    </Callout>
+const EnvironmentVariables: React.FC = () => (
+  <div>
+    <SectionHeading
+      icon={mdiCog}
+      iconBg="bg-slate-100"
+      iconColor="text-slate-600"
+      label="Configuration"
+      title="Environment Variables"
+      intro="CasaBoard needs very little configuration. These are the environment variables the docker-compose.yml sets for you by default."
+    />
+
+    <div className="space-y-3">
+      <div className="border border-slate-100 rounded-xl overflow-hidden">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+          <p className="font-semibold text-sm text-slate-800 font-mono">DATA_DIR</p>
+        </div>
+        <div className="p-4 text-sm text-slate-600">
+          Where dashboards, sidebars, themes, and the Home Assistant connection are stored.
+          Defaults to <code className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">/data</code> inside
+          the container — mount a volume here to persist data across restarts.
+        </div>
+      </div>
+      <div className="border border-slate-100 rounded-xl overflow-hidden">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+          <p className="font-semibold text-sm text-slate-800 font-mono">PORT</p>
+        </div>
+        <div className="p-4 text-sm text-slate-600">
+          Optional — which port the app listens on inside the container. Defaults to 3000.
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -210,7 +284,7 @@ const CreateFirstPage: React.FC = () => (
       iconColor="text-purple-600"
       label="Pages"
       title="Creating Your First Page"
-      intro="Pages are the heart of CasaBoard — each one is a full dashboard you can embed on a TV, tablet, or share publicly. Here's how to create your first."
+      intro="Pages are the heart of CasaBoard — each one is a full dashboard you can embed on a TV, tablet, or the HA sidebar. Here's how to create your first."
     />
 
     <TimelineStep number={1} title="Open Pages management" text="From the Setup dashboard, click 'Pages' in the sidebar or use the 'All Pages' quick action." />
@@ -218,7 +292,7 @@ const CreateFirstPage: React.FC = () => (
     <TimelineStep number={3} title="Open the editor" text="Click the pencil (edit) icon next to your new page. This opens the drag-and-drop builder where you'll add components." isLast />
 
     <Callout type="info" title="Page visibility">
-      Pages can be set to Live (publicly accessible at /view/your-slug) or Draft (only visible to you). You can toggle this from the Pages list.
+      Pages can be set to Live (accessible at /view/your-slug) or Draft. You can toggle this from the Pages list.
     </Callout>
   </div>
 );
@@ -278,7 +352,7 @@ const Tips: React.FC = () => (
         </h3>
         <CheckList items={[
           "Create separate pages for different rooms or functions (e.g. 'Kitchen', 'Security', 'Energy')",
-          "Use descriptive page names — these become the public URL slug",
+          "Use descriptive page names — these become the URL slug",
           "Group related components visually so the page is scannable at a glance",
           "Keep each page focused — fewer components means faster load and less cognitive overhead",
         ]} />
@@ -320,10 +394,10 @@ const Troubleshooting: React.FC = () => (
           <p className="font-semibold text-sm text-slate-800">Can't connect to Home Assistant</p>
         </div>
         <ul className="p-4 space-y-2 text-sm text-slate-600">
-          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Verify the URL is reachable from your current network</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Verify the URL is reachable from the machine running the CasaBoard container</li>
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Check that HA is running and accessible (try opening the URL directly)</li>
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> If using HTTPS, confirm your SSL certificate is valid</li>
-          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Clear browser storage and try re-authorising the connection</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Use the reconnect option on the connection screen to re-authorise</li>
         </ul>
       </div>
 
@@ -340,12 +414,12 @@ const Troubleshooting: React.FC = () => (
 
       <div className="border border-slate-100 rounded-xl overflow-hidden">
         <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-          <p className="font-semibold text-sm text-slate-800">Tokens expired / forced to re-login to HA</p>
+          <p className="font-semibold text-sm text-slate-800">Dashboards disappeared after restart</p>
         </div>
         <ul className="p-4 space-y-2 text-sm text-slate-600">
-          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> This is expected if browser storage was cleared</li>
-          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Tokens are stored locally only — switching devices requires re-auth</li>
-          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Use optional cloud sync (paid plans) to persist HA instance metadata across devices</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Confirm the ./data volume is mounted in your docker-compose.yml</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Check the container has write permissions to the mounted folder</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Avoid docker compose down -v, which removes volumes</li>
         </ul>
       </div>
     </div>
@@ -360,16 +434,13 @@ const Help: React.FC = () => (
       iconColor="text-indigo-500"
       label="Support"
       title="Getting Help"
-      intro="If you can't find an answer in the docs, we're happy to help directly."
+      intro="If you can't find an answer in the docs, the project's GitHub repository is the best place to ask."
     />
 
     <div className="grid sm:grid-cols-2 gap-4">
       <div className="p-5 bg-white border border-slate-100 shadow-sm rounded-xl">
-        <h3 className="font-semibold text-slate-900 mb-1">Email support</h3>
-        <p className="text-sm text-slate-500 mb-3">Send us a message and we'll get back to you as soon as possible.</p>
-        <a href="mailto:support@casaboard.dev" className="text-sm font-medium text-violet-600 hover:underline">
-          support@casaboard.dev
-        </a>
+        <h3 className="font-semibold text-slate-900 mb-1">GitHub Issues</h3>
+        <p className="text-sm text-slate-500 mb-3">Report a bug or ask a question by opening an issue on the project's GitHub repository.</p>
       </div>
       <div className="p-5 bg-white border border-slate-100 shadow-sm rounded-xl">
         <h3 className="font-semibold text-slate-900 mb-1">Community</h3>
@@ -379,15 +450,18 @@ const Help: React.FC = () => (
     </div>
 
     <Callout type="info" title="Before reaching out">
-      Include your browser, whether you're on a local or remote HA setup, and any error messages from the browser console. This helps us respond much faster.
+      Include your Docker/HA versions, your host OS, and any error messages from the container logs
+      (docker compose logs). This helps maintainers respond much faster.
     </Callout>
   </div>
 );
 
 export const sections: DocSection[] = [
   { slug: "quick-start", title: "Quick Start", icon: mdiLightbulb, Content: QuickStart },
-  { slug: "google-login", title: "Google OAuth Login", icon: mdiGoogle, Content: GoogleOAuth },
+  { slug: "docker-install", title: "Installing with Docker", icon: mdiDocker, Content: DockerInstall },
+  { slug: "hacs-panel", title: "Installing the HACS Panel", icon: mdiPuzzleOutline, Content: HACSPanel },
   { slug: "ha-connection", title: "Home Assistant Connection", icon: mdiHomeAssistant, Content: HAConnection },
+  { slug: "env-vars", title: "Environment Variables", icon: mdiCog, Content: EnvironmentVariables },
   { slug: "first-page", title: "Creating Your First Page", icon: mdiGrid, Content: CreateFirstPage },
   { slug: "components", title: "Adding Components", icon: mdiDrag, Content: AddingComponents },
   { slug: "tips", title: "Tips & Best Practices", icon: mdiInformation, Content: Tips },

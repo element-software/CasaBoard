@@ -26,6 +26,11 @@ import {
   resolvedTokensToCssVars,
 } from "@repo/lib";
 import type { ThemeTokens } from "@repo/types/theme";
+import {
+  STYLE_PRESETS,
+  DEFAULT_STYLE_ID,
+  type StyleId,
+} from "@repo/types/style";
 import { ThemeScope } from "../ThemeScope/ThemeScope";
 
 type ThemePickerOption = { id: string; name: string };
@@ -36,7 +41,6 @@ type PuckEditorClientProps = {
   initialData?: Data;
   itemId?: string | null;
   initialPublished?: boolean;
-  haInstances?: { id: string; name: string; hass_url: string }[];
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
   maxItemsPerDashboard?: number;
@@ -44,6 +48,7 @@ type PuckEditorClientProps = {
   themeLibrary?: ThemeLibraryEntry[];
   initialThemeId?: string | null;
   initialThemeOverrides?: ThemeTokens | null;
+  initialStyleId?: StyleId | null;
   onCreateItem: (data: {
     name: string;
     slug: string;
@@ -80,7 +85,6 @@ export default function PuckEditorClient({
   initialData,
   itemId,
   initialPublished = false,
-  haInstances = [],
   sidebars = [],
   initialSlug,
   maxItemsPerDashboard = -1,
@@ -88,6 +92,7 @@ export default function PuckEditorClient({
   themeLibrary = [],
   initialThemeId = null,
   initialThemeOverrides = null,
+  initialStyleId = null,
   onCreateItem,
   onUpdateItem,
   onPublishItem,
@@ -112,10 +117,10 @@ export default function PuckEditorClient({
   const [settings, setSettings] = useState<{
     title: string;
     slug: string;
-    haInstanceId?: string | null;
     sidebarId?: string | null;
     themeId: string | null;
     themeOverridesJson: string;
+    styleId: StyleId;
   }>(() => {
     const props = (initialData?.root?.props as Record<string, unknown>) || {};
     return {
@@ -123,11 +128,10 @@ export default function PuckEditorClient({
         (props.title as string) ||
         `New ${type === "page" ? "Page" : "Sidebar"}`,
       slug: initialSlug || (props.slug as string) || `new-${type}`,
-      haInstanceId:
-        (props.haInstanceId as string) || haInstances[0]?.id || undefined,
       sidebarId: (props.sidebarId as string | null) || null,
       themeId: initialThemeId ?? null,
       themeOverridesJson: JSON.stringify(initialThemeOverrides ?? {}, null, 2),
+      styleId: initialStyleId ?? DEFAULT_STYLE_ID,
     };
   });
 
@@ -155,6 +159,15 @@ export default function PuckEditorClient({
     themeLibrary,
     type,
   ]);
+
+  const editorStyleVars = useMemo((): CSSProperties => {
+    const preset = STYLE_PRESETS[settings.styleId] ?? STYLE_PRESETS[DEFAULT_STYLE_ID];
+    const vars: Record<string, string> = {};
+    for (const [key, value] of Object.entries(preset.tokens)) {
+      vars[`--style-${key}`] = value;
+    }
+    return vars as CSSProperties;
+  }, [settings.styleId]);
 
   useEffect(() => {
     if (!currentItemId) {
@@ -196,6 +209,7 @@ export default function PuckEditorClient({
   const buildThemePayload = (): {
     theme_id: string | null;
     theme_overrides?: ThemeTokens | null;
+    style_id: StyleId;
   } => {
     if (type === "page") {
       const theme_overrides = parseThemeOverridesJson(
@@ -204,9 +218,10 @@ export default function PuckEditorClient({
       return {
         theme_id: settings.themeId || null,
         theme_overrides,
+        style_id: settings.styleId,
       };
     }
-    return { theme_id: settings.themeId || null };
+    return { theme_id: settings.themeId || null, style_id: settings.styleId };
   };
 
   const saveItem = async () => {
@@ -367,7 +382,6 @@ export default function PuckEditorClient({
           ...prev.root.props,
           title: settings.title,
           slug: newSlug,
-          haInstanceId: settings.haInstanceId,
           sidebarId: settings.sidebarId,
         },
       },
@@ -394,6 +408,8 @@ export default function PuckEditorClient({
       <ThemeScope
         className="flex-1 min-h-0 flex flex-col bg-theme-page-background text-theme-text"
         style={editorThemeStyle}
+        styleVars={editorStyleVars}
+        styleId={settings.styleId}
       >
         <Puck
           config={PuckConfig}
@@ -507,27 +523,6 @@ export default function PuckEditorClient({
                 description="URL-friendly version of the name"
                 isDisabled={isExistingItem}
               />
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Home Assistant Instance
-                </label>
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={settings.haInstanceId || ""}
-                  onChange={(e) =>
-                    setSettings((prev) => ({
-                      ...prev,
-                      haInstanceId: e.target.value,
-                    }))
-                  }
-                >
-                  {haInstances.map((instance) => (
-                    <option key={instance.id} value={instance.id}>
-                      {instance.name} ({instance.hass_url})
-                    </option>
-                  ))}
-                </select>
-              </div>
               {type === "page" && sidebars.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -580,6 +575,29 @@ export default function PuckEditorClient({
                   {type === "sidebar"
                     ? "Optional. Leave default to use the page theme when this sidebar is shown with a page."
                     : "Optional library theme for this page."}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Style</label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={settings.styleId}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      styleId: e.target.value as StyleId,
+                    }))
+                  }
+                >
+                  {Object.values(STYLE_PRESETS).map((preset) => (
+                    <option key={preset.id} value={preset.id}>
+                      {preset.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Controls the shape/chrome of components (radius, shadow,
+                  icon layout) — independent of the color Theme above.
                 </p>
               </div>
               {type === "page" && (

@@ -1,15 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { HAProvider, useHA, reauthenticateInstance } from "@repo/ha";
-import { HAInstance } from "@repo/types/ha";
+import React from "react";
+import { HAProvider, useHA, reauthenticate } from "@repo/ha";
+import { HAConnection } from "@repo/types/ha";
 import { ConnectionErrorIndicator } from "./ConnectionErrorFallback";
-import { clientLogger, SupabaseClient } from "@repo/lib";
+import { clientLogger } from "@repo/lib";
 
 interface HassConnectWrapperProps {
   children: React.ReactNode;
-  haInstance: HAInstance;
-  onDelete?: (id: string) => void;
+  haInstance: HAConnection;
 }
 
 /**
@@ -18,44 +16,15 @@ interface HassConnectWrapperProps {
 const HassConnectWrapperContent = ({
   children,
   haInstance,
-  onDelete,
 }: HassConnectWrapperProps) => {
   const { error, loading, retry } = useHA();
-  const router = useRouter();
-  const [userId, setUserId] = useState<string>("");
-
-  useEffect(() => {
-    const supabase = SupabaseClient.createClient();
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (error || !data.user?.id) {
-        clientLogger.error('HassConnectWrapper', 'Could not resolve user ID', error);
-        return;
-      }
-      setUserId(data.user.id);
-    });
-  }, []);
-
-  // Log connection details
-  useEffect(() => {
-    console.log("HassConnectWrapper", {
-      instanceId: haInstance.id,
-      instanceName: haInstance.name,
-      instanceUrl: haInstance.hass_url,
-    });
-  }, [haInstance.id]);
 
   const handleReauthenticate = async () => {
     try {
-      clientLogger.info('HassConnectWrapper', 'initiating re-authentication for', haInstance.id);
-      await reauthenticateInstance({ haInstance, userId });
+      clientLogger.info('HassConnectWrapper', 'initiating re-authentication for', haInstance.hass_url);
+      await reauthenticate({ haInstance });
     } catch (error) {
       clientLogger.error('HassConnectWrapper', 're-authentication failed', error);
-    }
-  };
-
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete(haInstance.id);
     }
   };
 
@@ -63,12 +32,11 @@ const HassConnectWrapperContent = ({
   if (error && !loading) {
     return (
       <ConnectionErrorIndicator
-        instanceName={haInstance.name}
+        instanceName={haInstance.hass_url}
         instanceUrl={haInstance.hass_url}
         error={error}
         onRetry={retry}
         onReauthenticate={handleReauthenticate}
-        onDelete={onDelete ? handleDelete : undefined}
       />
     );
   }
@@ -82,11 +50,10 @@ const HassConnectWrapperContent = ({
 export const HassConnectWrapper = ({
   children,
   haInstance,
-  onDelete,
 }: HassConnectWrapperProps) => {
   return (
     <HAProvider haInstance={haInstance}>
-      <HassConnectWrapperContent haInstance={haInstance} onDelete={onDelete}>
+      <HassConnectWrapperContent haInstance={haInstance}>
         {children}
       </HassConnectWrapperContent>
     </HAProvider>

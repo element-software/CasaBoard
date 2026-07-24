@@ -1,17 +1,18 @@
 import type { Data } from "@measured/puck";
+import type { StyleId } from "@repo/types/style";
 import SidebarEditorBody from "./SidebarEditorBody";
-import { SubscriptionService } from "@repo/lib";
 import { listThemes } from "@repo/lib/actions/themeActions";
+import { HAConnectionActions } from "@repo/lib";
 
 type ThemePickerOption = { id: string; name: string };
 
 type SidebarEditorClientProps = {
   initialData?: Data;
   sidebarId?: string | null;
-  userId?: string | null;
   initialPublished?: boolean;
   initialSlug?: string;
   initialThemeId?: string | null;
+  initialStyleId?: StyleId | null;
 };
 
 export default async function SidebarEditorClient({
@@ -20,10 +21,11 @@ export default async function SidebarEditorClient({
   initialPublished = true,
   initialSlug,
   initialThemeId,
+  initialStyleId,
 }: SidebarEditorClientProps) {
-  const [entitlements, themes] = await Promise.all([
-    SubscriptionService.getEntitlementsForCurrentUser(),
+  const [themes, haConnection] = await Promise.all([
     listThemes(),
+    HAConnectionActions.getHAConnection(),
   ]);
 
   const themePickerThemes: ThemePickerOption[] = themes.map((t) => ({
@@ -38,7 +40,6 @@ export default async function SidebarEditorClient({
 
   return (
     <SidebarEditorBody
-      entitlements={entitlements}
       initialData={initialData}
       sidebarId={sidebarId}
       initialPublished={initialPublished}
@@ -46,6 +47,8 @@ export default async function SidebarEditorClient({
       themePickerThemes={themePickerThemes}
       themeLibrary={themeLibrary}
       initialThemeId={initialThemeId}
+      initialStyleId={initialStyleId}
+      haConnection={haConnection}
     />
   );
 }

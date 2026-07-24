@@ -1,9 +1,19 @@
 /* Load after @measured/puck/puck.css.
  * Puck sets #puck-canvas-root to white; ThemeScope provides --theme-page-background. */
 
-/* Puck's component wrapper divs don't get a width by default; force them to
- * fill their grid column so components stretch correctly. */
+/* Puck's component wrapper divs don't get a size by default; force them to
+ * fill their grid/flex cell so components stretch to match neighbors. */
 [data-puck-component] {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+[data-puck-component] > * {
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
 }
 [data-casaboard-theme] #puck-canvas-root {
