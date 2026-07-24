@@ -55,7 +55,7 @@ const Graph = ({ data, className }: GraphCardProps) => {
   }, [data?.entityHistory]);
 
   const domainY = useMemo(
-    () => yDomainFor(processedData.map((d) => d.y)),
+    () => yDomainFor(processedData.map((d: { y: number }) => d.y)),
     [processedData]
   );
 

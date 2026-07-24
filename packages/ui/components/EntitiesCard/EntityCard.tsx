@@ -29,7 +29,7 @@ const TOGGLE_DOMAINS = new Set([
 ]);
 
 function statusLabel(
-  entity: NonNullable<ReturnType<typeof useEntity>>,
+  entity: { state?: unknown },
   domain: string
 ): string {
   const state = String(entity.state ?? "");

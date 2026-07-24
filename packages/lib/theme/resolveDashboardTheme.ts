@@ -1,3 +1,5 @@
+"use server";
+
 import type { CSSProperties } from "react";
 import type { Page } from "@repo/types/page";
 import { getThemeById } from "../store/themes";

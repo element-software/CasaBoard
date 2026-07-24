@@ -73,13 +73,6 @@ function buildAuthOptions(
   };
 }
 
-function isLongLivedTokenAuth(data: {
-  access_token?: string;
-  refresh_token?: string;
-} | null): boolean {
-  return Boolean(data?.access_token && !data.refresh_token);
-}
-
 export async function connect({
   haInstance,
   tokenStore,
@@ -88,12 +81,10 @@ export async function connect({
   let auth: Auth | undefined;
   let connection: import("home-assistant-js-websocket").Connection | undefined;
 
-  const stored = await Promise.resolve(tokenStore.loadTokens());
-  if (isLongLivedTokenAuth(stored) && stored?.access_token) {
-    auth = createLongLivedTokenAuth(
-      haInstance.hass_url,
-      stored.access_token
-    );
+  const stored = (await Promise.resolve(tokenStore.loadTokens())) ?? null;
+  const longLivedToken = stored?.access_token;
+  if (longLivedToken && !stored?.refresh_token) {
+    auth = createLongLivedTokenAuth(haInstance.hass_url, longLivedToken);
     connection = await createConnection({ auth });
     return { connection, auth };
   }
