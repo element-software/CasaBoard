@@ -12,7 +12,7 @@ Open [http://localhost:3000](http://localhost:3000). On first run you'll be redi
 
 Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`) lives in `./data`, bind-mounted into the container — back that directory up.
 
-To embed CasaBoard in the Home Assistant sidebar, see [`hacs-panel/README.md`](hacs-panel/README.md).
+To embed CasaBoard in the Home Assistant sidebar (with status sensors), see [`hacs-panel/README.md`](hacs-panel/README.md) — install the `custom_components/casaboard` integration via HACS.
 
 ## Apps
 
@@ -27,7 +27,7 @@ To embed CasaBoard in the Home Assistant sidebar, see [`hacs-panel/README.md`](h
 - `packages/hooks` – Shared hooks (theme, pages, etc.)
 - `packages/lib` – Actions, services, and the flat-JSON-file persistence layer (`packages/lib/store`)
 - `packages/types` – Shared TypeScript types
-- `dist/casaboard-panel.js` – HACS-installable Home Assistant sidebar panel that iframes the running CasaBoard container (see [`hacs-panel/README.md`](hacs-panel/README.md))
+- `custom_components/casaboard` – Home Assistant integration (HACS): sidebar panel + health sensors for the running CasaBoard app (see [`hacs-panel/README.md`](hacs-panel/README.md))
 
 ## Local Development
 

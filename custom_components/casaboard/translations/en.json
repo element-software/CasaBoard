@@ -1,0 +1,71 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "CasaBoard",
+        "description": "Connect Home Assistant to your self-hosted CasaBoard instance. CasaBoard must already be running (for example via Docker Compose).",
+        "data": {
+          "url": "CasaBoard URL",
+          "sidebar_title": "Sidebar title",
+          "sidebar_icon": "Sidebar icon (mdi:...)",
+          "scan_interval": "Status poll interval (seconds)"
+        },
+        "data_description": {
+          "url": "Base URL of CasaBoard, e.g. http://homeassistant.local:3000 or http://casaboard:3000 on the HA Docker network."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach CasaBoard at that URL. Check the address and that /api/health responds."
+    },
+    "abort": {
+      "already_configured": "This CasaBoard URL is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "CasaBoard options",
+        "data": {
+          "sidebar_title": "Sidebar title",
+          "sidebar_icon": "Sidebar icon (mdi:...)",
+          "scan_interval": "Status poll interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      }
+    },
+    "sensor": {
+      "pages": {
+        "name": "Pages"
+      },
+      "published_pages": {
+        "name": "Published pages"
+      },
+      "ha_connection": {
+        "name": "HA connection",
+        "state": {
+          "connected": "Connected",
+          "disconnected": "Disconnected"
+        }
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh status",
+      "description": "Poll CasaBoard /api/health immediately.",
+      "fields": {
+        "entry_id": {
+          "name": "Config entry ID",
+          "description": "Optional. When set, only that entry is refreshed."
+        }
+      }
+    }
+  }
+}

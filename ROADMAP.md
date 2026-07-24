@@ -16,14 +16,13 @@ Done (2026-07-24):
 
 ## 2. HACS install
 
-Done (2026-07-24):
-- Moved `hacs.json` to the repo root (HACS requires it there) and `casaboard-panel.js` to `dist/` (HACS plugin layout).
-- Added `LICENSE` (MIT) so the HACS license check can pass once GitHub detects it.
-- Added `.github/workflows/validate-hacs.yml`: checkout layout check + `hacs/action` (category `plugin`).
-- Corrected install docs to use `/hacsfiles/CasaBoard/casaboard-panel.js` (matches the GitHub repo name).
-- Repo topics/description updated for HACS discoverability.
+Done (2026-07-24), evolved from a JS-only plugin to a full HA **integration**:
+- `custom_components/casaboard` — config flow, sidebar panel, online/pages/HA-connection sensors, `casaboard.refresh` service.
+- CasaBoard app exposes `/api/health` for the coordinator to poll.
+- Root `hacs.json` + `.github/workflows/validate-hacs.yml` (layout check, `hacs/action` category `integration`, hassfest).
+- Docs in `hacs-panel/README.md`.
 
-Remaining for end-user install: HACS only works with **public** GitHub repos. This repo is still private — make it public (coordinate with item 6 / history rewrite), merge so GitHub detects `LICENSE` on the default branch, then drop `hacsjson` and `license` from the workflow `ignore` list.
+Remaining for end-user install: repo must be **public**; merge so GitHub detects `LICENSE` on default branch; then drop `hacsjson` / `license` from the workflow ignore list. Brands assets needed only if submitting to the HACS default store.
 
 ## 3. Publish pages to a configurable path
 

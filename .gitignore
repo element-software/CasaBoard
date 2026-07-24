@@ -27,9 +27,6 @@ coverage
 out/
 build
 dist
-# Keep the HACS panel JS tracked (HACS requires it under dist/ or repo root)
-!/dist/
-!/dist/casaboard-panel.js
 
 
 # Debug
@@ -42,3 +39,5 @@ yarn-error.log*
 *.pem
 
 apps/app/data
+__pycache__/
+*.py[cod]

@@ -1,0 +1,12 @@
+{
+  "domain": "casaboard",
+  "name": "CasaBoard",
+  "codeowners": ["@element-software"],
+  "config_flow": true,
+  "documentation": "https://github.com/element-software/CasaBoard/blob/main/hacs-panel/README.md",
+  "issue_tracker": "https://github.com/element-software/CasaBoard/issues",
+  "iot_class": "local_polling",
+  "dependencies": ["http", "frontend", "panel_custom"],
+  "requirements": [],
+  "version": "0.1.0"
+}
