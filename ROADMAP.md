@@ -18,11 +18,12 @@ Done (2026-07-24):
 
 Done (2026-07-24):
 - Moved `hacs.json` to the repo root (HACS requires it there) and `casaboard-panel.js` to `dist/` (HACS plugin layout).
-- Added `.github/workflows/validate-hacs.yml` (`hacs/action`, category `plugin`).
+- Added `LICENSE` (MIT) so the HACS license check can pass once GitHub detects it.
+- Added `.github/workflows/validate-hacs.yml`: checkout layout check + `hacs/action` (category `plugin`).
 - Corrected install docs to use `/hacsfiles/CasaBoard/casaboard-panel.js` (matches the GitHub repo name).
 - Repo topics/description updated for HACS discoverability.
 
-Note: HACS only works with **public** GitHub repos. This repo is still private — end-user HACS install is blocked until the repo is made public (coordinate with item 6 / history rewrite if needed).
+Remaining for end-user install: HACS only works with **public** GitHub repos. This repo is still private — make it public (coordinate with item 6 / history rewrite) and then drop `hacsjson` from the workflow `ignore` list so the official action validates the manifest over the network.
 
 ## 3. Publish pages to a configurable path
 

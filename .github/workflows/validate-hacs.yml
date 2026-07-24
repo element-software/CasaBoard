@@ -11,6 +11,55 @@ permissions:
   contents: read
 
 jobs:
+  # Checkout-based checks: work on private repos. HACS itself downloads
+  # hacs.json via raw.githubusercontent.com, which 404s while the repo is private.
+  validate-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate hacs.json schema and plugin layout
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import json, sys
+          from pathlib import Path
+
+          allowed = {
+              "name", "content_in_root", "filename", "hacs",
+              "hide_default_branch", "homeassistant", "persistent_directory",
+              "render_readme", "zip_release", "country",
+          }
+          errors = []
+          hacs_path = Path("hacs.json")
+          if not hacs_path.is_file():
+              errors.append("missing root hacs.json")
+          else:
+              data = json.loads(hacs_path.read_text())
+              extra = set(data) - allowed
+              if extra:
+                  errors.append(f"hacs.json unknown keys: {sorted(extra)}")
+              if "name" not in data or not isinstance(data["name"], str) or not data["name"].strip():
+                  errors.append("hacs.json requires non-empty string 'name'")
+              filename = data.get("filename", "casaboard.js")
+              content_in_root = bool(data.get("content_in_root", False))
+              candidates = [Path(filename)] if content_in_root else [Path(filename), Path("dist") / filename]
+              if not any(p.is_file() for p in candidates):
+                  errors.append(f"missing plugin file {filename} (looked in {[str(p) for p in candidates]})")
+              print(f"hacs.json OK: {data}")
+
+          if not Path("LICENSE").is_file():
+              errors.append("missing LICENSE")
+          if not Path("README.md").is_file():
+              errors.append("missing README.md")
+
+          if errors:
+              print("FAIL:")
+              for e in errors:
+                  print(f" - {e}")
+              sys.exit(1)
+          print("HACS layout checks passed")
+          PY
+
   validate-hacs:
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +67,9 @@ jobs:
         uses: hacs/action@main
         with:
           category: plugin
-          # Not seeking default-store inclusion; brands/images are optional for a custom repo.
-          ignore: brands images
+          # brands/images: optional for a custom (non-default-store) repo.
+          # hacsjson: ignored while the repo is private — HACS fetches hacs.json
+          # from raw.githubusercontent.com without auth. Remove `hacsjson` from
+          # ignore once the repo is public (see ROADMAP item 2 / item 6).
+          ignore: brands images hacsjson
           comment: false
