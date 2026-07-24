@@ -3,240 +3,215 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Connection } from "home-assistant-js-websocket";
 import { useHA } from "../provider/HAProvider";
+import {
+  appendLivePoint,
+  normalizeHistoryResponse,
+  normalizeStatisticsResponse,
+  type EntityHistoryPoint,
+  withTimeout,
+} from "./entityHistory";
 
-export interface EntityHistoryPoint {
-  s: string;
-  lu: string;
-}
+export type { EntityHistoryPoint } from "./entityHistory";
 
 type HistoryMode = "history" | "statistics";
+
+const FETCH_TIMEOUT_MS = 8_000;
+
+async function fetchStatistics(
+  conn: Connection,
+  id: string,
+  start: Date,
+  end: Date,
+  period: "5minute" | "hour" = "5minute"
+): Promise<EntityHistoryPoint[]> {
+  const stats = await withTimeout(
+    conn.sendMessagePromise<unknown>({
+      type: "recorder/statistics_during_period",
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      statistic_ids: [id],
+      period,
+    }),
+    FETCH_TIMEOUT_MS,
+    "recorder/statistics_during_period"
+  );
+  return normalizeStatisticsResponse(stats, id);
+}
+
+async function fetchHistoryWs(
+  conn: Connection,
+  id: string,
+  start: Date,
+  end: Date
+): Promise<EntityHistoryPoint[]> {
+  const data = await withTimeout(
+    conn.sendMessagePromise<unknown>({
+      type: "history/history_during_period",
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      entity_ids: [id],
+      minimal_response: true,
+      no_attributes: true,
+      include_start_time_state: true,
+      significant_changes_only: false,
+    }),
+    FETCH_TIMEOUT_MS,
+    "history/history_during_period"
+  );
+  return normalizeHistoryResponse(data, id);
+}
+
+async function fetchHistoryRest(
+  hassUrl: string,
+  accessToken: string,
+  id: string,
+  start: Date,
+  end: Date,
+  signal?: AbortSignal
+): Promise<EntityHistoryPoint[]> {
+  const base = hassUrl.replace(/\/$/, "");
+  const url =
+    `${base}/api/history/period/${encodeURIComponent(start.toISOString())}` +
+    `?filter_entity_id=${encodeURIComponent(id)}` +
+    `&end_time=${encodeURIComponent(end.toISOString())}` +
+    `&minimal_response`;
+
+  const res = await withTimeout(
+    fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal,
+    }),
+    FETCH_TIMEOUT_MS,
+    "REST /api/history/period"
+  );
+  if (!res.ok) {
+    throw new Error(`REST history failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return normalizeHistoryResponse(data, id);
+}
 
 export function useEntityHistory(
   entityId: string | null | undefined,
   limit: number = 50,
   lookbackMs: number = 24 * 60 * 60 * 1000,
-  mode: HistoryMode = "history",
+  mode: HistoryMode = "history"
 ) {
-  const { connection } = useHA();
+  const { connection, auth, hassUrl } = useHA();
   const [points, setPoints] = useState<EntityHistoryPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
+    fetchedRef.current = false;
     abortRef.current?.abort();
-    abortRef.current = new AbortController();
+    const abort = new AbortController();
+    abortRef.current = abort;
 
-    async function run(conn: Connection, id: string) {
+    async function loadHistory(conn: Connection, id: string) {
       setLoading(true);
       setError(null);
 
-       const end = new Date();
-       const start = new Date(end.getTime() - lookbackMs);
-       
-       // Try a longer time range if the default doesn't work
-       const extendedStart = new Date(end.getTime() - (lookbackMs * 7)); // 7 days instead of 1
+      const end = new Date();
+      const start = new Date(end.getTime() - lookbackMs);
+      // Prefer 5-minute buckets for ≤48h; hourly for longer windows
+      const statsPeriod = lookbackMs > 48 * 60 * 60 * 1000 ? "hour" : "5minute";
 
-      console.log(
-        "useEntityHistory: Starting fetch for entity:",
-        id,
-        "mode:",
-        mode,
-        "limit:",
-        limit,
-        "lookbackMs:",
-        lookbackMs
-      );
+      const attempts: Array<() => Promise<EntityHistoryPoint[]>> =
+        mode === "statistics"
+          ? [
+              () => fetchStatistics(conn, id, start, end, statsPeriod),
+              () => fetchHistoryWs(conn, id, start, end),
+            ]
+          : [
+              () => fetchHistoryWs(conn, id, start, end),
+              () => fetchStatistics(conn, id, start, end, statsPeriod),
+            ];
 
-      try {
-        if (mode === "statistics") {
-          // Long-term statistics (downsampled, efficient for long ranges)
-          +console.log(
-            "useEntityHistory: Fetching statistics for",
-            id,
-            "from",
-            start.toISOString(),
-            "to",
-            end.toISOString()
-          );
-          const stats = await conn.sendMessagePromise<any>({
-            type: "recorder/statistics_during_period",
-            start_time: start.toISOString(),
-            end_time: end.toISOString(),
-            statistic_ids: [id],
-            period: "hour", // or "5minute" | "day"
-          });
-          +console.log("useEntityHistory: Statistics response:", stats);
-
-          const series = stats?.[id] ?? [];
-          +console.log(
-            "useEntityHistory: Statistics series for",
-            id,
-            ":",
-            series.length,
-            "points"
-          );
-          const parsed: EntityHistoryPoint[] = series
-            .map((s: any) => ({
-              state: typeof s.mean === "number" ? s.mean : Number(s.mean),
-              last_changed: s.start, // bucket start
-              last_updated: s.end, // bucket end
-            }))
-            .filter((p: EntityHistoryPoint) => Number.isFinite(p.s))
-            .sort((a: { last_changed: any }, b: { last_changed: any }) =>
-              a.last_changed! > b.last_changed! ? 1 : -1
-            );
-
-          +console.log(
-            "useEntityHistory: Statistics parsed points:",
-            parsed.length
-          );
-          if (!cancelled) setPoints(parsed.slice(-limit));
-          return;
-        }
-
-        // Raw state history (exact state changes)
-        +console.log(
-          "useEntityHistory: Fetching raw history for",
-          id,
-          "from",
-          start.toISOString(),
-          "to",
-          end.toISOString()
+      const token = auth?.accessToken ?? auth?.data?.access_token;
+      if (hassUrl && token) {
+        attempts.push(() =>
+          fetchHistoryRest(hassUrl, token, id, start, end, abort.signal)
         );
-         // Try extended time range first
-         let data = await conn.sendMessagePromise<any>({
-           type: "history/history_during_period",
-           start_time: extendedStart.toISOString(),
-           end_time: end.toISOString(),
-           entity_ids: [id],
-           minimal_response: true,
-           no_attributes: true,
-           include_start_time_state: true,
-         });
-         
-         // If still null, try the original time range
-         if (data === null) {
-           console.log("useEntityHistory: Extended range returned null, trying original range");
-           data = await conn.sendMessagePromise<any>({
-             type: "history/history_during_period",
-             start_time: start.toISOString(),
-             end_time: end.toISOString(),
-             entity_ids: [id],
-             minimal_response: true,
-             no_attributes: true,
-             include_start_time_state: true,
-           });
-         }
-        +console.log("useEntityHistory: Raw history response:", data);
+      }
 
-        // Handle null response - might mean no history or different response format
-        if (data === null) {
-          console.log("useEntityHistory: Received null response, trying statistics mode");
-          // Try statistics mode as fallback
-          try {
-            const stats = await conn.sendMessagePromise<any>({
-              type: "recorder/statistics_during_period",
-              start_time: extendedStart.toISOString(),
-              end_time: end.toISOString(),
-              statistic_ids: [id],
-              period: "hour",
-            });
-            console.log("useEntityHistory: Statistics fallback response:", stats);
-            
-            const series = stats?.[id] ?? [];
-            if (series.length > 0) {
-              const parsed: EntityHistoryPoint[] = series
-                .map((s: any) => ({
-                  s: s.s,
-                  lu: s.start,
-                }))
-                .sort((a: { last_changed: any }, b: { last_changed: any }) =>
-                  a.last_changed! > b.last_changed! ? 1 : -1
-                );
-              
-              console.log("useEntityHistory: Statistics fallback parsed points:", parsed.length);
-              if (!cancelled) setPoints(parsed.slice(-limit));
-              return;
+      let lastErr: Error | null = null;
+      for (const attempt of attempts) {
+        if (cancelled || abort.signal.aborted) return;
+        try {
+          const parsed = await attempt();
+          if (parsed.length > 0) {
+            if (!cancelled) {
+              setPoints(parsed.slice(-limit));
+              fetchedRef.current = true;
+              setError(null);
             }
-          } catch (statsErr: any) {
-            console.log("useEntityHistory: Statistics fallback also failed:", statsErr);
+            return;
           }
-          
-          console.log("useEntityHistory: All websocket methods failed, trying REST fallback");
-          throw new Error("Websocket returned null - no history data");
+        } catch (err: any) {
+          lastErr = err instanceof Error ? err : new Error(String(err));
         }
+      }
 
-        // Parse the response - it's an object with entity_id as key, not an array
-        let list: any[] = [];
-        if (data && typeof data === 'object') {
-          // Response format: {entity_id: [history_points]}
-          list = data[id] || [];
-          console.log(`useEntityHistory: Found ${list.length} points for entity ${id}`);
-        } else if (Array.isArray(data)) {
-          // Fallback: if it's an array, take the first element
-          list = data[0] ?? [];
-        }
-        
-        +console.log(
-          "useEntityHistory: Raw history list length:",
-          list.length,
-          "first few items:",
-          list.slice(0, 3)
-        );
-
-        if (!cancelled) setPoints(list.slice(-limit));
-      } catch (wsErr: any) {
-        // REST fallback (helps if WS command is blocked)
-        +console.log(
-          "useEntityHistory: Websocket failed, trying REST fallback:",
-          wsErr
-        );
-      } finally {
-        if (!cancelled) setLoading(false);
+      if (!cancelled && lastErr) {
+        setError(lastErr);
       }
     }
 
-     if (connection && entityId) {
-       console.log(
-         "useEntityHistory: Connection available, entityId:",
-         entityId
-       );
-       run(connection as any, entityId);
-      
-       
-       // Also listen to state changes for real-time updates
-       let unsubscribe: (() => void) | null = null;
-       connection.subscribeEvents((event: any) => {
-         if (event.data?.entity_id === entityId) {
-           console.log("useEntityHistory: State change detected, refreshing data");
-           run(connection as any, entityId);
-         }
-       }, "state_changed").then((unsub) => {
-         unsubscribe = unsub;
-       });
-       
-       return () => {
-         cancelled = true;
-         abortRef.current?.abort();
-         if (unsubscribe) {
-           unsubscribe();
-         }
-       };
-     } else {
-       console.log(
-         "useEntityHistory: Missing connection or entityId - connection:",
-         !!connection,
-         "entityId:",
-         entityId
-       );
-       return () => {
-         cancelled = true;
-         abortRef.current?.abort();
-       };
-     }
-   }, [connection, entityId, limit, lookbackMs, mode]);
+    if (!connection || !entityId) {
+      setPoints([]);
+      setLoading(false);
+      return () => {
+        cancelled = true;
+        abort.abort();
+      };
+    }
+
+    loadHistory(connection as Connection, entityId).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+
+    let unsubscribe: (() => void) | null = null;
+    connection
+      .subscribeEvents((event: any) => {
+        if (event.data?.entity_id !== entityId) return;
+        const newState = event.data?.new_state;
+        if (!newState) return;
+        setPoints((prev) =>
+          appendLivePoint(
+            prev,
+            newState.state,
+            newState.last_updated ?? newState.last_changed,
+            limit
+          )
+        );
+      }, "state_changed")
+      .then((unsub) => {
+        if (cancelled) {
+          unsub();
+          return;
+        }
+        unsubscribe = unsub;
+      });
+
+    return () => {
+      cancelled = true;
+      abort.abort();
+      unsubscribe?.();
+    };
+  }, [
+    connection,
+    entityId,
+    limit,
+    lookbackMs,
+    mode,
+    auth?.accessToken,
+    auth?.data?.access_token,
+    hassUrl,
+  ]);
 
   const history = useMemo(() => points, [points]);
   return { history, loading, error };
