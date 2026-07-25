@@ -3,37 +3,68 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_URL
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.network import get_url
 
 from .api import CasaBoardApiError, async_fetch_status, normalize_base_url
 from .const import (
     CONF_SCAN_INTERVAL,
     CONF_SIDEBAR_ICON,
     CONF_SIDEBAR_TITLE,
+    DEFAULT_CASABOARD_PORT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SIDEBAR_ICON,
     DEFAULT_SIDEBAR_TITLE,
+    DEFAULT_URL,
     DOMAIN,
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
 )
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_URL): str,
-        vol.Optional(CONF_SIDEBAR_TITLE, default=DEFAULT_SIDEBAR_TITLE): str,
-        vol.Optional(CONF_SIDEBAR_ICON, default=DEFAULT_SIDEBAR_ICON): str,
-        vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
-            vol.Coerce(int),
-            vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL),
-        ),
-    }
-)
+
+def default_casaboard_url(hass: HomeAssistant) -> str:
+    """Suggest CasaBoard on the same host as Home Assistant (port 3000)."""
+    try:
+        ha_url = get_url(hass, prefer_external=False, allow_cloud=False)
+    except HomeAssistantError:
+        return DEFAULT_URL
+
+    hostname = urlparse(ha_url).hostname
+    if not hostname:
+        return DEFAULT_URL
+
+    if ":" in hostname:
+        hostname = f"[{hostname}]"
+
+    return f"http://{hostname}:{DEFAULT_CASABOARD_PORT}"
+
+
+def _user_schema(defaults: dict[str, Any]) -> vol.Schema:
+    """Schema for the user step, prefilled with defaults."""
+    return vol.Schema(
+        {
+            vol.Required(CONF_URL, default=defaults[CONF_URL]): str,
+            vol.Optional(
+                CONF_SIDEBAR_TITLE, default=defaults[CONF_SIDEBAR_TITLE]
+            ): str,
+            vol.Optional(
+                CONF_SIDEBAR_ICON, default=defaults[CONF_SIDEBAR_ICON]
+            ): str,
+            vol.Optional(
+                CONF_SCAN_INTERVAL, default=defaults[CONF_SCAN_INTERVAL]
+            ): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL),
+            ),
+        }
+    )
 
 
 class CasaBoardConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -73,9 +104,18 @@ class CasaBoardConfigFlow(ConfigFlow, domain=DOMAIN):
                     },
                 )
 
+        defaults: dict[str, Any] = {
+            CONF_URL: default_casaboard_url(self.hass),
+            CONF_SIDEBAR_TITLE: DEFAULT_SIDEBAR_TITLE,
+            CONF_SIDEBAR_ICON: DEFAULT_SIDEBAR_ICON,
+            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+        }
+        if user_input is not None:
+            defaults.update(user_input)
+
         return self.async_show_form(
             step_id="user",
-            data_schema=STEP_USER_DATA_SCHEMA,
+            data_schema=_user_schema(defaults),
             errors=errors,
         )
 

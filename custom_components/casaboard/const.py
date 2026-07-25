@@ -15,6 +15,8 @@ CONF_SCAN_INTERVAL: Final = "scan_interval"
 DEFAULT_SIDEBAR_TITLE: Final = "CasaBoard"
 DEFAULT_SIDEBAR_ICON: Final = "mdi:view-dashboard"
 DEFAULT_SCAN_INTERVAL: Final = 60
+DEFAULT_CASABOARD_PORT: Final = 3000
+DEFAULT_URL: Final = f"http://homeassistant.local:{DEFAULT_CASABOARD_PORT}"
 
 PANEL_URL_PATH: Final = "casaboard"
 PANEL_WEBCOMPONENT: Final = "casaboard-panel"
