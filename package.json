@@ -14,7 +14,7 @@
     "typescript": "5.9.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.9.0"
   },
   "packageManager": "npm@10.9.2",
   "workspaces": [
@@ -22,6 +22,21 @@
     "packages/*"
   ],
   "dependencies": {
-    "next": "15.5.18"
+    "next": "16.2.11"
+  },
+  "overrides": {
+    "postcss": "8.5.18",
+    "sharp": "0.35.0",
+    "tsup": {
+      "esbuild": "0.28.1"
+    },
+    "vite": {
+      "esbuild": "0.25.12"
+    },
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "minimatch@3": {
+      "brace-expansion": "1.1.16"
+    }
   }
 }

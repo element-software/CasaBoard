@@ -4,6 +4,7 @@
     ".env*"
   ],
   "globalEnv": [
+    "NODE_ENV",
     "RESEND_API_KEY",
     "DATA_DIR",
     "PUBLISH_DIR",

@@ -1,3 +1,4 @@
+/* global process */
 // Event listener setup to prevent memory leak warnings
 // This should be imported early in the application lifecycle
 
@@ -6,7 +7,7 @@ if (typeof process !== 'undefined' && process.setMaxListeners) {
   // This is common in Next.js development due to hot reloading and multiple connections
   const maxListeners = process.env.NODE_ENV === 'development' ? 20 : 10;
   process.setMaxListeners(maxListeners);
-  
+
   if (process.env.NODE_ENV === 'development') {
     console.log(`✓ Max listeners set to ${maxListeners} for development`);
   }

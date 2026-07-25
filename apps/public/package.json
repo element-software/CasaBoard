@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3001",
+    "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,9 +19,9 @@
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@tailwindcss/postcss": "^4.1.13",
-    "next": "15.5.18",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "next": "16.2.11",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -29,8 +29,8 @@
     "@repo/tailwind-config": "*",
     "@repo/ui": "*",
     "@types/node": "^22.15.3",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "eslint": "^9.34.0",
     "tailwindcss": "^4.1.13",
     "typescript": "5.9.2"

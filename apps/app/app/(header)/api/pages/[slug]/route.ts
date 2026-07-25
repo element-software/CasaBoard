@@ -11,7 +11,7 @@ export async function GET(
   try {
     const page = await PageActions.getPage(slug)
     return NextResponse.json(page)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Page not found' }, { status: 404 })
   }
 }
