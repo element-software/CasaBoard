@@ -11,7 +11,7 @@
     "@heroui/react": "^2.8.3"
   },
   "devDependencies": {
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.18",
     "tailwindcss": "^4.1.5"
   }
 }
