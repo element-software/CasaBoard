@@ -43,8 +43,8 @@ export default function ContactPageContent() {
       setEmail("");
       setSubject("");
       setMessage("");
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Something went wrong.");
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setIsSubmitting(false);
     }

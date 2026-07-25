@@ -34,12 +34,12 @@
     "dotenv": "^17.2.2",
     "framer-motion": "^12.23.12",
     "home-assistant-js-websocket": "^9.5.0",
-    "next": "15.5.21",
+    "next": "16.2.11",
     "node-scp": "^0.0.25",
     "pino": "^9.11.0",
     "pino-pretty": "^11.3.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "use-debounce": "^10.0.6"
   },
   "devDependencies": {

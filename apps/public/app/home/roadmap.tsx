@@ -119,7 +119,7 @@ export const Roadmap = () => {
 
       <div className="relative mx-auto">
         <div className="space-y-4">
-          {roadmapItems.map((item, index) => (
+          {roadmapItems.map((item) => (
             <div key={item.id} className="relative flex items-center gap-4">
               {/* Timeline dot */}
               <div className="relative z-10 min-w-12 min-h-12 w-12 h-12 bg-white rounded-full border-2 border-violet-200 flex items-center justify-center shadow-sm">

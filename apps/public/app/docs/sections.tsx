@@ -149,7 +149,7 @@ const QuickStart: React.FC = () => (
     </div>
 
     <Callout type="success" title="Free and self-hosted">
-      There's no account, no subscription, and no data leaving your server. CasaBoard runs entirely on infrastructure you control.
+      There&apos;s no account, no subscription, and no data leaving your server. CasaBoard runs entirely on infrastructure you control.
     </Callout>
 
     <Callout type="info" title="What you'll need">
@@ -369,7 +369,7 @@ const Tips: React.FC = () => (
       </div>
 
       <Callout type="info" title="Display tip">
-        For always-on wall displays, set the page to 'Live' and open it in a kiosk browser in fullscreen mode. Most smart TVs support this natively.
+        For always-on wall displays, set the page to &apos;Live&apos; and open it in a kiosk browser in fullscreen mode. Most smart TVs support this natively.
       </Callout>
     </div>
   </div>
@@ -389,7 +389,7 @@ const Troubleshooting: React.FC = () => (
     <div className="space-y-5">
       <div className="border border-slate-100 rounded-xl overflow-hidden">
         <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-          <p className="font-semibold text-sm text-slate-800">Can't connect to Home Assistant</p>
+          <p className="font-semibold text-sm text-slate-800">Can&apos;t connect to Home Assistant</p>
         </div>
         <ul className="p-4 space-y-2 text-sm text-slate-600">
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Verify the URL is reachable from the machine running the CasaBoard container</li>
