@@ -3,20 +3,16 @@
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/v/release/element-software/CasaBoard?style=for-the-badge&include_prereleases)](https://github.com/element-software/CasaBoard/releases)
 [![HA](https://img.shields.io/badge/Home%20Assistant-%3E%3D%202024.6-41BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/github/license/element-software/CasaBoard?style=for-the-badge)](https://github.com/element-software/CasaBoard/blob/main/LICENSE)
 [![Website](https://img.shields.io/badge/Website-casaboard.dev-8B5CF6.svg?style=for-the-badge)](https://casaboard.dev)
 
-<p align="center">
-  <img src="docs/media/icon.png" alt="CasaBoard icon" width="96" />
-</p>
+![CasaBoard icon](https://raw.githubusercontent.com/element-software/CasaBoard/main/docs/media/icon.png)
 
 **Open-source, self-hosted dashboard builder for Home Assistant.**
 
 Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integration for a sidebar panel and health sensors — **no account, no cloud, no login**.
 
-<p align="center">
-  <img src="docs/media/hero.png" alt="CasaBoard — local-only Home Assistant dashboards" width="720" />
-</p>
+![CasaBoard — local-only Home Assistant dashboards](https://raw.githubusercontent.com/element-software/CasaBoard/main/docs/media/hero.png)
 
 ## What you get
 
