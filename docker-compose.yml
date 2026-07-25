@@ -1,0 +1,15 @@
+services:
+  casaboard:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+      # Point HA_WWW at your Home Assistant config/www/casaboard directory so
+      # published pages are served at http://homeassistant.local:8123/local/casaboard/<slug>/
+      - ${HA_WWW:-./publish}:/publish
+    environment:
+      - DATA_DIR=/data
+      - PUBLISH_DIR=/publish
+      - VIEWER_DIST_DIR=/app/viewer-dist
+    restart: unless-stopped
