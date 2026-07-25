@@ -60,13 +60,30 @@ for headless / kiosk clients. OAuth (`getAuth` via `reauthenticate` /
 
 ## Publishing (maintainers)
 
-From the monorepo:
+CI uses [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
+(OIDC) — no long-lived `NPM_TOKEN`.
+
+**One-time bootstrap** (package must exist before Trusted Publisher can be set):
 
 ```bash
-npm run build -w @casaboard/ha
-npm publish -w @casaboard/ha --access public
+cd packages/ha
+npm run build
+npm publish --access public   # enter your npm 2FA OTP when prompted
 ```
 
-Or push a tag matching `ha-v*` (e.g. `ha-v0.1.0`) to run the GitHub Actions
-publish workflow. Requires an `NPM_TOKEN` repository secret with publish rights
-to the `@casaboard` npm scope.
+Then on npmjs.com → `@casaboard/ha` → **Settings** → **Trusted Publisher**:
+
+- Provider: **GitHub Actions**
+- Repository owner: `element-software`
+- Repository name: `CasaBoard`
+- Workflow filename: `publish-ha.yml` (filename only)
+- Allowed action: **`npm publish`**
+
+**Afterwards**, push a version tag:
+
+```bash
+git tag ha-v0.1.1
+git push origin ha-v0.1.1
+```
+
+That runs `.github/workflows/publish-ha.yml` and publishes via OIDC.

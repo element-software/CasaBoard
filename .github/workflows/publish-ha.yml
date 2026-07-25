@@ -11,6 +11,9 @@ on:
         required: false
         type: string
 
+# Trusted Publishing (OIDC) — no NPM_TOKEN required.
+# Configure on npmjs.com → @casaboard/ha → Settings → Trusted Publisher
+# after the package exists (one-time manual publish).
 permissions:
   contents: read
   id-token: write
@@ -28,11 +31,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          # Trusted publishing needs Node ≥22.14 and npm ≥11.5.1
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
           scope: "@casaboard"
-          cache: npm
-          cache-dependency-path: package-lock.json
+
+      - name: Ensure recent npm CLI
+        run: npm install -g npm@latest
 
       - name: Install
         working-directory: .
@@ -55,7 +60,7 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Do NOT set NODE_AUTH_TOKEN — that forces the legacy token path and
+      # prevents npm Trusted Publishing (OIDC) from authenticating.
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
