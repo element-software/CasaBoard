@@ -6,13 +6,13 @@
 [![License](https://img.shields.io/github/license/element-software/CasaBoard?style=for-the-badge)](https://github.com/element-software/CasaBoard/blob/main/LICENSE)
 [![Website](https://img.shields.io/badge/Website-casaboard.dev-8B5CF6.svg?style=for-the-badge)](https://casaboard.dev)
 
-![CasaBoard icon](https://raw.githubusercontent.com/element-software/CasaBoard/main/docs/media/icon.png)
+![CasaBoard icon](https://casaboard.dev/brand/icon.png)
 
 **Open-source, self-hosted dashboard builder for Home Assistant.**
 
 Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integration for a sidebar panel and health sensors — **no account, no cloud, no login**.
 
-![CasaBoard — local-only Home Assistant dashboards](https://raw.githubusercontent.com/element-software/CasaBoard/main/docs/media/hero.png)
+![CasaBoard — local-only Home Assistant dashboards](https://casaboard.dev/brand/hero.png)
 
 ## What you get
 
