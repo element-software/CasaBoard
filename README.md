@@ -1,119 +1,180 @@
 # CasaBoard
 
-An open-source, self-hosted dashboard builder for Home Assistant. Build custom dashboards with a drag-and-drop editor (Puck), connect it to your own Home Assistant instance, and run the whole thing yourself with Docker — no account, no cloud, no login.
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/v/release/element-software/CasaBoard?style=for-the-badge&include_prereleases)](https://github.com/element-software/CasaBoard/releases)
+[![HA](https://img.shields.io/badge/Home%20Assistant-%3E%3D%202024.6-41BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-casaboard.dev-8B5CF6.svg?style=for-the-badge)](https://casaboard.dev)
 
-## Run it
+<p align="center">
+  <img src="docs/media/icon.png" alt="CasaBoard icon" width="96" />
+</p>
+
+**Open-source, self-hosted dashboard builder for Home Assistant.**
+
+Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integration for a sidebar panel and health sensors — **no account, no cloud, no login**.
+
+<p align="center">
+  <img src="docs/media/hero.png" alt="CasaBoard — local-only Home Assistant dashboards" width="720" />
+</p>
+
+## What you get
+
+| Piece | What it does |
+| --- | --- |
+| **CasaBoard app** | Self-hosted editor + live dashboards (Docker recommended) |
+| **HACS integration** | Sidebar panel (iframe), online/page sensors, `casaboard.refresh` service |
+| **Static publish** | Export pages into Home Assistant `/local/casaboard/` for wall tablets & bookmarks |
+
+Your layouts and Home Assistant credentials stay on **your** machine. Nothing phones home.
+
+## Requirements
+
+- A running [Home Assistant](https://www.home-assistant.io/) instance (**2024.6+** for the HACS integration)
+- [Docker](https://docs.docker.com/get-docker/) + Docker Compose (for the recommended install)
+- Optional: [HACS](https://hacs.xyz/) to install the sidebar integration
+
+## Quick start (app)
 
 ```bash
+git clone https://github.com/element-software/CasaBoard.git
+cd CasaBoard
 docker compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000). On first run you'll be guided through connecting to Home Assistant (URL + long-lived access token, or sign-in with HA); once connected, start building dashboards.
+Open [http://localhost:3000](http://localhost:3000) (or `http://<host-ip>:3000`).
 
-Your data (`pages.json`, `sidebars.json`, `themes.json`, `ha-connection.json`, `publish-settings.json`) lives in `./data`, bind-mounted into the container — back that directory up.
+On first launch you connect to Home Assistant (URL + long-lived access token, or HA sign-in). After that, create a page and build in the drag-and-drop editor.
 
-### Publish dashboards to Home Assistant `/local/`
+Dashboard data lives in `./data` (bind-mounted into the container) — back that directory up.
 
-Published pages are exported as static files (shared viewer JS/CSS + per-page JSON/HTML). Mount your HA `www/casaboard` folder into the container:
+> Full walkthrough: [casaboard.dev/docs](https://casaboard.dev/docs)
+
+## Install the HACS integration
+
+The integration does **not** replace the CasaBoard app — it bridges a running instance into Home Assistant.
+
+### 1. Add the repository in HACS
+
+1. HACS → **Integrations** → ⋮ → **Custom repositories**
+2. Repository: `https://github.com/element-software/CasaBoard`
+3. Category: **Integration**
+4. Download **CasaBoard**, then **restart Home Assistant**
+
+### 2. Add the integration
+
+[![Open your Home Assistant instance and start setting up CasaBoard.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=casaboard)
+
+Or: **Settings → Devices & services → Add integration → CasaBoard**
+
+Enter the base URL of your CasaBoard app, for example:
+
+- `http://homeassistant.local:3000`
+- `http://casaboard:3000` (same Docker network as HA)
+- `http://192.168.x.x:3000`
+
+### What the integration provides
+
+| Entity / feature | Meaning |
+| --- | --- |
+| Sidebar **CasaBoard** panel | Opens the app in an iframe (title/icon configurable in options) |
+| `binary_sensor.casaboard_online` | CasaBoard `/api/health` is reachable |
+| `sensor.casaboard_pages` | Total pages |
+| `sensor.casaboard_published_pages` | Published pages |
+| `sensor.casaboard_ha_connection` | `connected` / `disconnected` (stored HA credentials in the app) |
+| `casaboard.refresh` | Service to re-poll health (optional `entry_id`) |
+
+### Manual install (without HACS)
+
+Copy `custom_components/casaboard` into `<config>/custom_components/casaboard`, restart Home Assistant, then add the integration from the UI.
+
+### Sidebar only (no sensors)
+
+If you only want an iframe and no custom component:
+
+```yaml
+# configuration.yaml
+panel_iframe:
+  casaboard:
+    title: CasaBoard
+    icon: mdi:view-dashboard
+    url: http://homeassistant.local:3000
+```
+
+## Publish dashboards to `/local/`
+
+Export published pages as static files under Home Assistant’s `www/` tree:
+
+`http://homeassistant.local:8123/local/casaboard/<slug>/`
+
+1. Create `<config>/www/casaboard` on the HA host.
+2. Point Compose at it:
 
 ```bash
 # Example: HA config at /home/pi/homeassistant
 HA_WWW=/home/pi/homeassistant/www/casaboard docker compose up -d
 ```
 
-Or set `HA_WWW` in a `.env` next to `docker-compose.yml`. Defaults to `./publish` for local smoke tests.
+Or set `HA_WWW` in a `.env` next to `docker-compose.yml`. Default is `./publish` for local tests.
 
-Then in CasaBoard → Setup → HA Settings, set **Public base URL** to e.g. `http://homeassistant.local:8123/local/casaboard`. Publishing a page writes to that mount; open `…/local/casaboard/<slug>/`. The static viewer asks for a long-lived access token once (browser localStorage only — tokens are never written into `www/`).
+3. In CasaBoard → **Setup → HA Settings**, set **Public base URL** to e.g. `http://homeassistant.local:8123/local/casaboard`.
+4. Publish a page — files land on the mount. The static viewer asks for a long-lived access token once (browser `localStorage` only; tokens are never written into `www/`).
 
 Drafts stay previewable in the app at `/dashboard/<slug>`.
 
-To embed CasaBoard in the Home Assistant sidebar (with status sensors), see [`hacs-panel/README.md`](hacs-panel/README.md) — install the `custom_components/casaboard` integration via HACS.
+## Environment variables
 
-## Apps
+| Variable | Default (Docker) | Purpose |
+| --- | --- | --- |
+| `DATA_DIR` | `/data` | JSON store (`pages`, sidebars, themes, HA connection, publish settings) |
+| `PUBLISH_DIR` | `/publish` | Static export directory |
+| `VIEWER_DIST_DIR` | `/app/viewer-dist` | Built viewer assets copied on publish |
+| `HA_WWW` | `./publish` (Compose host path) | Host folder mounted at `/publish` — use `<ha-config>/www/casaboard` |
+| `PORT` | `3000` | HTTP port |
 
-- `apps/app` – The dashboard builder (Next.js App Router). This is what runs in the Docker image.
-- `apps/viewer` – Static dashboard runtime (Vite). Built into the Docker image and copied into `PUBLISH_DIR` on publish.
-- `apps/public` – Documentation / project site (Next.js App Router, not part of the Docker image)
+## Privacy
 
-## Packages
+No analytics or tracking in the app or the marketing site. No cookie consent banner — there is nothing to consent to. Your Home Assistant credentials and dashboard JSON never leave the server you run.
 
-- `packages/ui` – Shared UI components (HeroUI, Material and Hero Icons, Puck page editor)
-- `packages/config` – Various config items
-- `packages/utils` – Entity utils (lights, binary sensors, icons)
-- `packages/hooks` – Shared hooks (theme, pages, etc.)
-- `packages/lib` – Actions, services, and the flat-JSON-file persistence layer (`packages/lib/store`)
-- `packages/types` – Shared TypeScript types
-- `custom_components/casaboard` – Home Assistant integration (HACS): sidebar panel + health sensors for the running CasaBoard app (see [`hacs-panel/README.md`](hacs-panel/README.md))
+## Support
 
-## Local Development
+- Docs: [casaboard.dev/docs](https://casaboard.dev/docs)
+- Issues: [GitHub Issues](https://github.com/element-software/CasaBoard/issues)
+- Email: [support@casaboard.dev](mailto:support@casaboard.dev)
 
-Requirements: Node 18+, npm 10+, PNPM/NPM/Yarn (repo uses npm). From the repo root:
+---
+
+## Development
+
+Requirements: Node 18+, npm 10+. From the repo root:
 
 ```bash
 npm install
 npm run dev
 ```
 
-That starts both apps. Visit:
-
-- App: http://localhost:3000
-- Public: http://localhost:3001
-
-To run a single app:
+- App: [http://localhost:3000](http://localhost:3000)
+- Public site: [http://localhost:3001](http://localhost:3001)
 
 ```bash
-npm run dev --workspace=app
-npm run dev --workspace=public
+npm run build        # all apps/packages
+npm run lint
+npm run check-types
 ```
 
-## Environment
+### Repository layout
 
-- `DATA_DIR` – where `apps/app` stores its JSON data files. Defaults to `./data`; the Docker image sets it to `/data`.
-- `PUBLISH_DIR` – filesystem path for static page exports. Defaults to `./publish`; Docker uses `/publish`.
-- `VIEWER_DIST_DIR` – built viewer assets to copy on publish. Docker sets `/app/viewer-dist`.
-- `HA_WWW` – compose-only host path mounted at `/publish` (point at `<ha-config>/www/casaboard`).
-- `PORT` – optional, defaults to `3000`.
+| Path | Role |
+| --- | --- |
+| `apps/app` | Dashboard builder (Next.js) — what the Docker image runs |
+| `apps/viewer` | Static dashboard runtime (Vite), baked into publishes |
+| `apps/public` | Documentation / marketing site ([casaboard.dev](https://casaboard.dev)) |
+| `packages/ui` | Shared UI (HeroUI, icons, Puck editor) |
+| `packages/lib` | Actions, services, flat-JSON persistence |
+| `packages/ha` | Home Assistant websocket helpers (`@casaboard/ha`) |
+| `custom_components/casaboard` | HACS integration (panel + sensors); brand assets in `brand/` |
 
-`apps/public` (docs site) needs no environment variables beyond an optional `RESEND_API_KEY` for the contact form.
-
-## Tailwind CSS v4
-
-Shared Tailwind + PostCSS lives in `packages/tailwind-config`. Each app:
-
-- Imports `./app/globals.css` which in turn imports the shared CSS and adds `@source` globs for that app and `packages/ui`.
-- Has a `postcss.config.js` re-exporting `@repo/tailwind-config/postcss` so Vercel picks up Tailwind during build.
-
-## Theming
-
-- Uses HeroUI Theme Provider and allows configuring the theme in `hero.ts` in the `tailwind-config` package.
-
-## Privacy
-
-Neither `apps/app` nor `apps/public` ships analytics or tracking. There is no cookie consent banner — the marketing site and the self-hosted app set no analytics cookies.
-
-## Home Assistant Integration
-
-- Uses the home-assistant-websocket-js library.
-
-## Puck Editor
-
-- Puck component registry under `packages/ui/components/puck/puck.config.tsx`.
-- Import Puck config directly from that file to keep server bundles clean.
-
-## Build & Deploy
-
-```bash
-npm run build
-```
-
-For production, build and run the Docker image directly (`docker compose up -d` does this for you) — see the root `Dockerfile`. Only `apps/app` is containerized; `apps/public` is docs and can be hosted separately (or not at all) if you're just running the tool.
-
-## Scripts
-
-- `dev` – run all apps in dev
-- `build` – build all apps/packages
-- `lint` – ESLint across the repo
-- `check-types` – typecheck
+Integration-focused notes: [`hacs-panel/README.md`](hacs-panel/README.md).
 
 ## License
 

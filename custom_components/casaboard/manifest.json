@@ -4,7 +4,7 @@
   "codeowners": ["@element-software"],
   "config_flow": true,
   "dependencies": ["frontend", "http", "panel_custom"],
-  "documentation": "https://github.com/element-software/CasaBoard/blob/main/hacs-panel/README.md",
+  "documentation": "https://github.com/element-software/CasaBoard/blob/main/README.md",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/element-software/CasaBoard/issues",
   "requirements": [],

@@ -62,6 +62,10 @@ jobs:
           if not panel.is_file():
               errors.append("missing custom_components/casaboard/www/casaboard-panel.js")
 
+          brand_icon = domain_dir / "brand" / "icon.png"
+          if not brand_icon.is_file():
+              errors.append("missing custom_components/casaboard/brand/icon.png (required for HACS/HA brand images)")
+
           for required in ("LICENSE", "README.md"):
               if not Path(required).is_file():
                   errors.append(f"missing {required}")
@@ -81,10 +85,10 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
-          # brands: default-store requirement; skip for custom repo until brands PR.
+          # images: plugin/theme check only; safe to ignore for integrations.
           # hacsjson / integration_manifest: ignored while private (raw.githubusercontent.com).
           # license: GitHub only reports license from the default branch.
-          ignore: brands images hacsjson license integration_manifest
+          ignore: images hacsjson license integration_manifest
           comment: false
 
   validate-hassfest:
