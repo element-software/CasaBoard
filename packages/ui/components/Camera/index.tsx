@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiCamera } from "@mdi/js";
 import {
@@ -20,6 +20,8 @@ export interface CameraProps {
   entityId: string;
   audioEnabled?: boolean;
   showName?: boolean;
+  /** Fill the parent (for CCTV grid cells) instead of using a fixed min-height. */
+  fill?: boolean;
   [key: string]: unknown;
 }
 
@@ -27,73 +29,111 @@ export const Camera = ({
   entityId,
   audioEnabled = false,
   showName = true,
+  fill = false,
 }: CameraProps) => {
   const entity = useEntity(entityId);
   const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
   const [muted, setMuted] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const videoNodeRef = useRef<HTMLVideoElement | null>(null);
 
   const supportedFeatures =
     typeof entity?.attributes?.supported_features === "number"
       ? entity.attributes.supported_features
       : undefined;
 
-  // Only one live stream at a time: card when collapsed, modal when expanded.
-  const cardStream = useCameraStream({
+  // One live stream for card + modal; video remount reattaches without renegotiating.
+  const stream = useCameraStream({
     entityId,
-    enabled: isEntityReady && !expanded,
+    enabled: isEntityReady,
     supportedFeatures,
+    forceVisible: expanded,
   });
 
-  const modalStream = useCameraStream({
-    entityId,
-    enabled: isEntityReady && expanded,
-    supportedFeatures,
-    forceVisible: true,
-  });
-
-  const activeStream = expanded ? modalStream : cardStream;
   const showConnecting =
     isEntityReady &&
-    !activeStream.error &&
-    (activeStream.loading ||
-      (activeStream.mode === "idle" && activeStream.isVisible));
+    !stream.error &&
+    (stream.loading || (stream.mode === "idle" && stream.isVisible));
+
+  const canToggleAudio =
+    audioEnabled && (stream.mode === "hls" || stream.mode === "webrtc");
 
   useEffect(() => {
-    const video = activeStream.videoRef.current;
+    const video = videoNodeRef.current;
     if (!video) return;
     video.muted = muted || !audioEnabled;
-  }, [muted, audioEnabled, activeStream.videoRef, activeStream.mode, expanded]);
+  }, [muted, audioEnabled, stream.mode, expanded]);
 
   useEffect(() => {
     if (!audioEnabled) setMuted(true);
   }, [audioEnabled]);
 
+  const setVideoRef = useCallback(
+    (node: HTMLVideoElement | null) => {
+      videoNodeRef.current = node;
+      stream.videoRef(node);
+    },
+    [stream.videoRef]
+  );
+
+  const sizeClass = fill ? "h-full min-h-0" : "min-h-[160px]";
+
   if (!entityId) {
     return (
-      <div className="p-4 border-2 border-dashed border-theme-border rounded-xl text-center text-theme-text-muted">
-        <Icon path={mdiCamera} className="h-12 w-12 mx-auto mb-2 opacity-40" />
-        Configure Camera Entity
+      <div
+        className={
+          fill
+            ? "flex h-full w-full flex-col items-center justify-center gap-1 bg-neutral-950 text-white/35"
+            : "p-4 border-2 border-dashed border-theme-border rounded-xl text-center text-theme-text-muted"
+        }
+      >
+        <Icon
+          path={mdiCamera}
+          className={fill ? "h-6 w-6 opacity-40" : "h-12 w-12 mx-auto mb-2 opacity-40"}
+        />
+        {!fill && <span>Configure Camera Entity</span>}
       </div>
     );
   }
 
   const name =
     entity?.attributes?.friendly_name || entityId.replace(/^camera\./, "");
-  const canToggleAudio = audioEnabled && activeStream.mode === "hls";
+
+  const player = (
+    <CameraPlayer
+      name={name}
+      showName={showName && !expanded}
+      mode={stream.mode}
+      mjpegUrl={stream.mjpegUrl}
+      posterUrl={stream.posterUrl}
+      error={stream.error}
+      showConnecting={
+        expanded
+          ? !stream.error && (stream.loading || stream.mode === "idle")
+          : showConnecting
+      }
+      muted={muted || !audioEnabled}
+      canToggleAudio={canToggleAudio}
+      onToggleMute={() => setMuted((m) => !m)}
+      videoRef={setVideoRef}
+      objectFit={expanded ? "contain" : "cover"}
+    />
+  );
 
   return (
     <>
       <Skeleton
         isLoaded={isLoaded}
-        className="flex h-full w-full flex-col rounded-xl"
+        className={`flex h-full w-full flex-col ${fill ? "" : "rounded-xl"}`}
         classNames={{ content: "flex h-full min-h-0 w-full flex-1 flex-col" }}
       >
         {showNotAvailable ? (
-          <CardShell status="unavailable" className="min-h-[160px]">
-            <div className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 p-4 text-theme-text-muted">
-              <Icon path={mdiCamera} className="h-8 w-8 opacity-50" />
-              <span className="text-sm">{entityId}</span>
+          <CardShell status="unavailable" className={`relative bg-black ${sizeClass}`}>
+            <div
+              className={`flex h-full flex-col items-center justify-center gap-1 p-2 text-theme-text-muted ${sizeClass}`}
+            >
+              <Icon path={mdiCamera} className="h-6 w-6 opacity-50" />
+              {!fill && <span className="text-sm">{entityId}</span>}
               <span className="text-xs">Unavailable</span>
             </div>
           </CardShell>
@@ -102,56 +142,44 @@ export const Camera = ({
             status="on"
             domain="camera"
             interactive
-            className="relative min-h-[160px] bg-black"
+            className={`relative bg-black ${sizeClass}`}
             onClick={(e) => {
               if ((e.target as HTMLElement).closest("button")) return;
               setExpanded(true);
             }}
           >
-            {expanded ? (
-              // Poster placeholder while the live stream runs in the modal
-              <div className="relative h-full min-h-[160px] w-full bg-black">
-                {cardStream.posterUrl || modalStream.posterUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={
-                      (cardStream.posterUrl || modalStream.posterUrl) as string
-                    }
-                    alt={name}
-                    className="absolute inset-0 h-full w-full object-cover opacity-80"
-                    draggable={false}
-                  />
-                ) : (
-                  <div className="flex h-full min-h-[160px] items-center justify-center text-white/50 text-sm">
-                    Expanded
-                  </div>
-                )}
-                {showName && (
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                    <span className="truncate text-sm font-medium text-white drop-shadow">
-                      {name}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="h-full min-h-[160px] w-full">
-                <CameraPlayer
-                  name={name}
-                  showName={showName}
-                  mode={cardStream.mode}
-                  mjpegUrl={cardStream.mjpegUrl}
-                  posterUrl={cardStream.posterUrl}
-                  error={cardStream.error}
-                  showConnecting={showConnecting}
-                  muted={muted || !audioEnabled}
-                  canToggleAudio={canToggleAudio}
-                  onToggleMute={() => setMuted((m) => !m)}
-                  containerRef={cardStream.containerRef}
-                  videoRef={cardStream.videoRef}
-                />
-              </div>
-            )}
+            {/* Keep observer target on the card so expand/collapse doesn't reset visibility. */}
+            <div
+              ref={stream.containerRef}
+              className={`relative h-full w-full ${sizeClass}`}
+            >
+              {expanded ? (
+                <div className={`relative h-full w-full bg-black ${sizeClass}`}>
+                  {stream.posterUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={stream.posterUrl}
+                      alt={name}
+                      className="absolute inset-0 h-full w-full object-cover opacity-80"
+                      draggable={false}
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-white/50 text-sm">
+                      Expanded
+                    </div>
+                  )}
+                  {showName && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                      <span className="truncate text-sm font-medium text-white drop-shadow">
+                        {name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                player
+              )}
+            </div>
           </CardShell>
         )}
       </Skeleton>
@@ -175,24 +203,7 @@ export const Camera = ({
           </ModalHeader>
           <ModalBody>
             <div className="relative aspect-video w-full max-h-[80vh] bg-black">
-              <CameraPlayer
-                name={name}
-                showName={false}
-                mode={modalStream.mode}
-                mjpegUrl={modalStream.mjpegUrl}
-                posterUrl={modalStream.posterUrl}
-                error={modalStream.error}
-                showConnecting={
-                  !modalStream.error &&
-                  (modalStream.loading || modalStream.mode === "idle")
-                }
-                muted={muted || !audioEnabled}
-                canToggleAudio={audioEnabled && modalStream.mode === "hls"}
-                onToggleMute={() => setMuted((m) => !m)}
-                containerRef={modalStream.containerRef}
-                videoRef={modalStream.videoRef}
-                objectFit="contain"
-              />
+              {expanded ? player : null}
             </div>
           </ModalBody>
         </ModalContent>

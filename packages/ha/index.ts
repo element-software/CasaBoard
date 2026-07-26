@@ -57,13 +57,22 @@ export type {
 } from "./connection";
 export {
   CAMERA_FEATURE_STREAM,
+  addWebRtcCandidate,
   cameraSupportsHls,
+  cameraSupportsWebRtc,
   ensureFreshAccessToken,
   getCameraCapabilities,
   getCameraHlsUrl,
   getCameraMjpegUrl,
   getCameraPosterUrl,
+  getWebRtcClientConfiguration,
   joinHassUrl,
+  subscribeWebRtcOffer,
 } from "./camera/stream";
-export type { CameraCapabilities, CameraStreamType } from "./camera/stream";
+export type {
+  CameraCapabilities,
+  CameraStreamType,
+  WebRtcClientConfiguration,
+  WebRtcOfferEvent,
+} from "./camera/stream";
 export type { ConnectResult, EntityDomain, EntityId, HAConnection } from "./types";

@@ -24,6 +24,10 @@ export interface CameraPlayerProps {
   objectFit?: "cover" | "contain";
 }
 
+function isVideoMode(mode: CameraStreamMode): boolean {
+  return mode === "hls" || mode === "webrtc";
+}
+
 export function CameraPlayer({
   name,
   showName = true,
@@ -48,7 +52,7 @@ export function CameraPlayer({
       <video
         ref={videoRef}
         className={
-          mode === "hls"
+          isVideoMode(mode)
             ? `absolute inset-0 h-full w-full ${fitClass} ${videoClassName}`
             : "hidden"
         }

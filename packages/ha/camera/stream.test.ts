@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   CAMERA_FEATURE_STREAM,
   cameraSupportsHls,
+  cameraSupportsWebRtc,
   getCameraMjpegUrl,
   getCameraPosterUrl,
   joinHassUrl,
@@ -26,11 +27,34 @@ describe("camera stream helpers", () => {
       true
     );
     assert.equal(
-      cameraSupportsHls({ frontend_stream_types: ["webrtc"] }, CAMERA_FEATURE_STREAM),
+      cameraSupportsHls(
+        { frontend_stream_types: ["web_rtc"] },
+        CAMERA_FEATURE_STREAM
+      ),
       false
+    );
+    assert.equal(
+      cameraSupportsHls(
+        { frontend_stream_types: ["hls", "web_rtc"] },
+        CAMERA_FEATURE_STREAM
+      ),
+      true
     );
     assert.equal(cameraSupportsHls(null, CAMERA_FEATURE_STREAM), true);
     assert.equal(cameraSupportsHls(null, 0), false);
+  });
+
+  it("detects WebRTC support from capabilities only", () => {
+    assert.equal(
+      cameraSupportsWebRtc({ frontend_stream_types: ["web_rtc"] }),
+      true
+    );
+    assert.equal(
+      cameraSupportsWebRtc({ frontend_stream_types: ["hls", "web_rtc"] }),
+      true
+    );
+    assert.equal(cameraSupportsWebRtc({ frontend_stream_types: ["hls"] }), false);
+    assert.equal(cameraSupportsWebRtc(null), false);
   });
 
   it("builds authenticated proxy URLs", () => {
