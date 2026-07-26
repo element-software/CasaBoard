@@ -3,7 +3,9 @@ import { XMarkIcon, BackspaceIcon } from "@heroicons/react/24/outline";
 import { Modal, ModalContent, ModalBody } from "@heroui/react";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import type { AlarmAction } from "./index";
+import type { AlarmAction, AlarmArmFailure } from "@casaboard/ha";
+
+export type { AlarmArmFailure };
 
 const ACTION_CONFIRM_LABEL: Record<Exclude<AlarmAction, "none">, string> = {
   alarm_disarm: "Disarm",
@@ -23,6 +25,12 @@ interface AlarmConfirmPopupProps {
   onConfirm: (code?: string) => void;
   /** When true, show PIN keypad; code is sent to HA for validation. */
   requiresCode?: boolean;
+  /** Service call in flight. */
+  isSubmitting?: boolean;
+  /** Arm/disarm failure — zones + optional force-arm. */
+  failure?: AlarmArmFailure | null;
+  onForceArm?: () => void;
+  onForceCancel?: () => void;
 }
 
 export const AlarmConfirmPopup = ({
@@ -31,12 +39,17 @@ export const AlarmConfirmPopup = ({
   onClose,
   onConfirm,
   requiresCode = false,
+  isSubmitting = false,
+  failure = null,
+  onForceArm,
+  onForceCancel,
 }: AlarmConfirmPopupProps) => {
   const [pin, setPin] = useState("");
   const isDisarm = action === "alarm_disarm";
   // Disarm always prompts for a PIN when HA exposes a code format; arming
   // follows `requiresCode` (code_arm_required). Fallback: disarm always asks.
-  const showPin = requiresCode || isDisarm;
+  const showPin = !failure && !isSubmitting && (requiresCode || isDisarm);
+  const showFailure = Boolean(failure) && !isSubmitting;
 
   useEffect(() => {
     if (isOpen) setPin("");
@@ -51,6 +64,7 @@ export const AlarmConfirmPopup = ({
   };
 
   const handleConfirm = () => {
+    if (isSubmitting) return;
     if (showPin && pin.length === 0) return;
     onConfirm(showPin ? pin : undefined);
   };
@@ -63,6 +77,8 @@ export const AlarmConfirmPopup = ({
       isOpen={isOpen}
       onClose={onClose}
       size="sm"
+      isDismissable={!isSubmitting}
+      hideCloseButton
       classNames={{
         base: "hk-modal bg-white opacity-100",
         backdrop: "hk-modal__backdrop",
@@ -77,6 +93,7 @@ export const AlarmConfirmPopup = ({
             className="hk-modal__close"
             onClick={onClose}
             aria-label="Close"
+            disabled={isSubmitting}
           >
             <XMarkIcon className="h-4 w-4" />
           </button>
@@ -84,21 +101,47 @@ export const AlarmConfirmPopup = ({
           <div className="hk-modal__stack">
             <div className="hk-modal__header">
               <p className="hk-modal__eyebrow">
-                {showPin ? "Security" : "Confirm action"}
+                {showFailure ? "Security" : showPin ? "Security" : "Confirm action"}
               </p>
               <h2 className="hk-modal__title">
-                {showPin
-                  ? isDisarm
-                    ? "Enter PIN to Disarm"
-                    : `Enter PIN to ${label}`
-                  : label}
+                {isSubmitting
+                  ? `${label}…`
+                  : showFailure
+                    ? failure?.canForceArm
+                      ? "Open sensor(s) — arm anyway?"
+                      : "Arming failed"
+                    : showPin
+                      ? isDisarm
+                        ? "Enter PIN to Disarm"
+                        : `Enter PIN to ${label}`
+                      : label}
               </h2>
-              {!showPin && (
+              {!showPin && !showFailure && !isSubmitting && (
                 <p className="hk-modal__desc">
                   Are you sure you want to {label.toLowerCase()}?
                 </p>
               )}
+              {showFailure && failure?.message && (
+                <p className="hk-modal__desc">{failure.message}</p>
+              )}
             </div>
+
+            {showFailure && failure && failure.zones.length > 0 && (
+              <ul className="hk-modal__zones">
+                {failure.zones.map((zone) => (
+                  <li key={zone} className="hk-modal__zone">
+                    {zone}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {isSubmitting && (
+              <div className="hk-modal__loading" aria-live="polite">
+                <span className="hk-modal__spinner" />
+                <span>Talking to Home Assistant…</span>
+              </div>
+            )}
 
             {showPin && (
               <>
@@ -142,27 +185,39 @@ export const AlarmConfirmPopup = ({
               </>
             )}
 
-            <div className="hk-modal__actions">
-              <button
-                type="button"
-                className="hk-modal__btn hk-modal__btn--cancel"
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  "hk-modal__btn hk-modal__btn--primary",
-                  isDisarm && "hk-modal__btn--danger",
-                  !canConfirm && "hk-modal__btn--disabled"
-                )}
-                disabled={!canConfirm}
-                onClick={handleConfirm}
-              >
-                {label}
-              </button>
-            </div>
+            {!isSubmitting && (
+              <div className="hk-modal__actions">
+                <button
+                  type="button"
+                  className="hk-modal__btn hk-modal__btn--cancel"
+                  onClick={showFailure && onForceCancel ? onForceCancel : onClose}
+                >
+                  Cancel
+                </button>
+                {showFailure && failure?.canForceArm ? (
+                  <button
+                    type="button"
+                    className="hk-modal__btn hk-modal__btn--primary"
+                    onClick={onForceArm}
+                  >
+                    Force Arm
+                  </button>
+                ) : !showFailure ? (
+                  <button
+                    type="button"
+                    className={classNames(
+                      "hk-modal__btn hk-modal__btn--primary",
+                      isDisarm && "hk-modal__btn--danger",
+                      !canConfirm && "hk-modal__btn--disabled"
+                    )}
+                    disabled={!canConfirm}
+                    onClick={handleConfirm}
+                  >
+                    {label}
+                  </button>
+                ) : null}
+              </div>
+            )}
           </div>
         </ModalBody>
       </ModalContent>
