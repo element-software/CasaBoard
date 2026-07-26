@@ -77,3 +77,17 @@ export async function deletePage(slug: string): Promise<void> {
   delete all[slug];
   await writeJson(FILE, all);
 }
+
+/** Overwrites the whole store, used to restore an exported settings bundle. */
+export async function replaceAllPages(pages: Page[]): Promise<void> {
+  const all: PageMap = {};
+  for (const page of pages) all[page.slug] = page;
+  await writeJson(FILE, all);
+}
+
+/** Upserts by slug, keeping existing pages not present in `pages`. */
+export async function mergePages(pages: Page[]): Promise<void> {
+  const all = await readAll();
+  for (const page of pages) all[page.slug] = page;
+  await writeJson(FILE, all);
+}

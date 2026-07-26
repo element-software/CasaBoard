@@ -9,6 +9,7 @@ import {
   mdiAlertCircle,
   mdiArrowRight,
   mdiPaletteSwatch,
+  mdiSwapHorizontal,
 } from '@mdi/js';
 import { cn } from '@heroui/react';
 import { useHAConnection } from '@repo/hooks';
@@ -62,6 +63,14 @@ export const QuickActions = () => {
       description: 'Configure Home Assistant',
       gradient: 'from-teal-500 to-emerald-600',
       hoverBg: 'hover:bg-teal-50',
+    },
+    {
+      href: '/setup/settings',
+      icon: mdiSwapHorizontal,
+      title: 'Import / Export',
+      description: 'Back up or restore your settings',
+      gradient: 'from-amber-500 to-orange-600',
+      hoverBg: 'hover:bg-amber-50',
     },
   ];
 

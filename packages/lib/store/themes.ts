@@ -62,3 +62,17 @@ export async function deleteTheme(id: string): Promise<void> {
   delete all[id];
   await writeJson(FILE, all);
 }
+
+/** Overwrites the whole store, used to restore an exported settings bundle. */
+export async function replaceAllThemes(themes: Theme[]): Promise<void> {
+  const all: ThemeMap = {};
+  for (const theme of themes) all[theme.id] = theme;
+  await writeJson(FILE, all);
+}
+
+/** Upserts by id, keeping existing themes not present in `themes`. */
+export async function mergeThemes(themes: Theme[]): Promise<void> {
+  const all = await readAll();
+  for (const theme of themes) all[theme.id] = theme;
+  await writeJson(FILE, all);
+}

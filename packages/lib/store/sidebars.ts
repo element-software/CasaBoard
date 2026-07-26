@@ -94,3 +94,17 @@ export async function deleteSidebar(slug: string): Promise<void> {
   delete all[found.key];
   await writeJson(FILE, all);
 }
+
+/** Overwrites the whole store, used to restore an exported settings bundle. */
+export async function replaceAllSidebars(sidebars: Sidebar[]): Promise<void> {
+  const all: SidebarMap = {};
+  for (const sidebar of sidebars) all[sidebar.slug] = sidebar;
+  await writeJson(FILE, all);
+}
+
+/** Upserts by slug, keeping existing sidebars not present in `sidebars`. */
+export async function mergeSidebars(sidebars: Sidebar[]): Promise<void> {
+  const all = await readAll();
+  for (const sidebar of sidebars) all[sidebar.slug] = sidebar;
+  await writeJson(FILE, all);
+}
