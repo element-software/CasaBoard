@@ -5,12 +5,12 @@ import EntityField from "../EntityAutocomplete/EntityField";
 
 const ACTION_OPTIONS = [
   { label: "None", value: "none" },
-  { label: "Disarm", value: "disarm" },
-  { label: "Arm Home", value: "arm_home" },
-  { label: "Arm Away", value: "arm_away" },
+  { label: "Disarm", value: "alarm_disarm" },
+  { label: "Arm Home", value: "alarm_arm_home" },
+  { label: "Arm Away", value: "alarm_arm_away" },
   { label: "Arm Night", value: "alarm_arm_night" },
-  { label: "Arm Vacation", value: "arm_vacation" },
-  { label: "Trigger", value: "trigger" },
+  { label: "Arm Vacation", value: "alarm_arm_vacation" },
+  { label: "Trigger", value: "alarm_trigger" },
 ];
 
 export const AlarmConfig = {

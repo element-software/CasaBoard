@@ -1,23 +1,20 @@
 "use client";
-import { useEntity, useHA } from "@casaboard/ha";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useAlarm,
+  type AlarmAction,
+  type AlarmArmFailure,
+} from "@casaboard/ha";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "@heroui/react";
 import { useEntityLoading } from "@repo/hooks/useEntityLoading";
 import { AlarmConfirmPopup } from "./AlarmConfirmPopup";
 
-export type AlarmAction =
-  | "alarm_disarm"
-  | "alarm_arm_home"
-  | "alarm_arm_away"
-  | "alarm_arm_night"
-  | "alarm_arm_vacation"
-  | "alarm_trigger"
-  | "none";
+export type { AlarmAction, AlarmArmFailure };
 
 export interface AlarmProps {
   entityId: string;
-  tapAction?: AlarmAction;
-  longPressAction?: AlarmAction;
+  tapAction?: AlarmAction | string;
+  longPressAction?: AlarmAction | string;
   code?: string;
 }
 
@@ -32,131 +29,148 @@ const ACTION_LABEL: Record<Exclude<AlarmAction, "none">, string> = {
   alarm_trigger: "Triggering",
 };
 
-/** Map HA alarm_control_panel state → HomeKit "Mode · Status" line. */
-function formatSecurityStatus(state?: string): { mode: string; detail: string; tone: "ok" | "armed" | "alert" | "pending" } {
-  switch (state) {
-    case "disarmed":
-      return { mode: "Home", detail: "Disarmed", tone: "ok" };
-    case "armed_home":
-      return { mode: "Home", detail: "Armed", tone: "armed" };
-    case "armed_away":
-      return { mode: "Away", detail: "Armed", tone: "armed" };
-    case "armed_night":
-      return { mode: "Night", detail: "Armed", tone: "armed" };
-    case "armed_vacation":
-      return { mode: "Vacation", detail: "Armed", tone: "armed" };
-    case "armed_custom_bypass":
-      return { mode: "Custom", detail: "Armed", tone: "armed" };
-    case "triggered":
-      return { mode: "Alarm", detail: "Triggered", tone: "alert" };
-    case "pending":
-      return { mode: "Security", detail: "Pending", tone: "pending" };
-    case "arming":
-      return { mode: "Security", detail: "Arming", tone: "pending" };
-    default:
-      if (!state) return { mode: "Security", detail: "Unknown", tone: "pending" };
-      return {
-        mode: "Security",
-        detail: state
-          .split("_")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" "),
-        tone: "pending",
-      };
-  }
-}
-
 export const Alarm = ({
   entityId,
   tapAction = "none",
   longPressAction = "none",
   code,
 }: AlarmProps) => {
-  const entity = useEntity(entityId);
-  const { connection } = useHA();
+  const {
+    entity,
+    snapshot,
+    failure,
+    isBusy,
+    pendingService,
+    clearFailure,
+    requiresCode,
+    resolveGestureAction,
+    call,
+    forceArm,
+    cancelForceArm,
+  } = useAlarm(entityId, { code });
+
   const { isEntityReady, showNotAvailable, isLoaded } = useEntityLoading(entity);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
-  const [pendingAction, setPendingAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
+  const lastArmActionRef = useRef<Exclude<AlarmAction, "none"> | null>(null);
+  const sawForceArmRef = useRef(false);
+
   const [confirmAction, setConfirmAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
 
-  useEffect(() => {
-    if (!pendingAction) return;
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setPendingAction(null), 30_000);
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [pendingAction]);
+  const effectiveTap = resolveGestureAction(tapAction);
+  const effectiveLongPress = resolveGestureAction(longPressAction);
+  const { status, forceArmAvailable } = snapshot;
 
-  useEffect(() => {
-    if (pendingAction) setPendingAction(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entity?.state]);
+  const closePopup = useCallback(() => {
+    setConfirmAction(null);
+    clearFailure();
+  }, [clearFailure]);
 
-  const callAction = useCallback(
-    (action: AlarmAction, enteredCode?: string) => {
-      if (!connection || !entityId || action === "none") return;
-      setPendingAction(action as Exclude<AlarmAction, "none">);
-      const service_data: Record<string, any> = { entity_id: entityId };
-      const codeToUse = enteredCode ?? code;
-      if (codeToUse) service_data.code = codeToUse;
-      connection
-        .sendMessagePromise({
-          type: "call_service",
-          domain: "alarm_control_panel",
-          service: action,
-          service_data,
-        })
-        .catch(() => setPendingAction(null));
-    },
-    [connection, entityId, code]
-  );
+  // When HA reports a force-arm window, keep/open the confirm popup.
+  useEffect(() => {
+    if (forceArmAvailable) {
+      sawForceArmRef.current = true;
+      setConfirmAction((current) => {
+        if (current) return current;
+        return (
+          lastArmActionRef.current ??
+          (effectiveTap !== "none" && effectiveTap !== "alarm_disarm"
+            ? effectiveTap
+            : "alarm_arm_away")
+        );
+      });
+      return;
+    }
+
+    // Force-arm window cleared (armed, cancelled, or expired).
+    if (sawForceArmRef.current) {
+      sawForceArmRef.current = false;
+      if (confirmAction) closePopup();
+    }
+  }, [forceArmAvailable, effectiveTap, confirmAction, closePopup]);
+
+  // Close once the panel reaches the intended armed/disarmed state.
+  useEffect(() => {
+    if (!confirmAction || failure?.canForceArm) return;
+    if (confirmAction === "alarm_disarm" && snapshot.state === "disarmed") {
+      closePopup();
+      return;
+    }
+    if (
+      confirmAction.startsWith("alarm_arm_") &&
+      typeof snapshot.state === "string" &&
+      snapshot.state.startsWith("armed_")
+    ) {
+      closePopup();
+    }
+  }, [snapshot.state, confirmAction, failure, closePopup]);
 
   const openConfirm = useCallback(
     (action: AlarmAction) => {
-      if (action === "none" || pendingAction) return;
+      if (action === "none" || isBusy) return;
+
+      if (forceArmAvailable) {
+        setConfirmAction(
+          lastArmActionRef.current ??
+            (action !== "alarm_disarm"
+              ? (action as Exclude<AlarmAction, "none">)
+              : "alarm_arm_away")
+        );
+        return;
+      }
+
+      clearFailure();
       setConfirmAction(action as Exclude<AlarmAction, "none">);
     },
-    [pendingAction]
+    [isBusy, forceArmAvailable, clearFailure]
   );
 
   const handleConfirmed = useCallback(
-    (enteredCode?: string) => {
-      setConfirmAction(null);
-      if (confirmAction) callAction(confirmAction, enteredCode);
+    async (enteredCode?: string) => {
+      if (!confirmAction || isBusy) return;
+      if (confirmAction !== "alarm_disarm") {
+        lastArmActionRef.current = confirmAction;
+      }
+      await call(confirmAction, enteredCode);
     },
-    [confirmAction, callAction]
+    [confirmAction, call, isBusy]
   );
 
+  const handleForceArm = useCallback(async () => {
+    await forceArm();
+  }, [forceArm]);
+
+  const handleForceCancel = useCallback(async () => {
+    await cancelForceArm();
+    closePopup();
+  }, [cancelForceArm, closePopup]);
+
   const handlePointerDown = useCallback(() => {
-    if (pendingAction) return;
+    if (isBusy) return;
     didLongPress.current = false;
-    if (longPressAction && longPressAction !== "none") {
+    if (effectiveLongPress !== "none") {
       timerRef.current = setTimeout(() => {
         didLongPress.current = true;
-        openConfirm(longPressAction);
+        openConfirm(effectiveLongPress);
       }, LONG_PRESS_MS);
     }
-  }, [longPressAction, openConfirm, pendingAction]);
+  }, [effectiveLongPress, openConfirm, isBusy]);
 
   const handlePointerUp = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    if (!didLongPress.current && !pendingAction) {
-      openConfirm(tapAction ?? "none");
+    if (!didLongPress.current && !isBusy) {
+      if (forceArmAvailable) {
+        openConfirm(effectiveTap !== "none" ? effectiveTap : "alarm_arm_away");
+        return;
+      }
+      openConfirm(effectiveTap);
     }
-  }, [tapAction, openConfirm, pendingAction]);
+  }, [effectiveTap, openConfirm, isBusy, forceArmAvailable]);
 
   const handlePointerLeave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
-
-  const status = useMemo(
-    () => formatSecurityStatus(entity?.state),
-    [entity?.state]
-  );
 
   if (!entityId) {
     return (
@@ -167,22 +181,35 @@ export const Alarm = ({
   }
 
   const isInteractive =
-    !pendingAction &&
+    !isBusy &&
     isEntityReady &&
-    ((tapAction && tapAction !== "none") ||
-      (longPressAction && longPressAction !== "none"));
+    (forceArmAvailable ||
+      effectiveTap !== "none" ||
+      effectiveLongPress !== "none");
 
-  const statusLine = pendingAction
-    ? `${ACTION_LABEL[pendingAction]}…`
-    : `${status.mode} • ${status.detail}`;
+  const busyAction = pendingService ?? confirmAction;
+  const statusLine = isBusy
+    ? busyAction
+      ? `${ACTION_LABEL[busyAction]}…`
+      : "Working…"
+    : forceArmAvailable
+      ? "Arming blocked"
+      : `${status.mode} • ${status.detail}`;
+
+  const tone = forceArmAvailable ? "alert" : status.tone;
 
   return (
     <>
       <AlarmConfirmPopup
         action={confirmAction}
         isOpen={confirmAction !== null}
-        onClose={() => setConfirmAction(null)}
+        onClose={failure?.canForceArm ? handleForceCancel : closePopup}
         onConfirm={handleConfirmed}
+        requiresCode={confirmAction ? requiresCode(confirmAction) : false}
+        isSubmitting={isBusy}
+        failure={failure}
+        onForceArm={handleForceArm}
+        onForceCancel={handleForceCancel}
       />
       <Skeleton
         isLoaded={isLoaded}
@@ -201,7 +228,7 @@ export const Alarm = ({
           </div>
         ) : isEntityReady ? (
           <div
-            className={`alarm-hk alarm-hk--${status.tone}${isInteractive ? " alarm-hk--interactive" : ""}`}
+            className={`alarm-hk alarm-hk--${tone}${isInteractive ? " alarm-hk--interactive" : ""}`}
             onPointerDown={isInteractive ? handlePointerDown : undefined}
             onPointerUp={isInteractive ? handlePointerUp : undefined}
             onPointerLeave={isInteractive ? handlePointerLeave : undefined}
@@ -209,7 +236,7 @@ export const Alarm = ({
             tabIndex={isInteractive ? 0 : undefined}
           >
             <div className="alarm-hk__icon" aria-hidden>
-              {pendingAction ? (
+              {isBusy ? (
                 <span className="alarm-hk__spinner" />
               ) : (
                 <span className="alarm-hk__glyph" />
