@@ -24,13 +24,11 @@ Done (2026-07-24), evolved from a JS-only plugin to a full HA **integration**:
 
 Remaining for end-user install: repo must be **public**; merge so GitHub detects `LICENSE` on default branch; then drop `hacsjson` / `license` from the workflow ignore list. Brands assets needed only if submitting to the HACS default store.
 
-## 3. Publish pages to a configurable path
+## 3. Static publish (removed)
 
-Done (2026-07-24):
-- Static Vite viewer (`apps/viewer`) baked on publish into `PUBLISH_DIR` (Docker: `/publish`, compose `HA_WWW` → HA `www/casaboard`).
-- Per-page `{slug}/index.html` + `pages/{slug}.json` (theme/style resolved; `hassUrl` only — tokens stay in the browser).
-- Publish settings in `DATA_DIR/publish-settings.json` (Setup → HA Settings).
-- Drafts remain previewable at `/dashboard/[slug]` in the app; only published pages are exported.
+Removed (2026-07-26):
+- Dropped static export to HA `/local/`, `apps/viewer`, publish settings, and draft/publish UI.
+- Pages are served only from the CasaBoard app at `/dashboard/[slug]`.
 
 ## 4. First-run onboarding
 

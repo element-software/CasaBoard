@@ -27,7 +27,6 @@ MIN_SCAN_INTERVAL: Final = 15
 MAX_SCAN_INTERVAL: Final = 3600
 
 ATTR_PAGES: Final = "pages"
-ATTR_PUBLISHED: Final = "published"
 ATTR_HA_CONNECTED: Final = "ha_connected"
 ATTR_HASS_URL: Final = "hass_url"
 ATTR_URL: Final = "url"

@@ -61,7 +61,7 @@ export function useDashboardChrome() {
  * Registers sidebar chrome for the persistent dashboard shell.
  * Prior chrome is kept on unmount so SPA navigations do not flash an empty sidebar.
  * Same sidebar id/updated_at keeps the previous chrome reference (no remount).
- * No-ops when rendered outside DashboardChromeProvider (e.g. static viewer).
+ * No-ops when rendered outside DashboardChromeProvider.
  */
 export function useRegisterDashboardChrome(
   chrome: DashboardChromeState | null

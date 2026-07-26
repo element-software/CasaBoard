@@ -42,7 +42,7 @@ export async function createPage(data: CreatePageData): Promise<Page> {
     name: data.name,
     slug: data.slug,
     puck_data: data.puck_data,
-    published: data.published ?? false,
+    published: true,
     sidebar_id: data.sidebar_id ?? null,
     theme_id: data.theme_id ?? null,
     theme_overrides: data.theme_overrides ?? null,

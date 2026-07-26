@@ -8,7 +8,8 @@ export interface Page {
   name: string;
   slug: string;
   puck_data: Data;
-  published: boolean;
+  /** @deprecated Kept for existing data files; all pages are live in the app. */
+  published?: boolean;
   sidebar_id?: string | null;
   sidebar?: Sidebar;
   theme_id?: string | null;
@@ -22,7 +23,6 @@ export interface CreatePageData {
   name: string;
   slug: string;
   puck_data: Data;
-  published?: boolean;
   sidebar_id?: string | null;
   theme_id?: string | null;
   theme_overrides?: ThemeTokens | null;
@@ -32,7 +32,6 @@ export interface CreatePageData {
 export interface UpdatePageData {
   name?: string;
   puck_data?: Data;
-  published?: boolean;
   sidebar_id?: string | null;
   theme_id?: string | null;
   theme_overrides?: ThemeTokens | null;

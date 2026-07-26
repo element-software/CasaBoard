@@ -17,7 +17,6 @@ type ThemeLibraryEntry = { id: string; tokens: ThemeTokens };
 type SidebarEditorBodyProps = {
   initialData?: Data;
   sidebarId?: string | null;
-  initialPublished?: boolean;
   initialSlug?: string;
   themePickerThemes?: ThemePickerOption[];
   themeLibrary?: ThemeLibraryEntry[];
@@ -29,7 +28,6 @@ type SidebarEditorBodyProps = {
 export default function SidebarEditorBody({
   initialData,
   sidebarId,
-  initialPublished = true,
   initialSlug,
   themePickerThemes = [],
   themeLibrary = [],
@@ -42,7 +40,6 @@ export default function SidebarEditorBody({
       type="sidebar"
       initialData={initialData}
       itemId={sidebarId}
-      initialPublished={initialPublished}
       initialSlug={initialSlug}
       themePickerThemes={themePickerThemes}
       themeLibrary={themeLibrary}
@@ -56,7 +53,9 @@ export default function SidebarEditorBody({
   );
 
   if (haConnection) {
-    return <HassConnectWrapper haInstance={haConnection}>{editor}</HassConnectWrapper>;
+    return (
+      <HassConnectWrapper haInstance={haConnection}>{editor}</HassConnectWrapper>
+    );
   }
 
   return editor;

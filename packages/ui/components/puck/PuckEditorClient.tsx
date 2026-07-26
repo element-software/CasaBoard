@@ -40,7 +40,6 @@ type PuckEditorClientProps = {
   type: "page" | "sidebar";
   initialData?: Data;
   itemId?: string | null;
-  initialPublished?: boolean;
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
   maxItemsPerDashboard?: number;
@@ -59,7 +58,6 @@ type PuckEditorClientProps = {
     slug: string,
     data: { name?: string; puck_data?: Data; [key: string]: unknown }
   ) => Promise<unknown>;
-  onPublishItem?: (slug: string, published: boolean) => Promise<unknown>;
   editUrlTemplate: string;
   viewUrlTemplate?: string;
   backUrl: string;
@@ -84,7 +82,6 @@ export default function PuckEditorClient({
   type,
   initialData,
   itemId,
-  initialPublished = false,
   sidebars = [],
   initialSlug,
   maxItemsPerDashboard = -1,
@@ -95,7 +92,6 @@ export default function PuckEditorClient({
   initialStyleId = null,
   onCreateItem,
   onUpdateItem,
-  onPublishItem,
   editUrlTemplate,
   viewUrlTemplate,
   backUrl,
@@ -109,8 +105,7 @@ export default function PuckEditorClient({
   const [currentItemId, setCurrentItemId] = useState<string | null>(
     itemId || null
   );
-  const [isPublished, setIsPublished] = useState<boolean>(initialPublished);
-  const [isPublishPending, startPublishTransition] = useTransition();
+  const [isSavePending, startSaveTransition] = useTransition();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isApplyingSettings, setIsApplyingSettings] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -301,47 +296,6 @@ export default function PuckEditorClient({
     }
   };
 
-  const publish = async () => {
-    if (!currentItemId) {
-      await saveItem();
-    } else {
-      await updateItem();
-      if (onPublishItem) {
-        startPublishTransition(async () => {
-          try {
-            await onPublishItem(initialSlug || settings.slug, true);
-            setIsPublished(true);
-          } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to publish");
-            clientLogger.error("PuckEditorClient", "Publish failed", err);
-          }
-        });
-      } else {
-        setIsPublished(true);
-      }
-    }
-  };
-
-  const updatePublished = async () => {
-    if (!currentItemId) return;
-
-    if (onPublishItem) {
-      startPublishTransition(async () => {
-        try {
-          await onPublishItem(initialSlug || settings.slug, !isPublished);
-          setIsPublished(!isPublished);
-        } catch (err) {
-          setError(
-            err instanceof Error ? err.message : "Failed to update status"
-          );
-          clientLogger.error("PuckEditorClient", "Publish update failed", err);
-        }
-      });
-    } else {
-      setIsPublished(!isPublished);
-    }
-  };
-
   const applySettings = async () => {
     setError(null);
     const newSlug = generateSlug(settings.title);
@@ -421,20 +375,16 @@ export default function PuckEditorClient({
           iframe={{ enabled: false }}
           overrides={{
           headerActions: () => {
-            const rightLabel = !currentItemId
-              ? "Create"
-              : !isPublished
-                ? "Publish"
-                : isDirty
-                  ? "Update"
-                  : "Unpublish";
-            const rightHandler = !currentItemId
-              ? saveItem
-              : !isPublished
-                ? publish
-                : isDirty
-                  ? updateItem
-                  : updatePublished;
+            const rightLabel = !currentItemId ? "Create" : "Save";
+            const rightHandler = () => {
+              startSaveTransition(async () => {
+                if (!currentItemId) {
+                  await saveItem();
+                } else {
+                  await updateItem();
+                }
+              });
+            };
 
             return (
               <div className="flex items-center gap-2">
@@ -483,8 +433,8 @@ export default function PuckEditorClient({
                   size="sm"
                   color="primary"
                   onPress={rightHandler}
-                  isLoading={isPublishPending}
-                  isDisabled={currentItemId ? !isDirty && !isPublished : false}
+                  isLoading={isSavePending}
+                  isDisabled={Boolean(currentItemId) && !isDirty}
                 >
                   {rightLabel}
                 </Button>

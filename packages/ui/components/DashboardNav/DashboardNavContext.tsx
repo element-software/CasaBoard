@@ -8,7 +8,7 @@ import {
 } from "react";
 
 export type DashboardNavConfig = {
-  /** Build an href for a published/dashboard page slug. */
+  /** Build an href for a dashboard page slug. */
   hrefForSlug: (slug: string) => string;
   /** Current path used for active-link highlighting. */
   pathname: string;

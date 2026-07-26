@@ -9,7 +9,6 @@ type ThemePickerOption = { id: string; name: string };
 type SidebarEditorClientProps = {
   initialData?: Data;
   sidebarId?: string | null;
-  initialPublished?: boolean;
   initialSlug?: string;
   initialThemeId?: string | null;
   initialStyleId?: StyleId | null;
@@ -18,7 +17,6 @@ type SidebarEditorClientProps = {
 export default async function SidebarEditorClient({
   initialData,
   sidebarId,
-  initialPublished = true,
   initialSlug,
   initialThemeId,
   initialStyleId,
@@ -42,7 +40,6 @@ export default async function SidebarEditorClient({
     <SidebarEditorBody
       initialData={initialData}
       sidebarId={sidebarId}
-      initialPublished={initialPublished}
       initialSlug={initialSlug}
       themePickerThemes={themePickerThemes}
       themeLibrary={themeLibrary}

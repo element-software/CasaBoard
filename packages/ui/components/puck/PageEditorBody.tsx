@@ -3,7 +3,6 @@
 import PuckEditorClient from "./PuckEditorClient";
 import {
   createPageEditorAction,
-  publishPageEditorAction,
   updatePageEditorAction,
 } from "./pageEditorActions";
 import { HassConnectWrapper } from "../Shared/util/HassConnectWrapper";
@@ -19,7 +18,6 @@ type ThemeLibraryEntry = { id: string; tokens: ThemeTokens };
 type PageEditorBodyProps = {
   initialData?: Data;
   pageId?: string | null;
-  initialPublished?: boolean;
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
   themePickerThemes?: ThemePickerOption[];
@@ -33,7 +31,6 @@ type PageEditorBodyProps = {
 export default function PageEditorBody({
   initialData,
   pageId,
-  initialPublished = false,
   sidebars = [],
   initialSlug,
   themePickerThemes = [],
@@ -48,7 +45,6 @@ export default function PageEditorBody({
       type="page"
       initialData={initialData}
       itemId={pageId}
-      initialPublished={initialPublished}
       sidebars={sidebars}
       initialSlug={initialSlug}
       themePickerThemes={themePickerThemes}
@@ -58,7 +54,6 @@ export default function PageEditorBody({
       initialStyleId={initialStyleId}
       onCreateItem={createPageEditorAction}
       onUpdateItem={updatePageEditorAction}
-      onPublishItem={publishPageEditorAction}
       editUrlTemplate="/setup/pages/edit/{slug}"
       viewUrlTemplate="/dashboard/{slug}"
       backUrl="/setup/pages"
@@ -66,7 +61,9 @@ export default function PageEditorBody({
   );
 
   if (haConnection) {
-    return <HassConnectWrapper haInstance={haConnection}>{editor}</HassConnectWrapper>;
+    return (
+      <HassConnectWrapper haInstance={haConnection}>{editor}</HassConnectWrapper>
+    );
   }
 
   return editor;

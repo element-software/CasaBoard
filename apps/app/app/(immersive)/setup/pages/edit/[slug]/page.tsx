@@ -28,7 +28,6 @@ export default async function PageEdit({ params }: PageProps) {
     <PageEditorClient
       initialData={page.puck_data}
       pageId={page.id}
-      initialPublished={page.published}
       sidebars={sidebars}
       initialSlug={page.slug}
       initialThemeId={page.theme_id ?? null}

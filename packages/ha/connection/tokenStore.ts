@@ -12,8 +12,7 @@ export type HATokenStore = {
 const LOCAL_STORAGE_KEY = "casaboard-ha-auth";
 
 /**
- * Browser token store for the static viewer (and any non-Next runtime).
- * Tokens stay in localStorage — never written into published www/ files.
+ * Browser token store for non-server runtimes (localStorage).
  */
 export function createLocalStorageTokenStore(
   storageKey: string = LOCAL_STORAGE_KEY

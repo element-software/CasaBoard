@@ -15,13 +15,10 @@ export async function GET() {
       HAConnectionActions.getHAAuthData(),
     ]);
 
-    const published = pages.filter((p) => p.published).length;
-
     return NextResponse.json({
       ok: true,
       service: "casaboard",
       pages: pages.length,
-      published,
       ha_connected: Boolean(connection?.hass_url && auth),
       hass_url: connection?.hass_url ?? null,
     });

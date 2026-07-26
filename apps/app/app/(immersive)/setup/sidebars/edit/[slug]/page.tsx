@@ -26,7 +26,6 @@ export default async function SidebarEditPage({
     <SidebarEditorClient
       initialData={sidebar.puck_data}
       sidebarId={sidebar.id}
-      initialPublished={true}
       initialSlug={sidebar.slug}
       initialThemeId={sidebar.theme_id ?? null}
       initialStyleId={sidebar.style_id ?? null}

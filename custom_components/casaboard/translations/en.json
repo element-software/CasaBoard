@@ -44,9 +44,6 @@
       "pages": {
         "name": "Pages"
       },
-      "published_pages": {
-        "name": "Published pages"
-      },
       "ha_connection": {
         "name": "HA connection",
         "state": {

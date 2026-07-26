@@ -20,7 +20,6 @@ Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integ
 | --- | --- |
 | **CasaBoard app** | Self-hosted editor + live dashboards (Docker recommended) |
 | **HACS integration** | Sidebar panel (iframe), online/page sensors, `casaboard.refresh` service |
-| **Static publish** | Export pages into Home Assistant `/local/casaboard/` for wall tablets & bookmarks |
 
 Your layouts and Home Assistant credentials stay on **your** machine. Nothing phones home.
 
@@ -76,7 +75,6 @@ Enter the base URL of your CasaBoard app, for example:
 | Sidebar **CasaBoard** panel | Opens the app in an iframe (title/icon configurable in options) |
 | `binary_sensor.casaboard_online` | CasaBoard `/api/health` is reachable |
 | `sensor.casaboard_pages` | Total pages |
-| `sensor.casaboard_published_pages` | Published pages |
 | `sensor.casaboard_ha_connection` | `connected` / `disconnected` (stored HA credentials in the app) |
 | `casaboard.refresh` | Service to re-poll health (optional `entry_id`) |
 
@@ -97,35 +95,15 @@ panel_iframe:
     url: http://homeassistant.local:3000
 ```
 
-## Publish dashboards to `/local/`
+## Viewing dashboards
 
-Export published pages as static files under Home Assistant’s `www/` tree:
-
-`http://homeassistant.local:8123/local/casaboard/<slug>/`
-
-1. Create `<config>/www/casaboard` on the HA host.
-2. Point Compose at it:
-
-```bash
-# Example: HA config at /home/pi/homeassistant
-HA_WWW=/home/pi/homeassistant/www/casaboard docker compose up -d
-```
-
-Or set `HA_WWW` in a `.env` next to `docker-compose.yml`. Default is `./publish` for local tests.
-
-3. In CasaBoard → **Setup → HA Settings**, set **Public base URL** to e.g. `http://homeassistant.local:8123/local/casaboard`.
-4. Publish a page — files land on the mount. The static viewer asks for a long-lived access token once (browser `localStorage` only; tokens are never written into `www/`).
-
-Drafts stay previewable in the app at `/dashboard/<slug>`.
+Open any page in the CasaBoard app at `/dashboard/<slug>` (for example `http://<host>:3000/dashboard/upstairs`). Wall tablets and bookmarks should point at that URL.
 
 ## Environment variables
 
 | Variable | Default (Docker) | Purpose |
 | --- | --- | --- |
-| `DATA_DIR` | `/data` | JSON store (`pages`, sidebars, themes, HA connection, publish settings) |
-| `PUBLISH_DIR` | `/publish` | Static export directory |
-| `VIEWER_DIST_DIR` | `/app/viewer-dist` | Built viewer assets copied on publish |
-| `HA_WWW` | `./publish` (Compose host path) | Host folder mounted at `/publish` — use `<ha-config>/www/casaboard` |
+| `DATA_DIR` | `/data` | JSON store (`pages`, sidebars, themes, HA connection) |
 | `PORT` | `3000` | HTTP port |
 
 ## Privacy
@@ -163,7 +141,6 @@ npm run check-types
 | Path | Role |
 | --- | --- |
 | `apps/app` | Dashboard builder (Next.js) — what the Docker image runs |
-| `apps/viewer` | Static dashboard runtime (Vite), baked into publishes |
 | `apps/public` | Documentation / marketing site ([casaboard.dev](https://casaboard.dev)) |
 | `packages/ui` | Shared UI (HeroUI, icons, Puck editor) |
 | `packages/lib` | Actions, services, flat-JSON persistence |

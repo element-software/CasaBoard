@@ -13,10 +13,3 @@ export async function updatePageEditorAction(
 ) {
   return PageActions.updatePage(slug, data);
 }
-
-export async function publishPageEditorAction(
-  slug: string,
-  published: boolean
-) {
-  return PageActions.updatePage(slug, { published });
-}

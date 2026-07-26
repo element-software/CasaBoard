@@ -6,9 +6,7 @@
   "globalEnv": [
     "NODE_ENV",
     "RESEND_API_KEY",
-    "DATA_DIR",
-    "PUBLISH_DIR",
-    "VIEWER_DIST_DIR"
+    "DATA_DIR"
   ],
   "ui": "tui",
   "tasks": {

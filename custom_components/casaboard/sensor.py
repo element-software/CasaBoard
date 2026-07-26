@@ -37,13 +37,6 @@ SENSORS: tuple[CasaBoardSensorEntityDescription, ...] = (
         value_fn=lambda status: status.pages,
     ),
     CasaBoardSensorEntityDescription(
-        key="published_pages",
-        translation_key="published_pages",
-        icon="mdi:file-document-check",
-        state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda status: status.published,
-    ),
-    CasaBoardSensorEntityDescription(
         key="ha_connection",
         translation_key="ha_connection",
         icon="mdi:home-assistant",

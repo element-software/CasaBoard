@@ -2,7 +2,7 @@
 
 Companion custom component for [CasaBoard](https://github.com/element-software/CasaBoard). The app still runs as Docker/Node; this integration embeds it in Home Assistant and exposes health sensors.
 
-> End-user install, Docker, and publish steps live in the [root README](../README.md).
+> End-user install and Docker steps live in the [root README](../README.md).
 
 ## Features
 
@@ -24,7 +24,6 @@ Manual: copy `custom_components/casaboard` into `<config>/custom_components/casa
 | --- | --- |
 | `binary_sensor.casaboard_online` | `/api/health` reachable |
 | `sensor.casaboard_pages` | Total pages |
-| `sensor.casaboard_published_pages` | Published pages |
 | `sensor.casaboard_ha_connection` | App has stored HA credentials (`connected` / `disconnected`) |
 
 ## Brand assets

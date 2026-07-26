@@ -18,8 +18,6 @@ interface PagesManagementProps {
   initialPages?: Page[];
   initialError?: string | null;
   compact?: boolean;
-  /** e.g. http://homeassistant.local:8123/local/casaboard — enables copy public URL */
-  publicBaseUrl?: string;
 }
 
 export const PagesManagement = ({
@@ -28,7 +26,6 @@ export const PagesManagement = ({
   initialPages = [],
   initialError = null,
   compact = false,
-  publicBaseUrl = "",
 }: PagesManagementProps) => {
   const { connection } = useHAConnection();
   const router = useRouter();
@@ -64,32 +61,11 @@ export const PagesManagement = ({
     });
   };
 
-  const handleTogglePublished = async (
-    slug: string,
-    currentPublished: boolean
-  ) => {
-    startTransition(async () => {
-      try {
-        await PageActions.updatePage(slug, { published: !currentPublished });
-        setPages(
-          pages.map((page) =>
-            page.slug === slug
-              ? { ...page, published: !currentPublished }
-              : page
-          )
-        );
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to update page status"
-        );
-      }
-    });
-  };
-
   const maxDisplayPages = compact ? 3 : 6;
-  const displayPages = showAllPages ? pages : pages.slice(0, Math.max(maxDisplayPages, pages.length));
+  const displayPages = showAllPages
+    ? pages
+    : pages.slice(0, Math.max(maxDisplayPages, pages.length));
 
-  // Early returns for error and empty states
   if (error) return <ErrorState error={error} />;
   if (pages.length === 0)
     return (
@@ -101,8 +77,12 @@ export const PagesManagement = ({
 
   return (
     <div className="space-y-4">
-      {/* Header — same structure regardless of showHeader to keep React Aria IDs stable */}
-      <div className={cn("flex items-center", showHeader ? "justify-between" : "justify-end")}>
+      <div
+        className={cn(
+          "flex items-center",
+          showHeader ? "justify-between" : "justify-end"
+        )}
+      >
         {showHeader && (
           <div>
             <h2
@@ -131,7 +111,6 @@ export const PagesManagement = ({
         </Button>
       </div>
 
-      {/* Pages List */}
       <div
         className={cn(
           compact ? "space-y-2" : "grid grid-cols-1 sm:grid-cols-2 gap-3"
@@ -142,15 +121,12 @@ export const PagesManagement = ({
             key={page.id}
             page={page}
             compact={compact}
-            onTogglePublished={handleTogglePublished}
             onDelete={handleDeletePage}
             isPending={isPending}
-            publicBaseUrl={publicBaseUrl}
           />
         ))}
       </div>
 
-      {/* Footer Info */}
       {!showAllPages && pages.length > maxDisplayPages && (
         <div className={cn("text-center", compact ? "py-2" : "py-3")}>
           <p
@@ -164,7 +140,6 @@ export const PagesManagement = ({
         </div>
       )}
 
-      {/* Action Buttons */}
       {!showAllPages && (
         <div className="flex flex-col sm:flex-row gap-3">
           <Button

@@ -1,4 +1,4 @@
-import { PageActions, PublishSettingsActions, serverLogger } from "@repo/lib";
+import { PageActions, serverLogger } from "@repo/lib";
 import { PagesManagement } from "@repo/ui/components/Pages/PagesManagement";
 import { SetupPageShell } from "@repo/ui/components/Setup/SetupPageShell";
 import { Page } from "@repo/types/page";
@@ -9,14 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function PagesListPage() {
   let pages: Page[] = [];
   let error = null;
-  let publicBaseUrl = "";
   try {
-    const [allPages, publishSettings] = await Promise.all([
-      PageActions.getAllPages(),
-      PublishSettingsActions.getPublishSettings(),
-    ]);
-    pages = allPages;
-    publicBaseUrl = publishSettings.publicBaseUrl;
+    pages = await PageActions.getAllPages();
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load pages";
   }
@@ -33,7 +27,6 @@ export default async function PagesListPage() {
         initialError={error}
         showAllPages={true}
         showHeader={false}
-        publicBaseUrl={publicBaseUrl}
       />
     </SetupPageShell>
   );

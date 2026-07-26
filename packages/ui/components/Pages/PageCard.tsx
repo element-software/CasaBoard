@@ -3,7 +3,6 @@ import {
   Card,
   CardBody,
   Button,
-  Chip,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
@@ -17,34 +16,20 @@ import {
   mdiEye,
   mdiPencil,
   mdiDotsVertical,
-  mdiCheckCircle,
-  mdiAlertCircle,
   mdiTrashCan,
-  mdiEyeOff,
-  mdiEyeOutline,
-  mdiContentCopy,
-  mdiOpenInNew,
 } from "@mdi/js";
 import Link from "next/link";
-
-function publicUrlForSlug(base: string, slug: string): string {
-  return `${base.replace(/\/+$/, "")}/${slug}/`;
-}
 
 export const PageCard = ({
   page,
   compact,
-  onTogglePublished,
   onDelete,
   isPending,
-  publicBaseUrl = "",
 }: {
   page: Page;
   compact: boolean;
-  onTogglePublished: (slug: string, published: boolean) => void;
   onDelete: (slug: string, name: string) => void;
   isPending: boolean;
-  publicBaseUrl?: string;
 }) => {
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -54,19 +39,6 @@ export const PageCard = ({
       minute: "2-digit",
     });
 
-  const publicUrl =
-    page.published && publicBaseUrl
-      ? publicUrlForSlug(publicBaseUrl, page.slug)
-      : null;
-
-  const copyPublicUrl = async () => {
-    if (!publicUrl) return;
-    try {
-      await navigator.clipboard.writeText(publicUrl);
-    } catch {
-      // ignore
-    }
-  };
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardBody className={cn(compact ? "p-3" : "p-4")}>
@@ -86,22 +58,6 @@ export const PageCard = ({
               >
                 {page.name}
               </h3>
-              <Chip
-                size="sm"
-                color={page.published ? "success" : "warning"}
-                variant="flat"
-                className={compact ? "text-xs" : ""}
-                startContent={
-                  !compact && (
-                    <Icon
-                      path={page.published ? mdiCheckCircle : mdiAlertCircle}
-                      className="w-3 h-3"
-                    />
-                  )
-                }
-              >
-                {page.published ? (compact ? "Live" : "Published") : "Draft"}
-              </Chip>
             </div>
 
             {compact ? (
@@ -127,38 +83,13 @@ export const PageCard = ({
           </div>
 
           <div className="flex items-center gap-1">
-            {publicUrl ? (
-              <>
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  title="Copy public /local/ URL"
-                  onPress={copyPublicUrl}
-                >
-                  <Icon path={mdiContentCopy} className="w-4 h-4" />
-                </Button>
-                <Button
-                  as="a"
-                  href={publicUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  title="Open public URL"
-                >
-                  <Icon path={mdiOpenInNew} className="w-4 h-4" />
-                </Button>
-              </>
-            ) : null}
             <Button
               as={Link}
               href={`/dashboard/${page.slug}`}
               isIconOnly
               size="sm"
               variant="light"
-              title="Preview in app"
+              title="Open dashboard"
             >
               <Icon path={mdiEye} className="w-4 h-4" />
             </Button>
@@ -184,24 +115,6 @@ export const PageCard = ({
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Page actions">
-                <DropdownItem key="toggle-publish" className="p-0">
-                  <Button
-                    color="primary"
-                    variant="flat"
-                    size="sm"
-                    title="Toggle publish"
-                    className="w-full"
-                    startContent={
-                      <Icon
-                        path={page.published ? mdiEyeOff : mdiEyeOutline}
-                        className="w-4 h-4"
-                      />
-                    }
-                    onPress={() => onTogglePublished(page.slug, page.published)}
-                  >
-                    {page.published ? "Unpublish" : "Publish"}
-                  </Button>
-                </DropdownItem>
                 <DropdownItem key="delete" className="p-0">
                   <Button
                     color="danger"

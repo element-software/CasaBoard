@@ -20,7 +20,6 @@ class CasaBoardStatus:
 
     ok: bool
     pages: int
-    published: int
     ha_connected: bool
     hass_url: str | None
     raw: dict[str, Any]
@@ -54,7 +53,6 @@ async def async_fetch_status(hass: HomeAssistant, base_url: str) -> CasaBoardSta
     return CasaBoardStatus(
         ok=True,
         pages=int(data.get("pages") or 0),
-        published=int(data.get("published") or 0),
         ha_connected=bool(data.get("ha_connected")),
         hass_url=data.get("hass_url") if isinstance(data.get("hass_url"), str) else None,
         raw=data,

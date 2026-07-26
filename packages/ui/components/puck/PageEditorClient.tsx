@@ -10,7 +10,6 @@ type ThemePickerOption = { id: string; name: string };
 type PageEditorClientProps = {
   initialData?: Data;
   pageId?: string | null;
-  initialPublished?: boolean;
   sidebars?: { id: string; name: string; slug: string }[];
   initialSlug?: string;
   initialThemeId?: string | null;
@@ -21,7 +20,6 @@ type PageEditorClientProps = {
 export default async function PageEditorClient({
   initialData,
   pageId,
-  initialPublished = false,
   sidebars = [],
   initialSlug,
   initialThemeId,
@@ -47,7 +45,6 @@ export default async function PageEditorClient({
     <PageEditorBody
       initialData={initialData}
       pageId={pageId}
-      initialPublished={initialPublished}
       sidebars={sidebars}
       initialSlug={initialSlug}
       themePickerThemes={themePickerThemes}
