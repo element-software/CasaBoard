@@ -11,12 +11,10 @@ RUN npm ci
 
 FROM base AS build
 WORKDIR /repo
-COPY --from=deps /repo/node_modules ./node_modules
-COPY --from=deps /repo/packages ./packages
-# Nested workspace installs (vite, etc.) — root node_modules alone is not enough
-COPY --from=deps /repo/apps/app/node_modules ./apps/app/node_modules
-COPY --from=deps /repo/apps/viewer/node_modules ./apps/viewer/node_modules
+# Source first, then overlay hoisted workspace installs from the deps stage.
+# npm workspaces hoist into /repo/node_modules — apps/*/node_modules is often absent.
 COPY . .
+COPY --from=deps /repo/node_modules ./node_modules
 RUN npm run build --workspace=viewer
 RUN npm run build --workspace=app
 
