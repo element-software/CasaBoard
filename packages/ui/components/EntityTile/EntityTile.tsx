@@ -2,6 +2,7 @@
 
 import { Light } from "../Light";
 import { Switch } from "../Switch";
+import { MediaPlayer } from "../MediaPlayer";
 import { useEntity } from "@casaboard/ha";
 import { Skeleton } from "@heroui/react";
 import { useCallback, useState } from "react";
@@ -26,6 +27,9 @@ export function EntityTile({ entityId, tileLayout = "tile" }: EntityTileProps) {
   }
   if (domain === "switch" || domain === "input_boolean") {
     return <Switch entityId={entityId} tileLayout={tileLayout} />;
+  }
+  if (domain === "media_player") {
+    return <MediaPlayer entityId={entityId} />;
   }
 
   return <GenericToggleTile entityId={entityId} tileLayout={tileLayout} />;

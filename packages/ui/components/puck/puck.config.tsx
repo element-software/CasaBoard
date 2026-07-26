@@ -11,6 +11,7 @@ import { ThermostatConfig } from "@repo/ui/components/Thermostat/Thermostat.conf
 import { WeatherConfig } from "@repo/ui/components/Weather/Weather.config";
 import { CameraConfig } from "@repo/ui/components/Camera/Camera.config";
 import { CameraGridConfig } from "@repo/ui/components/CameraGrid/CameraGrid.config";
+import { MediaPlayerConfig } from "@repo/ui/components/MediaPlayer/MediaPlayer.config";
 import { RoomsConfig } from "@repo/ui/components/Rooms/Rooms.config";
 import { SidebarNavConfig } from "@repo/ui/components/SidebarNav/SidebarNav.config";
 import { PagePlaceholderConfig } from "@repo/ui/components/PagePlaceholder/PagePlaceholder.config";
@@ -36,6 +37,7 @@ type Components = {
   Weather: {};
   Camera: {};
   CameraGrid: {};
+  MediaPlayer: {};
   Rooms: {};
   SidebarNav: {};
   PagePlaceholder: {};
@@ -281,6 +283,7 @@ export const PuckConfig: Config<Components> = {
     Weather: WeatherConfig,
     Camera: CameraConfig,
     CameraGrid: CameraGridConfig,
+    MediaPlayer: MediaPlayerConfig,
     Rooms: RoomsConfig,
     SidebarNav: SidebarNavConfig,
     PagePlaceholder: PagePlaceholderConfig,
@@ -309,6 +312,7 @@ export const PuckConfig: Config<Components> = {
         "Weather",
         "Camera",
         "CameraGrid",
+        "MediaPlayer",
         "Alarm",
       ],
     },
