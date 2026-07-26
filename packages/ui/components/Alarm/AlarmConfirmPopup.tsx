@@ -21,6 +21,8 @@ interface AlarmConfirmPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (code?: string) => void;
+  /** When true, show PIN keypad; code is sent to HA for validation. */
+  requiresCode?: boolean;
 }
 
 export const AlarmConfirmPopup = ({
@@ -28,9 +30,13 @@ export const AlarmConfirmPopup = ({
   isOpen,
   onClose,
   onConfirm,
+  requiresCode = false,
 }: AlarmConfirmPopupProps) => {
   const [pin, setPin] = useState("");
   const isDisarm = action === "alarm_disarm";
+  // Disarm always prompts for a PIN when HA exposes a code format; arming
+  // follows `requiresCode` (code_arm_required). Fallback: disarm always asks.
+  const showPin = requiresCode || isDisarm;
 
   useEffect(() => {
     if (isOpen) setPin("");
@@ -45,12 +51,12 @@ export const AlarmConfirmPopup = ({
   };
 
   const handleConfirm = () => {
-    if (isDisarm && pin.length === 0) return;
-    onConfirm(isDisarm ? pin : undefined);
+    if (showPin && pin.length === 0) return;
+    onConfirm(showPin ? pin : undefined);
   };
 
   const label = action ? ACTION_CONFIRM_LABEL[action] : "";
-  const canConfirm = !isDisarm || pin.length > 0;
+  const canConfirm = !showPin || pin.length > 0;
 
   return (
     <Modal
@@ -78,19 +84,23 @@ export const AlarmConfirmPopup = ({
           <div className="hk-modal__stack">
             <div className="hk-modal__header">
               <p className="hk-modal__eyebrow">
-                {isDisarm ? "Security" : "Confirm action"}
+                {showPin ? "Security" : "Confirm action"}
               </p>
               <h2 className="hk-modal__title">
-                {isDisarm ? "Enter PIN to Disarm" : label}
+                {showPin
+                  ? isDisarm
+                    ? "Enter PIN to Disarm"
+                    : `Enter PIN to ${label}`
+                  : label}
               </h2>
-              {!isDisarm && (
+              {!showPin && (
                 <p className="hk-modal__desc">
                   Are you sure you want to {label.toLowerCase()}?
                 </p>
               )}
             </div>
 
-            {isDisarm && (
+            {showPin && (
               <>
                 <div className="hk-modal__pin">
                   {pin.length === 0 ? (

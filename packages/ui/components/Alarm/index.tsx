@@ -16,8 +16,8 @@ export type AlarmAction =
 
 export interface AlarmProps {
   entityId: string;
-  tapAction?: AlarmAction;
-  longPressAction?: AlarmAction;
+  tapAction?: AlarmAction | string;
+  longPressAction?: AlarmAction | string;
   code?: string;
 }
 
@@ -31,6 +31,56 @@ const ACTION_LABEL: Record<Exclude<AlarmAction, "none">, string> = {
   alarm_arm_vacation: "Arming Vacation",
   alarm_trigger: "Triggering",
 };
+
+/** Legacy config values → HA alarm_control_panel service names. */
+const ACTION_ALIASES: Record<string, AlarmAction> = {
+  none: "none",
+  disarm: "alarm_disarm",
+  alarm_disarm: "alarm_disarm",
+  arm_home: "alarm_arm_home",
+  alarm_arm_home: "alarm_arm_home",
+  arm_away: "alarm_arm_away",
+  alarm_arm_away: "alarm_arm_away",
+  arm_night: "alarm_arm_night",
+  alarm_arm_night: "alarm_arm_night",
+  arm_vacation: "alarm_arm_vacation",
+  alarm_arm_vacation: "alarm_arm_vacation",
+  trigger: "alarm_trigger",
+  alarm_trigger: "alarm_trigger",
+};
+
+const ACTIVE_ALARM_STATES = new Set([
+  "armed_home",
+  "armed_away",
+  "armed_night",
+  "armed_vacation",
+  "armed_custom_bypass",
+  "triggered",
+  "pending",
+  "arming",
+]);
+
+export function normalizeAlarmAction(action?: string | null): AlarmAction {
+  if (!action) return "none";
+  return ACTION_ALIASES[action] ?? "none";
+}
+
+function isAlarmActive(state?: string): boolean {
+  return !!state && ACTIVE_ALARM_STATES.has(state);
+}
+
+/** When armed, arm/trigger gestures become disarm so the card can be cleared. */
+export function resolveAlarmGestureAction(
+  configured: string | undefined,
+  state?: string
+): AlarmAction {
+  const action = normalizeAlarmAction(configured);
+  if (action === "none") return "none";
+  if (isAlarmActive(state) && action !== "alarm_disarm") {
+    return "alarm_disarm";
+  }
+  return action;
+}
 
 /** Map HA alarm_control_panel state → HomeKit "Mode · Status" line. */
 function formatSecurityStatus(state?: string): { mode: string; detail: string; tone: "ok" | "armed" | "alert" | "pending" } {
@@ -82,6 +132,22 @@ export const Alarm = ({
   const [pendingAction, setPendingAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
   const [confirmAction, setConfirmAction] = useState<Exclude<AlarmAction, "none"> | null>(null);
 
+  const normalizedTap = normalizeAlarmAction(tapAction);
+  const normalizedLongPress = normalizeAlarmAction(longPressAction);
+  const effectiveTap = resolveAlarmGestureAction(normalizedTap, entity?.state);
+  const effectiveLongPress = resolveAlarmGestureAction(
+    normalizedLongPress,
+    entity?.state
+  );
+
+  /** HA `code_format` is set when the panel expects a code (number/text). */
+  const codeFormat = entity?.attributes?.code_format as string | null | undefined;
+  const codeArmRequired = Boolean(entity?.attributes?.code_arm_required);
+  const requiresCode =
+    confirmAction === "alarm_disarm"
+      ? Boolean(codeFormat)
+      : Boolean(codeFormat) && codeArmRequired;
+
   useEffect(() => {
     if (!pendingAction) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -101,6 +167,7 @@ export const Alarm = ({
       if (!connection || !entityId || action === "none") return;
       setPendingAction(action as Exclude<AlarmAction, "none">);
       const service_data: Record<string, any> = { entity_id: entityId };
+      // Prefer the PIN entered in the confirm UI; fall back to optional stored code.
       const codeToUse = enteredCode ?? code;
       if (codeToUse) service_data.code = codeToUse;
       connection
@@ -134,20 +201,20 @@ export const Alarm = ({
   const handlePointerDown = useCallback(() => {
     if (pendingAction) return;
     didLongPress.current = false;
-    if (longPressAction && longPressAction !== "none") {
+    if (effectiveLongPress !== "none") {
       timerRef.current = setTimeout(() => {
         didLongPress.current = true;
-        openConfirm(longPressAction);
+        openConfirm(effectiveLongPress);
       }, LONG_PRESS_MS);
     }
-  }, [longPressAction, openConfirm, pendingAction]);
+  }, [effectiveLongPress, openConfirm, pendingAction]);
 
   const handlePointerUp = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!didLongPress.current && !pendingAction) {
-      openConfirm(tapAction ?? "none");
+      openConfirm(effectiveTap);
     }
-  }, [tapAction, openConfirm, pendingAction]);
+  }, [effectiveTap, openConfirm, pendingAction]);
 
   const handlePointerLeave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -169,8 +236,7 @@ export const Alarm = ({
   const isInteractive =
     !pendingAction &&
     isEntityReady &&
-    ((tapAction && tapAction !== "none") ||
-      (longPressAction && longPressAction !== "none"));
+    (effectiveTap !== "none" || effectiveLongPress !== "none");
 
   const statusLine = pendingAction
     ? `${ACTION_LABEL[pendingAction]}…`
@@ -183,6 +249,7 @@ export const Alarm = ({
         isOpen={confirmAction !== null}
         onClose={() => setConfirmAction(null)}
         onConfirm={handleConfirmed}
+        requiresCode={requiresCode}
       />
       <Skeleton
         isLoaded={isLoaded}
