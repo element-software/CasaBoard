@@ -58,4 +58,47 @@ describe("sidebars store slug key drift", () => {
     assert.equal(raw.shared.slug, "shared");
     assert.equal(raw.shared.name, "Shared");
   });
+
+  it("renames slug and rejects conflicts", async () => {
+    await writeFile(
+      path.join(dataDir, "sidebars.json"),
+      JSON.stringify(
+        {
+          shared: {
+            id: "9e3c5e7f-4b6d-4335-8b11-d4b8c43aea36",
+            name: "Shared",
+            slug: "shared",
+            puck_data: { content: [], root: { props: {} } },
+            theme_id: null,
+            style_id: null,
+            created_at: "2026-07-23T09:29:53.806Z",
+            updated_at: "2026-07-23T09:29:53.806Z",
+          },
+          other: {
+            id: "11111111-2222-4333-8444-555555555555",
+            name: "Other",
+            slug: "other",
+            puck_data: { content: [], root: { props: {} } },
+            theme_id: null,
+            style_id: null,
+            created_at: "2026-07-23T09:30:53.806Z",
+            updated_at: "2026-07-23T09:30:53.806Z",
+          },
+        },
+        null,
+        2
+      ),
+      "utf-8"
+    );
+
+    const renamed = await updateSidebar("shared", { slug: "main" });
+    assert.equal(renamed.slug, "main");
+    assert.equal(await getSidebar("shared"), null);
+    assert.ok(await getSidebar("main"));
+
+    await assert.rejects(
+      () => updateSidebar("main", { slug: "other" }),
+      /already exists/
+    );
+  });
 });

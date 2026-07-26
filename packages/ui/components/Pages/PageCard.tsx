@@ -17,6 +17,7 @@ import {
   mdiPencil,
   mdiDotsVertical,
   mdiTrashCan,
+  mdiContentCopy,
 } from "@mdi/js";
 import Link from "next/link";
 
@@ -24,11 +25,13 @@ export const PageCard = ({
   page,
   compact,
   onDelete,
+  onDuplicate,
   isPending,
 }: {
   page: Page;
   compact: boolean;
   onDelete: (slug: string, name: string) => void;
+  onDuplicate: (slug: string) => void;
   isPending: boolean;
 }) => {
   const formatDate = (dateString: string) =>
@@ -115,6 +118,21 @@ export const PageCard = ({
                 </Button>
               </DropdownTrigger>
               <DropdownMenu aria-label="Page actions">
+                <DropdownItem key="duplicate" className="p-0">
+                  <Button
+                    variant="flat"
+                    size="sm"
+                    title="Duplicate page"
+                    className="w-full"
+                    onPress={() => onDuplicate(page.slug)}
+                    startContent={
+                      <Icon path={mdiContentCopy} className="w-4 h-4" />
+                    }
+                    isDisabled={isPending}
+                  >
+                    Duplicate
+                  </Button>
+                </DropdownItem>
                 <DropdownItem key="delete" className="p-0">
                   <Button
                     color="danger"

@@ -13,6 +13,7 @@ import {
   mdiClock,
   mdiCheckCircle,
   mdiAlertCircle,
+  mdiContentCopy,
 } from "@mdi/js";
 import {
   Button,
@@ -27,6 +28,7 @@ import {
   cn,
 } from "@heroui/react";
 import { useHAConnection } from "@repo/hooks";
+import { useRouter } from "next/navigation";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
@@ -44,6 +46,7 @@ export const SidebarManagement = ({
   compact = false,
 }: SidebarManagementProps) => {
   const { connection } = useHAConnection();
+  const router = useRouter();
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
@@ -65,6 +68,20 @@ export const SidebarManagement = ({
         setSidebars(sidebars.filter((sidebar) => sidebar.slug !== slug));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to delete sidebar");
+      }
+    });
+  };
+
+  const handleDuplicateSidebar = (slug: string) => {
+    startTransition(async () => {
+      try {
+        const sidebar = await SidebarActions.duplicateSidebar(slug);
+        router.push(`/setup/sidebars/edit/${sidebar.slug}`);
+        router.refresh();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to duplicate sidebar"
+        );
       }
     });
   };
@@ -288,6 +305,21 @@ export const SidebarManagement = ({
                       </Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Sidebar actions">
+                      <DropdownItem key="duplicate" className="p-0">
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          title="Duplicate sidebar"
+                          className="w-full"
+                          onPress={() => handleDuplicateSidebar(sidebar.slug)}
+                          startContent={
+                            <Icon path={mdiContentCopy} className="w-4 h-4" />
+                          }
+                          isDisabled={isPending}
+                        >
+                          Duplicate
+                        </Button>
+                      </DropdownItem>
                       <DropdownItem key="delete" className="p-0">
                         <Button
                           color="danger"

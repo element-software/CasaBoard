@@ -31,6 +31,7 @@ export interface CreatePageData {
 
 export interface UpdatePageData {
   name?: string;
+  slug?: string;
   puck_data?: Data;
   sidebar_id?: string | null;
   theme_id?: string | null;

@@ -22,6 +22,7 @@ export interface CreateSidebarData {
 
 export interface UpdateSidebarData {
   name?: string;
+  slug?: string;
   puck_data?: Data;
   theme_id?: string | null;
   style_id?: StyleId | null;

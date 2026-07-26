@@ -67,7 +67,14 @@ export async function updatePage(
     ...data,
     updated_at: new Date().toISOString(),
   };
-  all[slug] = updated;
+  const newKey = updated.slug;
+  if (newKey !== slug) {
+    if (all[newKey]) {
+      throw new Error("A page with this slug already exists");
+    }
+    delete all[slug];
+  }
+  all[newKey] = updated;
   await writeJson(FILE, all);
   return withSidebar(updated);
 }

@@ -80,6 +80,10 @@ export async function updateSidebar(
   };
   const newKey = updated.slug;
   if (found.key !== newKey) {
+    const conflict = findSidebarEntry(all, newKey);
+    if (conflict && conflict.sidebar.id !== found.sidebar.id) {
+      throw new Error("A sidebar with this slug already exists");
+    }
     delete all[found.key];
   }
   all[newKey] = updated;

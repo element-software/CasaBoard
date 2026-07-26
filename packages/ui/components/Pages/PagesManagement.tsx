@@ -61,6 +61,20 @@ export const PagesManagement = ({
     });
   };
 
+  const handleDuplicatePage = (slug: string) => {
+    startTransition(async () => {
+      try {
+        const page = await PageActions.duplicatePage(slug);
+        router.push(`/setup/pages/edit/${page.slug}`);
+        router.refresh();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to duplicate page"
+        );
+      }
+    });
+  };
+
   const maxDisplayPages = compact ? 3 : 6;
   const displayPages = showAllPages
     ? pages
@@ -122,6 +136,7 @@ export const PagesManagement = ({
             page={page}
             compact={compact}
             onDelete={handleDeletePage}
+            onDuplicate={handleDuplicatePage}
             isPending={isPending}
           />
         ))}

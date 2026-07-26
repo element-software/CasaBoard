@@ -56,8 +56,8 @@ type PuckEditorClientProps = {
   }) => Promise<{ id: string; slug: string }>;
   onUpdateItem: (
     slug: string,
-    data: { name?: string; puck_data?: Data; [key: string]: unknown }
-  ) => Promise<unknown>;
+    data: { name?: string; slug?: string; puck_data?: Data; [key: string]: unknown }
+  ) => Promise<{ id: string; slug: string } | unknown>;
   editUrlTemplate: string;
   viewUrlTemplate?: string;
   backUrl: string;
@@ -105,6 +105,7 @@ export default function PuckEditorClient({
   const [currentItemId, setCurrentItemId] = useState<string | null>(
     itemId || null
   );
+  const [savedSlug, setSavedSlug] = useState<string | null>(initialSlug || null);
   const [isSavePending, startSaveTransition] = useTransition();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isApplyingSettings, setIsApplyingSettings] = useState(false);
@@ -130,7 +131,6 @@ export default function PuckEditorClient({
     };
   });
 
-  const isExistingItem = !!currentItemId;
   const router = useRouter();
 
   const editorThemeStyle = useMemo((): CSSProperties => {
@@ -170,13 +170,22 @@ export default function PuckEditorClient({
     }
   }, [currentItemId]);
 
-  const generateSlug = (title: string) =>
-    title
+  const generateSlug = (value: string) =>
+    value
       .toLowerCase()
       .replace(/[^a-z0-9 -]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
+      .replace(/(^-|-$)/g, "")
       .trim();
+
+  const resolveSlug = (slug: string, title: string) => {
+    const fromSlug = generateSlug(slug);
+    if (fromSlug) return fromSlug;
+    const fromTitle = generateSlug(title);
+    if (fromTitle) return fromTitle;
+    throw new Error("Slug is required");
+  };
 
   const isDirty = useMemo(() => {
     try {
@@ -236,9 +245,10 @@ export default function PuckEditorClient({
         );
         return;
       }
+      const nextSlug = resolveSlug(settings.slug, settings.title);
       const createData = {
         name: settings.title,
-        slug: settings.slug,
+        slug: nextSlug,
         puck_data: data,
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
         ...themePayload,
@@ -246,6 +256,8 @@ export default function PuckEditorClient({
 
       const result = await onCreateItem(createData);
       setCurrentItemId(result.id);
+      setSavedSlug(result.slug);
+      setSettings((prev) => ({ ...prev, slug: result.slug }));
       setLastSavedJson(JSON.stringify(data));
       clientLogger.info(
         "PuckEditorClient",
@@ -277,16 +289,32 @@ export default function PuckEditorClient({
         );
         return;
       }
+      const nextSlug = resolveSlug(settings.slug, settings.title);
       const updateData = {
         name: settings.title,
+        slug: nextSlug,
         puck_data: data,
         ...(sidebars.length > 0 && { sidebar_id: settings.sidebarId }),
         ...themePayload,
       };
 
-      const slugToUse = initialSlug || settings.slug;
-      await onUpdateItem(slugToUse, updateData);
+      const slugToUse = savedSlug || settings.slug;
+      const result = await onUpdateItem(slugToUse, updateData);
+      const resultSlug =
+        result &&
+        typeof result === "object" &&
+        "slug" in result &&
+        typeof result.slug === "string"
+          ? result.slug
+          : nextSlug;
+      setSettings((prev) => ({ ...prev, slug: resultSlug }));
       setLastSavedJson(JSON.stringify(data));
+      if (savedSlug && resultSlug !== savedSlug) {
+        setSavedSlug(resultSlug);
+        router.replace(editUrlTemplate.replace("{slug}", resultSlug));
+      } else {
+        setSavedSlug(resultSlug);
+      }
       clientLogger.info("PuckEditorClient", `${type} updated successfully`);
     } catch (err) {
       const errorMessage =
@@ -298,22 +326,43 @@ export default function PuckEditorClient({
 
   const applySettings = async () => {
     setError(null);
-    const newSlug = generateSlug(settings.title);
+    let nextSlug: string;
+    try {
+      nextSlug = resolveSlug(settings.slug, settings.title);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Slug is required");
+      return;
+    }
 
     if (currentItemId) {
       setIsApplyingSettings(true);
       try {
         const themePayload = buildThemePayload();
-        const slugToUse = initialSlug || settings.slug;
+        const slugToUse = savedSlug || settings.slug;
         const patch: Record<string, unknown> = {
           name: settings.title,
+          slug: nextSlug,
           ...themePayload,
         };
         if (type === "page" && sidebars.length > 0) {
           patch.sidebar_id = settings.sidebarId;
         }
-        await onUpdateItem(slugToUse, patch);
-        router.refresh();
+        const result = await onUpdateItem(slugToUse, patch);
+        const resultSlug =
+          result &&
+          typeof result === "object" &&
+          "slug" in result &&
+          typeof result.slug === "string"
+            ? result.slug
+            : nextSlug;
+        nextSlug = resultSlug;
+        if (savedSlug && resultSlug !== savedSlug) {
+          setSavedSlug(resultSlug);
+          router.replace(editUrlTemplate.replace("{slug}", resultSlug));
+        } else {
+          setSavedSlug(resultSlug);
+          router.refresh();
+        }
         clientLogger.info("PuckEditorClient", "Settings (incl. theme) saved");
       } catch (e) {
         const msg =
@@ -326,7 +375,7 @@ export default function PuckEditorClient({
       }
     }
 
-    setSettings((prev) => ({ ...prev, slug: newSlug }));
+    setSettings((prev) => ({ ...prev, slug: nextSlug }));
 
     setData((prev) => ({
       ...prev,
@@ -335,7 +384,7 @@ export default function PuckEditorClient({
         props: {
           ...prev.root.props,
           title: settings.title,
-          slug: newSlug,
+          slug: nextSlug,
           sidebarId: settings.sidebarId,
         },
       },
@@ -403,9 +452,9 @@ export default function PuckEditorClient({
                     {itemCount}/{maxItemsPerDashboard} items
                   </Chip>
                 )}
-                {viewUrlTemplate && initialSlug && (
+                {viewUrlTemplate && savedSlug && (
                   <Link
-                    href={viewUrlTemplate.replace("{slug}", initialSlug)}
+                    href={viewUrlTemplate.replace("{slug}", savedSlug)}
                     size="sm"
                     color="secondary"
                     target="_blank"
@@ -459,9 +508,19 @@ export default function PuckEditorClient({
                 label="Name"
                 placeholder={`Enter ${type} name`}
                 value={settings.title}
-                onChange={(e) =>
-                  setSettings((prev) => ({ ...prev, title: e.target.value }))
-                }
+                onChange={(e) => {
+                  const title = e.target.value;
+                  setSettings((prev) => {
+                    const shouldSyncSlug =
+                      !currentItemId &&
+                      prev.slug === generateSlug(prev.title);
+                    return {
+                      ...prev,
+                      title,
+                      slug: shouldSyncSlug ? generateSlug(title) : prev.slug,
+                    };
+                  });
+                }}
               />
               <Input
                 label="Slug"
@@ -470,8 +529,7 @@ export default function PuckEditorClient({
                 onChange={(e) =>
                   setSettings((prev) => ({ ...prev, slug: e.target.value }))
                 }
-                description="URL-friendly version of the name"
-                isDisabled={isExistingItem}
+                description="URL-friendly identifier used in links. Changing it updates the URL."
               />
               {type === "page" && sidebars.length > 0 && (
                 <div>

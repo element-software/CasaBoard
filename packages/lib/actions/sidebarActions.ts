@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { serverLogger } from "../logger";
 import {
   Sidebar,
@@ -56,7 +57,14 @@ export async function updateSidebar(
 ): Promise<Sidebar> {
   try {
     const sidebar = await SidebarStore.updateSidebar(slug, sidebarData);
-    serverLogger.info("updateSidebar", `Updated sidebar ${slug}`);
+    revalidatePath("/setup/sidebars");
+    if (sidebar.slug !== slug) {
+      revalidatePath(`/setup/sidebars/edit/${sidebar.slug}`);
+    }
+    serverLogger.info(
+      "updateSidebar",
+      `Updated sidebar ${slug}${sidebar.slug !== slug ? ` -> ${sidebar.slug}` : ""}`
+    );
     return sidebar;
   } catch (error) {
     serverLogger.error(
@@ -76,6 +84,42 @@ export async function deleteSidebar(slug: string): Promise<void> {
     serverLogger.error(
       "deleteSidebar",
       `Failed to delete sidebar ${slug}`,
+      error
+    );
+    throw error;
+  }
+}
+
+async function uniqueSidebarSlug(base: string): Promise<string> {
+  let slug = `${base}-copy`;
+  let n = 2;
+  while (await SidebarStore.getSidebar(slug)) {
+    slug = `${base}-copy-${n}`;
+    n += 1;
+  }
+  return slug;
+}
+
+export async function duplicateSidebar(slug: string): Promise<Sidebar> {
+  try {
+    const existing = await getSidebar(slug);
+    const sidebar = await createSidebar({
+      name: `${existing.name} (copy)`,
+      slug: await uniqueSidebarSlug(existing.slug),
+      puck_data: structuredClone(existing.puck_data),
+      theme_id: existing.theme_id ?? null,
+      style_id: existing.style_id ?? null,
+    });
+    revalidatePath("/setup/sidebars");
+    serverLogger.info(
+      "duplicateSidebar",
+      `Duplicated sidebar ${slug} -> ${sidebar.slug}`
+    );
+    return sidebar;
+  } catch (error) {
+    serverLogger.error(
+      "duplicateSidebar",
+      `Failed to duplicate sidebar ${slug}`,
       error
     );
     throw error;
