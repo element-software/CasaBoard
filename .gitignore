@@ -27,7 +27,8 @@ coverage
 out/
 build
 dist
-/publish/
+/publish/*
+!/publish/.gitkeep
 
 # Debug
 npm-debug.log*
@@ -39,7 +40,8 @@ yarn-error.log*
 *.pem
 
 # Runtime data (Docker bind-mount ./data → DATA_DIR; never commit tokens)
-/data/
+/data/*
+!/data/.gitkeep
 apps/app/data/**/*
 __pycache__/
 *.py[cod]
