@@ -1,4 +1,5 @@
-import type { AnchorHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { navigate, shouldClientNavigate } from "../clientHistory";
 
 type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
@@ -8,16 +9,33 @@ type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
   replace?: boolean;
 };
 
-/** Vite shim for next/link — plain anchor. */
-export default function Link({ href, children, ...rest }: Props) {
+/** Vite shim for next/link — soft-navigates same-origin routes. */
+export default function Link({
+  href,
+  children,
+  onClick,
+  replace,
+  ...rest
+}: Props) {
   const {
     prefetch: _prefetch,
     scroll: _scroll,
-    replace: _replace,
     ...anchorProps
   } = rest;
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(event);
+    if (
+      shouldClientNavigate(event, event.currentTarget) &&
+      href
+    ) {
+      event.preventDefault();
+      navigate(href, { replace });
+    }
+  };
+
   return (
-    <a href={href} {...anchorProps}>
+    <a href={href} {...anchorProps} onClick={handleClick}>
       {children}
     </a>
   );

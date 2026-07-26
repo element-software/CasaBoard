@@ -1,24 +1,41 @@
+import { useCallback, useSyncExternalStore } from "react";
+import {
+  bindPopState,
+  getPathname,
+  navigate,
+  subscribe,
+} from "../clientHistory";
+
+bindPopState();
+
 export function usePathname(): string {
-  if (typeof window === "undefined") return "";
-  return window.location.pathname;
+  return useSyncExternalStore(subscribe, getPathname, () => "");
 }
 
 export function useRouter() {
-  return {
-    push: (href: string) => {
-      window.location.href = href;
-    },
-    replace: (href: string) => {
-      window.location.replace(href);
-    },
-    back: () => window.history.back(),
-    refresh: () => window.location.reload(),
-    prefetch: async () => {},
-  };
+  const push = useCallback((href: string) => {
+    navigate(href);
+  }, []);
+  const replace = useCallback((href: string) => {
+    navigate(href, { replace: true });
+  }, []);
+  const back = useCallback(() => {
+    window.history.back();
+  }, []);
+  const refresh = useCallback(() => {
+    window.location.reload();
+  }, []);
+  const prefetch = useCallback(async () => {}, []);
+
+  return { push, replace, back, refresh, prefetch };
+}
+
+function getSearch(): string {
+  if (typeof window === "undefined") return "";
+  return window.location.search;
 }
 
 export function useSearchParams() {
-  return new URLSearchParams(
-    typeof window !== "undefined" ? window.location.search : ""
-  );
+  const search = useSyncExternalStore(subscribe, getSearch, () => "");
+  return new URLSearchParams(search);
 }

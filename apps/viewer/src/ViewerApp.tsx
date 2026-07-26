@@ -1,13 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { PublishedPagePayload } from "@repo/types/publishedPage";
 import { DashboardNavProvider } from "@repo/ui/components/DashboardNav/DashboardNavContext";
-import { StaticDashboard } from "./StaticDashboard";
+import { usePathname } from "next/navigation";
+import {
+  mergeViewerChrome,
+  StaticDashboard,
+  type ViewerChrome,
+} from "./StaticDashboard";
 import { ViewerConnectForm } from "./ViewerConnectForm";
+import {
+  bindPopState,
+  navigate,
+  shouldClientNavigate,
+} from "./clientHistory";
 import {
   createLocalStorageTokenStore,
   HAProvider,
   useHA,
 } from "./ha";
+
+bindPopState();
 
 function slugFromPathname(pathname: string): string | null {
   const parts = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
@@ -44,9 +56,11 @@ function ErrorScreen({ message }: { message: string }) {
 
 function ConnectedGate({
   payload,
+  chrome,
   onNeedAuth,
 }: {
   payload: PublishedPagePayload;
+  chrome: ViewerChrome | null;
   onNeedAuth: () => void;
 }) {
   const { loading, error, connected } = useHA();
@@ -65,31 +79,54 @@ function ConnectedGate({
     return <LoadingScreen message="Waiting for Home Assistant…" />;
   }
 
-  return <StaticDashboard payload={payload} />;
+  return <StaticDashboard payload={payload} chrome={chrome} />;
 }
 
 export function ViewerApp() {
+  const pathname = usePathname();
+  const slug = useMemo(() => slugFromPathname(pathname), [pathname]);
+
   const [payload, setPayload] = useState<PublishedPagePayload | null>(null);
+  const [chrome, setChrome] = useState<ViewerChrome | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState<boolean | null>(null);
   const [authEpoch, setAuthEpoch] = useState(0);
+  const [navigating, setNavigating] = useState(false);
 
   const tokenStore = useMemo(() => createLocalStorageTokenStore(), []);
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
 
   const hrefForSlug = useCallback(
-    (slug: string) => hrefForPublishedSlug(slug),
-    []
+    (nextSlug: string) => hrefForPublishedSlug(nextSlug),
+    // Recompute relative URLs when the path changes so ../ stays correct.
+    [pathname]
   );
 
+  // Soft-navigate plain same-origin anchors (defense in depth for non-Link markup).
   useEffect(() => {
-    const slug = slugFromPathname(window.location.pathname);
+    const onClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (!anchor.href) return;
+      if (!shouldClientNavigate(event, anchor)) return;
+      event.preventDefault();
+      navigate(anchor.href);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+
+  useEffect(() => {
     if (!slug) {
       setLoadError("Could not determine page slug from URL.");
       return;
     }
 
     let cancelled = false;
+    const hasPayload = payload !== null;
+    if (hasPayload) setNavigating(true);
+
     (async () => {
       try {
         const res = await fetch(pageJsonUrl(slug), { cache: "no-store" });
@@ -100,23 +137,40 @@ export function ViewerApp() {
         }
         const data = (await res.json()) as PublishedPagePayload;
         if (cancelled) return;
+
         setPayload(data);
+        setChrome((prev) => mergeViewerChrome(prev, data));
+        setLoadError(null);
+        document.title = `CasaBoard — ${data.name || data.slug}`;
 
         const tokens = await Promise.resolve(tokenStore.loadTokens());
-        setNeedsAuth(!tokens?.access_token);
+        setNeedsAuth((prev) => {
+          // Don't bounce back to the auth form mid-session if tokens exist.
+          if (prev === false && tokens?.access_token) return false;
+          return !tokens?.access_token;
+        });
       } catch (err) {
         if (!cancelled) {
-          setLoadError(
-            err instanceof Error ? err.message : "Failed to load page data"
-          );
+          // Keep the prior dashboard visible on soft-nav failures.
+          if (!hasPayload) {
+            setLoadError(
+              err instanceof Error ? err.message : "Failed to load page data"
+            );
+          } else {
+            console.error(err);
+          }
         }
+      } finally {
+        if (!cancelled) setNavigating(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [tokenStore]);
+    // Intentionally depend on slug + tokenStore only — not payload.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when URL slug changes
+  }, [slug, tokenStore]);
 
   const onAuthSaved = useCallback(() => {
     setNeedsAuth(false);
@@ -154,7 +208,19 @@ export function ViewerApp() {
         tokenStore={tokenStore}
         redirectUrl={redirectUrl}
       >
-        <ConnectedGate payload={payload} onNeedAuth={onNeedAuth} />
+        <div className="relative">
+          {navigating ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-theme-interactive-active/80"
+            />
+          ) : null}
+          <ConnectedGate
+            payload={payload}
+            chrome={chrome}
+            onNeedAuth={onNeedAuth}
+          />
+        </div>
       </HAProvider>
     </DashboardNavProvider>
   );

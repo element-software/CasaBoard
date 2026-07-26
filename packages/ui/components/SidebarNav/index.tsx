@@ -12,6 +12,7 @@ import {
   mdiChevronRight,
 } from "@mdi/js";
 import classNames from "classnames";
+import Link from "next/link";
 import { useDashboardNav } from "../DashboardNav/DashboardNavContext";
 
 export type SidebarNavItem = {
@@ -72,7 +73,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
         const showChevron = item.pageSlug === "media";
 
         return (
-          <a
+          <Link
             key={item.pageSlug}
             href={href}
             aria-current={active ? "page" : undefined}
@@ -97,7 +98,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
                 className="h-4 w-4 shrink-0 opacity-50 group-hover:opacity-70"
               />
             )}
-          </a>
+          </Link>
         );
       })}
     </nav>
