@@ -9,8 +9,7 @@ export type PublicOgRouteKey =
   | "cookies"
   | "docs"
   | "privacy"
-  | "security"
-  | "terms";
+  | "security";
 
 type RouteOgDefinition = {
   path: string;
@@ -116,19 +115,6 @@ export const publicOgRoutes: Record<PublicOgRouteKey, RouteOgDefinition> = {
       title: "Security",
       description: "Self-hosted by design — your credentials and data never leave your server.",
       alt: "CasaBoard security overview",
-    },
-  },
-  terms: {
-    path: "/terms",
-    metadata: {
-      title: "Terms — CasaBoard",
-      description:
-        "CasaBoard is free, MIT-licensed software provided as-is. No account, no subscription, no warranty.",
-    },
-    og: {
-      title: "Terms",
-      description: "Free, MIT-licensed software, provided as-is.",
-      alt: "CasaBoard terms",
     },
   },
 };
