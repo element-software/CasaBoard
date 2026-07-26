@@ -1,3 +1,5 @@
+import type { Connection } from "home-assistant-js-websocket";
+
 /** Domains that expose force_arm / force_arm_cancel (Verisure OWA + legacy). */
 export const FORCE_ARM_DOMAINS = ["verisure_owa", "securitas"] as const;
 
@@ -39,10 +41,6 @@ export type AlarmPanelSnapshot = {
   status: AlarmSecurityStatus;
   /** Blocking failure derived from force-arm attributes, if any. */
   forceArmFailure: AlarmArmFailure | null;
-};
-
-type HassConnection = {
-  sendMessagePromise: (msg: unknown) => Promise<unknown>;
 };
 
 /** Legacy UI/config values → HA alarm_control_panel service names. */
@@ -200,7 +198,7 @@ export function getAlarmPanelSnapshot(
 }
 
 export async function callAlarmService(
-  connection: HassConnection,
+  connection: Connection,
   entityId: string,
   service: AlarmPanelService,
   code?: string
@@ -216,7 +214,7 @@ export async function callAlarmService(
 }
 
 async function callForceService(
-  connection: HassConnection,
+  connection: Connection,
   service: "force_arm" | "force_arm_cancel",
   entityId: string,
   code?: string
@@ -241,7 +239,7 @@ async function callForceService(
 }
 
 export function forceArmAlarm(
-  connection: HassConnection,
+  connection: Connection,
   entityId: string,
   code?: string
 ): Promise<void> {
@@ -249,7 +247,7 @@ export function forceArmAlarm(
 }
 
 export function cancelForceArmAlarm(
-  connection: HassConnection,
+  connection: Connection,
   entityId: string
 ): Promise<void> {
   return callForceService(connection, "force_arm_cancel", entityId);
