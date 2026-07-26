@@ -1,5 +1,6 @@
 "use client";
 import { LightConfig } from "@repo/ui/components/Light/Light.config";
+import { LightGroupConfig } from "@repo/ui/components/LightGroup/LightGroup.config";
 import { SwitchConfig } from "@repo/ui/components/Switch/Switch.config";
 import { AlarmConfig } from "@repo/ui/components/Alarm/Alarm.config";
 import { BinarySensorConfig } from "@repo/ui/components/BinarySensor/BinarySensor.config";
@@ -19,6 +20,7 @@ import { cn } from "@heroui/react";
 
 type Components = {
   Light: {};
+  LightGroup: {};
   Switch: {};
   Alarm: {};
   BinarySensor: {};
@@ -265,6 +267,7 @@ export const PuckConfig: Config<Components> = {
   },
   components: {
     Light: LightConfig,
+    LightGroup: LightGroupConfig,
     Switch: SwitchConfig,
     Alarm: AlarmConfig,
     BinarySensor: BinarySensorConfig,
@@ -293,6 +296,7 @@ export const PuckConfig: Config<Components> = {
       title: "Entities",
       components: [
         "Light",
+        "LightGroup",
         "Switch",
         "Clock",
         "BinarySensor",
