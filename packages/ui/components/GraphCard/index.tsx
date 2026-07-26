@@ -13,6 +13,10 @@ interface GraphCardProps {
   showStatistics: boolean;
 }
 
+/** 24h window; 288 keeps a full day of 5-minute statistics buckets. */
+const LOOKBACK_MS = 24 * 60 * 60 * 1000;
+const POINT_LIMIT = 288;
+
 function formatSensorValue(value: string | number | null | undefined): string {
   const num = typeof value === "number" ? value : parseFloat(String(value ?? ""));
   if (Number.isNaN(num)) return String(value ?? "--");
@@ -28,35 +32,18 @@ const GraphCard = ({
   // Prefer long-term statistics (downsampled); hook falls back to raw history / REST / live append
   const { history, loading } = useEntityHistory(
     entityId,
-    96,
-    24 * 60 * 60 * 1000,
+    POINT_LIMIT,
+    LOOKBACK_MS,
     "statistics"
   );
   const unit = entity?.attributes?.unit_of_measurement || "W";
 
-  const chartHistory = useMemo(() => {
-    if (history.length > 0) return history;
-    // When recorder history is unavailable, seed a short flat line from the live state
-    // so the card isn't blank while live updates accumulate.
-    if (entity?.state != null && Number.isFinite(parseFloat(String(entity.state)))) {
-      const end = Date.parse(
-        String(entity.last_updated ?? entity.last_changed ?? "")
-      );
-      const endMs = Number.isFinite(end) ? end : Date.now();
-      return [
-        { s: String(entity.state), lu: endMs - 60_000 },
-        { s: String(entity.state), lu: endMs },
-      ];
-    }
-    return history;
-  }, [history, entity]);
-
   const statistics = useMemo(() => {
-    if (!chartHistory || chartHistory.length === 0) {
+    if (!history || history.length === 0) {
       return { min: null, avg: null, max: null };
     }
 
-    const values = chartHistory
+    const values = history
       .map((item) => parseFloat(String(item.s)))
       .filter((value) => Number.isFinite(value));
 
@@ -69,7 +56,7 @@ const GraphCard = ({
     const avg = values.reduce((sum, value) => sum + value, 0) / values.length;
 
     return { min, avg, max };
-  }, [chartHistory]);
+  }, [history]);
 
   const { isEntityReady, showNotAvailable } = useEntityLoading(entity);
 
@@ -148,10 +135,20 @@ const GraphCard = ({
             )}
           </div>
 
-          <Graph
-            data={{ entityHistory: chartHistory, unit }}
-            className="mt-auto h-28 w-full shrink-0"
-          />
+          {/* Reserve space; omit chart until history has ≥2 points (no seed flash) */}
+          <div className="mt-auto h-28 w-full shrink-0">
+            {history.length >= 2 ? (
+              <Graph
+                key={entityId}
+                data={{
+                  entityHistory: history,
+                  unit,
+                  lookbackMs: LOOKBACK_MS,
+                }}
+                className="h-full w-full"
+              />
+            ) : null}
+          </div>
         </CardShell>
       )}
     </Skeleton>

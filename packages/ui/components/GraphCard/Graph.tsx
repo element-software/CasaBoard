@@ -7,14 +7,24 @@ import {
   VictoryTooltip,
   VictoryVoronoiContainer,
 } from "victory";
-import { useId, useMemo } from "react";
+import { useId, useMemo, useRef } from "react";
 import { toChartDate } from "@casaboard/ha";
 import classNames from "classnames";
 
 interface GraphCardProps {
-  data: any;
+  data: {
+    entityHistory: any[];
+    unit?: string;
+    lookbackMs?: number;
+  };
   className?: string;
 }
+
+const DISPLAY_MAX_POINTS = 48;
+const Y_EXPAND_EPS = 0.02;
+const Y_SHRINK_UNUSED = 0.25;
+
+type ChartPoint = { y: number; x: Date };
 
 function yDomainFor(values: number[]): [number, number] {
   const min = Math.min(...values);
@@ -28,6 +38,59 @@ function yDomainFor(values: number[]): [number, number] {
   return [min - pad, max + pad];
 }
 
+/** Keep Y scale steady: expand immediately when clipped; shrink only when mostly unused. */
+function stabilizeYDomain(
+  prev: [number, number] | null,
+  next: [number, number]
+): [number, number] {
+  if (!prev) return next;
+  const [pMin, pMax] = prev;
+  const [nMin, nMax] = next;
+  const span = pMax - pMin || 1;
+  let min = pMin;
+  let max = pMax;
+
+  if (nMin < pMin - span * Y_EXPAND_EPS) min = nMin;
+  if (nMax > pMax + span * Y_EXPAND_EPS) max = nMax;
+
+  const unusedLow = min - nMin;
+  const unusedHigh = max - nMax;
+  if (unusedLow > span * Y_SHRINK_UNUSED || unusedHigh > span * Y_SHRINK_UNUSED) {
+    return next;
+  }
+  return [min, max];
+}
+
+function downsample(data: ChartPoint[], maxPoints: number): ChartPoint[] {
+  if (data.length <= maxPoints) return data;
+  const out: ChartPoint[] = new Array(maxPoints);
+  const last = data.length - 1;
+  const step = last / (maxPoints - 1);
+  for (let i = 0; i < maxPoints; i++) {
+    out[i] = data[Math.round(i * step)]!;
+  }
+  out[maxPoints - 1] = data[last]!;
+  return out;
+}
+
+function stabilizeXDomain(
+  prev: [Date, Date] | null,
+  endMs: number,
+  lookbackMs: number
+): [Date, Date] {
+  const next: [Date, Date] = [
+    new Date(endMs - lookbackMs),
+    new Date(endMs),
+  ];
+  if (!prev) return next;
+  const prevEnd = prev[1].getTime();
+  // Only nudge the window forward when time advanced meaningfully (≥2% of window)
+  if (endMs - prevEnd < lookbackMs * 0.02) {
+    return prev;
+  }
+  return next;
+}
+
 const Graph = ({ data, className }: GraphCardProps) => {
   const reactGradientId = useId();
   const gradientId = useMemo(
@@ -35,11 +98,15 @@ const Graph = ({ data, className }: GraphCardProps) => {
     [reactGradientId]
   );
 
+  const lookbackMs = data?.lookbackMs ?? 24 * 60 * 60 * 1000;
+  const domainYRef = useRef<[number, number] | null>(null);
+  const domainXRef = useRef<[Date, Date] | null>(null);
+
   const processedData = useMemo(() => {
     if (!data?.entityHistory || !Array.isArray(data.entityHistory)) {
       return [];
     }
-    return data.entityHistory
+    const points = data.entityHistory
       .map((item: any) => {
         const y = parseFloat(String(item.s ?? item.state ?? ""));
         if (!Number.isFinite(y)) return null;
@@ -49,15 +116,28 @@ const Graph = ({ data, className }: GraphCardProps) => {
           x: toChartDate(time),
         };
       })
-      .filter((p: { y: number; x: Date } | null): p is { y: number; x: Date } =>
-        p != null
-      );
+      .filter((p: ChartPoint | null): p is ChartPoint => p != null);
+    return downsample(points, DISPLAY_MAX_POINTS);
   }, [data?.entityHistory]);
 
-  const domainY = useMemo(
-    () => yDomainFor(processedData.map((d: { y: number }) => d.y)),
-    [processedData]
-  );
+  const domainY = useMemo(() => {
+    if (processedData.length === 0) return [0, 1] as [number, number];
+    const next = yDomainFor(processedData.map((d) => d.y));
+    const stable = stabilizeYDomain(domainYRef.current, next);
+    domainYRef.current = stable;
+    return stable;
+  }, [processedData]);
+
+  const domainX = useMemo(() => {
+    if (processedData.length === 0) {
+      const end = Date.now();
+      return [new Date(end - lookbackMs), new Date(end)] as [Date, Date];
+    }
+    const endMs = processedData[processedData.length - 1]!.x.getTime();
+    const stable = stabilizeXDomain(domainXRef.current, endMs, lookbackMs);
+    domainXRef.current = stable;
+    return stable;
+  }, [processedData, lookbackMs]);
 
   const unit = data?.unit || "W";
 
@@ -98,7 +178,8 @@ const Graph = ({ data, className }: GraphCardProps) => {
         height={160}
         width={640}
         padding={{ top: 6, bottom: 0, left: 0, right: 0 }}
-        domain={{ y: domainY }}
+        domain={{ x: domainX, y: domainY }}
+        scale={{ x: "time", y: "linear" }}
         style={{
           parent: {
             width: "100%",
@@ -162,7 +243,8 @@ const Graph = ({ data, className }: GraphCardProps) => {
             },
           }}
           animate={{
-            duration: 0,
+            duration: 250,
+            onLoad: { duration: 0 },
           }}
         />
       </VictoryChart>

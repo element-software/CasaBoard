@@ -66,21 +66,39 @@ describe("entityHistory helpers", () => {
     assert.equal(points[0]?.lu, "2026-07-24T00:00:00+00:00");
   });
 
-  it("appends live points and respects limit", () => {
+  it("appends live points and respects limit when outside coalesce window", () => {
+    const t0 = 1_784_850_000;
     const limited = appendLivePoint(
       [
-        { s: "1", lu: 1 },
-        { s: "2", lu: 2 },
+        { s: "1", lu: t0 },
+        { s: "2", lu: t0 + 120 },
       ],
       "3",
-      3,
+      t0 + 240,
       2
     );
     assert.deepEqual(limited, [
-      { s: "2", lu: 2 },
-      { s: "3", lu: 3 },
+      { s: "2", lu: t0 + 120 },
+      { s: "3", lu: t0 + 240 },
     ]);
     assert.deepEqual(appendLivePoint([], "bad", 1, 10), []);
+  });
+
+  it("coalesces live updates within the window by replacing the last point", () => {
+    const t0 = 1_784_850_000;
+    const coalesced = appendLivePoint(
+      [
+        { s: "1", lu: t0 },
+        { s: "2", lu: t0 + 120 },
+      ],
+      "2.5",
+      t0 + 150,
+      10
+    );
+    assert.deepEqual(coalesced, [
+      { s: "1", lu: t0 },
+      { s: "2.5", lu: t0 + 150 },
+    ]);
   });
 
   it("withTimeout rejects slow promises", async () => {

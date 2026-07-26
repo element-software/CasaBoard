@@ -88,17 +88,39 @@ export function normalizeStatisticsResponse(
   return normalizeStatisticsSeries(series);
 }
 
+/** Replace the last point when updates arrive within this window (ms). */
+export const LIVE_COALESCE_MS = 60_000;
+
+/**
+ * Append a live state sample. Frequent updates within `coalesceMs` replace the
+ * last point instead of growing the series (reduces chart redraw churn).
+ */
 export function appendLivePoint(
   points: EntityHistoryPoint[],
   state: string | number,
   lastUpdated: string | number | undefined,
-  limit: number
+  limit: number,
+  coalesceMs: number = LIVE_COALESCE_MS
 ): EntityHistoryPoint[] {
   if (!isFiniteNumericState(state)) return points;
   const next: EntityHistoryPoint = {
     s: String(state),
     lu: lastUpdated ?? new Date().toISOString(),
   };
+  if (points.length === 0) return [next];
+
+  const last = points[points.length - 1]!;
+  const lastMs = toChartDate(last.lu).getTime();
+  const nextMs = toChartDate(next.lu).getTime();
+  if (
+    coalesceMs > 0 &&
+    Number.isFinite(lastMs) &&
+    Number.isFinite(nextMs) &&
+    nextMs - lastMs < coalesceMs
+  ) {
+    return [...points.slice(0, -1), next];
+  }
+
   const merged = [...points, next];
   return merged.length > limit ? merged.slice(-limit) : merged;
 }
