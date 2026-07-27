@@ -135,9 +135,9 @@ const EntitiesCard = ({
           "grid-cols-4 sm:grid-cols-7 md:grid-cols-10": normalizedCols === 10,
         })}
       >
-        {(entities || []).map((entity) => (
+        {(entities || []).map((entity, index) => (
           <EntityCard
-            key={entity.id}
+            key={entity.id ? `${entity.id}-${index}` : `entity-${index}`}
             entityId={entity.id}
             icon={entity.icon}
             showTitle={showTitles}
