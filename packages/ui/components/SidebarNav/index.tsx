@@ -70,7 +70,6 @@ export function SidebarNav({ items }: SidebarNavProps) {
           pathname.endsWith(`/${item.pageSlug}/`) ||
           pathname.includes(`/dashboard/${item.pageSlug}`);
         const path = resolveIcon(item.icon, item.pageSlug);
-        const showChevron = item.pageSlug === "media";
 
         return (
           <Link
@@ -92,7 +91,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
               )}
             />
             <span className="flex-1 truncate text-left">{item.label}</span>
-            {showChevron && !active && (
+            {!active && (
               <Icon
                 path={mdiChevronRight}
                 className="h-4 w-4 shrink-0 opacity-50 group-hover:opacity-70"
