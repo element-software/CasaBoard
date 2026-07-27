@@ -20,7 +20,7 @@ const DOMAIN_SERVICES: Record<string, string[]> = {
   light: ["toggle", "turn_on", "turn_off"],
   switch: ["toggle", "turn_on", "turn_off"],
   cover: ["open_cover", "close_cover", "toggle"],
-  climate: ["set_temperature", "turn_on", "turn_off"],
+  climate: ["set_temperature", "set_hvac_mode", "set_fan_mode", "turn_on", "turn_off"],
   media_player: [
     "play_media",
     "media_play",
