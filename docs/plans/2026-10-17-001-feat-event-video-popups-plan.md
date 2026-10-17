@@ -87,7 +87,6 @@ export type EventPopupSound =
   | "custom";
 
 export interface EventPopupRule {
-  id: string;                       // stable key for React and dedupe
   name?: string;                    // popup title; falls back to the camera's friendly name
   enabled: boolean;
 
@@ -116,6 +115,11 @@ export interface EventPopupRule {
   entities: { id: string }[];       // rendered with EntityTile tileLayout="row"
 }
 ```
+
+Rules have no `id`: Puck's `defaultItemProps` is a static object, so every new
+item would get the same id. The hook tracks cooldowns by array index instead.
+Phase 1 ships only the trigger, stream and auto-close fields; the sound and
+`entities` fields are added in later phases.
 
 Root props gain `eventPopups: EventPopupRule[]`. The default is `[]`, so
 existing pages are unaffected.
@@ -180,7 +184,12 @@ existing pages are unaffected.
 
 ## Implementation phases
 
-### Phase 1: Trigger + popup + stream (MVP)
+### Phase 1: Trigger + popup + stream (MVP) — done (2026-10-17)
+
+Notes: `shouldFire` shipped as `isOutsideCooldown`. When more than one rule
+fires in the same update, the last one wins until the Phase 3 queue lands. When
+live streaming fails, the popup shows the camera snapshot and refreshes it
+every 5 s (open question 3).
 
 1. `packages/types/eventPopup.ts` types.
 2. `packages/ha/events/popupTrigger.ts` with tests: `to_state`, `fromState`
@@ -247,11 +256,9 @@ existing pages are unaffected.
 
 ## Open questions
 
-1. Is per-page enough for v1, or should a rule also fire from the sidebar,
-   meaning on every page? The plan defers that to a follow-up because it
-   reuses the same field and host.
+1. ~~Is per-page enough for v1?~~ Yes, per-page is enough for now.
 2. Are synthesised chimes plus a custom URL enough, or should we bundle
    recorded (CC0) sound files?
-3. When the camera stream fails, should the popup still show the entities
-   and a snapshot? The proposed default is yes: it shows `posterUrl` and the
-   existing error overlay.
+3. ~~When the camera stream fails, should the popup still show a snapshot?~~
+   Yes: it shows the refreshing snapshot, and will also show the entities
+   once Phase 3 adds them.

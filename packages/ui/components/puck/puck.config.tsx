@@ -18,6 +18,7 @@ import { PagePlaceholderConfig } from "@repo/ui/components/PagePlaceholder/PageP
 import { SectionHeaderConfig } from "@repo/ui/components/SectionHeader/SectionHeader.config";
 import { Config } from "@measured/puck";
 import { GridConfig } from "@repo/ui/components/Grid/Grid.config";
+import { eventPopupsField } from "@repo/ui/components/EventPopup/EventPopup.fields";
 import { cn } from "@heroui/react";
 
 type Components = {
@@ -258,6 +259,7 @@ export const PuckConfig: Config<Components> = {
         label: "Align vertical",
         options: [...ALIGN_Y_OPTIONS],
       },
+      eventPopups: eventPopupsField,
     },
     defaultProps: {
       layoutDirection: "column",
@@ -266,6 +268,7 @@ export const PuckConfig: Config<Components> = {
       layoutWrap: "nowrap",
       alignX: "start",
       alignY: "stretch",
+      eventPopups: [],
     },
     render: (props: any) => <RootCanvas {...props} />,
   },

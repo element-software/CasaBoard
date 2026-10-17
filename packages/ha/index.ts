@@ -76,3 +76,8 @@ export type {
   WebRtcOfferEvent,
 } from "./camera/stream";
 export type { ConnectResult, EntityDomain, EntityId, HAConnection } from "./types";
+export { matchesTrigger, isOutsideCooldown } from "./events/popupTrigger";
+export type {
+  PopupTriggerConfig,
+  PopupTriggerMode,
+} from "./events/popupTrigger";

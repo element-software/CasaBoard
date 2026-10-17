@@ -6,11 +6,13 @@ import { Page } from "@repo/types/page";
 import { PuckConfig } from "./puck.config";
 import { ThemeScope } from "../ThemeScope/ThemeScope";
 import type { StyleId } from "@repo/types/style";
+import type { EventPopupRule } from "@repo/types/eventPopup";
 import {
   useRegisterDashboardChrome,
   type DashboardChromeState,
 } from "../Shared/util/DashboardChrome";
 import { useMemo } from "react";
+import { EventPopupHost } from "../EventPopup/EventPopupHost";
 
 interface PuckRendererProps {
   pageId: string;
@@ -69,6 +71,10 @@ export const PuckRenderer = ({
     );
   }
 
+  const pageRootProps = pageData.puck_data.root?.props as
+    | { eventPopups?: EventPopupRule[] }
+    | undefined;
+
   return (
     <ThemeScope
       style={themeMainStyle}
@@ -79,6 +85,7 @@ export const PuckRenderer = ({
       <div className="p-4 pt-0 md:pt-4 w-full" key={pageId}>
         <Render config={PuckConfig} data={pageData.puck_data} />
       </div>
+      <EventPopupHost rules={pageRootProps?.eventPopups} />
     </ThemeScope>
   );
 };
