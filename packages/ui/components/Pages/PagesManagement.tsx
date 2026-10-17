@@ -2,15 +2,14 @@
 import { useState, useTransition } from "react";
 import { PageActions } from "@repo/lib";
 import { Page } from "@repo/types/page";
-import Link from "next/link";
-import { useHAConnection } from "@repo/hooks";
 import Icon from "@mdi/react";
 import { mdiPlus, mdiWeb } from "@mdi/js";
 import { Button, cn } from "@heroui/react";
 import { ErrorState } from "./ErrorState";
 import { EmptyState } from "./EmptyState";
 import { PageCard } from "./PageCard";
-import { useRouter } from "next/navigation";
+import { useAppRouter, useHAConnection } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
 
 interface PagesManagementProps {
   showAllPages?: boolean;
@@ -28,7 +27,7 @@ export const PagesManagement = ({
   compact = false,
 }: PagesManagementProps) => {
   const { connection } = useHAConnection();
-  const router = useRouter();
+  const { push, refresh } = useAppRouter();
   const [pages, setPages] = useState<Page[]>(initialPages);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
@@ -37,9 +36,9 @@ export const PagesManagement = ({
 
   const handleCreatePage = () => {
     if (!connection) {
-      router.push("/onboarding");
+      push("/onboarding");
     } else {
-      window.location.href = "/setup/pages/create";
+      push("/setup/pages/create");
     }
   };
 
@@ -65,8 +64,8 @@ export const PagesManagement = ({
     startTransition(async () => {
       try {
         const page = await PageActions.duplicatePage(slug);
-        router.push(`/setup/pages/edit/${page.slug}`);
-        router.refresh();
+        push(`/setup/pages/edit/${page.slug}`);
+        refresh();
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to duplicate page"
@@ -158,7 +157,7 @@ export const PagesManagement = ({
       {!showAllPages && (
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
-            as={Link}
+            as={AppLink}
             href="/setup/pages"
             variant="bordered"
             className="flex-1"

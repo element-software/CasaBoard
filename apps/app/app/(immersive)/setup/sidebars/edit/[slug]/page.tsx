@@ -1,4 +1,5 @@
-import { SidebarActions, requireValidHAConnection } from "@repo/lib";
+import { SidebarActions } from "@repo/lib";
+import { requireValidHAConnection } from "@repo/lib/ha/requireValidHAConnection";
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
 import { notFound } from "next/navigation";
 

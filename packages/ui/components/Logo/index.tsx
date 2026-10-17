@@ -1,6 +1,6 @@
 import { cn } from "@heroui/react";
 import Image from "next/image";
-import Link from "next/link";
+import { AppLink } from "../Shared/AppLink";
 
 export interface CasaBoardLogoProps {
   className?: string;
@@ -26,7 +26,7 @@ export const CasaBoardLogo = ({
   size = "medium",
 }: CasaBoardLogoProps) => {
   return (
-    <Link href="/" className="flex items-center justify-center">
+    <AppLink href="/" className="flex items-center justify-center">
       <Image
         src={url}
         alt="CasaBoard Logo"
@@ -38,6 +38,6 @@ export const CasaBoardLogo = ({
           "w-40 h-40": size === "large",
         })}
       />
-    </Link>
+    </AppLink>
   );
 };

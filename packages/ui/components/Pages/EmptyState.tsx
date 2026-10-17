@@ -1,7 +1,9 @@
+"use client";
+
 import { Card, CardBody, Button } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiWeb, mdiPlus } from "@mdi/js";
-import Link from "next/link";
+import { AppLink } from "../Shared/AppLink";
 
 export const EmptyState = ({
   canCreate,
@@ -29,7 +31,7 @@ export const EmptyState = ({
             You need to have at least one Home Assistant instance to create a
             page.
           </p>
-          <Link href="/onboarding">
+          <AppLink href="/onboarding">
             <Button
               color="primary"
               size="lg"
@@ -37,7 +39,7 @@ export const EmptyState = ({
             >
               Connect Home Assistant
             </Button>
-          </Link>
+          </AppLink>
         </>
       ) : (
         <Button

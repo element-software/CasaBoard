@@ -12,7 +12,7 @@ import {
   mdiChevronRight,
 } from "@mdi/js";
 import classNames from "classnames";
-import Link from "next/link";
+import { AppLink } from "../Shared/AppLink";
 import { useDashboardNav } from "../DashboardNav/DashboardNavContext";
 
 export type SidebarNavItem = {
@@ -65,14 +65,11 @@ export function SidebarNav({ items }: SidebarNavProps) {
       {navItems.map((item) => {
         const href = hrefForSlug(item.pageSlug);
         const active =
-          pathname === href ||
-          pathname.endsWith(`/${item.pageSlug}`) ||
-          pathname.endsWith(`/${item.pageSlug}/`) ||
-          pathname.includes(`/dashboard/${item.pageSlug}`);
+          pathname === href || pathname.startsWith(`${href}/`);
         const path = resolveIcon(item.icon, item.pageSlug);
 
         return (
-          <Link
+          <AppLink
             key={item.pageSlug}
             href={href}
             aria-current={active ? "page" : undefined}
@@ -97,7 +94,7 @@ export function SidebarNav({ items }: SidebarNavProps) {
                 className="h-4 w-4 shrink-0 opacity-50 group-hover:opacity-70"
               />
             )}
-          </Link>
+          </AppLink>
         );
       })}
     </nav>

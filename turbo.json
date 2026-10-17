@@ -6,7 +6,9 @@
   "globalEnv": [
     "NODE_ENV",
     "RESEND_API_KEY",
-    "DATA_DIR"
+    "DATA_DIR",
+    "CASABOARD_VERSION",
+    "SUPERVISOR_TOKEN"
   ],
   "ui": "tui",
   "tasks": {

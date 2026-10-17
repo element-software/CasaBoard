@@ -1,5 +1,6 @@
 import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
 import { ConfigService, HAConnectionActions } from "@repo/lib";
+import { withIngressRedirectPath } from "@repo/lib/ingress/server";
 import { SetupLayout } from "@repo/ui/components/Setup/SetupLayout";
 import { redirect } from "next/navigation";
 
@@ -17,7 +18,7 @@ export default async function HeaderShellLayout({
   ]);
 
   if (!valid) {
-    redirect("/onboarding");
+    redirect(await withIngressRedirectPath("/onboarding"));
   }
 
   return (

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
 import { Button, Input, Spinner, Tab, Tabs } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiCheckCircle, mdiHomeAssistant } from "@mdi/js";
@@ -59,7 +60,7 @@ export function OnboardingWizard({
 }: {
   initialHassUrl?: string;
 }) {
-  const router = useRouter();
+  const { replace, refresh } = useAppRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState<"connect" | "completing" | "done">(
     isOAuthCallbackUrl(searchParams) ? "completing" : "connect"
@@ -93,7 +94,7 @@ export function OnboardingWizard({
               "Home Assistant returned here, but no URL was saved. Enter your HA URL and try again.",
           });
           setStep("connect");
-          router.replace("/onboarding");
+          replace("/onboarding");
           return;
         }
 
@@ -104,24 +105,24 @@ export function OnboardingWizard({
         });
 
         setStep("done");
-        router.replace("/setup");
-        router.refresh();
+        replace("/setup");
+        refresh();
       } catch (err) {
         setFailure(classifyConnectionError(err));
         setStep("connect");
         // Strip callback params so a refresh doesn't loop, but keep the form.
-        router.replace("/onboarding");
+        replace("/onboarding");
       }
     };
 
     void finish();
-  }, [searchParams, tokenStore, redirectUrl, initialHassUrl, router]);
+  }, [searchParams, tokenStore, redirectUrl, initialHassUrl, replace, refresh]);
 
   const goToSetup = () => {
     setStep("done");
     window.setTimeout(() => {
-      router.replace("/setup");
-      router.refresh();
+      replace("/setup");
+      refresh();
     }, 500);
   };
 

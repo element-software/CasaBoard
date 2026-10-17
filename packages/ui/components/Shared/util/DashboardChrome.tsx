@@ -26,9 +26,9 @@ import {
 import { useDisclosure } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiMenu } from "@mdi/js";
-import NextLink from "next/link";
-import { usePathname } from "next/navigation";
+import { useAppPathname } from "@repo/hooks";
 import { useHAConnection } from "@repo/hooks";
+import { AppLink } from "../AppLink";
 import { HassConnectWrapper } from "./HassConnectWrapper";
 import { DashboardNavProvider } from "../../DashboardNav/DashboardNavContext";
 
@@ -115,9 +115,7 @@ function PersistentSidebar({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const pathname = usePathname();
-
-  // Close the mobile drawer after SPA navigations.
+  const pathname = useAppPathname();
   useEffect(() => {
     onClose();
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps -- close on route change only
@@ -158,7 +156,7 @@ function PersistentSidebar({
 
 export function DashboardChromeProvider({ children }: { children: ReactNode }) {
   const { connection, loading } = useHAConnection();
-  const pathname = usePathname() ?? "";
+  const pathname = useAppPathname();
   const [mounted, setMounted] = useState(false);
   const [chrome, setChromeState] = useState<DashboardChromeState | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -203,7 +201,7 @@ export function DashboardChromeProvider({ children }: { children: ReactNode }) {
         <p className="text-foreground-600 max-w-md">
           This dashboard needs a Home Assistant connection.
         </p>
-        <Button as={NextLink} href="/setup/ha-config" color="primary">
+        <Button as={AppLink} href="/setup/ha-config" color="primary">
           Configure Home Assistant
         </Button>
       </div>

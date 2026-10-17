@@ -5,13 +5,17 @@
   "exports": {
     ".": "./index.ts",
     "./*": "./*.{ts,tsx}",
+    "./ingress/path": "./ingress/path.ts",
+    "./ingress/server": "./ingress/server.ts",
+    "./ha/requireValidHAConnection": "./ha/requireValidHAConnection.ts",
+    "./releases/compare": "./releases/compare.ts",
     "./puck/countPuckDataWidgets": "./puck/countPuckDataWidgets.ts",
     "./actions/themeActions": "./actions/themeActions.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "test": "tsx --test store/**/*.test.ts"
+    "test": "tsx --test store/**/*.test.ts ingress/**/*.test.ts releases/**/*.test.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

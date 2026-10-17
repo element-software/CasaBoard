@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { HAConnectForm } from "@repo/ui/components/HAConnect/HAConnectForm";
 import { HAConnectionActions } from "@repo/lib";
+import { withIngressRedirectPath } from "@repo/lib/ingress/server";
 import Icon from "@mdi/react";
 import { mdiHomeAssistant } from "@mdi/js";
 import { CleanAuthUrl } from "./clean-auth-url";
@@ -10,7 +11,10 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function HAConfigPage() {
-  const connection = await HAConnectionActions.getHAConnection();
+  const [connection, setupHref] = await Promise.all([
+    HAConnectionActions.getHAConnection(),
+    withIngressRedirectPath("/setup"),
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -40,7 +44,7 @@ export default async function HAConfigPage() {
       </div>
       <div className="mt-8 pt-6 border-t border-theme-border">
         <Link
-          href="/setup"
+          href={setupHref}
           className="inline-flex items-center text-theme-text-secondary hover:text-theme-text transition-colors"
         >
           ← Back to Setup Dashboard

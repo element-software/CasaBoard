@@ -1,3 +1,5 @@
+"use client";
+
 import { Page } from "@repo/types/page";
 import {
   Card,
@@ -19,7 +21,7 @@ import {
   mdiTrashCan,
   mdiContentCopy,
 } from "@mdi/js";
-import Link from "next/link";
+import { AppLink } from "../Shared/AppLink";
 
 export const PageCard = ({
   page,
@@ -87,7 +89,7 @@ export const PageCard = ({
 
           <div className="flex items-center gap-1">
             <Button
-              as={Link}
+              as={AppLink}
               href={`/dashboard/${page.slug}`}
               isIconOnly
               size="sm"
@@ -97,7 +99,7 @@ export const PageCard = ({
               <Icon path={mdiEye} className="w-4 h-4" />
             </Button>
             <Button
-              as={Link}
+              as={AppLink}
               href={`/setup/pages/edit/${page.slug}`}
               isIconOnly
               size="sm"

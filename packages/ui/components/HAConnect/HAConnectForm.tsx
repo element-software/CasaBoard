@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useMemo, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
 import { Button, Card, CardBody, CardHeader, Chip, Input, Tab, Tabs } from "@heroui/react";
 import Icon from "@mdi/react";
 import { mdiCheckCircle, mdiAlertCircle, mdiHomeAssistant } from "@mdi/js";
@@ -74,7 +74,7 @@ export interface HAConnectFormProps {
 }
 
 export function HAConnectForm({ compact = false, initialConnection }: HAConnectFormProps) {
-  const router = useRouter();
+  const { replace, refresh } = useAppRouter();
   // Avoid racing CleanAuthUrl: don't open a second getAuth while the code is exchanged.
   const oauthReturning = useIsOAuthCallback();
   const [hassUrl, setHassUrl] = useState(initialConnection?.hass_url ?? "");
@@ -133,8 +133,8 @@ export function HAConnectForm({ compact = false, initialConnection }: HAConnectF
       setConnection(null);
       setHassUrl("");
       setToken("");
-      router.replace("/onboarding");
-      router.refresh();
+      replace("/onboarding");
+      refresh();
     });
   };
 

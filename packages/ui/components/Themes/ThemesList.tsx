@@ -12,14 +12,14 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import Link from "next/link";
 import type { Theme } from "@repo/types/theme";
 import {
   createTheme,
   deleteTheme,
   duplicateTheme,
 } from "@repo/lib/actions/themeActions";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
 import Icon from "@mdi/react";
 import {
   mdiPlus,
@@ -47,7 +47,7 @@ const formatDate = (dateString: string) => {
 };
 
 export function ThemesList({ initialThemes }: ThemesListProps) {
-  const router = useRouter();
+  const { push, refresh } = useAppRouter();
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -58,8 +58,8 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
       try {
         const t = await createTheme({ name: name.trim() || "New theme" });
         setName("");
-        router.push(`/setup/themes/${t.id}/edit`);
-        router.refresh();
+        push(`/setup/themes/${t.id}/edit`);
+        refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not create theme");
       }
@@ -71,7 +71,7 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
     startTransition(async () => {
       try {
         await deleteTheme(id);
-        router.refresh();
+        refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not delete");
       }
@@ -82,8 +82,8 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
     startTransition(async () => {
       try {
         const t = await duplicateTheme(id);
-        router.push(`/setup/themes/${t.id}/edit`);
-        router.refresh();
+        push(`/setup/themes/${t.id}/edit`);
+        refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not duplicate");
       }
@@ -166,7 +166,7 @@ export function ThemesList({ initialThemes }: ThemesListProps) {
 
                 <div className="flex items-center gap-1">
                   <Button
-                    as={Link}
+                    as={AppLink}
                     href={`/setup/themes/${t.id}/edit`}
                     isIconOnly
                     size="sm"

@@ -1,14 +1,15 @@
 # CasaBoard — Home Assistant integration
 
-Companion custom component for [CasaBoard](https://github.com/element-software/CasaBoard). The app still runs as Docker/Node; this integration embeds it in Home Assistant and exposes health sensors.
+Companion custom component for [CasaBoard](https://github.com/element-software/CasaBoard). The app runs as a Home Assistant **App** (Ingress on HAOS) or via Docker Compose; this integration exposes health sensors only.
 
-> End-user install and Docker steps live in the [root README](../README.md).
+> End-user install steps live in the [root README](../README.md).
 
 ## Features
 
-1. **Sidebar panel** — iframe of your CasaBoard URL (title/icon in integration options)
-2. **Health sensors** — polls CasaBoard `/api/health`
-3. **`casaboard.refresh`** — re-poll on demand
+1. **Health sensors** — polls CasaBoard `/api/health`
+2. **`casaboard.refresh`** — re-poll on demand
+
+There is **no sidebar iframe panel**. On HAOS, open CasaBoard from the App store → **Open Web UI**.
 
 ## Install
 

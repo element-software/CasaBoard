@@ -1,6 +1,7 @@
 import { ConfigurationProvider } from "@repo/ui/components/Shared/util/ConfigurationProvider";
 import { DashboardChromeProvider } from "@repo/ui/components/Shared/util/DashboardChrome";
-import { ConfigService, requireValidHAConnection } from "@repo/lib";
+import { ConfigService } from "@repo/lib";
+import { requireValidHAConnection } from "@repo/lib/ha/requireValidHAConnection";
 
 // Force dynamic rendering for this layout since it uses cookies
 export const dynamic = "force-dynamic";

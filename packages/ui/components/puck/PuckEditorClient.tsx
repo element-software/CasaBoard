@@ -18,7 +18,8 @@ import {
 } from "@heroui/react";
 import "@measured/puck/puck.css";
 import "./puck-editor-theme.css";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
 import { countPuckDataWidgets } from "@repo/lib/puck/countPuckDataWidgets";
 import {
   clientLogger,
@@ -131,7 +132,7 @@ export default function PuckEditorClient({
     };
   });
 
-  const router = useRouter();
+  const { push, replace, refresh } = useAppRouter();
 
   const editorThemeStyle = useMemo((): CSSProperties => {
     const layerFromLibrary = settings.themeId
@@ -264,7 +265,7 @@ export default function PuckEditorClient({
         `${type} created successfully`,
         result
       );
-      router.push(editUrlTemplate.replace("{slug}", result.slug));
+      push(editUrlTemplate.replace("{slug}", result.slug));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save";
       setError(errorMessage);
@@ -311,7 +312,7 @@ export default function PuckEditorClient({
       setLastSavedJson(JSON.stringify(data));
       if (savedSlug && resultSlug !== savedSlug) {
         setSavedSlug(resultSlug);
-        router.replace(editUrlTemplate.replace("{slug}", resultSlug));
+        replace(editUrlTemplate.replace("{slug}", resultSlug));
       } else {
         setSavedSlug(resultSlug);
       }
@@ -358,10 +359,10 @@ export default function PuckEditorClient({
         nextSlug = resultSlug;
         if (savedSlug && resultSlug !== savedSlug) {
           setSavedSlug(resultSlug);
-          router.replace(editUrlTemplate.replace("{slug}", resultSlug));
+          replace(editUrlTemplate.replace("{slug}", resultSlug));
         } else {
           setSavedSlug(resultSlug);
-          router.refresh();
+          refresh();
         }
         clientLogger.info("PuckEditorClient", "Settings (incl. theme) saved");
       } catch (e) {
@@ -466,7 +467,7 @@ export default function PuckEditorClient({
                   size="sm"
                   variant="bordered"
                   color="secondary"
-                  onPress={() => router.push(backUrl)}
+                  onPress={() => push(backUrl)}
                 >
                   Back to {type}s
                 </Button>
@@ -558,9 +559,9 @@ export default function PuckEditorClient({
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <label className="block text-sm font-medium">Theme</label>
-                  <Link href="/setup/themes" size="sm">
+                  <AppLink href="/setup/themes" className="text-sm">
                     Manage themes
-                  </Link>
+                  </AppLink>
                 </div>
                 <select
                   className="w-full p-2 border border-gray-300 rounded-md"
