@@ -5,33 +5,9 @@ import {
   normalizeIngressPrefix,
 } from "@repo/lib/ingress/path";
 
-const SUPERVISOR_INGRESS_IP = "172.30.32.2";
-
-function clientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() ?? "";
-  }
-  return request.headers.get("x-real-ip") ?? "";
-}
-
-function isAllowedSupervisorClient(ip: string): boolean {
-  return (
-    ip === SUPERVISOR_INGRESS_IP ||
-    ip === "127.0.0.1" ||
-    ip === "::1" ||
-    ip === ""
-  );
-}
-
+// The Supervisor-only client check lives in ingress-server.cjs: it needs the
+// socket address, and X-Forwarded-For carries the browser's IP under Ingress.
 export function middleware(request: NextRequest) {
-  if (process.env.SUPERVISOR_TOKEN) {
-    const ip = clientIp(request);
-    if (!isAllowedSupervisorClient(ip)) {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-  }
-
   const ingressPath = normalizeIngressPrefix(
     request.headers.get(INGRESS_HEADER)
   );
