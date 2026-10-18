@@ -154,9 +154,7 @@ npm run check-types
 | `packages/ui` | Shared UI (HeroUI, icons, Puck editor) |
 | `packages/lib` | Actions, services, flat-JSON persistence |
 | `packages/ha` | Home Assistant websocket helpers (`@casaboard/ha`) |
-| `custom_components/casaboard` | HACS integration (panel + sensors); brand assets in `brand/` |
-
-Integration-focused notes: [`hacs-panel/README.md`](hacs-panel/README.md).
+| `custom_components/casaboard` | HACS integration (health sensors); brand assets in `brand/` |
 
 ## License
 
