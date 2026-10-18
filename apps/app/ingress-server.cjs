@@ -96,11 +96,24 @@ function wrapResponse(req, res, prefix) {
   };
 }
 
+// Under Supervisor only the Ingress proxy (and local health checks) may connect.
+const SUPERVISOR_CLIENTS = new Set(["172.30.32.2", "127.0.0.1", "::1"]);
+
+function isAllowedClient(req) {
+  if (!process.env.SUPERVISOR_TOKEN) return true;
+  const ip = String(req.socket.remoteAddress ?? "").replace(/^::ffff:/, "");
+  return SUPERVISOR_CLIENTS.has(ip);
+}
+
 const originalCreateServer = http.createServer;
 http.createServer = function createServerWithIngress(...args) {
   const listener = args[0];
   if (typeof listener === "function") {
     args[0] = function ingressRequestListener(req, res) {
+      if (!isAllowedClient(req)) {
+        res.writeHead(403, { "content-type": "text/plain" });
+        return res.end("Forbidden");
+      }
       const prefix = normalizeIngressPrefix(req.headers[INGRESS_HEADER]);
       if (prefix) wrapResponse(req, res, prefix);
       return listener(req, res);
