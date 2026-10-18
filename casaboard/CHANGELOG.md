@@ -2,6 +2,10 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.2.0] - 2026-10-18
+
+- Add an opt-in kiosk port for full-screen dashboards.
+
 ## [0.1.2] - 2026-10-18
 
 - Fix Ingress returning Forbidden under Home Assistant.
