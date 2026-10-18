@@ -2,6 +2,10 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.1.2] - 2026-10-18
+
+- Fix Ingress returning Forbidden under Home Assistant.
+
 ## [0.1.1] - 2026-10-18
 
 - Remove the leftover hacs-panel docs folder.
