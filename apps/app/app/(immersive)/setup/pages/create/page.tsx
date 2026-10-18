@@ -1,5 +1,6 @@
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
-import { SidebarActions, requireValidHAConnection } from "@repo/lib";
+import { SidebarActions } from "@repo/lib";
+import { requireValidHAConnection } from "@repo/lib/ha/requireValidHAConnection";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";

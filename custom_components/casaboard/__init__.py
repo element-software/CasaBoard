@@ -12,7 +12,6 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, SERVICE_REFRESH
 from .coordinator import CasaBoardCoordinator
-from .panel import async_setup_panel, async_unload_panel
 
 PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
@@ -34,7 +33,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: CasaBoardConfigEntry) ->
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
 
-    await async_setup_panel(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
@@ -63,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: CasaBoardConfigEntry) ->
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload when options change (sidebar title/icon/interval)."""
+    """Reload when options change."""
     await hass.config_entries.async_reload(entry.entry_id)
 
 
@@ -76,9 +74,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: CasaBoardConfigEntry) -
         for e in hass.config_entries.async_entries(DOMAIN)
         if e.entry_id != entry.entry_id and e.state.loaded
     ]
-    if not remaining:
-        await async_unload_panel(hass)
-        if hass.services.has_service(DOMAIN, SERVICE_REFRESH):
-            hass.services.async_remove(DOMAIN, SERVICE_REFRESH)
+    if not remaining and hass.services.has_service(DOMAIN, SERVICE_REFRESH):
+        hass.services.async_remove(DOMAIN, SERVICE_REFRESH)
 
     return unload_ok

@@ -8,14 +8,14 @@ import { mergeThemeLayers, resolvedTokensToCssVars } from "@repo/lib";
 import { updateTheme } from "@repo/lib/actions/themeActions";
 import { ThemeScope } from "../ThemeScope/ThemeScope";
 import { ThemeFixturePreview } from "./ThemeFixturePreview";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
 
 type ThemeEditorFormProps = {
   theme: Theme;
 };
 
 export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
-  const router = useRouter();
+  const { push, refresh } = useAppRouter();
   const [name, setName] = useState(theme.name);
   const [tokens, setTokens] = useState(() => mergeThemeLayers(theme.tokens));
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
           name: name.trim(),
           tokens,
         });
-        router.refresh();
+        refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Save failed");
       }
@@ -62,7 +62,7 @@ export function ThemeEditorForm({ theme }: ThemeEditorFormProps) {
             <Button color="primary" onPress={save} isLoading={pending}>
               Save
             </Button>
-            <Button variant="bordered" onPress={() => router.push("/setup/themes")}>
+            <Button variant="bordered" onPress={() => push("/setup/themes")}>
               Back
             </Button>
           </div>

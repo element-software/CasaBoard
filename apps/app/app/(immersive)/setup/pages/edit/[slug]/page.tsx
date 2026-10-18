@@ -1,4 +1,5 @@
-import { PageActions, SidebarActions, requireValidHAConnection } from "@repo/lib";
+import { PageActions, SidebarActions } from "@repo/lib";
+import { requireValidHAConnection } from "@repo/lib/ha/requireValidHAConnection";
 import PageEditorClient from "@repo/ui/components/puck/PageEditorClient";
 import { notFound } from "next/navigation";
 

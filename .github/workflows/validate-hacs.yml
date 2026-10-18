@@ -58,10 +58,6 @@ jobs:
                   errors.append("manifest.json domain must be 'casaboard'")
               print(f"manifest.json OK: domain={manifest.get('domain')} version={manifest.get('version')}")
 
-          panel = domain_dir / "www" / "casaboard-panel.js"
-          if not panel.is_file():
-              errors.append("missing custom_components/casaboard/www/casaboard-panel.js")
-
           brand_icon = domain_dir / "brand" / "icon.png"
           if not brand_icon.is_file():
               errors.append("missing custom_components/casaboard/brand/icon.png (required for HACS/HA brand images)")

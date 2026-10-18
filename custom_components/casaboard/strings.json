@@ -3,11 +3,9 @@
     "step": {
       "user": {
         "title": "CasaBoard",
-        "description": "Connect Home Assistant to your self-hosted CasaBoard instance. CasaBoard must already be running (for example via Docker Compose).",
+        "description": "Connect Home Assistant to your self-hosted CasaBoard instance. On Home Assistant OS, open CasaBoard from the App Ingress UI; use this integration for health sensors when CasaBoard has a direct HTTP URL.",
         "data": {
           "url": "CasaBoard URL",
-          "sidebar_title": "Sidebar title",
-          "sidebar_icon": "Sidebar icon (mdi:...)",
           "scan_interval": "Status poll interval (seconds)"
         },
         "data_description": {
@@ -27,8 +25,6 @@
       "init": {
         "title": "CasaBoard options",
         "data": {
-          "sidebar_title": "Sidebar title",
-          "sidebar_icon": "Sidebar icon (mdi:...)",
           "scan_interval": "Status poll interval (seconds)"
         }
       }

@@ -1,17 +1,17 @@
 "use client";
 import React, { useTransition, useState } from "react";
 import { Button, Card, CardBody } from "@heroui/react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
 
 export default function HassErrorFallback({ error }: { error: unknown }) {
-  const router = useRouter();
+  const { replace, refresh } = useAppRouter();
   const [pending, startTransition] = useTransition();
   const [localError, setLocalError] = useState<string | null>(null);
 
   const handleReset = async () => {
     startTransition(async () => {
       try {
-        router.replace("/setup/ha-config");
+        replace("/setup/ha-config");
       } catch (e: any) {
         setLocalError(e?.message || "Failed to delete settings");
       }
@@ -35,7 +35,7 @@ export default function HassErrorFallback({ error }: { error: unknown }) {
             <Button color="danger" onPress={handleReset} isLoading={pending}>
               Delete HA settings and reconfigure
             </Button>
-            <Button variant="bordered" onPress={() => router.refresh()}>
+            <Button variant="bordered" onPress={() => refresh()}>
               Try again
             </Button>
           </div>

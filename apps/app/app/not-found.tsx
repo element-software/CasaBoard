@@ -1,7 +1,7 @@
 "use client";
 import { mdiCog } from "@mdi/js";
 import Icon from "@mdi/react";
-import Link from "next/link";
+import { AppLink } from "@repo/ui/components/Shared/AppLink";
 
 export default function NotFound() {
   return (
@@ -15,13 +15,13 @@ export default function NotFound() {
           The page doesn&apos;t exist or hasn&apos;t been created yet.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link
+          <AppLink
             href="/setup"
             className="flex items-center gap-2 px-4 py-2 bg-theme-secondary border border-theme-border text-theme-text rounded-lg hover:bg-theme-background transition-colors"
           >
             <Icon path={mdiCog} className="h-4 w-4" />
             Setup
-          </Link>
+          </AppLink>
         </div>
       </div>
     </main>

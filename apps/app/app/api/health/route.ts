@@ -18,6 +18,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       service: "casaboard",
+      version: process.env.CASABOARD_VERSION ?? "dev",
       pages: pages.length,
       ha_connected: Boolean(connection?.hass_url && auth),
       hass_url: connection?.hass_url ?? null,

@@ -5,7 +5,6 @@ export * as HAConnectionActions from "./actions/haConnectionActions";
 export * as SettingsActions from "./actions/settingsActions";
 export type { ImportMode } from "./actions/settingsActions";
 export { createServerTokenStore } from "./ha/serverTokenStore";
-export { requireValidHAConnection } from "./ha/requireValidHAConnection";
 export {
   sanitizeThemeTokens,
   mergeThemeLayers,

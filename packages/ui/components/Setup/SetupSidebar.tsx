@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import {
   Button,
   Drawer,
@@ -25,6 +23,9 @@ import {
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";
 import { LinkService } from "@repo/lib";
+import { useAppPathname, useAppRouter } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
+import Link from "next/link";
 
 interface NavLeaf {
   title: string;
@@ -56,8 +57,8 @@ export const SetupSidebar = ({
   isCollapsed = false,
   onToggleCollapse,
 }: SetupSidebarProps) => {
-  const pathname = usePathname();
-  const router = useRouter();
+  const pathname = useAppPathname();
+  const { push } = useAppRouter();
   const [isMobileView, setIsMobileView] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(["screens", "manage"])
@@ -137,7 +138,7 @@ export const SetupSidebar = ({
     <div className="relative group px-2">
       <button
         onClick={() => {
-          router.push(item.href);
+          push(item.href);
           onClick?.();
         }}
         title={item.title}
@@ -181,7 +182,7 @@ export const SetupSidebar = ({
             <button
               onClick={() =>
                 section.selfClick && section.href
-                  ? router.push(section.href)
+                  ? push(section.href)
                   : toggleSection(section.id)
               }
               className={cn(
@@ -218,7 +219,7 @@ export const SetupSidebar = ({
                   <button
                     key={item.href}
                     onClick={() => {
-                      router.push(item.href);
+                      push(item.href);
                       closeMobile?.();
                     }}
                     className={cn(

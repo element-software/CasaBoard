@@ -1,7 +1,6 @@
 "use client";
-import { useRouter } from 'next/navigation';
-import Icon from '@mdi/react';
 import { Chip } from '@heroui/react';
+import Icon from '@mdi/react';
 import {
   mdiPlus,
   mdiWeb,
@@ -12,7 +11,7 @@ import {
   mdiSwapHorizontal,
 } from '@mdi/js';
 import { cn } from '@heroui/react';
-import { useHAConnection } from '@repo/hooks';
+import { useAppRouter, useHAConnection } from '@repo/hooks';
 
 interface QuickAction {
   href: string;
@@ -26,7 +25,7 @@ interface QuickAction {
 }
 
 export const QuickActions = () => {
-  const router = useRouter();
+  const { push } = useAppRouter();
   const { connection } = useHAConnection();
 
   const quickActions: QuickAction[] = [
@@ -76,10 +75,10 @@ export const QuickActions = () => {
 
   const handleActionClick = (action: QuickAction) => {
     if (action.disabled) {
-      if (action.href === '/setup/pages/create') router.push('/onboarding');
+      if (action.href === '/setup/pages/create') push('/onboarding');
       return;
     }
-    router.push(action.href);
+    push(action.href);
   };
 
   return (

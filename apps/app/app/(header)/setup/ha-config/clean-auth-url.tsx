@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@repo/hooks";
 import { Spinner } from "@heroui/react";
 import {
   completeOAuthCallback,
@@ -18,7 +19,7 @@ import {
  * before stripping `auth_callback` from the URL.
  */
 export function CleanAuthUrl() {
-  const router = useRouter();
+  const { replace, refresh } = useAppRouter();
   const searchParams = useSearchParams();
   const started = useRef(false);
   const [status, setStatus] = useState<"idle" | "working" | "done">("idle");
@@ -47,13 +48,13 @@ export function CleanAuthUrl() {
         // Form / HassConnectWrapper will surface connection issues after reload.
       } finally {
         setStatus("done");
-        router.replace("/setup/ha-config");
-        router.refresh();
+        replace("/setup/ha-config");
+        refresh();
       }
     };
 
     void finish();
-  }, [searchParams, router, tokenStore, redirectUrl]);
+  }, [searchParams, replace, refresh, tokenStore, redirectUrl]);
 
   if (status !== "working") return null;
 

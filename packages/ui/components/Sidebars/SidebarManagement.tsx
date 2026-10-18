@@ -2,7 +2,6 @@
 import { useState, useTransition } from "react";
 import { SidebarActions } from "@repo/lib";
 import { Sidebar } from "@repo/types/sidebar";
-import Link from "next/link";
 import Icon from "@mdi/react";
 import {
   mdiPlus,
@@ -27,8 +26,8 @@ import {
   DropdownItem,
   cn,
 } from "@heroui/react";
-import { useHAConnection } from "@repo/hooks";
-import { useRouter } from "next/navigation";
+import { useHAConnection, useAppRouter } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
 
 interface SidebarManagementProps {
   showAllSidebars?: boolean;
@@ -46,7 +45,7 @@ export const SidebarManagement = ({
   compact = false,
 }: SidebarManagementProps) => {
   const { connection } = useHAConnection();
-  const router = useRouter();
+  const { push, refresh } = useAppRouter();
   const [sidebars, setSidebars] = useState<Sidebar[]>(initialSidebars);
   const [error, setError] = useState<string | null>(initialError);
   const [isPending, startTransition] = useTransition();
@@ -76,8 +75,8 @@ export const SidebarManagement = ({
     startTransition(async () => {
       try {
         const sidebar = await SidebarActions.duplicateSidebar(slug);
-        router.push(`/setup/sidebars/edit/${sidebar.slug}`);
-        router.refresh();
+        push(`/setup/sidebars/edit/${sidebar.slug}`);
+        refresh();
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to duplicate sidebar"
@@ -142,7 +141,7 @@ export const SidebarManagement = ({
               You need to have at least one Home Assistant instance to create a sidebar.
             </p>
             <Button
-              as={Link}
+              as={AppLink}
               href="/onboarding"
               color="primary"
               startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
@@ -156,7 +155,7 @@ export const SidebarManagement = ({
               Create your first sidebar to get started
             </p>
             <Button
-              as={Link}
+              as={AppLink}
               href="/setup/sidebars/create"
               color="primary"
               startContent={<Icon path={mdiPlus} className="w-4 h-4" />}
@@ -194,7 +193,7 @@ export const SidebarManagement = ({
           </div>
         )}
         <Button
-          as={Link}
+          as={AppLink}
           href="/setup/sidebars/create"
           color="primary"
           size="sm"
@@ -283,7 +282,7 @@ export const SidebarManagement = ({
                 {/* Actions */}
                 <div className="flex items-center gap-1">
                   <Button
-                    as={Link}
+                    as={AppLink}
                     href={`/setup/sidebars/edit/${sidebar.slug}`}
                     isIconOnly
                     size="sm"
@@ -363,7 +362,7 @@ export const SidebarManagement = ({
       {!showAllSidebars && (
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
-            as={Link}
+            as={AppLink}
             href="/setup/sidebars"
             variant="bordered"
             className="flex-1"

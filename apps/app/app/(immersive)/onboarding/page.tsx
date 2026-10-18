@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { HAConnectionActions } from "@repo/lib";
+import { withIngressRedirectPath } from "@repo/lib/ingress/server";
 import { OnboardingWizard } from "@repo/ui/components/Onboarding/OnboardingWizard";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,7 @@ export default async function OnboardingPage() {
     HAConnectionActions.getHAConnection(),
   ]);
   if (valid) {
-    redirect("/setup");
+    redirect(await withIngressRedirectPath("/setup"));
   }
 
   return (

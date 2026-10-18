@@ -1,14 +1,17 @@
 import { SettingsBackup } from "@repo/ui/components/Settings/SettingsBackup";
+import { SettingsUpdates } from "@repo/ui/components/Settings/SettingsUpdates";
 import { PageActions, SidebarActions, ThemeActions } from "@repo/lib";
+import { withIngressRedirectPath } from "@repo/lib/ingress/server";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const [pages, sidebars, themes] = await Promise.all([
+  const [pages, sidebars, themes, setupHref] = await Promise.all([
     PageActions.getAllPages(),
     SidebarActions.getAllSidebars(),
     ThemeActions.listThemes(),
+    withIngressRedirectPath("/setup"),
   ]);
 
   return (
@@ -28,9 +31,13 @@ export default async function SettingsPage() {
         }}
       />
 
+      <div className="mt-8">
+        <SettingsUpdates />
+      </div>
+
       <div className="mt-8 pt-6 border-t border-theme-border">
         <Link
-          href="/setup"
+          href={setupHref}
           className="inline-flex items-center text-theme-text-secondary hover:text-theme-text transition-colors"
         >
           ← Back to Setup Dashboard

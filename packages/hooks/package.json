@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     ".": "./index.ts",
+    "./ingress": "./ingress.tsx",
     "./*": "./*.ts"
   },
   "scripts": {

@@ -1,5 +1,5 @@
 import SidebarEditorClient from "@repo/ui/components/puck/SidebarEditorClient";
-import { requireValidHAConnection } from "@repo/lib";
+import { requireValidHAConnection } from "@repo/lib/ha/requireValidHAConnection";
 
 export const dynamic = "force-dynamic";
 

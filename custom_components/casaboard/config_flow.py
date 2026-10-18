@@ -16,12 +16,8 @@ from homeassistant.helpers.network import get_url
 from .api import CasaBoardApiError, async_fetch_status, normalize_base_url
 from .const import (
     CONF_SCAN_INTERVAL,
-    CONF_SIDEBAR_ICON,
-    CONF_SIDEBAR_TITLE,
     DEFAULT_CASABOARD_PORT,
     DEFAULT_SCAN_INTERVAL,
-    DEFAULT_SIDEBAR_ICON,
-    DEFAULT_SIDEBAR_TITLE,
     DEFAULT_URL,
     DOMAIN,
     MAX_SCAN_INTERVAL,
@@ -51,12 +47,6 @@ def _user_schema(defaults: dict[str, Any]) -> vol.Schema:
     return vol.Schema(
         {
             vol.Required(CONF_URL, default=defaults[CONF_URL]): str,
-            vol.Optional(
-                CONF_SIDEBAR_TITLE, default=defaults[CONF_SIDEBAR_TITLE]
-            ): str,
-            vol.Optional(
-                CONF_SIDEBAR_ICON, default=defaults[CONF_SIDEBAR_ICON]
-            ): str,
             vol.Optional(
                 CONF_SCAN_INTERVAL, default=defaults[CONF_SCAN_INTERVAL]
             ): vol.All(
@@ -89,15 +79,9 @@ class CasaBoardConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             else:
                 return self.async_create_entry(
-                    title=user_input.get(CONF_SIDEBAR_TITLE) or DEFAULT_SIDEBAR_TITLE,
+                    title="CasaBoard",
                     data={
                         CONF_URL: url,
-                        CONF_SIDEBAR_TITLE: user_input.get(
-                            CONF_SIDEBAR_TITLE, DEFAULT_SIDEBAR_TITLE
-                        ),
-                        CONF_SIDEBAR_ICON: user_input.get(
-                            CONF_SIDEBAR_ICON, DEFAULT_SIDEBAR_ICON
-                        ),
                         CONF_SCAN_INTERVAL: user_input.get(
                             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                         ),
@@ -106,8 +90,6 @@ class CasaBoardConfigFlow(ConfigFlow, domain=DOMAIN):
 
         defaults: dict[str, Any] = {
             CONF_URL: default_casaboard_url(self.hass),
-            CONF_SIDEBAR_TITLE: DEFAULT_SIDEBAR_TITLE,
-            CONF_SIDEBAR_ICON: DEFAULT_SIDEBAR_ICON,
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         }
         if user_input is not None:
@@ -141,20 +123,6 @@ class CasaBoardOptionsFlow(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(
-                        CONF_SIDEBAR_TITLE,
-                        default=entry.options.get(
-                            CONF_SIDEBAR_TITLE,
-                            entry.data.get(CONF_SIDEBAR_TITLE, DEFAULT_SIDEBAR_TITLE),
-                        ),
-                    ): str,
-                    vol.Optional(
-                        CONF_SIDEBAR_ICON,
-                        default=entry.options.get(
-                            CONF_SIDEBAR_ICON,
-                            entry.data.get(CONF_SIDEBAR_ICON, DEFAULT_SIDEBAR_ICON),
-                        ),
-                    ): str,
                     vol.Optional(
                         CONF_SCAN_INTERVAL,
                         default=entry.options.get(

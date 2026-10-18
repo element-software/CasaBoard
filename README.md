@@ -10,7 +10,7 @@
 
 **Open-source, self-hosted dashboard builder for Home Assistant.**
 
-Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integration for a sidebar panel and health sensors — **no account, no cloud, no login**.
+Drag-and-drop editing. On **Home Assistant OS**, install CasaBoard as an App with Ingress and Updates. **Docker Compose** remains a fallback. Optional HACS integration for health sensors — **no account, no cloud, no login**.
 
 ![CasaBoard — local-only Home Assistant dashboards](https://casaboard.dev/brand/hero.png)
 
@@ -18,22 +18,36 @@ Drag-and-drop editing, Docker Compose (or Node) for the app, optional HACS integ
 
 | Piece | What it does |
 | --- | --- |
-| **CasaBoard app** | Self-hosted editor + live dashboards (Docker recommended) |
-| **HACS integration** | Sidebar panel (iframe), online/page sensors, `casaboard.refresh` service |
+| **CasaBoard App (HAOS)** | Install from a custom Supervisor repo; open via **Ingress**; update from HA **Updates** |
+| **CasaBoard app (Compose)** | Self-hosted editor + live dashboards (Docker fallback) |
+| **HACS integration** | Health sensors + `casaboard.refresh` (optional; no sidebar panel) |
 
 Your layouts and Home Assistant credentials stay on **your** machine. Nothing phones home.
 
 ## Requirements
 
-- A running [Home Assistant](https://www.home-assistant.io/) instance (**2024.6+** for the HACS integration)
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose (for the recommended install)
-- Optional: [HACS](https://hacs.xyz/) to install the sidebar integration
+- Home Assistant OS or Supervised (recommended) **or** Docker Compose on any host
+- A running [Home Assistant](https://www.home-assistant.io/) instance (**2024.6+** for the optional HACS integration)
+- [Docker](https://docs.docker.com/get-docker/) + Docker Compose (fallback install)
+- Optional: [HACS](https://hacs.xyz/) for health sensors
 
-## Quick start (app)
+## Install on Home Assistant OS (recommended)
+
+1. **Settings → Apps** (called **Add-ons** on older HA) → store → ⋮ → **Repositories**
+2. Add: `https://github.com/element-software/CasaBoard`
+3. Install **CasaBoard**, start it, then **Open Web UI** (Ingress)
+4. Connect to Home Assistant inside CasaBoard on first launch
+
+Updates appear under **Settings → System → Updates**. No official store submission is required — this uses Supervisor’s custom repository flow.
+
+See [`casaboard/DOCS.md`](casaboard/DOCS.md) for App-specific notes.
+
+## Quick start (Docker Compose fallback)
 
 ```bash
 git clone https://github.com/element-software/CasaBoard.git
 cd CasaBoard
+docker compose pull
 docker compose up -d
 ```
 
@@ -43,11 +57,17 @@ On first launch you connect to Home Assistant (URL + long-lived access token, or
 
 Dashboard data lives in `./data` (bind-mounted into the container) — back that directory up.
 
+Check for newer releases under **Setup → Import / Export → Updates** in the app.
+
 > Full walkthrough: [casaboard.dev/docs](https://casaboard.dev/docs)
 
-## Install the HACS integration
+## Releasing
 
-The integration does **not** replace the CasaBoard app — it bridges a running instance into Home Assistant.
+Actions → **Release** → **Run workflow** (pick patch/minor/major). It builds and pushes the multi-arch image to GHCR, then bumps `casaboard/config.yaml`, prepends `casaboard/CHANGELOG.md`, tags `vX.Y.Z` and creates the GitHub Release. Home Assistant installs see the update within a few hours (or immediately via **Check for updates**); Compose installs pick it up on `docker compose pull`.
+
+## Install the HACS integration (optional sensors)
+
+The integration does **not** replace the CasaBoard app. On HAOS, use the App **Ingress** UI; use HACS when you want health sensors against a direct HTTP URL (typical for Compose).
 
 ### 1. Add the repository in HACS
 
@@ -72,28 +92,16 @@ Enter the base URL of your CasaBoard app, for example:
 
 | Entity / feature | Meaning |
 | --- | --- |
-| Sidebar **CasaBoard** panel | Opens the app in an iframe (title/icon configurable in options) |
 | `binary_sensor.casaboard_online` | CasaBoard `/api/health` is reachable |
 | `sensor.casaboard_pages` | Total pages |
 | `sensor.casaboard_ha_connection` | `connected` / `disconnected` (stored HA credentials in the app) |
 | `casaboard.refresh` | Service to re-poll health (optional `entry_id`) |
 
+On HAOS, open CasaBoard from the **App → Open Web UI** (Ingress), not a HACS sidebar panel.
+
 ### Manual install (without HACS)
 
 Copy `custom_components/casaboard` into `<config>/custom_components/casaboard`, restart Home Assistant, then add the integration from the UI.
-
-### Sidebar only (no sensors)
-
-If you only want an iframe and no custom component:
-
-```yaml
-# configuration.yaml
-panel_iframe:
-  casaboard:
-    title: CasaBoard
-    icon: mdi:view-dashboard
-    url: http://homeassistant.local:3000
-```
 
 ## Viewing dashboards
 
@@ -105,6 +113,7 @@ Open any page in the CasaBoard app at `/dashboard/<slug>` (for example `http://<
 | --- | --- | --- |
 | `DATA_DIR` | `/data` | JSON store (`pages`, sidebars, themes, HA connection) |
 | `PORT` | `3000` | HTTP port |
+| `CASABOARD_VERSION` | `dev` (image tag at build) | Reported in `/api/health` and update checks |
 
 ## Privacy
 
@@ -145,9 +154,7 @@ npm run check-types
 | `packages/ui` | Shared UI (HeroUI, icons, Puck editor) |
 | `packages/lib` | Actions, services, flat-JSON persistence |
 | `packages/ha` | Home Assistant websocket helpers (`@casaboard/ha`) |
-| `custom_components/casaboard` | HACS integration (panel + sensors); brand assets in `brand/` |
-
-Integration-focused notes: [`hacs-panel/README.md`](hacs-panel/README.md).
+| `custom_components/casaboard` | HACS integration (health sensors); brand assets in `brand/` |
 
 ## License
 
