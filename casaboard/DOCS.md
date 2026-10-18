@@ -15,6 +15,30 @@ No official Community Store submission is required for this custom repository fl
 
 Inside CasaBoard, connect to your Home Assistant instance (URL + long-lived token, or HA sign-in). Pages and connection data are stored in the App’s persistent `/data` volume and survive updates.
 
+## Kiosk / wall tablets
+
+Ingress always shows the Home Assistant sidebar and header. For a full-bleed dashboard on a wall tablet (e.g. Fully Kiosk Browser), turn on the optional kiosk port.
+
+1. **Settings → Apps → CasaBoard → Configuration → Network**: enter a host port (e.g. `3000`), save, then restart the App.
+2. Find the page slug: it's the last part of the page's URL in CasaBoard (e.g. `kitchen`).
+3. In Fully Kiosk Browser, set **Start URL** to `http://<ha-ip>:3000/dashboard/<page-slug>`.
+4. Optional, in Fully Kiosk: turn on **Fullscreen mode**, **Keep screen on** and **Reload on network reconnect**.
+
+What the kiosk port serves:
+
+| Path | On the kiosk port |
+| --- | --- |
+| `/dashboard/<page-slug>` | ✅ Served |
+| Editor, setup, onboarding (`/`, `/setup/…`) | ❌ 403 Forbidden, so use Ingress |
+
+> **Warning:** the kiosk port has no login. Anyone on your LAN can open dashboards on that port, and the dashboard gives their browser your Home Assistant access token. Only enable it on a trusted network. Clear the port to turn it off.
+
+Tips:
+
+- Connect CasaBoard with a **long-lived access token**. OAuth re-authentication redirects to `/setup`, which the kiosk port blocks.
+- A **403 Forbidden** on the tablet means the URL isn't a `/dashboard/…` page.
+- A **page that won't load** usually means the port isn't set, or the App wasn't restarted after setting it.
+
 ## Updates
 
 When a newer App version is published, Home Assistant shows it under **Settings → System → Updates**. Install from there — Supervisor pulls the new image from GHCR.

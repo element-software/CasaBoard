@@ -63,7 +63,7 @@ const roadmapItems: RoadmapItem[] = [
     title: "Kiosk & Display Mode",
     description:
       "Fullscreen display mode for dedicated tablets and wall-mounted screens",
-    status: "planned",
+    status: "completed",
     quarter: "Q4 2026",
     icon: mdiMonitor,
   },

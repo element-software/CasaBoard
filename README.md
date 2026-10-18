@@ -18,7 +18,7 @@ Drag-and-drop editing. On **Home Assistant OS**, install CasaBoard as an App wit
 
 | Piece | What it does |
 | --- | --- |
-| **CasaBoard App (HAOS)** | Install from a custom Supervisor repo; open via **Ingress**; update from HA **Updates** |
+| **CasaBoard App (HAOS)** | Install from a custom Supervisor repo; open via **Ingress**; update from HA **Updates**; optional **kiosk port** for wall tablets |
 | **CasaBoard app (Compose)** | Self-hosted editor + live dashboards (Docker fallback) |
 | **HACS integration** | Health sensors + `casaboard.refresh` (optional; no sidebar panel) |
 
@@ -41,6 +41,8 @@ Your layouts and Home Assistant credentials stay on **your** machine. Nothing ph
 Updates appear under **Settings → System → Updates**. No official store submission is required — this uses Supervisor’s custom repository flow.
 
 See [`casaboard/DOCS.md`](casaboard/DOCS.md) for App-specific notes.
+
+**Wall tablets / kiosk:** set an optional direct port under the App’s **Network** settings and open `http://<ha-ip>:<port>/dashboard/<slug>`. That gives a full-screen page without HA’s sidebar. See [Kiosk / wall tablets](casaboard/DOCS.md#kiosk--wall-tablets).
 
 ## Quick start (Docker Compose fallback)
 

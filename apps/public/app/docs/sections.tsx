@@ -15,6 +15,7 @@ import {
   mdiEye,
   mdiCheck,
   mdiAlertDecagram,
+  mdiTabletDashboard,
 } from "@mdi/js";
 import React from "react";
 
@@ -331,6 +332,42 @@ const AddingComponents: React.FC = () => (
   </div>
 );
 
+const KioskDisplays: React.FC = () => (
+  <div>
+    <SectionHeading
+      icon={mdiTabletDashboard}
+      iconBg="bg-violet-50"
+      iconColor="text-violet-600"
+      label="Displays"
+      title="Kiosk & Wall Displays"
+      intro="Every CasaBoard page lives at its own URL, /dashboard/<page-slug>. Point a kiosk browser such as Fully Kiosk Browser at that URL and the page fills the screen, with no editor or Home Assistant chrome around it."
+    />
+
+    <h3 className="font-semibold text-slate-900 mb-3">Home Assistant OS (App)</h3>
+    <p className="text-sm text-slate-600 leading-relaxed mb-4">
+      Ingress always wraps CasaBoard in the Home Assistant sidebar and header. To get a full-bleed page, turn on the optional kiosk port.
+    </p>
+    <TimelineStep number={1} title="Set a kiosk port" text="Open Settings → Apps → CasaBoard → Configuration → Network, enter a host port such as 3000, save, then restart the App." />
+    <TimelineStep number={2} title="Point the tablet at a page" text="In your kiosk browser, set the Start URL to http://<ha-ip>:3000/dashboard/<page-slug>." />
+    <TimelineStep number={3} title="Lock it down in the browser" text="Turn on the kiosk browser's own fullscreen, screen-on, and reload-on-network-reconnect options." isLast />
+
+    <CodeBlock>{`http://192.168.1.10:3000/dashboard/kitchen`}</CodeBlock>
+
+    <Callout type="warning" title="Only on a trusted network">
+      The kiosk port has no login. It only serves /dashboard pages (the editor and setup stay behind Ingress), but anyone on your LAN can open those pages, and the page gives their browser your Home Assistant access token. Clear the port to turn it off.
+    </Callout>
+
+    <h3 className="font-semibold text-slate-900 mb-3 mt-8">Docker Compose</h3>
+    <p className="text-sm text-slate-600 leading-relaxed mb-4">
+      Compose installs are already served directly, so open http://&lt;host-ip&gt;:3000/dashboard/&lt;page-slug&gt; in your kiosk browser.
+    </p>
+
+    <Callout type="info" title="Use a long-lived access token">
+      Kiosks should connect to Home Assistant with a long-lived access token. Sign-in (OAuth) re-authentication redirects to the setup screen, and the kiosk port blocks that page.
+    </Callout>
+  </div>
+);
+
 const Tips: React.FC = () => (
   <div>
     <SectionHeading
@@ -369,7 +406,7 @@ const Tips: React.FC = () => (
       </div>
 
       <Callout type="info" title="Display tip">
-        For always-on wall displays, set the page to &apos;Live&apos; and open it in a kiosk browser in fullscreen mode. Most smart TVs support this natively.
+        For always-on wall displays, open the page&apos;s /dashboard URL in a kiosk browser in fullscreen mode. See Kiosk &amp; Wall Displays for the Home Assistant OS kiosk port.
       </Callout>
     </div>
   </div>
@@ -477,6 +514,7 @@ export const sections: DocSection[] = [
   { slug: "env-vars", title: "Environment Variables", icon: mdiCog, Content: EnvironmentVariables },
   { slug: "first-page", title: "Creating Your First Page", icon: mdiGrid, Content: CreateFirstPage },
   { slug: "components", title: "Adding Components", icon: mdiDrag, Content: AddingComponents },
+  { slug: "kiosk", title: "Kiosk & Wall Displays", icon: mdiTabletDashboard, Content: KioskDisplays },
   { slug: "tips", title: "Tips & Best Practices", icon: mdiInformation, Content: Tips },
   { slug: "troubleshooting", title: "Troubleshooting", icon: mdiAlertCircle, Content: Troubleshooting },
   { slug: "help", title: "Getting Help", icon: mdiEye, Content: Help },

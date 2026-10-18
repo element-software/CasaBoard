@@ -98,11 +98,17 @@ function wrapResponse(req, res, prefix) {
 
 // Under Supervisor only the Ingress proxy (and local health checks) may connect.
 const SUPERVISOR_CLIENTS = new Set(["172.30.32.2", "127.0.0.1", "::1"]);
+// Direct-port (kiosk) clients: live dashboards and their assets only.
+// ponytail: server actions POST to /dashboard and are addressed by action id,
+// so any action is reachable from here; split actions behind a token if LAN isn't trusted.
+const KIOSK_PATHS =
+  /^\/(dashboard(\/|$)|_next\/|icon\.svg$|favicon\.ico$|manifest\.webmanifest$|api\/health$)/;
 
 function isAllowedClient(req) {
   if (!process.env.SUPERVISOR_TOKEN) return true;
   const ip = String(req.socket.remoteAddress ?? "").replace(/^::ffff:/, "");
-  return SUPERVISOR_CLIENTS.has(ip);
+  if (SUPERVISOR_CLIENTS.has(ip)) return true;
+  return KIOSK_PATHS.test(new URL(req.url ?? "/", "http://x").pathname);
 }
 
 const originalCreateServer = http.createServer;
