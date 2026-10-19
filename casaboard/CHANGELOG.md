@@ -2,6 +2,10 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.2.4] - 2026-10-19
+
+- fix: stop dumping full dashboard JSON into Supervisor logs
+
 ## [0.2.3] - 2026-10-19
 
 - fix: stop re-rendering the editor on every HA entity update
