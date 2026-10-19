@@ -2,6 +2,10 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.2.3] - 2026-10-19
+
+- fix: stop re-rendering the editor on every HA entity update
+
 ## [0.2.2] - 2026-10-19
 
 - fix: make camera streams fall back like Lovelace
