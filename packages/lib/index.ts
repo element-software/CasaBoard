@@ -14,5 +14,11 @@ export {
 export { resolveDashboardStyle } from "./style";
 export * as ConfigService from "./services/configService";
 export * as LinkService from "./services/linkService";
-export { createLogger, serverLogger, clientLogger } from "./logger";
+export {
+  createLogger,
+  serverLogger,
+  clientLogger,
+  sanitizeLogDetails,
+  MAX_LOG_DETAILS_CHARS,
+} from "./logger";
 export { countPuckDataWidgets } from "./puck/countPuckDataWidgets";

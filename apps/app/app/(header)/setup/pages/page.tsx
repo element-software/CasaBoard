@@ -15,7 +15,14 @@ export default async function PagesListPage() {
     error = err instanceof Error ? err.message : "Failed to load pages";
   }
 
-  serverLogger.info("SetupPages", "pages", pages, "error", error);
+  // Never log full page/puck trees — Supervisor's log UI and HA become
+  // unresponsive when multi-KB dashboard JSON is written on every visit.
+  serverLogger.info(
+    "SetupPages",
+    error
+      ? `loaded ${pages.length} pages (error: ${error})`
+      : `loaded ${pages.length} pages (${pages.map((p) => p.slug).join(", ")})`
+  );
 
   return (
     <SetupPageShell

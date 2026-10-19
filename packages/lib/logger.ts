@@ -4,16 +4,42 @@ const BLUE = "\u001b[34m";
 const ORANGE = "\u001b[38;5;208m";
 const RESET = "\u001b[0m";
 
-
 const isProd = process.env.NODE_ENV === "production";
 
 // Keep simple: avoid transports/workers to prevent Next.js runtime issues.
 // Only instantiate pino for server; on client we'll write to console directly.
 const baseLogger = pino({ level: isProd ? "info" : "info" } as any);
 
+/** Cap for JSON-serialized log details; larger payloads are omitted. */
+export const MAX_LOG_DETAILS_CHARS = 2_048;
+
 function prefix(scope: "SERVER" | "CLIENT") {
   const color = scope === "SERVER" ? BLUE : ORANGE;
   return `${color}${scope}${RESET}`;
+}
+
+/**
+ * Never put unbounded app state (page/sidebar puck trees) into Supervisor logs.
+ * Returns a small summary when args are large or not JSON-serializable.
+ */
+export function sanitizeLogDetails(args: any[]): any | undefined {
+  if (!args.length) return undefined;
+  try {
+    const json = JSON.stringify(args);
+    if (json.length <= MAX_LOG_DETAILS_CHARS) return args;
+    return {
+      omitted: true,
+      reason: "details_too_large",
+      approxChars: json.length,
+      argCount: args.length,
+    };
+  } catch {
+    return {
+      omitted: true,
+      reason: "details_not_serializable",
+      argCount: args.length,
+    };
+  }
 }
 
 // unified writer to avoid variadic issues in different runtimes
@@ -35,10 +61,12 @@ function write(
     return;
   }
 
-  // Server: pino with ANSI prefix for readability
+  // Server: pino with ANSI prefix for readability. Cap details so Supervisor
+  // log viewers (and HA itself) are not flooded with full dashboard JSON.
   const message = `${prefix(scope)} ${fn}: ${String(msg)}`;
+  const details = sanitizeLogDetails(args);
   (baseLogger as any)[level](
-    { scope, fn, details: args && args.length ? args : undefined },
+    details === undefined ? { scope, fn } : { scope, fn, details },
     message
   );
 }
