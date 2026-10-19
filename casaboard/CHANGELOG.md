@@ -2,6 +2,11 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.2.2] - 2026-10-19
+
+- fix: make camera streams fall back like Lovelace
+- Ship in-app About/Docs, fix ingress breadcrumbs, and align kiosk docs.
+
 ## [0.2.1] - 2026-10-19
 
 - ci: auto-release on every push to main
