@@ -65,7 +65,9 @@ Check for newer releases under **Setup → Import / Export → Updates** in the 
 
 ## Releasing
 
-Actions → **Release** → **Run workflow** (pick patch/minor/major). It builds and pushes the multi-arch image to GHCR, then bumps `casaboard/config.yaml`, prepends `casaboard/CHANGELOG.md`, tags `vX.Y.Z` and creates the GitHub Release. Home Assistant installs see the update within a few hours (or immediately via **Check for updates**); Compose installs pick it up on `docker compose pull`.
+Every push to `main` triggers a release. The bump is inferred from conventional commits since the last tag (`feat` → minor, `BREAKING CHANGE` / `type!:` → major, otherwise patch). The workflow builds and pushes the multi-arch image to GHCR, bumps `casaboard/config.yaml`, prepends `casaboard/CHANGELOG.md` (shown on the HA Apps changelog tab), tags `vX.Y.Z`, and creates the GitHub Release.
+
+For a forced bump, use Actions → **Release** → **Run workflow** and pick patch/minor/major (or leave **auto**). Home Assistant installs see the update within a few hours (or immediately via **Check for updates**); Compose installs pick it up on `docker compose pull`.
 
 ## Install the HACS integration (optional sensors)
 

@@ -41,7 +41,7 @@ Tips:
 
 ## Updates
 
-When a newer App version is published, Home Assistant shows it under **Settings → System → Updates**. Install from there — Supervisor pulls the new image from GHCR.
+When a newer App version is published (each push to `main` on GitHub), Home Assistant shows it under **Settings → System → Updates**. Install from there — Supervisor pulls the new image from GHCR. Release notes appear on this App’s **Changelog** tab.
 
 ## HACS integration (optional)
 
