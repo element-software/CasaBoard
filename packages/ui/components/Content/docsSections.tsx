@@ -191,30 +191,25 @@ docker compose up -d
   </div>
 );
 
-const HACSPanel: React.FC = () => (
+const HAAppInstall: React.FC = () => (
   <div>
     <SectionHeading
       icon={mdiPuzzleOutline}
       iconBg="bg-purple-50"
       iconColor="text-purple-600"
       label="Installation"
-      title="Installing the HACS Panel"
-      intro="A small companion panel lets you embed the running CasaBoard app directly in the Home Assistant sidebar, distributed as a custom HACS repository."
+      title="Home Assistant OS (App)"
+      intro="On Home Assistant OS, install CasaBoard as an App from a custom Supervisor repository. The UI opens via Ingress (sidebar → CasaBoard → Open Web UI)."
     />
 
-    <TimelineStep number={1} title="Add the custom repository" text="In HACS, add https://github.com/element-software/CasaBoard as a custom repository (category: Integration)." />
-    <TimelineStep number={2} title="Install and restart" text="Install 'CasaBoard' from HACS, then restart Home Assistant." />
-    <TimelineStep number={3} title="Add the integration" text="Settings → Devices & Services → Add Integration → CasaBoard. Enter the base URL of your running CasaBoard container (e.g. http://homeassistant.local:3000)." isLast />
+    <TimelineStep number={1} title="Add the repository" text="Settings → Apps → Add-on store → ⋮ → Repositories. Add https://github.com/element-software/CasaBoard." />
+    <TimelineStep number={2} title="Install and start" text="Install CasaBoard, start it, then open it with Open Web UI (Ingress)." />
+    <TimelineStep number={3} title="Connect Home Assistant" text="Inside CasaBoard, connect with your HA URL and a long-lived access token (or HA sign-in)." isLast />
 
-    <CodeBlock>{`# Custom repository (HACS → Integrations → ⋮ → Custom repositories)
-# https://github.com/element-software/CasaBoard  ·  category: Integration
-#
-# No YAML required — configure in the UI.
-# Optional: call casaboard.refresh to re-poll /api/health.`}</CodeBlock>
-
-    <Callout type="info" title="What the integration provides">
-      A sidebar panel that iframes CasaBoard, plus sensors for online status, page
-      counts, and whether CasaBoard has stored Home Assistant credentials.
+    <Callout type="info" title="Optional HACS sensors">
+      The optional HACS CasaBoard integration exposes health sensors (online, page count, HA connection).
+      It does not add a sidebar iframe panel — use the App&apos;s Ingress for the UI. Sensors need a
+      plain HTTP base URL (Compose or the kiosk port); the Ingress URL is not a stable poll target.
     </Callout>
   </div>
 );
@@ -291,7 +286,7 @@ const CreateFirstPage: React.FC = () => (
     <TimelineStep number={3} title="Open the editor" text="Click the pencil (edit) icon next to your new page. This opens the drag-and-drop builder where you'll add components." isLast />
 
     <Callout type="info" title="Page visibility">
-      Pages can be set to Live (accessible at /view/your-slug) or Draft. You can toggle this from the Pages list.
+      Pages can be set to Live (accessible at /dashboard/your-slug) or Draft. You can toggle this from the Pages list.
     </Callout>
   </div>
 );
@@ -348,10 +343,10 @@ const KioskDisplays: React.FC = () => (
       Ingress always wraps CasaBoard in the Home Assistant sidebar and header. To get a full-bleed page, turn on the optional kiosk port.
     </p>
     <TimelineStep number={1} title="Set a kiosk port" text="Open Settings → Apps → CasaBoard → Configuration → Network, enter a host port such as 3000, save, then restart the App." />
-    <TimelineStep number={2} title="Point the tablet at a page" text="In your kiosk browser, set the Start URL to http://<ha-ip>:3000/dashboard/<page-slug>." />
+    <TimelineStep number={2} title="Point the tablet at a page" text="In your kiosk browser, set the Start URL to http://<ha-ip>:<port>/dashboard/<page-slug> (use the port from step 1)." />
     <TimelineStep number={3} title="Lock it down in the browser" text="Turn on the kiosk browser's own fullscreen, screen-on, and reload-on-network-reconnect options." isLast />
 
-    <CodeBlock>{`http://192.168.1.10:3000/dashboard/kitchen`}</CodeBlock>
+    <CodeBlock>{`http://192.168.1.10:<port>/dashboard/kitchen`}</CodeBlock>
 
     <Callout type="warning" title="Only on a trusted network">
       The kiosk port has no login. It only serves /dashboard pages (the editor and setup stay behind Ingress), but anyone on your LAN can open those pages, and the page gives their browser your Home Assistant access token. Clear the port to turn it off.
@@ -509,7 +504,7 @@ const Help: React.FC = () => (
 export const sections: DocSection[] = [
   { slug: "quick-start", title: "Quick Start", icon: mdiLightbulb, Content: QuickStart },
   { slug: "docker-install", title: "Installing with Docker", icon: mdiDocker, Content: DockerInstall },
-  { slug: "hacs-panel", title: "Installing the HACS Panel", icon: mdiPuzzleOutline, Content: HACSPanel },
+  { slug: "ha-app", title: "Home Assistant OS (App)", icon: mdiPuzzleOutline, Content: HAAppInstall },
   { slug: "ha-connection", title: "Home Assistant Connection", icon: mdiHomeAssistant, Content: HAConnection },
   { slug: "env-vars", title: "Environment Variables", icon: mdiCog, Content: EnvironmentVariables },
   { slug: "first-page", title: "Creating Your First Page", icon: mdiGrid, Content: CreateFirstPage },

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Icon from "@mdi/react";
 import {
   mdiHomeAssistant,
@@ -11,9 +10,44 @@ import {
   mdiCloudOffOutline,
   mdiArrowRight,
   mdiCheckCircle,
+  mdiTabletDashboard,
 } from "@mdi/js";
+import { AppLink } from "../Shared/AppLink";
 
-export default function AboutPageContent() {
+export type AboutPageContentProps = {
+  /** In-app docs live at /setup/docs; the website uses /docs. */
+  docsHref?: string;
+  /** Security overview — website path or absolute casaboard.dev URL. */
+  securityHref?: string;
+};
+
+function ContentLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  if (href.startsWith("http://") || href.startsWith("https://")) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <AppLink href={href} className={className}>
+      {children}
+    </AppLink>
+  );
+}
+
+export function AboutPageContent({
+  docsHref = "/docs",
+  securityHref = "/security",
+}: AboutPageContentProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
 
@@ -28,10 +62,10 @@ export default function AboutPageContent() {
           </div>
           <div className="space-y-4 text-slate-600 leading-relaxed">
             <p>
-              CasaBoard lets you design beautiful, fully custom smart home dashboards with a drag-and-drop editor — no coding required. It runs as a self-hosted Docker container alongside your own Home Assistant, and displays live entity data on any screen.
+              CasaBoard lets you design beautiful, fully custom smart home dashboards with a drag-and-drop editor — no coding required. It runs as a self-hosted app alongside your own Home Assistant, and displays live entity data on any screen.
             </p>
             <p>
-              CasaBoard pages are URLs served from your own server. Embed them in a kiosk browser on your wall display, open them on a tablet in the kitchen, or embed the whole app in the Home Assistant sidebar with the HACS integration. Free, MIT-licensed, and open on{" "}
+              CasaBoard pages are URLs served from your own server. Open them in a kiosk browser on a wall display, on a tablet in the kitchen, or through the Home Assistant App Ingress sidebar. Free, MIT-licensed, and open on{" "}
               <a
                 href="https://github.com/element-software/CasaBoard"
                 target="_blank"
@@ -74,8 +108,15 @@ export default function AboutPageContent() {
               icon: mdiDocker,
               iconBg: "bg-indigo-50",
               iconColor: "text-indigo-600",
-              title: "Docker Compose or HACS",
-              desc: "Run CasaBoard with a single docker-compose file, then optionally install the HACS integration for a Home Assistant sidebar panel. No account, no cloud, no ongoing cost.",
+              title: "HA App or Docker Compose",
+              desc: "Install as a Home Assistant App (Ingress + optional kiosk port) or run with Docker Compose. Optional HACS sensors for health — no cloud account, no ongoing cost.",
+            },
+            {
+              icon: mdiTabletDashboard,
+              iconBg: "bg-violet-50",
+              iconColor: "text-violet-600",
+              title: "Kiosk & wall displays",
+              desc: "Every page has a /dashboard/<slug> URL. On HAOS, map the optional kiosk port for full-bleed tablets without the Home Assistant chrome.",
             },
             {
               icon: mdiEye,
@@ -141,13 +182,13 @@ export default function AboutPageContent() {
               </li>
             ))}
           </ul>
-          <Link
-            href="/security"
+          <ContentLink
+            href={securityHref}
             className="inline-flex items-center gap-2 mt-6 text-sm font-medium text-violet-300 hover:text-white transition-colors"
           >
             Read the full security overview
             <Icon path={mdiArrowRight} className="w-4 h-4" />
-          </Link>
+          </ContentLink>
         </div>
       </section>
 
@@ -161,10 +202,10 @@ export default function AboutPageContent() {
           <div className="hidden sm:block absolute top-6 left-6 right-6 h-px bg-gradient-to-r from-violet-100 via-violet-200 to-violet-100" />
           <div className="grid sm:grid-cols-4 gap-6">
             {[
-              { n: "01", title: "Run with Docker", desc: "docker compose up -d — no account to create, no signup." },
+              { n: "01", title: "Install", desc: "HA App from the custom repo, or docker compose up -d." },
               { n: "02", title: "Connect HA", desc: "Enter your HA URL and authorise the connection once." },
               { n: "03", title: "Build pages", desc: "Drag components onto the canvas, link them to entities." },
-              { n: "04", title: "Display anywhere", desc: "Open the URL on any screen — phone, tablet, TV, or the HA sidebar." },
+              { n: "04", title: "Display anywhere", desc: "Open /dashboard/<slug> on any screen — or use the kiosk port on wall tablets." },
             ].map((step) => (
               <div key={step.n} className="relative flex flex-col items-start sm:items-center sm:text-center">
                 <div className="w-12 h-12 bg-white border-2 border-violet-200 rounded-full flex items-center justify-center mb-4 relative z-10">
@@ -183,21 +224,23 @@ export default function AboutPageContent() {
         <h2 className="text-xl font-bold text-slate-900 mb-2">Ready to build your dashboard?</h2>
         <p className="text-slate-500 mb-6 text-sm">Everything you need is in the docs. Takes about 10 minutes from zero to live dashboard.</p>
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/docs"
+          <ContentLink
+            href={docsHref}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 transition-colors"
           >
             Read the docs
             <Icon path={mdiArrowRight} className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/security"
+          </ContentLink>
+          <ContentLink
+            href={securityHref}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all"
           >
             Read the security overview
-          </Link>
+          </ContentLink>
         </div>
       </section>
     </div>
   );
 }
+
+export default AboutPageContent;

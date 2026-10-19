@@ -21,7 +21,7 @@ Ingress always shows the Home Assistant sidebar and header. For a full-bleed das
 
 1. **Settings → Apps → CasaBoard → Configuration → Network**: enter a host port (e.g. `3000`), save, then restart the App.
 2. Find the page slug: it's the last part of the page's URL in CasaBoard (e.g. `kitchen`).
-3. In Fully Kiosk Browser, set **Start URL** to `http://<ha-ip>:3000/dashboard/<page-slug>`.
+3. In Fully Kiosk Browser, set **Start URL** to `http://<ha-ip>:<port>/dashboard/<page-slug>` (use the port you set in step 1).
 4. Optional, in Fully Kiosk: turn on **Fullscreen mode**, **Keep screen on** and **Reload on network reconnect**.
 
 What the kiosk port serves:
@@ -32,6 +32,8 @@ What the kiosk port serves:
 | Editor, setup, onboarding (`/`, `/setup/…`) | ❌ 403 Forbidden, so use Ingress |
 
 > **Warning:** the kiosk port has no login. Anyone on your LAN can open dashboards on that port, and the dashboard gives their browser your Home Assistant access token. Only enable it on a trusted network. Clear the port to turn it off.
+
+**Docker Compose:** installs are already served directly — open `http://<host-ip>:3000/dashboard/<page-slug>` in your kiosk browser (no Network port mapping needed).
 
 Tips:
 

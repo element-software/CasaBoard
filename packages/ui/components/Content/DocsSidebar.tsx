@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@heroui/react";
-import { sections } from "./sections";
+import { sections } from "./docsSections";
 import Icon from "@mdi/react";
 import { mdiCheck } from "@mdi/js";
 

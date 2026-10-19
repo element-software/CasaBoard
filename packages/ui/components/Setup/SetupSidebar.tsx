@@ -22,10 +22,8 @@ import {
 } from "@mdi/js";
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";
-import { LinkService } from "@repo/lib";
 import { useAppPathname, useAppRouter } from "@repo/hooks";
 import { AppLink } from "../Shared/AppLink";
-import Link from "next/link";
 
 interface NavLeaf {
   title: string;
@@ -119,8 +117,8 @@ export const SetupSidebar = ({
   );
 
   const bottomItems: NavLeaf[] = [
-    { title: "About", href: LinkService.crossAppHref("public", "/about"), icon: mdiInformation },
-    { title: "Docs", href: LinkService.crossAppHref("public", "/docs"), icon: mdiBookOpen },
+    { title: "About", href: "/setup/about", icon: mdiInformation },
+    { title: "Docs", href: "/setup/docs", icon: mdiBookOpen },
   ];
 
   // ── Collapsed icon button with tooltip ────────────────────────────────────
@@ -249,7 +247,7 @@ export const SetupSidebar = ({
 
         {/* Bottom links */}
         {bottomItems.map((item) => (
-          <Link
+          <AppLink
             key={item.href}
             href={item.href}
             onClick={closeMobile}
@@ -262,7 +260,7 @@ export const SetupSidebar = ({
           >
             <Icon path={item.icon} className="w-4 h-4 flex-shrink-0 text-slate-300" />
             {item.title}
-          </Link>
+          </AppLink>
         ))}
       </div>
 

@@ -5,10 +5,12 @@ import {
   Breadcrumbs as HeroBreadcrumbs,
   Skeleton,
 } from "@heroui/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useAppPathname } from "@repo/hooks";
+import { AppLink } from "../Shared/AppLink";
+import { generateBreadcrumbs } from "./generateBreadcrumbs";
 
-type Crumb = { label: string; href?: string };
+export { generateBreadcrumbs } from "./generateBreadcrumbs";
+export type { Crumb } from "./generateBreadcrumbs";
 
 interface BreadcrumbsProps {
   showHome?: boolean;
@@ -16,54 +18,9 @@ interface BreadcrumbsProps {
 }
 
 export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps) => {
-  const pathname = usePathname() || "/";
-  // Generate breadcrumbs from pathname with simple, declarative rules
-  const generateBreadcrumbs = (): Crumb[] => {
-    const segments = (pathname || "/").split("/").filter(Boolean);
-    const labelMap: Record<string, string> = {
-      setup: "Setup",
-      pages: "Pages",
-      sidebars: "Sidebars",
-      themes: "Themes",
-      "ha-config": "HA Configuration",
-      about: "About",
-      create: "Create",
-      edit: "Edit",
-    };
+  const pathname = useAppPathname() || "/";
+  const breadcrumbItems = generateBreadcrumbs(pathname, showHome);
 
-    const toTitle = (s: string) =>
-      s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
-    const crumbs: Crumb[] = [];
-    if (showHome && pathname !== "/") crumbs.push({ label: "Home", href: "/" });
-
-    let acc = "";
-    for (let i = 0; i < segments.length; i++) {
-      const seg = decodeURIComponent(segments[i]);
-
-      // Special case: edit/<slug> -> "Edit <Slug>"
-      if (seg === "edit" && i + 1 < segments.length) {
-        const slug = decodeURIComponent(segments[i + 1]);
-        acc += `/${seg}/${slug}`;
-        const isLast = i + 1 === segments.length - 1;
-        crumbs.push({
-          label: `Edit ${toTitle(slug)}`,
-          href: isLast ? undefined : acc,
-        });
-        i++; // skip slug segment
-        continue;
-      }
-
-      acc += `/${seg}`;
-      const isLast = i === segments.length - 1;
-      const label = labelMap[seg] ?? toTitle(seg);
-      crumbs.push({ label, href: isLast ? undefined : acc });
-    }
-
-    return crumbs;
-  };
-
-  const breadcrumbItems = generateBreadcrumbs();
   if (breadcrumbItems.length === 0) {
     return null;
   }
@@ -76,7 +33,7 @@ export const Breadcrumbs = ({ showHome = true, startContent }: BreadcrumbsProps)
           {breadcrumbItems.map((item, index) => (
             <BreadcrumbItem key={`${item.label}-${index}`}>
               {item.href ? (
-                <Link href={item.href}>{item.label}</Link>
+                <AppLink href={item.href}>{item.label}</AppLink>
               ) : (
                 item.label
               )}

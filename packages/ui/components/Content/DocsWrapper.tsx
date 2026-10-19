@@ -1,7 +1,7 @@
 "use client";
 
-import { sections } from "./sections";
-import { DocsSidebar } from "./sidebar";
+import { sections } from "./docsSections";
+import { DocsSidebar } from "./DocsSidebar";
 import { useState } from "react";
 import Icon from "@mdi/react";
 import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";

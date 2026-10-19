@@ -18,7 +18,7 @@ Open-source, self-hosted dashboard builder for Home Assistant. Drag-and-drop edi
 
 ## Kiosk / wall tablets
 
-Set a host port under **Configuration → Network**, restart the App, then open `http://<ha-ip>:<port>/dashboard/<page-slug>` on the tablet. The port has no login, so only enable it on a trusted network. See the **Documentation** tab for details.
+Under **Settings → Apps → CasaBoard → Configuration → Network**, set a host port, save, and restart the App. On the tablet open `http://<ha-ip>:<port>/dashboard/<page-slug>`. The port has no login — only enable it on a trusted network. Compose installs use `http://<host-ip>:3000/dashboard/<page-slug>` directly. See the **Documentation** tab for details.
 
 Full documentation: [DOCS.md](./DOCS.md) · Website: [casaboard.dev/docs](https://casaboard.dev/docs) · Project: [github.com/element-software/CasaBoard](https://github.com/element-software/CasaBoard)
 

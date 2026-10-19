@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AboutPageContent from "./AboutPageContent";
+import { AboutPageContent } from "@repo/ui/components/Content/AboutPageContent";
 import Icon from "@mdi/react";
 import { mdiInformation, mdiGrid, mdiHomeAssistant, mdiDocker } from "@mdi/js";
 import { metadataForRoute } from "../lib/og/content";
@@ -46,7 +46,7 @@ export default function AboutPage() {
             {[
               { icon: mdiGrid, label: "Drag & Drop Editor" },
               { icon: mdiHomeAssistant, label: "Live HA Data" },
-              { icon: mdiDocker, label: "Docker or HACS" },
+              { icon: mdiDocker, label: "HA App or Docker" },
             ].map((badge) => (
               <div
                 key={badge.label}

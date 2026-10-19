@@ -42,7 +42,7 @@ Updates appear under **Settings → System → Updates**. No official store subm
 
 See [`casaboard/DOCS.md`](casaboard/DOCS.md) for App-specific notes.
 
-**Wall tablets / kiosk:** set an optional direct port under the App’s **Network** settings and open `http://<ha-ip>:<port>/dashboard/<slug>`. That gives a full-screen page without HA’s sidebar. See [Kiosk / wall tablets](casaboard/DOCS.md#kiosk--wall-tablets).
+**Wall tablets / kiosk:** set an optional direct port under **Settings → Apps → CasaBoard → Configuration → Network**, restart, then open `http://<ha-ip>:<port>/dashboard/<page-slug>`. Compose: `http://<host-ip>:3000/dashboard/<page-slug>`. Full-screen, no HA sidebar. See [Kiosk / wall tablets](casaboard/DOCS.md#kiosk--wall-tablets).
 
 ## Quick start (Docker Compose fallback)
 
