@@ -15,6 +15,7 @@ import {
   oauthRedirectUrl,
   reauthenticate,
   testLongLivedTokenConnection,
+  useEntityCount,
   useHA,
   type HAConnectionFailure,
 } from "@casaboard/ha";
@@ -32,8 +33,8 @@ function useIsOAuthCallback(): boolean {
 }
 
 function ConnectionStatus({ haInstance }: { haInstance: HAConnection }) {
-  const { connected, entities } = useHA();
-  const entityCount = Object.keys(entities ?? {}).length;
+  const { connected } = useHA();
+  const entityCount = useEntityCount();
 
   return (
     <div className="flex items-center gap-2">

@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { useHA } from "../provider/HAProvider";
+import {
+  getEntityById,
+  subscribeEntityStore,
+} from "../store/entityStore";
 
 // Generic service caller for any entity
 function callService(
@@ -58,13 +62,16 @@ const DOMAIN_SERVICES: Record<string, string[]> = {
 };
 
 /**
- * Read a single entity from the shared HAProvider store.
- * Avoids per-component get_states / state_changed subscriptions (which race
- * under load and can falsely report cameras as unavailable).
+ * Read a single entity from the shared entity store.
+ * Re-renders only when that entity's state object reference changes.
  */
 export function useEntity<T = any>(entityId: string) {
-  const { connection, entities } = useHA();
-  const state = entityId ? (entities[entityId] as T | undefined) : undefined;
+  const { connection } = useHA();
+  const state = useSyncExternalStore(
+    subscribeEntityStore,
+    () => (entityId ? getEntityById(entityId) : undefined),
+    () => undefined
+  ) as T | undefined;
 
   return useMemo(() => {
     if (!entityId || !state) return null;

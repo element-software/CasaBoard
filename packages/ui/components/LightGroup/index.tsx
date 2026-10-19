@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import classNames from "classnames";
 import Icon from "@mdi/react";
 import { mdiLightbulbGroup, mdiPower } from "@mdi/js";
-import { useHA } from "@casaboard/ha";
+import { useEntitiesByIds, useHA } from "@casaboard/ha";
 import { Light } from "../Light";
 
 interface LightGroupProps {
@@ -26,7 +26,8 @@ export const LightGroup = ({
   temperature = false,
   color = false,
 }: LightGroupProps) => {
-  const { connection, entities } = useHA();
+  const { connection } = useHA();
+  const entities = useEntitiesByIds(entityIds);
 
   const isOn = entityIds.some((id) => entities[id]?.state === "on");
 

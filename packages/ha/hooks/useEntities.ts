@@ -1,31 +1,20 @@
 "use client";
-import { useMemo } from "react";
-import { useHA } from "../provider/HAProvider";
+import { useSyncExternalStore } from "react";
+import {
+  getDomainEntitiesSnapshot,
+  subscribeEntityStore,
+  type EntitySummary,
+} from "../store/entityStore";
 
-export interface HAEntitySummary {
-  id: string; // entity_id
-  domain: string;
-  entity: any;
-}
+export type HAEntitySummary = EntitySummary;
 
 export function useEntities(domain?: string): HAEntitySummary[] {
-  const { entities } = useHA();
-
-  return useMemo(() => {
-    const entries = Object.entries(entities ?? {});
-    let mapped = entries.map(([entityId, entity]) => ({
-      id: entityId,
-      domain: String(entityId).split(".")[0],
-      entity,
-    }));
-
-    if (domain && typeof domain === "string") {
-      const domainLower = domain.toLowerCase();
-      mapped = mapped.filter((e) => e.domain === domainLower);
-    }
-
-    return mapped;
-  }, [entities, domain]);
+  const domainKey = domain?.toLowerCase() ?? "";
+  return useSyncExternalStore(
+    subscribeEntityStore,
+    () => getDomainEntitiesSnapshot(domainKey || undefined),
+    () => EMPTY_LIST
+  );
 }
 
-
+const EMPTY_LIST: HAEntitySummary[] = [];
