@@ -26,6 +26,11 @@ export interface UseCameraStreamOptions {
   entityId: string;
   enabled: boolean;
   supportedFeatures?: number;
+  /**
+   * Camera entity `attributes.access_token` for `/api/camera_proxy*` URLs.
+   * Required for posters/MJPEG (Lovelace uses this, not the user OAuth token).
+   */
+  entityAccessToken?: string | null;
   /** Skip IntersectionObserver and treat the player as always on-screen (e.g. modal). */
   forceVisible?: boolean;
 }
@@ -33,6 +38,8 @@ export interface UseCameraStreamOptions {
 /** Keep streams warm briefly when scrolling away to avoid full renegotiation. */
 const HIDE_TEARDOWN_MS = 2500;
 const VIDEO_READY_TIMEOUT_MS = 2000;
+/** How long to wait for WebRTC to produce decodeable frames before falling back. */
+const WEBRTC_FRAME_TIMEOUT_MS = 5000;
 
 async function waitForVideoElement(
   getVideo: () => HTMLVideoElement | null,
@@ -53,10 +60,32 @@ async function waitForVideoElement(
   throw new Error("Stream start cancelled");
 }
 
+/** Resolve once the element has real video frames, else reject. */
+async function waitForVideoFrames(
+  video: HTMLVideoElement,
+  signal: AbortSignal,
+  timeoutMs = WEBRTC_FRAME_TIMEOUT_MS
+): Promise<void> {
+  const started = Date.now();
+  while (!signal.aborted) {
+    if (video.videoWidth > 0 && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      return;
+    }
+    if (Date.now() - started > timeoutMs) {
+      throw new Error("WebRTC produced no video frames");
+    }
+    await new Promise<void>((resolve) => {
+      window.setTimeout(() => resolve(), 100);
+    });
+  }
+  throw new Error("Stream start cancelled");
+}
+
 export function useCameraStream({
   entityId,
   enabled,
   supportedFeatures,
+  entityAccessToken,
   forceVisible = false,
 }: UseCameraStreamOptions) {
   const { connection, auth, hassUrl } = useHA();
@@ -153,10 +182,12 @@ export function useCameraStream({
   useEffect(() => {
     const abort = new AbortController();
 
+    const proxyToken = entityAccessToken?.trim() || null;
+
     const startHls = async (
       conn: Connection,
       urlBase: string,
-      token: string,
+      bearerToken: string,
       video: HTMLVideoElement
     ) => {
       const playlistUrl = await getCameraHlsUrl(conn, urlBase, entityId);
@@ -170,7 +201,7 @@ export function useCameraStream({
           liveSyncDurationCount: 1,
           enableWorker: true,
           xhrSetup: (xhr) => {
-            const latest = accessTokenRef.current ?? token;
+            const latest = accessTokenRef.current ?? bearerToken;
             xhr.setRequestHeader("Authorization", `Bearer ${latest}`);
           },
         });
@@ -185,8 +216,13 @@ export function useCameraStream({
           clientLogger.error("useCameraStream", "HLS fatal error", data);
           hls.destroy();
           hlsRef.current = null;
-          setMjpegUrl(getCameraMjpegUrl(urlBase, entityId, token));
-          setMode("mjpeg");
+          if (proxyToken) {
+            setMjpegUrl(getCameraMjpegUrl(urlBase, entityId, proxyToken));
+            setMode("mjpeg");
+          } else {
+            setError("Camera stream failed");
+            setMode("idle");
+          }
         });
         setMode("hls");
         return;
@@ -194,15 +230,19 @@ export function useCameraStream({
 
       if (video.canPlayType("application/vnd.apple.mpegurl")) {
         const nativeUrl = new URL(playlistUrl);
-        nativeUrl.searchParams.set("token", token);
+        nativeUrl.searchParams.set("token", bearerToken);
         video.src = nativeUrl.toString();
         void video.play().catch(() => {});
         setMode("hls");
         return;
       }
 
-      setMjpegUrl(getCameraMjpegUrl(urlBase, entityId, token));
-      setMode("mjpeg");
+      if (proxyToken) {
+        setMjpegUrl(getCameraMjpegUrl(urlBase, entityId, proxyToken));
+        setMode("mjpeg");
+        return;
+      }
+      throw new Error("No playable camera stream");
     };
 
     const start = async () => {
@@ -215,7 +255,7 @@ export function useCameraStream({
       setError(null);
 
       try {
-        const [accessToken, caps] = await Promise.all([
+        const [bearerToken, caps] = await Promise.all([
           ensureFreshAccessToken(auth),
           getCameraCapabilities(connection, entityId).catch(
             () => null as CameraCapabilities | null
@@ -223,8 +263,12 @@ export function useCameraStream({
         ]);
         if (abort.signal.aborted) return;
 
-        accessTokenRef.current = accessToken;
-        setPosterUrl(getCameraPosterUrl(hassUrl, entityId, accessToken));
+        accessTokenRef.current = bearerToken;
+        if (proxyToken) {
+          setPosterUrl(getCameraPosterUrl(hassUrl, entityId, proxyToken));
+        } else {
+          setPosterUrl(null);
+        }
 
         const video = await waitForVideoElement(
           () => videoElRef.current,
@@ -247,6 +291,10 @@ export function useCameraStream({
             webrtcRef.current = handle;
             handle.attach(video);
             setMode("webrtc");
+            // Lovelace races streams and checks hasVideo; we verify frames
+            // and fall back if WebRTC connects without a decodeable picture.
+            await waitForVideoFrames(video, abort.signal);
+            if (abort.signal.aborted) return;
             return;
           } catch (err) {
             if (abort.signal.aborted) return;
@@ -255,17 +303,27 @@ export function useCameraStream({
               "WebRTC failed, falling back",
               err
             );
+            if (webrtcRef.current) {
+              webrtcRef.current.destroy();
+              webrtcRef.current = null;
+            }
             video.srcObject = null;
+            setMode("idle");
           }
         }
 
         if (canHls) {
-          await startHls(connection, hassUrl, accessToken, video);
+          await startHls(connection, hassUrl, bearerToken, video);
           return;
         }
 
-        setMjpegUrl(getCameraMjpegUrl(hassUrl, entityId, accessToken));
-        setMode("mjpeg");
+        if (proxyToken) {
+          setMjpegUrl(getCameraMjpegUrl(hassUrl, entityId, proxyToken));
+          setMode("mjpeg");
+          return;
+        }
+
+        throw new Error("No playable camera stream");
       } catch (err) {
         if (abort.signal.aborted) return;
         const message =
@@ -291,6 +349,7 @@ export function useCameraStream({
     auth,
     hassUrl,
     supportedFeatures,
+    entityAccessToken,
     teardown,
   ]);
 

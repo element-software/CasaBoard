@@ -42,11 +42,17 @@ export const Camera = ({
       ? entity.attributes.supported_features
       : undefined;
 
+  const entityAccessToken =
+    typeof entity?.attributes?.access_token === "string"
+      ? entity.attributes.access_token
+      : null;
+
   // One live stream for card + modal; video remount reattaches without renegotiating.
   const stream = useCameraStream({
     entityId,
     enabled: isEntityReady,
     supportedFeatures,
+    entityAccessToken,
     forceVisible: expanded,
   });
 

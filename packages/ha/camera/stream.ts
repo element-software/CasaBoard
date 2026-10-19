@@ -133,24 +133,32 @@ export async function addWebRtcCandidate(
   });
 }
 
+/**
+ * Build an MJPEG proxy URL. `token` must be the camera entity's
+ * `attributes.access_token` (same as Lovelace), not the user OAuth token.
+ */
 export function getCameraMjpegUrl(
   hassUrl: string,
   entityId: string,
-  accessToken: string
+  token: string
 ): string {
   const url = new URL(
     joinHassUrl(hassUrl, `/api/camera_proxy_stream/${entityId}`)
   );
-  url.searchParams.set("token", accessToken);
+  url.searchParams.set("token", token);
   return url.toString();
 }
 
+/**
+ * Build a still-image proxy URL. `token` must be the camera entity's
+ * `attributes.access_token` (same as Lovelace), not the user OAuth token.
+ */
 export function getCameraPosterUrl(
   hassUrl: string,
   entityId: string,
-  accessToken: string
+  token: string
 ): string {
   const url = new URL(joinHassUrl(hassUrl, `/api/camera_proxy/${entityId}`));
-  url.searchParams.set("token", accessToken);
+  url.searchParams.set("token", token);
   return url.toString();
 }

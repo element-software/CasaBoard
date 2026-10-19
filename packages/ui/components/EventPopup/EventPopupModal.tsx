@@ -59,10 +59,16 @@ export function EventPopupModal({ rule, firedAt, onClose }: EventPopupModalProps
       ? camera.attributes.supported_features
       : undefined;
 
+  const entityAccessToken =
+    typeof camera?.attributes?.access_token === "string"
+      ? camera.attributes.access_token
+      : null;
+
   const stream = useCameraStream({
     entityId: rule.cameraEntityId,
     enabled: !cameraUnavailable,
     supportedFeatures,
+    entityAccessToken,
     forceVisible: true,
   });
 

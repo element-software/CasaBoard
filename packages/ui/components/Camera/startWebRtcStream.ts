@@ -89,6 +89,9 @@ export async function startWebRtcStream(
 
     peerConnection.ontrack = (event) => {
       remoteStream.addTrack(event.track);
+      // Match Lovelace: only treat the session as ready once a video track
+      // exists. Resolving on the first (often audio) track leaves a black tile.
+      if (remoteStream.getVideoTracks().length === 0) return;
       settle(() => {
         resolve({
           peerConnection,
