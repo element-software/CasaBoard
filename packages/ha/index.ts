@@ -2,6 +2,8 @@ export { HAProvider } from "./provider/HAProvider";
 export { useHA } from "./provider/HAProvider";
 export { useEntity } from "./hooks/useEntity";
 export { useEntities } from "./hooks/useEntities";
+export { useEntitiesByIds } from "./hooks/useEntitiesByIds";
+export { useEntityCount } from "./hooks/useEntityCount";
 export { useEntityHistory } from "./hooks/useEntityHistory";
 export { useAlarm } from "./hooks/useAlarm";
 export type { UseAlarmOptions, UseAlarmResult } from "./hooks/useAlarm";

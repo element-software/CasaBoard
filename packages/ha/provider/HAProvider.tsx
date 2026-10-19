@@ -1,8 +1,10 @@
 "use client";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   ReactNode,
 } from "react";
@@ -13,6 +15,12 @@ import {
   Auth,
 } from "home-assistant-js-websocket";
 import { connect, type HATokenStore } from "../connection";
+import {
+  clearEntitySnapshot,
+  getEntityById as getStoreEntity,
+  getEntitySnapshot,
+  replaceEntitySnapshot,
+} from "../store/entityStore";
 import { HAConnection } from "../types";
 
 export interface HAContextType {
@@ -20,7 +28,7 @@ export interface HAContextType {
   auth: Auth | null;
   hassUrl: string | null;
   connected: boolean;
-  entities: { [entityId: string]: any };
+  /** Imperative read of the current entity map (not reactive). Prefer useEntity / useEntities. */
   getEntity: (entityId: string) => any | undefined;
   getAllEntities: () => any[];
   error: Error | null;
@@ -28,18 +36,7 @@ export interface HAContextType {
   retry: () => void;
 }
 
-const HAContext = createContext<HAContextType>({
-  connected: false,
-  entities: {},
-  getEntity: () => undefined,
-  getAllEntities: () => [],
-  connection: null,
-  auth: null,
-  hassUrl: null,
-  error: null,
-  loading: true,
-  retry: () => {},
-});
+const HAContext = createContext<HAContextType | null>(null);
 
 export interface HAProviderProps {
   haInstance: HAConnection;
@@ -57,7 +54,6 @@ export const HAProvider: React.FC<HAProviderProps> = ({
 }) => {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [auth, setAuth] = useState<Auth | null>(null);
-  const [entities, setEntities] = useState<{ [entityId: string]: any }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -81,10 +77,10 @@ export const HAProvider: React.FC<HAProviderProps> = ({
         acc[s.entity_id] = s;
         return acc;
       }, {} as Record<string, any>);
-      setEntities(initialMap);
+      replaceEntitySnapshot(initialMap);
 
       unsubscribe = subscribeEntities(activeConnection, (ents) => {
-        setEntities(ents as any);
+        replaceEntitySnapshot(ents as Record<string, any>);
       });
 
       setLoading(false);
@@ -97,11 +93,10 @@ export const HAProvider: React.FC<HAProviderProps> = ({
                 ? e.message
                 : "Home Assistant connection failed"
             );
-      // Preserve typed HAConnectionError when thrown from connect()
       setError(classified);
       setConnection(null);
       setAuth(null);
-      setEntities({});
+      clearEntitySnapshot();
       setLoading(false);
     }
 
@@ -121,36 +116,46 @@ export const HAProvider: React.FC<HAProviderProps> = ({
       if (unsubscribe) unsubscribe();
       setConnection(null);
       setAuth(null);
-      setEntities({});
+      clearEntitySnapshot();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect on url / retry / token store identity
   }, [haInstance.hass_url, retryCount, tokenStore, redirectUrl]);
 
-  const getEntityById = (entityId: string) => entities[entityId];
-  const getAllEntities = () => Object.values(entities);
-
-  const retry = () => {
+  const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1);
-  };
+  }, []);
 
-  return (
-    <HAContext.Provider
-      value={{
-        connection,
-        auth,
-        hassUrl: haInstance.hass_url,
-        connected: Boolean(connection),
-        entities,
-        getEntity: getEntityById,
-        getAllEntities,
-        error,
-        loading,
-        retry,
-      }}
-    >
-      {children}
-    </HAContext.Provider>
+  const getEntity = useCallback((entityId: string) => getStoreEntity(entityId), []);
+  const getAllEntities = useCallback(
+    () => Object.values(getEntitySnapshot()),
+    []
   );
+
+  const value = useMemo<HAContextType>(
+    () => ({
+      connection,
+      auth,
+      hassUrl: haInstance.hass_url,
+      connected: Boolean(connection),
+      getEntity,
+      getAllEntities,
+      error,
+      loading,
+      retry,
+    }),
+    [
+      connection,
+      auth,
+      haInstance.hass_url,
+      getEntity,
+      getAllEntities,
+      error,
+      loading,
+      retry,
+    ]
+  );
+
+  return <HAContext.Provider value={value}>{children}</HAContext.Provider>;
 };
 
 export function useHA(): HAContextType {

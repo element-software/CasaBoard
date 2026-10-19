@@ -1,7 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { isOutsideCooldown, matchesTrigger, useHA } from "@casaboard/ha";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  isOutsideCooldown,
+  matchesTrigger,
+  useEntitiesByIds,
+  useHA,
+} from "@casaboard/ha";
 import type { EventPopupRule } from "@repo/types/eventPopup";
 
 export interface ActiveEventPopup {
@@ -15,12 +20,21 @@ function isRuleUsable(rule: EventPopupRule | undefined): rule is EventPopupRule 
 }
 
 /**
- * Watches the HA entity map and opens a popup when a rule's trigger entity
- * changes. The first state seen per entity (page load, reconnect) is only a
- * baseline and never fires.
+ * Watches trigger entities and opens a popup when a rule matches.
+ * The first state seen per entity (page load, reconnect) is only a baseline
+ * and never fires.
  */
 export function useEventPopupTriggers(rules: EventPopupRule[]) {
-  const { entities, connected } = useHA();
+  const { connected } = useHA();
+  const triggerIds = useMemo(
+    () =>
+      rules
+        .filter(isRuleUsable)
+        .map((rule) => rule.triggerEntityId)
+        .filter(Boolean),
+    [rules]
+  );
+  const entities = useEntitiesByIds(triggerIds);
   const prevStatesRef = useRef(new Map<string, string>());
   const lastFiredRef = useRef(new Map<number, number>());
   const [active, setActive] = useState<ActiveEventPopup | null>(null);

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiCamera, mdiCameraOff } from "@mdi/js";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
-import { useHA } from "@casaboard/ha";
+import { useEntity } from "@casaboard/ha";
 import type { EventPopupRule } from "@repo/types/eventPopup";
 import { CameraPlayer } from "../Camera/CameraPlayer";
 import { useCameraStream } from "../Camera/useCameraStream";
@@ -47,8 +47,7 @@ function CountdownBar({ seconds }: { seconds: number }) {
 }
 
 export function EventPopupModal({ rule, firedAt, onClose }: EventPopupModalProps) {
-  const { entities } = useHA();
-  const camera = entities[rule.cameraEntityId];
+  const camera = useEntity(rule.cameraEntityId);
   const cameraUnavailable = !camera || camera.state === "unavailable";
   const [muted, setMuted] = useState(true);
   const [snapshotTick, setSnapshotTick] = useState(0);
