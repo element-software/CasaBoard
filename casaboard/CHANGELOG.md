@@ -2,6 +2,11 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.3.0] - 2026-10-22
+
+- feat: add Home Assistant cleanup in Setup
+- fix: use a house icon in the HA sidebar to match the CasaBoard logo
+
 ## [0.2.4] - 2026-10-19
 
 - fix: stop dumping full dashboard JSON into Supervisor logs
