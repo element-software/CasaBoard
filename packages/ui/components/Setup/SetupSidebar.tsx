@@ -19,6 +19,7 @@ import {
   mdiInformation,
   mdiBookOpen,
   mdiPaletteSwatch,
+  mdiBroom,
 } from "@mdi/js";
 import { cn } from "@heroui/react";
 import { CasaBoardLogo } from "../Logo";
@@ -106,6 +107,7 @@ export const SetupSidebar = ({
       icon: mdiCog,
       items: [
         { title: "Home Assistant", href: "/setup/ha-config", icon: mdiHome },
+        { title: "HA Cleanup", href: "/setup/ha-cleanup", icon: mdiBroom },
       ],
     },
   ];

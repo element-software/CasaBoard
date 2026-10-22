@@ -14,6 +14,13 @@ describe("generateBreadcrumbs", () => {
     assert.equal(crumbs[2]?.href, undefined);
   });
 
+  it("labels HA cleanup", () => {
+    assert.deepEqual(
+      generateBreadcrumbs("/setup/ha-cleanup").map((c) => c.label),
+      ["Home", "Setup", "HA Cleanup"]
+    );
+  });
+
   it("labels about and docs segments", () => {
     assert.deepEqual(
       generateBreadcrumbs("/setup/about").map((c) => c.label),

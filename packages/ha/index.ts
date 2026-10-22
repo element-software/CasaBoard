@@ -77,6 +77,19 @@ export type {
   WebRtcClientConfiguration,
   WebRtcOfferEvent,
 } from "./camera/stream";
+export {
+  findProblematicEntities,
+  listEntityRegistry,
+  removeEntityRegistryEntries,
+  removeEntityRegistryEntry,
+} from "./registry/entityRegistry";
+export type {
+  EntityRegistryEntry,
+  ProblematicEntity,
+  ProblematicEntityReason,
+} from "./registry/entityRegistry";
+export { ignoreRepairIssue, listRepairIssues } from "./repairs/repairs";
+export type { RepairIssue, RepairSeverity } from "./repairs/repairs";
 export type { ConnectResult, EntityDomain, EntityId, HAConnection } from "./types";
 export { matchesTrigger, isOutsideCooldown } from "./events/popupTrigger";
 export type {

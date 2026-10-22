@@ -6,6 +6,7 @@ const LABEL_MAP: Record<string, string> = {
   sidebars: "Sidebars",
   themes: "Themes",
   "ha-config": "HA Configuration",
+  "ha-cleanup": "HA Cleanup",
   settings: "Settings",
   about: "About",
   docs: "Docs",
