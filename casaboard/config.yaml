@@ -13,7 +13,7 @@ ingress: true
 ingress_port: 3000
 ports:
   3000/tcp: null
-panel_icon: mdi:view-dashboard-edit
+panel_icon: mdi:home-outline
 panel_title: CasaBoard
 panel_admin: false
 startup: application
