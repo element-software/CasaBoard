@@ -5,6 +5,7 @@ import {
 } from "home-assistant-js-websocket";
 import type { HAConnection } from "../types";
 import type { HATokenStore } from "./tokenStore";
+import { readIngressPrefixFromBrowser } from "./browserHassUrl";
 import { throwConnectionFailure } from "./errors";
 
 export type OAuthCallbackProps = {
@@ -18,23 +19,6 @@ export type OAuthCallbackProps = {
  * Prefer this over a configured APP_ORIGIN so client_id / redirect_uri match.
  * Includes Home Assistant ingress prefix when the app runs as an HA add-on.
  */
-function readIngressPrefixFromBrowser(): string {
-  if (typeof document === "undefined") return "";
-  const match = document.cookie.match(
-    /(?:^|;\s*)casaboard-ingress-path=([^;]*)/
-  );
-  if (match?.[1]) {
-    const decoded = decodeURIComponent(match[1]).trim();
-    if (decoded && decoded !== "/") {
-      return decoded.endsWith("/") ? decoded.slice(0, -1) : decoded;
-    }
-  }
-  const pathMatch = window.location.pathname.match(
-    /^(\/api\/hassio_ingress\/[^/]+)/
-  );
-  return pathMatch?.[1] ?? "";
-}
-
 export function oauthRedirectUrl(path: string): string {
   if (typeof window === "undefined") {
     return path.startsWith("/") ? path : `/${path}`;

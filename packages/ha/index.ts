@@ -48,6 +48,10 @@ export {
   completeOAuthCallback,
   isOAuthCallbackUrl,
   oauthRedirectUrl,
+  alignAuthHassUrl,
+  readIngressPrefixFromBrowser,
+  resolveBrowserHassUrl,
+  rewriteHassMediaUrl,
 } from "./connection";
 export type {
   HATokenStore,
@@ -56,6 +60,7 @@ export type {
   HAConnectionFailureCode,
   NormalizeHassUrlResult,
   TestLongLivedTokenResult,
+  BrowserLocationLike,
 } from "./connection";
 export {
   CAMERA_FEATURE_STREAM,

@@ -61,10 +61,9 @@ describe("classifyConnectionError", () => {
   });
 
   it("maps https-to-http mixed content", () => {
-    assert.equal(
-      classifyConnectionError(ERR_INVALID_HTTPS_TO_HTTP).code,
-      "https_to_http"
-    );
+    const failure = classifyConnectionError(ERR_INVALID_HTTPS_TO_HTTP);
+    assert.equal(failure.code, "https_to_http");
+    assert.match(failure.message, /HTTPS address you actually browse/i);
   });
 
   it("maps host required", () => {

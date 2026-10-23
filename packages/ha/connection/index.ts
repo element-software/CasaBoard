@@ -8,6 +8,7 @@ import {
 } from "home-assistant-js-websocket";
 import type { ConnectResult, EntityDomain, EntityId, HAConnection } from "../types";
 import type { HATokenStore } from "./tokenStore";
+import { alignAuthHassUrl } from "./browserHassUrl";
 import {
   classifyConnectionError,
   haConnectionFailure,
@@ -34,6 +35,13 @@ export {
   isOAuthCallbackUrl,
   oauthRedirectUrl,
 } from "./oauth";
+export {
+  alignAuthHassUrl,
+  readIngressPrefixFromBrowser,
+  resolveBrowserHassUrl,
+  rewriteHassMediaUrl,
+} from "./browserHassUrl";
+export type { BrowserLocationLike } from "./browserHassUrl";
 
 export interface HAConnectProps {
   haInstance: HAConnection;
@@ -101,13 +109,22 @@ export async function connect({
 
   const stored = (await Promise.resolve(tokenStore.loadTokens())) ?? null;
   const longLivedToken = stored?.access_token;
+  const connectUrl = haInstance.hass_url;
   if (longLivedToken && !stored?.refresh_token) {
-    auth = createLongLivedTokenAuth(haInstance.hass_url, longLivedToken);
+    auth = createLongLivedTokenAuth(connectUrl, longLivedToken);
+    alignAuthHassUrl(auth, connectUrl);
     connection = await createConnection({ auth });
     return { connection, auth };
   }
 
-  const getAuthOptions = buildAuthOptions(haInstance, tokenStore, redirectUrl);
+  // Reuse stored OAuth tokens (matched on their hassUrl), then point the
+  // websocket at connectUrl. First-run with no tokens authorizes at connectUrl.
+  const tokenHassUrl = stored?.hassUrl || connectUrl;
+  const getAuthOptions = buildAuthOptions(
+    { hass_url: tokenHassUrl },
+    tokenStore,
+    redirectUrl
+  );
 
   try {
     auth = await getAuth(getAuthOptions);
@@ -125,6 +142,7 @@ export async function connect({
 
   try {
     if (!auth) throwConnectionFailure(haConnectionFailure("unknown"));
+    alignAuthHassUrl(auth, connectUrl);
     connection = await createConnection({ auth });
   } catch (err) {
     throwConnectionFailure(err);

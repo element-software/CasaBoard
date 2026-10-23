@@ -90,10 +90,11 @@ export function resolveMediaArtworkUrl(
     entity?.attributes?.media_image_url ||
     null;
   if (!raw || typeof raw !== "string") return null;
-  if (raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("data:")) {
-    return raw;
+  if (raw.startsWith("data:")) return raw;
+  if (!hassUrl) {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+    return null;
   }
-  if (!hassUrl) return null;
   const url = joinHassUrl(hassUrl, raw);
   if (accessToken && url.includes("/api/") && !/[?&](?:token|auth)=/.test(url)) {
     const sep = url.includes("?") ? "&" : "?";

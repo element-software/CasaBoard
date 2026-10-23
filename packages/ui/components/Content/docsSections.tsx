@@ -228,6 +228,12 @@ const HAConnection: React.FC = () => (
     <TimelineStep number={1} title="Find your HA URL" text="Locate your Home Assistant base URL. This is typically something like https://homeassistant.local:8123 for local installs, or https://ha.yourdomain.com for remote access." />
     <TimelineStep number={2} title="Authorise the connection" text="On first run, CasaBoard redirects you to your Home Assistant login screen. Sign in and approve the connection — you'll be sent back automatically." isLast />
 
+    <Callout type="info" title="HTTPS Ingress">
+      When you open CasaBoard through Home Assistant Ingress, the dashboard talks to HA on the same
+      origin as the tab. A stored LAN http:// URL will not mark the page insecure. Compose installs
+      that only put CasaBoard on HTTPS still need an https:// Home Assistant URL.
+    </Callout>
+
     <Callout type="warning" title="Re-authorising">
       If you ever need to point CasaBoard at a different Home Assistant instance, or the stored
       connection expires, use the reconnect option on the connection screen to run through
@@ -428,6 +434,18 @@ const Troubleshooting: React.FC = () => (
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Check that HA is running and accessible (try opening the URL directly)</li>
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> If using HTTPS, confirm your SSL certificate is valid</li>
           <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Use the reconnect option on the connection screen to re-authorise</li>
+        </ul>
+      </div>
+
+      <div className="border border-slate-100 rounded-xl overflow-hidden">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+          <p className="font-semibold text-sm text-slate-800">Browser shows CasaBoard as Not Secure on HTTPS</p>
+        </div>
+        <ul className="p-4 space-y-2 text-sm text-slate-600">
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> On Home Assistant OS, open CasaBoard via Ingress (sidebar / Open Web UI). Ingress uses the same HTTPS origin as HA for the websocket, cameras, and media — a stored LAN http:// URL is fine.</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> If you reverse-proxy only CasaBoard (Compose) while HA stays on http://, set the HA URL to the https:// address you browse, or serve HA on the same origin.</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> Do not embed CasaBoard with a panel_iframe pointing at http://…:3000 — use App Ingress instead.</li>
+          <li className="flex items-start gap-2"><span className="text-slate-300 mt-0.5 font-bold">→</span> A full “Your connection is not private” interstitial is Home Assistant’s own certificate (self-signed / untrusted), not CasaBoard. Fix that in HA (Let’s Encrypt or Nabu Casa).</li>
         </ul>
       </div>
 

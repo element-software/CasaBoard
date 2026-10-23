@@ -15,6 +15,8 @@ No official Community Store submission is required for this custom repository fl
 
 Inside CasaBoard, connect to your Home Assistant instance (URL + long-lived token, or HA sign-in). Pages and connection data are stored in the App’s persistent `/data` volume and survive updates.
 
+On HTTPS Ingress, CasaBoard talks to Home Assistant on the **same origin as the browser tab** (websocket, cameras, media). You can keep a LAN `http://` URL stored for the connection — it will not mark the tab insecure. Docker Compose installs that put **only** CasaBoard on HTTPS while HA stays on HTTP still need an `https://` Home Assistant URL (or a reverse proxy that exposes HA on the same origin).
+
 ## Kiosk / wall tablets
 
 Ingress always shows the Home Assistant sidebar and header. For a full-bleed dashboard on a wall tablet (e.g. Fully Kiosk Browser), turn on the optional kiosk port.

@@ -37,7 +37,7 @@ const MESSAGES: Record<HAConnectionFailureCode, string> = {
     "Home Assistant rejected the credentials. The token may be wrong, revoked, or expired — create a new long-lived access token and try again.",
   ssl: "The TLS/SSL certificate for that URL couldn’t be verified. Use a trusted certificate, or connect over http:// on your local network.",
   https_to_http:
-    "This page is served over HTTPS but Home Assistant is on HTTP. Browsers block that mix — open CasaBoard over HTTP, or serve HA over HTTPS.",
+    "This page is served over HTTPS but Home Assistant is on HTTP. Browsers block that mix — set the HA URL to the HTTPS address you actually browse, or open CasaBoard over HTTP.",
   host_required: "Enter a Home Assistant URL before connecting.",
   unknown:
     "Something went wrong connecting to Home Assistant. Check the URL and credentials, then try again.",

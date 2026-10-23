@@ -21,6 +21,26 @@ describe("camera stream helpers", () => {
     );
   });
 
+  it("rewrites absolute http HA media URLs onto an https instance URL", () => {
+    assert.equal(
+      joinHassUrl(
+        "https://ha.example.com",
+        "http://192.168.1.222:8123/api/hls/abc/playlist.m3u8"
+      ),
+      "https://ha.example.com/api/hls/abc/playlist.m3u8"
+    );
+  });
+
+  it("leaves non-HA http URLs unchanged when joining", () => {
+    assert.equal(
+      joinHassUrl(
+        "https://ha.example.com",
+        "http://192.168.1.50/cgi-bin/snapshot.cgi"
+      ),
+      "http://192.168.1.50/cgi-bin/snapshot.cgi"
+    );
+  });
+
   it("detects HLS support from capabilities or STREAM feature bit", () => {
     assert.equal(
       cameraSupportsHls({ frontend_stream_types: ["hls"] }),

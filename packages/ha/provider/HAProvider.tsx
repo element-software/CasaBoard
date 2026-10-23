@@ -13,8 +13,13 @@ import {
   getStates,
   subscribeEntities,
   Auth,
+  type AuthData,
 } from "home-assistant-js-websocket";
-import { connect, type HATokenStore } from "../connection";
+import {
+  connect,
+  resolveBrowserHassUrl,
+  type HATokenStore,
+} from "../connection";
 import {
   clearEntitySnapshot,
   getEntityById as getStoreEntity,
@@ -58,6 +63,23 @@ export const HAProvider: React.FC<HAProviderProps> = ({
   const [error, setError] = useState<Error | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
+  const storedUrl = haInstance.hass_url;
+  const browserHassUrl = resolveBrowserHassUrl(storedUrl);
+
+  // Persist against the stored LAN URL so server-side health / HACS sensors
+  // keep working. Browser traffic uses browserHassUrl instead.
+  const persistStore = useMemo<HATokenStore>(
+    () => ({
+      loadTokens: tokenStore.loadTokens,
+      saveTokens: () => async (data: AuthData | null) => {
+        const persisted =
+          data == null ? null : { ...data, hassUrl: storedUrl };
+        await Promise.resolve(tokenStore.saveTokens(storedUrl)(persisted));
+      },
+    }),
+    [tokenStore, storedUrl]
+  );
+
   const run = async () => {
     let unsubscribe: (() => void) | undefined;
 
@@ -65,8 +87,8 @@ export const HAProvider: React.FC<HAProviderProps> = ({
     setError(null);
     try {
       const { connection: activeConnection, auth: activeAuth } = await connect({
-        haInstance,
-        tokenStore,
+        haInstance: { hass_url: browserHassUrl },
+        tokenStore: persistStore,
         redirectUrl,
       });
       setConnection(activeConnection);
@@ -119,7 +141,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({
       clearEntitySnapshot();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect on url / retry / token store identity
-  }, [haInstance.hass_url, retryCount, tokenStore, redirectUrl]);
+  }, [browserHassUrl, retryCount, persistStore, redirectUrl]);
 
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1);
@@ -135,7 +157,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({
     () => ({
       connection,
       auth,
-      hassUrl: haInstance.hass_url,
+      hassUrl: browserHassUrl,
       connected: Boolean(connection),
       getEntity,
       getAllEntities,
@@ -146,7 +168,7 @@ export const HAProvider: React.FC<HAProviderProps> = ({
     [
       connection,
       auth,
-      haInstance.hass_url,
+      browserHassUrl,
       getEntity,
       getAllEntities,
       error,

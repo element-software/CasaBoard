@@ -1,4 +1,5 @@
 import type { Auth, Connection, UnsubscribeFunc } from "home-assistant-js-websocket";
+import { rewriteHassMediaUrl } from "../connection/browserHassUrl";
 
 /** Matches Home Assistant `StreamType` values from `camera/capabilities`. */
 export type CameraStreamType = "hls" | "web_rtc";
@@ -24,7 +25,7 @@ export interface WebRtcClientConfiguration {
 export function joinHassUrl(hassUrl: string, path: string): string {
   const base = hassUrl.replace(/\/$/, "");
   if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
+    return rewriteHassMediaUrl(path, base);
   }
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${base}${normalized}`;
