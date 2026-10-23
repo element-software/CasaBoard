@@ -2,6 +2,10 @@
 
 All notable changes to the CasaBoard Home Assistant App are documented here.
 
+## [0.3.1] - 2026-10-23
+
+- fix: stop HTTPS Ingress from marking CasaBoard as insecure
+
 ## [0.3.0] - 2026-10-22
 
 - feat: add Home Assistant cleanup in Setup
